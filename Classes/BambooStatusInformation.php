@@ -31,11 +31,10 @@ class BambooStatusInformation
      * @param string $name
      * @return int
      */
-    protected function extractValue(string $name) : int
+    protected function extractValueForNameFromMinusSeparatedString(string $name) : int
     {
         $splitted = explode('-', $name);
-        $value = array_pop($splitted);
-        return (int)$value;
+        return (int)array_pop($splitted);
     }
 
     /**
@@ -51,7 +50,7 @@ class BambooStatusInformation
             $name = $label['name'];
             foreach ($resultKeys as $key) {
                 if (strpos($name, $key) === 0) {
-                    $result[$key] = $this->extractValue($name);
+                    $result[$key] = $this->extractValueForNameFromMinusSeparatedString($name);
                 }
 
             }
