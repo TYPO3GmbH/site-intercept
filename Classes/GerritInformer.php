@@ -8,7 +8,7 @@ use T3G\Intercept\Library\CurlGerritPostRequest;
 class GerritInformer
 {
     /**
-     * @var \T3G\Library\CurlGerritPostRequest
+     * @var \T3G\Intercept\Library\CurlGerritPostRequest
      */
     private $requester;
 
@@ -17,7 +17,11 @@ class GerritInformer
         $this->requester = $requester ?: new CurlGerritPostRequest();
     }
 
-    public function voteOnGerrit($buildInformation)
+    /**
+     * @param array $buildInformation
+     * @return void
+     */
+    public function voteOnGerrit(array $buildInformation)
     {
         $apiPath = $this->constructApiPath($buildInformation);
 
@@ -33,10 +37,10 @@ class GerritInformer
     }
 
     /**
-     * @param $buildInformation
+     * @param array $buildInformation
      * @return string
      */
-    protected function constructApiPath($buildInformation)
+    protected function constructApiPath(array $buildInformation) : string
     {
         return 'changes/' . $buildInformation['change'] . '/revisions/' . $buildInformation['patchset'] . '/review';
     }

@@ -6,9 +6,12 @@ namespace T3G\Intercept;
 class InterceptController
 {
 
+    /**
+     * @codeCoverageIgnore glue code only
+     */
     public function postBuildAction()
     {
-        $slackMessageParser = new \SlackMessageParser();
+        $slackMessageParser = new SlackMessageParser();
         $buildKey = $slackMessageParser->parseMessage();
 
         $bambooInformationRequestBuilder = new BambooStatusInformation();

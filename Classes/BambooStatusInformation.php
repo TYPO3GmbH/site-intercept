@@ -28,10 +28,10 @@ class BambooStatusInformation
     }
 
     /**
-     * @param $name
-     * @return mixed
+     * @param string $name
+     * @return int
      */
-    protected function extractValue($name)
+    protected function extractValue(string $name) : int
     {
         $splitted = explode('-', $name);
         $value = array_pop($splitted);
@@ -39,11 +39,11 @@ class BambooStatusInformation
     }
 
     /**
-     * @param $response
-     * @param $result
-     * @return mixed
+     * @param array $response
+     * @param array $result
+     * @return array
      */
-    protected function getInformationFromLabels($response, $result)
+    protected function getInformationFromLabels(array $response, array $result) : array
     {
         $labels = $response['labels']['label'];
         $resultKeys = ['change', 'patchset'];
