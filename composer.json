@@ -1,0 +1,28 @@
+{
+  "name": "T3G/BuildInformationService",
+  "description": "",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Susanne Moog",
+      "email": "susanne.moog@typo3.com"
+    }
+  ],
+  "require": {
+    "phpunit/phpunit": "5.4.6"
+  },
+  "config": {
+    "bin-dir": "bin/"
+  },
+  "autoload": {
+    "psr-4": {
+      "T3G\\Intercept\\": "Classes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "T3G\\Intercept\\Tests\\": "Tests/"
+    }
+  }
+}
