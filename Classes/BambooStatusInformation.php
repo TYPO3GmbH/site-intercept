@@ -2,19 +2,19 @@
 declare(strict_types = 1);
 namespace T3G\Intercept;
 
-use T3G\Intercept\Library\CurlBambooGetRequest;
+use T3G\Intercept\Library\CurlBambooRequests;
 
 class BambooStatusInformation
 {
 
     /**
-     * @var \T3G\Intercept\Library\CurlBambooGetRequest
+     * @var \T3G\Intercept\Library\CurlBambooRequests
      */
     private $requester;
 
-    public function __construct(CurlBambooGetRequest $requester = null)
+    public function __construct(CurlBambooRequests $requester = null)
     {
-        $this->requester = $requester ?: new CurlBambooGetRequest();
+        $this->requester = $requester ?: new CurlBambooRequests();
     }
 
     public function transform(string $buildKey) : array
