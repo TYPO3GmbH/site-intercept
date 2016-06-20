@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Library;
 
+use T3G\Intercept\LogManager;
+
 class CurlGerritPostRequest
 {
     protected $baseUrl = 'https://review.typo3.org/a/';
@@ -14,12 +16,17 @@ class CurlGerritPostRequest
      */
     public function postRequest(string $apiPath, array $postFields)
     {
+        $logger = LogManager::getLogger('GerritRequests');
+
         $curl = curl_init();
+
+        $url = $this->baseUrl . $apiPath;
+        $logger->info('cURL request to url ' . $url . ' with params ' . print_r($postFields, true));
 
         curl_setopt_array(
             $curl,
             [
-                CURLOPT_URL => $this->baseUrl . $apiPath,
+                CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,

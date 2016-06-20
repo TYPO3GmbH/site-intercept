@@ -3,10 +3,22 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Library;
 
+use Monolog\Logger;
+use T3G\Intercept\LogManager;
+
 class CurlBambooRequests
 {
 
     protected $baseUrl = 'https://bamboo.typo3.com/rest/api/';
+    /**
+     * @var \Monolog\Logger
+     */
+    private $logger;
+
+    public function __construct(Logger $logger = null)
+    {
+        $this->logger = $logger ?: LogManager::getLogger(__CLASS__);
+    }
 
     /**
      * @codeCoverageIgnore postman generated curl request
@@ -18,11 +30,14 @@ class CurlBambooRequests
         $apiPath = '/latest/result/' . $buildKey;
         $apiPathParams = '?os_authType=basic&expand=labels';
 
+        $url = $this->baseUrl . $apiPath . $apiPathParams;
+        $this->logger->info('cURL request to url' . $url);
+
         $curl = curl_init();
         curl_setopt_array(
             $curl,
             [
-                CURLOPT_URL => $this->baseUrl . $apiPath . $apiPathParams,
+                CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -56,13 +71,16 @@ class CurlBambooRequests
     {
         $apiPath = 'latest/queue/CORE-GTC';
         $apiPathParams = '?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=' .
-                         $changeUrl . '&bamboo.variable.patchset=' . $patchset;
+                         urlencode($changeUrl) . '&bamboo.variable.patchset=' . $patchset;
+        $url = $this->baseUrl . $apiPath . $apiPathParams;
+
+        $this->logger->info('cURL request to url' . $url);
 
         $curl = curl_init();
         curl_setopt_array(
             $curl,
             [
-                CURLOPT_URL => $this->baseUrl . $apiPath . $apiPathParams,
+                CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => "",
                 CURLOPT_MAXREDIRS => 10,

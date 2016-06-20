@@ -4,3 +4,4 @@ bin/
 atlassian-ide-plugin.xml
 
 /vendor/
+/Classes/Log/Intercept.log
