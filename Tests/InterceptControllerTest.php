@@ -17,8 +17,8 @@ class InterceptControllerTest extends \PHPUnit_Framework_TestCase
     public function newBuildActionTriggersNewBuildViaCurl(){
         $changeUrl = 'https://review.typo3.org/#/c/48574/';
         $patchset = 3;
-        $_GET['changeUrl'] = $changeUrl;
-        $_GET['patchset'] = (string)$patchset;
+        $_POST['changeUrl'] = $changeUrl;
+        $_POST['patchset'] = (string)$patchset;
 
         $requester = $this->prophesize(CurlBambooRequests::class);
 
