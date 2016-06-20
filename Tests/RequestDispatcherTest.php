@@ -44,7 +44,7 @@ class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function dispatchDispatchesToNewBuildActionIfChangeUrlAndPatchSetGiven()
     {
-        $_GET = [
+        $_POST = [
             'patchset' => '3',
             'changeUrl' => 'https://review.typo3.org/#/c/48574/'
         ];

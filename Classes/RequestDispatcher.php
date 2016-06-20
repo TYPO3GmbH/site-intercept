@@ -21,7 +21,7 @@ class RequestDispatcher
         if (!empty($_POST['payload'])) {
             $this->interceptController->postBuildAction();
         }
-        if (!empty($_GET['changeUrl']) && !empty($_GET['patchset'])) {
+        if (!empty($_POST['changeUrl']) && !empty($_POST['patchset'])) {
             $this->interceptController->newBuildAction();
         }
     }
