@@ -44,8 +44,8 @@ class InterceptController
      */
     public function newBuildAction()
     {
-        $changeUrl = $_GET['changeUrl'];
-        $patchSet = (int)$_GET['patchset'];
+        $changeUrl = $_POST['changeUrl'];
+        $patchSet = (int)$_POST['patchset'];
         $this->bambooRequests->triggerNewCoreBuild($changeUrl, $patchSet);
     }
 
