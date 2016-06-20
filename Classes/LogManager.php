@@ -12,7 +12,7 @@ class LogManager
     public static function getLogger($name)
     {
         $logger = new Logger($name);
-        $logger->pushHandler(new StreamHandler(__DIR__ . '/Log/Intercept.log', Logger::INFO));
+        $logger->pushHandler(new StreamHandler(__DIR__ . '/../Log/Intercept.log', Logger::INFO));
         return $logger;
     }
 }
