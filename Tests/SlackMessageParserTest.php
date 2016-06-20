@@ -26,4 +26,16 @@ class SlackMessageParserTest extends \PHPUnit_Framework_TestCase
 
         self::assertSame('T3G-AP-25', $buildKey);
     }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function parseMessageThrowsExceptionOnError()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $slackMessageParser = new SlackMessageParser();
+        $slackMessageParser->parseMessage();
+    }
 }

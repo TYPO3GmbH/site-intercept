@@ -4,7 +4,7 @@ namespace T3G\Intercept\Tests;
 
 use Prophecy\Argument;
 use T3G\Intercept\BambooStatusInformation;
-use T3G\Intercept\Library\CurlBambooGetRequest;
+use T3G\Intercept\Library\CurlBambooRequests;
 
 class BambooInformationRequestBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class BambooInformationRequestBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function extractExtractsPatchsetAndChangeNumberFromCurlStatusResponse()
     {
-        $curlBambooRequest = $this->prophesize(CurlBambooGetRequest::class);
+        $curlBambooRequest = $this->prophesize(CurlBambooRequests::class);
         $curlBambooRequest->getBuildStatus(Argument::any())->willReturn($this->exampleResponse);
         $bambooInformationRequestBuilder = new BambooStatusInformation($curlBambooRequest->reveal());
         $result = $bambooInformationRequestBuilder->transform('CORE-GTC-42');

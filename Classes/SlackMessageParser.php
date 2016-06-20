@@ -7,6 +7,7 @@ class SlackMessageParser
 {
     /**
      * @return string
+     * @throws \InvalidArgumentException
      */
     public function parseMessage() : string
     {
@@ -16,5 +17,6 @@ class SlackMessageParser
         ) {
             return $matches['buildKey'];
         }
+        throw new \InvalidArgumentException('SlackMessage could not be parsed.');
     }
 }
