@@ -28,7 +28,7 @@ class GerritInformer
         $verification = $buildInformation['success'] ? '+1' : '-1';
 
         $postFields = [
-            'message' => "Build completed.",
+            'message' => "Build completed at: " . $buildInformation['buildUrl'],
             'labels' => [
                 'Verified' => $verification
             ]

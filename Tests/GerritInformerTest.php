@@ -15,8 +15,9 @@ class GerritInformerTest extends \PHPUnit_Framework_TestCase
     public function voteOnGerritSendsRequestToVote_Success()
     {
         $curlGerritPostRequest = $this->prophesize(CurlGerritPostRequest::class);
+        $message = 'Build completed at: https://bamboo.typo3.com/browse/T3G-AP-25';
         $postFields = [
-            'message'=> "Build completed.",
+            'message'=> $message,
             'labels' => [
                 'Verified' => '+1'
             ]
@@ -24,7 +25,8 @@ class GerritInformerTest extends \PHPUnit_Framework_TestCase
         $buildInformation = [
             'patchset' => 3,
             'change' => 12345,
-            'success' => true
+            'success' => true,
+            'buildUrl' => 'https://bamboo.typo3.com/browse/T3G-AP-25'
         ];
 
         $gerritInformer = new GerritInformer($curlGerritPostRequest->reveal());
