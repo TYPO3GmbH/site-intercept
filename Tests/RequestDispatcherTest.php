@@ -46,7 +46,7 @@ class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $_POST = [
             'patchset' => '3',
-            'changeUrl' => 'https://review.typo3.org/#/c/48574/'
+            'changeUrl' => 'https://review.typo3.org/48574/'
         ];
 
         $this->requestDispatcher->dispatch();
