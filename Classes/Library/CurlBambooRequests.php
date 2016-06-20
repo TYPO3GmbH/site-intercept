@@ -27,7 +27,7 @@ class CurlBambooRequests
      */
     public function getBuildStatus(string $buildKey) : string
     {
-        $apiPath = '/latest/result/' . $buildKey;
+        $apiPath = 'latest/result/' . $buildKey;
         $apiPathParams = '?os_authType=basic&expand=labels';
 
         $url = $this->baseUrl . $apiPath . $apiPathParams;
