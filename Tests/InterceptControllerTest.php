@@ -15,7 +15,7 @@ class InterceptControllerTest extends \PHPUnit_Framework_TestCase
      * @return void
      */
     public function newBuildActionTriggersNewBuildViaCurl(){
-        $changeUrl = 'https://review.typo3.org/#/c/48574/';
+        $changeUrl = 'https://review.typo3.org/48574/';
         $patchset = 3;
         $_POST['changeUrl'] = $changeUrl;
         $_POST['patchset'] = (string)$patchset;
