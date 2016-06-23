@@ -25,7 +25,10 @@ class BambooStatusInformationTest extends \PHPUnit_Framework_TestCase
             'patchset' => 3,
             'change' => 12345,
             'buildUrl' => 'https://bamboo.typo3.com/browse/T3G-AP-25',
-            'success' => true
+            'success' => true,
+            'buildTestSummary' => '6 passed',
+            'prettyBuildCompletedTime' => 'Sat, 18 Jun, 06:59 PM',
+            'buildDurationInSeconds' => 21
         ];
 
         self::assertSame($expected, $result);

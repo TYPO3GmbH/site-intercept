@@ -27,8 +27,9 @@ class GerritInformer
 
         $verification = $buildInformation['success'] ? '+1' : '-1';
 
+        $message = $this->getMessage($buildInformation);
         $postFields = [
-            'message' => "Build completed at: " . $buildInformation['buildUrl'],
+            'message' => $message,
             'labels' => [
                 'Verified' => $verification
             ]
@@ -36,11 +37,19 @@ class GerritInformer
         $this->requester->postRequest($apiPath, $postFields);
     }
 
+    private function getMessage(array $buildInformation) : string
+    {
+        $messageParts[] = "Completed build in " . $buildInformation['buildDurationInSeconds'] . " seconds on " . $buildInformation['prettyBuildCompletedTime'];
+        $messageParts[] = "Test Summary: " . $buildInformation['buildTestSummary'];
+        $messageParts[] = "Find logs and detail information at " . $buildInformation['buildUrl'];
+        return join("\n", $messageParts);
+    }
+
     /**
      * @param array $buildInformation
      * @return string
      */
-    protected function constructApiPath(array $buildInformation) : string
+    private function constructApiPath(array $buildInformation) : string
     {
         return 'changes/' . $buildInformation['change'] . '/revisions/' . $buildInformation['patchset'] . '/review';
     }

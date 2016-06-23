@@ -25,6 +25,9 @@ class BambooStatusInformation
         $result = $this->getInformationFromLabels($response, $result);
         $result['buildUrl'] = 'https://bamboo.typo3.com/browse/' . $response['buildResultKey'];
         $result['success'] = $response['successful'];
+        $result['buildTestSummary'] = $response['buildTestSummary'];
+        $result['prettyBuildCompletedTime'] = $response['prettyBuildCompletedTime'];
+        $result['buildDurationInSeconds'] = $response['buildDurationInSeconds'] ;
         return $result;
     }
 
