@@ -16,7 +16,7 @@ class GerritInformerTest extends \PHPUnit_Framework_TestCase
     {
         $curlGerritPostRequest = $this->prophesize(CurlGerritPostRequest::class);
 
-        $message = "Completed build in 21 seconds on Sat, 18 Jun, 06:59 PM\nTest Summary: 6 passed\nFind logs and detail information at https://bamboo.typo3.com/browse/T3G-AP-25";
+        $message = "Completed build in 21s on Sat, 18 Jun, 06:59 PM\nTest Summary: 6 passed\nFind logs and detail information at https://bamboo.typo3.com/browse/T3G-AP-25";
         $postFields = [
             'message'=> $message,
             'labels' => [
