@@ -74,6 +74,24 @@ class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
      * @test
      * @return void
      */
+    public function dispatchDoesNotLogRequestsItCouldDispatch()
+    {
+        $_POST = [
+            'patchset' => '3',
+            'changeUrl' => 'https://review.typo3.org/48574/',
+            'branch' => 'master'
+        ];
+        $logger = $this->prophesize(Logger::class);
+        $requestDispatcher = new RequestDispatcher($this->interceptController->reveal(), $logger->reveal());
+        $requestDispatcher->dispatch();
+        $logger->warning(Argument::any())->shouldNotHaveBeenCalled();
+        $logger->error(Argument::any())->shouldNotHaveBeenCalled();
+    }
+
+    /**
+     * @test
+     * @return void
+     */
     public function dispatchLogsExceptions()
     {
         $this->interceptController->newBuildAction()->willThrow(\InvalidArgumentException::class);

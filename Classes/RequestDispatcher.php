@@ -25,13 +25,15 @@ class RequestDispatcher
         try {
             if (!empty($_POST['payload'])) {
                 $this->interceptController->postBuildAction();
-            }
-            if (!empty($_POST['changeUrl']) && !empty($_POST['patchset']) && !empty($_POST['branch'])) {
+            } else if (!empty($_POST['changeUrl']) && !empty($_POST['patchset']) && !empty($_POST['branch'])) {
                 $this->interceptController->newBuildAction();
+            } else {
+                $this->logger->warning(
+                    'Could not dispatch request. Request Data:' . "\n" . var_export($_REQUEST, true)
+                );
             }
         } catch (\Exception $e) {
             $this->logger->error('ERROR:"' . $e->getMessage() . '"" in ' . $e->getFile() . ' line ' . $e->getLine());
         }
-        $this->logger->warning('Could not dispatch request. Request Data:' . "\n" . var_export($_REQUEST, true));
     }
 }
