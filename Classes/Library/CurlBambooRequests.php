@@ -8,16 +8,13 @@ use T3G\Intercept\LogManager;
 
 class CurlBambooRequests
 {
+    use \T3G\Intercept\Traits\Logger;
 
     protected $baseUrl = 'https://bamboo.typo3.com/rest/api/';
-    /**
-     * @var \Monolog\Logger
-     */
-    private $logger;
 
     public function __construct(Logger $logger = null)
     {
-        $this->logger = $logger ?: LogManager::getLogger(__CLASS__);
+        $this->setLogger($logger);
     }
 
     /**

@@ -2,12 +2,15 @@
 declare(strict_types = 1);
 namespace T3G\Tests;
 
+use Monolog\Logger;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use T3G\Intercept\InterceptController;
 use T3G\Intercept\RequestDispatcher;
 
 class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
 {
+
     /**
      * @var RequestDispatcher
      */
@@ -46,11 +49,45 @@ class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $_POST = [
             'patchset' => '3',
-            'changeUrl' => 'https://review.typo3.org/48574/'
+            'changeUrl' => 'https://review.typo3.org/48574/',
+            'branch' => 'master'
         ];
 
         $this->requestDispatcher->dispatch();
 
         $this->interceptController->newBuildAction()->shouldHaveBeenCalled();
+    }
+
+    /**
+     * @test
+     */
+    public function dispatchLogsRequestsItCouldNotDispatch()
+    {
+        $logger = $this->prophesize(Logger::class);
+        $requestDispatcher = new RequestDispatcher($this->interceptController->reveal(), $logger->reveal());
+        $_REQUEST['something'] = 'else';
+        $requestDispatcher->dispatch();
+        $logger->warning(Argument::containingString('something'))->shouldHaveBeenCalled();
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function dispatchLogsExceptions()
+    {
+        $this->interceptController->newBuildAction()->willThrow(\InvalidArgumentException::class);
+
+        $logger = $this->prophesize(Logger::class);
+        $requestDispatcher = new RequestDispatcher($this->interceptController->reveal(), $logger->reveal());
+
+        $_POST = [
+            'patchset' => '3',
+            'changeUrl' => 'https://review.typo3.org/48574/',
+            'branch' => 'master'
+        ];
+
+        $requestDispatcher->dispatch();
+        $logger->error(Argument::containingString('ERROR'))->shouldHaveBeenCalled();
     }
 }

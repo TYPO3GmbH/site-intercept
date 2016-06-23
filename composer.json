@@ -10,7 +10,8 @@
     }
   ],
   "require": {
-    "monolog/monolog": "*"
+    "monolog/monolog": "*",
+    "hassankhan/config": "0.10.0"
   },
   "require-dev": {
     "phpunit/phpunit": "5.4.6"
