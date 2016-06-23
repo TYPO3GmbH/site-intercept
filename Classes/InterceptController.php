@@ -46,7 +46,7 @@ class InterceptController
     {
         $changeUrl = $_POST['changeUrl'];
         $patchSet = (int)$_POST['patchset'];
-        if (isset($_POST['branch']) && $_POST['branch'] === 'master') {
+        if ($_POST['branch'] === 'master') {
             $this->bambooRequests->triggerNewCoreBuild($changeUrl, $patchSet);
         }
     }

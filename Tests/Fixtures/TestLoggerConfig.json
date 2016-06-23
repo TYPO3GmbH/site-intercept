@@ -1,0 +1,11 @@
+{
+  "Handlers": [
+    {
+      "class": "\\T3G\\Intercept\\Tests\\Fixtures\\TestLogHandler",
+      "arguments": {
+        "path": "Log/InterceptTest.log",
+        "level": "WARNING"
+      }
+    }
+  ]
+}
