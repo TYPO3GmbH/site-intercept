@@ -19,6 +19,7 @@ class InterceptControllerTest extends \PHPUnit_Framework_TestCase
         $patchset = 3;
         $_POST['changeUrl'] = $changeUrl;
         $_POST['patchset'] = (string)$patchset;
+        $_POST['branch'] = 'master';
 
         $requester = $this->prophesize(CurlBambooRequests::class);
 
