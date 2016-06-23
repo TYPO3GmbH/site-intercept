@@ -16,7 +16,7 @@ class LogManager
         $handlers = $config->get('Handlers');
         foreach ($handlers as $handler) {
             if (isset($handler['arguments']['path'])) {
-                $handler['arguments']['path'] = BASEPATH . $handler['arguments']['path'];
+                $handler['arguments']['path'] = BASEPATH . '/' . $handler['arguments']['path'];
             }
             $logger->pushHandler(new $handler['class'](...array_values($handler['arguments'])));
         }
