@@ -27,7 +27,7 @@ class BambooStatusInformation
         $result['success'] = $response['successful'];
         $result['buildTestSummary'] = $response['buildTestSummary'];
         $result['prettyBuildCompletedTime'] = $response['prettyBuildCompletedTime'];
-        $result['buildDurationInSeconds'] = $response['buildDurationInSeconds'] ;
+        $result['buildDurationInSeconds'] = $response['buildDurationInSeconds'];
         return $result;
     }
 

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace T3G\Intercept;
 
 use T3G\Intercept\Library\CurlGerritPostRequest;
+use T3G\Intercept\Utility\TimeUtility;
 
 class GerritInformer
 {
@@ -39,7 +40,7 @@ class GerritInformer
 
     private function getMessage(array $buildInformation) : string
     {
-        $messageParts[] = "Completed build in " . $buildInformation['buildDurationInSeconds'] . " seconds on " . $buildInformation['prettyBuildCompletedTime'];
+        $messageParts[] = "Completed build in " . TimeUtility::convertSecondsToHumanReadable($buildInformation['buildDurationInSeconds']) . ' on '  . $buildInformation['prettyBuildCompletedTime'];
         $messageParts[] = "Test Summary: " . $buildInformation['buildTestSummary'];
         $messageParts[] = "Find logs and detail information at " . $buildInformation['buildUrl'];
         return join("\n", $messageParts);
