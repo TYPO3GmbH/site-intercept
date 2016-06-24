@@ -23,7 +23,6 @@ class GerritInformerTest extends \PHPUnit_Framework_TestCase
                 'Verified' => '+1'
             ]
         ];
-        echo $message;
         $buildInformation = [
             'patchset' => 3,
             'change' => 12345,
