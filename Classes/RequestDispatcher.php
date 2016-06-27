@@ -5,6 +5,13 @@ namespace T3G\Intercept;
 
 use Monolog\Logger;
 
+/**
+ * Class RequestDispatcher
+ *
+ * Dispatches to controller->actions depending on $_REQUEST parameters
+ *
+ * @package T3G\Intercept
+ */
 class RequestDispatcher
 {
     use Traits\Logger;

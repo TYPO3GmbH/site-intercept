@@ -5,6 +5,13 @@ namespace T3G\Intercept\Library;
 
 use Monolog\Logger;
 
+/**
+ * Class CurlGerritPostRequest
+ *
+ * Responsible for all requests sent to Gerrit
+ *
+ * @package T3G\Intercept\Library
+ */
 class CurlGerritPostRequest
 {
     use \T3G\Intercept\Traits\Logger;
@@ -47,7 +54,6 @@ class CurlGerritPostRequest
             ]
         );
         curl_exec($curl);
-        //$err = curl_error($curl);
         curl_close($curl);
     }
 }

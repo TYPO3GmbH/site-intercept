@@ -1,9 +1,18 @@
 <?php
 declare(strict_types = 1);
+
 namespace T3G\Intercept;
 
 use T3G\Intercept\Library\CurlBambooRequests;
 
+/**
+ * Class BambooStatusInformation
+ *
+ * Responsible for:
+ * * Extracting and transforming bamboo status information
+ *
+ * @package T3G\Intercept
+ */
 class BambooStatusInformation
 {
 
@@ -37,8 +46,8 @@ class BambooStatusInformation
      */
     protected function extractValueForNameFromMinusSeparatedString(string $name) : int
     {
-        $splitted = explode('-', $name);
-        return (int)array_pop($splitted);
+        $split = explode('-', $name);
+        return (int)array_pop($split);
     }
 
     /**

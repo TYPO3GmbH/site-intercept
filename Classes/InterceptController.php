@@ -5,6 +5,11 @@ namespace T3G\Intercept;
 
 use T3G\Intercept\Library\CurlBambooRequests;
 
+/**
+ * Class InterceptController
+ *
+ * @package T3G\Intercept
+ */
 class InterceptController
 {
 
@@ -12,14 +17,17 @@ class InterceptController
      * @var \T3G\Intercept\Library\CurlBambooRequests
      */
     private $bambooRequests;
+
     /**
      * @var \T3G\Intercept\SlackMessageParser
      */
     private $slackMessageParser;
+
     /**
      * @var \T3G\Intercept\BambooStatusInformation
      */
     private $bambooStatusInformation;
+
     /**
      * @var \T3G\Intercept\GerritInformer
      */
@@ -30,8 +38,7 @@ class InterceptController
         SlackMessageParser $slackMessageParser = null,
         BambooStatusInformation $bambooStatusInformation = null,
         GerritInformer $gerritInformer = null
-    )
-    {
+    ) {
         $this->bambooRequests = $bambooRequests ?: new CurlBambooRequests();
         $this->slackMessageParser = $slackMessageParser ?: new SlackMessageParser();
         $this->bambooStatusInformation = $bambooStatusInformation ?: new BambooStatusInformation();
