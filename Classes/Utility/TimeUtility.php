@@ -1,5 +1,6 @@
 <?php
 declare(strict_types = 1);
+
 namespace T3G\Intercept\Utility;
 
 class TimeUtility
@@ -8,7 +9,6 @@ class TimeUtility
      * Used to transform seconds given as integers
      *
      * @param int $seconds
-     *
      * @return string
      */
     static public function convertSecondsToHumanReadable(int $seconds) : string

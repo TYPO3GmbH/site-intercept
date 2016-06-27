@@ -6,6 +6,14 @@ namespace T3G\Intercept;
 use T3G\Intercept\Library\CurlGerritPostRequest;
 use T3G\Intercept\Utility\TimeUtility;
 
+/**
+ * Class GerritInformer
+ *
+ * Responsible for:
+ * * Posting a vote with build information on Gerrit
+ *
+ * @package T3G\Intercept
+ */
 class GerritInformer
 {
     /**

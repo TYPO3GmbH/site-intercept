@@ -3,6 +3,14 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept;
 
+
+/**
+ * Class SlackMessageParser
+ *
+ * Parses the slack message format send to us via Bamboo Slack Notification hook
+ *
+ * @package T3G\Intercept
+ */
 class SlackMessageParser
 {
     /**

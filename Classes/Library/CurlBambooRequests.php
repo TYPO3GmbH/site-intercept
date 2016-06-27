@@ -4,8 +4,14 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Library;
 
 use Monolog\Logger;
-use T3G\Intercept\LogManager;
 
+/**
+ * Class CurlBambooRequests
+ *
+ * Responsible for all requests sent to bamboo
+ *
+ * @package T3G\Intercept\Library
+ */
 class CurlBambooRequests
 {
     use \T3G\Intercept\Traits\Logger;

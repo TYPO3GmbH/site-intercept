@@ -5,6 +5,13 @@ namespace T3G\Intercept\Traits;
 
 use T3G\Intercept\LogManager;
 
+/**
+ * Logger Trait
+ *
+ * Used for setting the logger in a class independent of prior instantiation
+ *
+ * @package T3G\Intercept\Traits
+ */
 trait Logger
 {
     /**

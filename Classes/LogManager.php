@@ -6,6 +6,13 @@ namespace T3G\Intercept;
 use Monolog\Logger;
 use Noodlehaus\Config;
 
+/**
+ * Class LogManager
+ *
+ * Only the log handlers are currently configurable (see: Configuration/logger.dist.json)
+ *
+ * @package T3G\Intercept
+ */
 class LogManager
 {
 
