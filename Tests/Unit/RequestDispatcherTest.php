@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace T3G\Tests;
+namespace T3G\Intercept\Tests\Unit;
 
 use Monolog\Logger;
 use Prophecy\Argument;

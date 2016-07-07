@@ -1,7 +1,8 @@
 <?php
 declare(strict_types = 1);
-namespace T3G\Intercept\Tests;
+namespace T3G\Intercept\Tests\Unit;
 
+use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use T3G\Intercept\BambooStatusInformation;
 use T3G\Intercept\Library\CurlBambooRequests;
@@ -16,8 +17,10 @@ class BambooStatusInformationTest extends \PHPUnit_Framework_TestCase
      */
     public function extractExtractsPatchsetAndChangeNumberFromCurlStatusResponse()
     {
+        $responseProphecy = $this->prophesize(Response::class);
+        $responseProphecy->getBody(Argument::any())->willReturn(\GuzzleHttp\Psr7\stream_for($this->exampleResponse));
         $curlBambooRequest = $this->prophesize(CurlBambooRequests::class);
-        $curlBambooRequest->getBuildStatus(Argument::any())->willReturn($this->exampleResponse);
+        $curlBambooRequest->getBuildStatus(Argument::any())->willReturn($responseProphecy->reveal());
         $bambooInformationRequestBuilder = new BambooStatusInformation($curlBambooRequest->reveal());
         $result = $bambooInformationRequestBuilder->transform('CORE-GTC-42');
 

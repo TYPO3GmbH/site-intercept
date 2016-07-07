@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept\Tests;
+namespace T3G\Intercept\Tests\Unit;
 
 use T3G\Intercept\SlackMessageParser;
 
