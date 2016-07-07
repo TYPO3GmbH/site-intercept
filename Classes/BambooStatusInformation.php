@@ -28,9 +28,9 @@ class BambooStatusInformation
 
     public function transform(string $buildKey) : array
     {
-        $jsonResponse = $this->requester->getBuildStatus($buildKey);
+        $jsonResponse = $this->requester->getBuildStatus($buildKey)->getBody();
         $result = [];
-        $response = json_decode($jsonResponse, true);
+        $response = json_decode((string)$jsonResponse, true);
         $result = $this->getInformationFromLabels($response, $result);
         $result['buildUrl'] = 'https://bamboo.typo3.com/browse/' . $response['buildResultKey'];
         $result['success'] = $response['successful'];

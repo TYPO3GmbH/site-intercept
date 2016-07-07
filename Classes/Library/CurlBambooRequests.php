@@ -3,62 +3,54 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Library;
 
-use Monolog\Logger;
+use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
+use T3G\Intercept\Traits\Logger;
 
 /**
  * Class CurlBambooRequests
  *
  * Responsible for all requests sent to bamboo
  *
+ * @codeCoverageIgnore tested via integration tests only
  * @package T3G\Intercept\Library
  */
 class CurlBambooRequests
 {
-    use \T3G\Intercept\Traits\Logger;
+    use Logger;
 
+    /**
+     * @var \GuzzleHttp\Client
+     */
+    protected $client;
     protected $baseUrl = 'https://bamboo.typo3.com/rest/api/';
+    protected $projectKey = 'CORE-GTC';
 
-    public function __construct(Logger $logger = null)
+    public function __construct(LoggerInterface $logger = null)
     {
         $this->setLogger($logger);
+        $this->client = new Client(['base_uri' => $this->baseUrl]);
     }
 
     /**
-     * @codeCoverageIgnore postman generated curl request
      * @param string $buildKey
-     * @return string
+     * @return ResponseInterface
      */
-    public function getBuildStatus(string $buildKey) : string
+    public function getBuildStatus(string $buildKey) : ResponseInterface
     {
         $apiPath = 'latest/result/' . $buildKey;
         $apiPathParams = '?os_authType=basic&expand=labels';
 
-        $url = $this->baseUrl . $apiPath . $apiPathParams;
-        $this->logger->info('cURL request to url' . $url);
-
-        $curl = curl_init();
-        curl_setopt_array(
-            $curl,
-            [
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-                CURLOPT_HTTPHEADER => [
-                    'accept: application/json',
-                    'authorization: Basic d2I6dHk5MDMhISEx',
-                    'cache-control: no-cache',
-                    'content-type: application/json',
-                    'x-atlassian-token: nocheck'
-                ],
-            ]
-        );
-
-        $response = curl_exec($curl);
-        curl_close($curl);
+        $uri = $apiPath . $apiPathParams;
+        $this->logger->info('cURL request to uri' . $this->baseUrl . $uri);
+        $response = $this->client->get($uri, ['headers' => [
+            'accept' => 'application/json',
+            'authorization' => 'Basic d2I6dHk5MDMhISEx',
+            'cache-control' => 'no-cache',
+            'content-type' => 'application/json',
+            'x-atlassian-token' => 'nocheck'
+        ]]);
 
         return $response;
     }
@@ -66,39 +58,34 @@ class CurlBambooRequests
     /**
      * Triggers new build in project CORE-GTC
      *
-     * @codeCoverageIgnore postman generated curl request
      * @param string $changeUrl
      * @param int $patchset
+     * @return \Psr\Http\Message\ResponseInterface
      */
     public function triggerNewCoreBuild(string $changeUrl, int $patchset)
     {
-        $apiPath = 'latest/queue/CORE-GTC';
+        $apiPath = 'latest/queue/' . $this->projectKey;
         $apiPathParams = '?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=' .
                          urlencode($changeUrl) . '&bamboo.variable.patchset=' . $patchset;
-        $url = $this->baseUrl . $apiPath . $apiPathParams;
+        $uri = $apiPath . $apiPathParams;
 
-        $this->logger->info('cURL request to url' . $url);
+        $this->logger->info('cURL request to url' . $this->baseUrl);
 
-        $curl = curl_init();
-        curl_setopt_array(
-            $curl,
-            [
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_HTTPHEADER => [
-                    "authorization: Basic d2I6dHk5MDMhISEx",
-                    "cache-control: no-cache",
-                    "x-atlassian-token: nocheck"
+        return $this->client->post($uri, ['headers' => [
+                    'authorization' => 'Basic d2I6dHk5MDMhISEx',
+                    'cache-control' => 'no-cache',
+                    'x-atlassian-token' => 'nocheck'
                 ],
             ]
         );
+    }
 
-        curl_exec($curl);
-        curl_close($curl);
+    /**
+     * @param string $projectKey
+     * @internal
+     */
+    public function setProjectKey(string $projectKey)
+    {
+        $this->projectKey = $projectKey;
     }
 }

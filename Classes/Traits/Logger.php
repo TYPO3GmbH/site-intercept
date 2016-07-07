@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Traits;
 
+use Psr\Log\LoggerInterface;
 use T3G\Intercept\LogManager;
 
 /**
@@ -15,11 +16,11 @@ use T3G\Intercept\LogManager;
 trait Logger
 {
     /**
-     * @var \Monolog\Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
-    public function setLogger(\Monolog\Logger $logger = null)
+    public function setLogger(LoggerInterface $logger = null)
     {
         if ($logger === null) {
             $logManager = new LogManager();

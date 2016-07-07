@@ -1,12 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: psychomieze
- * Date: 23/06/16
- * Time: 09:09
- */
+declare(strict_types = 1);
 
-namespace T3G\Intercept\Tests;
+namespace T3G\Intercept\Tests\Unit;
 
 use Noodlehaus\Config;
 use T3G\Intercept\LogManager;
