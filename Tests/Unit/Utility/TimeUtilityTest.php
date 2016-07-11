@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace T3G\Intercept\Tests\Unit;
+namespace T3G\Intercept\Tests\Unit\Utility;
 
 
 use T3G\Intercept\Utility\TimeUtility;

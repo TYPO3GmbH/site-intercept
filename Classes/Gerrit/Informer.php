@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept;
+namespace T3G\Intercept\Gerrit;
 
 use T3G\Intercept\Library\CurlGerritPostRequest;
 use T3G\Intercept\Utility\TimeUtility;
@@ -14,7 +14,7 @@ use T3G\Intercept\Utility\TimeUtility;
  *
  * @package T3G\Intercept
  */
-class GerritInformer
+class Informer
 {
     /**
      * @var \T3G\Intercept\Library\CurlGerritPostRequest

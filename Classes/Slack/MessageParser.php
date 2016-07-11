@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept;
+namespace T3G\Intercept\Slack;
 
 
 /**
@@ -11,7 +11,7 @@ namespace T3G\Intercept;
  *
  * @package T3G\Intercept
  */
-class SlackMessageParser
+class MessageParser
 {
     /**
      * @return string

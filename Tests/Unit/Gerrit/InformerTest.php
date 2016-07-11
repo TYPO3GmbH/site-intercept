@@ -1,13 +1,13 @@
 <?php
 declare(strict_types = 1);
-namespace T3G\Intercept\Tests\Unit;
+namespace T3G\Intercept\Tests\Unit\Gerrit;
 
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use T3G\Intercept\GerritInformer;
 use T3G\Intercept\Library\CurlGerritPostRequest;
 
-class GerritInformerTest extends \PHPUnit_Framework_TestCase
+class InformerTest extends \PHPUnit_Framework_TestCase
 {
 
     /**

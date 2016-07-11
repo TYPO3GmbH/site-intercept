@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept;
+namespace T3G\Intercept\Bamboo;
 
 use T3G\Intercept\Library\CurlBambooRequests;
 
@@ -13,7 +13,7 @@ use T3G\Intercept\Library\CurlBambooRequests;
  *
  * @package T3G\Intercept
  */
-class BambooStatusInformation
+class StatusInformation
 {
 
     /**

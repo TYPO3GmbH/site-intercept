@@ -6,7 +6,7 @@ use T3G\Intercept\BambooStatusInformation;
 use T3G\Intercept\GerritInformer;
 use T3G\Intercept\InterceptController;
 use T3G\Intercept\Library\CurlBambooRequests;
-use T3G\Intercept\SlackMessageParser;
+use T3G\Intercept\Slack\MessageParser;
 
 class InterceptControllerTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +37,7 @@ class InterceptControllerTest extends \PHPUnit_Framework_TestCase
     {
         $buildKey = 'CORE-GTC-48';
         $buildStatusInformation = ['successful' => true];
-        $slackMessageParser = $this->prophesize(SlackMessageParser::class);
+        $slackMessageParser = $this->prophesize(MessageParser::class);
         $bambooStatusInformation = $this->prophesize(BambooStatusInformation::class);
         $gerritInformer = $this->prophesize(GerritInformer::class);
 
