@@ -2,7 +2,7 @@
 declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit;
 
-use T3G\Intercept\Bamboo\Request;
+use T3G\Intercept\Bamboo\Client;
 use T3G\Intercept\Bamboo\StatusInformation;
 use T3G\Intercept\Gerrit\Informer;
 use T3G\Intercept\InterceptController;
@@ -21,7 +21,7 @@ class InterceptControllerTest extends \PHPUnit_Framework_TestCase
         $_POST['patchset'] = (string)$patchset;
         $_POST['branch'] = 'master';
 
-        $requester = $this->prophesize(Request::class);
+        $requester = $this->prophesize(Client::class);
 
         $interceptController = new InterceptController($requester->reveal());
         $interceptController->newBuildAction();

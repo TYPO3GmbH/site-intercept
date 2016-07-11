@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Integration\Bamboo;
 
 use Psr\Log\LoggerInterface;
-use T3G\Intercept\Bamboo\Request;
+use T3G\Intercept\Bamboo\Client;
 
 /**
  * Class CurlBambooRequestsTest
@@ -16,7 +16,7 @@ use T3G\Intercept\Bamboo\Request;
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Request
+     * @var Client
      */
     protected $curlBambooRequests;
 
@@ -44,11 +44,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Request
+     * @return Client
      */
     public function setUp()
     {
         $loggerProphecy = $this->prophesize(LoggerInterface::class);
-        $this->curlBambooRequests = new Request($loggerProphecy->reveal());
+        $this->curlBambooRequests = new Client($loggerProphecy->reveal());
     }
 }

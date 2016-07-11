@@ -3,7 +3,7 @@
 namespace T3G\Intercept\Github;
 
 
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use T3G\Intercept\Traits\Logger;
@@ -16,7 +16,7 @@ use T3G\Intercept\Traits\Logger;
  * @codeCoverageIgnore tested via integration tests only
  * @package T3G\Intercept\Requests
  */
-class Request
+class Client
 {
     use Logger;
 
@@ -28,7 +28,7 @@ class Request
     public function __construct(LoggerInterface $logger = null)
     {
         $this->setLogger($logger);
-        $this->client = new Client();
+        $this->client = new GuzzleClient();
     }
 
     public function get(string $url) : ResponseInterface

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Gerrit;
 
 use T3G\Intercept\Utility\TimeUtility;
-use T3G\Intercept\Gerrit\Request;
+use T3G\Intercept\Gerrit\Client;
 
 
 /**
@@ -18,13 +18,13 @@ use T3G\Intercept\Gerrit\Request;
 class Informer
 {
     /**
-     * @var Request
+     * @var Client
      */
     private $requester;
 
-    public function __construct(Request $requester = null)
+    public function __construct(Client $requester = null)
     {
-        $this->requester = $requester ?: new Request();
+        $this->requester = $requester ?: new Client();
     }
 
     /**
