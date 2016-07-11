@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f2de52a16135d02ea360bdfc970babbf",
-    "content-hash": "489e96338ed57d2106f25afcb445e00e",
+    "hash": "a8cd9759544ba2ad0df53b81a1150f83",
+    "content-hash": "3ec889e1c6ee3cbae2505a79c4ab6f94",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -234,6 +234,52 @@
                 "yml"
             ],
             "time": "2016-02-11 16:21:17"
+        },
+        {
+            "name": "kbsali/redmine-api",
+            "version": "v1.5.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kbsali/php-redmine-api.git",
+                "reference": "a8efda49805faac3fc59d95bc4b7fc6a75387bd4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kbsali/php-redmine-api/zipball/a8efda49805faac3fc59d95bc4b7fc6a75387bd4",
+                "reference": "a8efda49805faac3fc59d95bc4b7fc6a75387bd4",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Redmine": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Saliou",
+                    "email": "kevin@saliou.name",
+                    "homepage": "http://kevin.saliou.name"
+                }
+            ],
+            "description": "Redmine API client",
+            "homepage": "https://github.com/kbsali/php-redmine-api",
+            "keywords": [
+                "api",
+                "redmine"
+            ],
+            "time": "2016-07-01 09:54:04"
         },
         {
             "name": "monolog/monolog",

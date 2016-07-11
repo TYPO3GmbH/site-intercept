@@ -3,19 +3,22 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept;
 
+use T3G\Intercept\Forge\Client as ForgeClient;
 use T3G\Intercept\Github\IssueInformation;
 use T3G\Intercept\Github\PullRequestInformation;
 use T3G\Intercept\Github\UserInformation;
-use T3G\Intercept\Github\Client;
+use T3G\Intercept\Github\Client as GithubClient;
 
 class GithubToGerritController
 {
 
-    protected $githubRequests;
+    protected $githubClient;
+    protected $forgeClient;
 
     public function __construct()
     {
-        $this->githubRequests = new Client();
+        $this->githubClient = new GithubClient();
+        $this->forgeClient = new ForgeClient();
     }
 
     public function transformPullRequestToGerritReview(string $payload)
@@ -27,19 +30,22 @@ class GithubToGerritController
 
         $userData = $this->getUserData($pullRequestUrls['userUrl']);
 
+
+        //$result->id
+        //$this->forgeClient->createIssue($issueData['title'], $issueData['body']);
     }
 
 
     protected function getIssueData(string $issueUrl) : array
     {
-        $issueResponse = $this->githubRequests->get($issueUrl);
+        $issueResponse = $this->githubClient->get($issueUrl);
         $issueInformation = new IssueInformation();
         return $issueInformation->transform($issueResponse);
     }
 
     protected function getUserData(string $userUrl)
     {
-        $userResponse = $this->githubRequests->get($userUrl);
+        $userResponse = $this->githubClient->get($userUrl);
         $userInformation = new UserInformation();
         return $userInformation->transform($userResponse);
     }

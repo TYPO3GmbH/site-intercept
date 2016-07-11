@@ -15,7 +15,7 @@ use T3G\Intercept\Github\Client;
  *
  * @package T3G\Intercept\Tests\Integration\Requests
  */
-class RequestTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends \PHPUnit_Framework_TestCase
 {
 
     /**

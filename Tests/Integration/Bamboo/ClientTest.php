@@ -13,7 +13,7 @@ use T3G\Intercept\Bamboo\Client;
  *
  * @package T3G\Intercept\Tests\Functional\Requests
  */
-class RequestTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Client
