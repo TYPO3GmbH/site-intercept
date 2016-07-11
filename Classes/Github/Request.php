@@ -1,6 +1,6 @@
 <?php
 
-namespace T3G\Intercept\Library;
+namespace T3G\Intercept\Github;
 
 
 use GuzzleHttp\Client;
@@ -14,9 +14,9 @@ use T3G\Intercept\Traits\Logger;
  * Responsible for all requests sent to Github
  *
  * @codeCoverageIgnore tested via integration tests only
- * @package T3G\Intercept\Library
+ * @package T3G\Intercept\Requests
  */
-class GithubRequests
+class Request
 {
     use Logger;
 

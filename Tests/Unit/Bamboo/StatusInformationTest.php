@@ -4,8 +4,8 @@ namespace T3G\Intercept\Tests\Unit\Bamboo;
 
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
+use T3G\Intercept\Bamboo\Request;
 use T3G\Intercept\Bamboo\StatusInformation;
-use T3G\Intercept\Library\CurlBambooRequests;
 
 class StatusInformationTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class StatusInformationTest extends \PHPUnit_Framework_TestCase
     {
         $responseProphecy = $this->prophesize(Response::class);
         $responseProphecy->getBody(Argument::any())->willReturn(\GuzzleHttp\Psr7\stream_for($this->exampleResponse));
-        $curlBambooRequest = $this->prophesize(CurlBambooRequests::class);
+        $curlBambooRequest = $this->prophesize(Request::class);
         $curlBambooRequest->getBuildStatus(Argument::any())->willReturn($responseProphecy->reveal());
         $bambooInformationRequestBuilder = new StatusInformation($curlBambooRequest->reveal());
         $result = $bambooInformationRequestBuilder->transform('CORE-GTC-42');

@@ -1,19 +1,19 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept\Tests\Integration\Library;
+namespace T3G\Intercept\Tests\Integration\Gerrit;
 
 use Psr\Log\LoggerInterface;
-use T3G\Intercept\Library\CurlGerritPostRequest;
+use T3G\Intercept\Requests\CurlGerritPostRequests;
 
 /**
  * Class CurlGerritPostRequestTest
  *
  * @@@@ WARNING! These tests trigger real requests! @@@@
  *
- * @package T3G\Intercept\Tests\Integration\Library
+ * @package T3G\Intercept\Tests\Integration\Requests
  */
-class CurlGerritPostRequestTest extends \PHPUnit_Framework_TestCase
+class RequestTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
@@ -24,7 +24,7 @@ class CurlGerritPostRequestTest extends \PHPUnit_Framework_TestCase
         $loggerProphecy = $this->prophesize(LoggerInterface::class);
         // merged patch, so reviewing doesn't harm
         $apiPath = 'changes/48799/revisions/4/review';
-        $curlGerritPostRequest = new CurlGerritPostRequest($loggerProphecy->reveal());
+        $curlGerritPostRequest = new CurlGerritPostRequests($loggerProphecy->reveal());
         $response = $curlGerritPostRequest->postRequest($apiPath, [
             'message' => 'integration test message',
             'labels' => [

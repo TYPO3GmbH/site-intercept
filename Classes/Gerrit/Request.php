@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept\Library;
+namespace T3G\Intercept\Gerrit;
 
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
@@ -14,9 +14,9 @@ use T3G\Intercept\Traits\Logger;
  * Responsible for all requests sent to Gerrit
  *
  * @codeCoverageIgnore tested via integration tests only
- * @package T3G\Intercept\Library
+ * @package T3G\Intercept\Requests
  */
-class CurlGerritPostRequest
+class Request
 {
     use Logger;
 

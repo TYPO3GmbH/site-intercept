@@ -6,7 +6,7 @@ namespace T3G\Intercept;
 use T3G\Intercept\Github\IssueInformation;
 use T3G\Intercept\Github\PullRequestInformation;
 use T3G\Intercept\Github\UserInformation;
-use T3G\Intercept\Library\GithubRequests;
+use T3G\Intercept\Github\Request;
 
 class GithubToGerritController
 {
@@ -15,7 +15,7 @@ class GithubToGerritController
 
     public function __construct()
     {
-        $this->githubRequests = new GithubRequests();
+        $this->githubRequests = new Request();
     }
 
     public function transformPullRequestToGerritReview(string $payload)

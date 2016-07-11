@@ -1,11 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept\Tests\Integration\Library;
+namespace T3G\Intercept\Tests\Integration\Github;
 
 
 use Psr\Log\LoggerInterface;
-use T3G\Intercept\Library\GithubRequests;
+use T3G\Intercept\Github\Request;
 
 
 /**
@@ -13,9 +13,9 @@ use T3G\Intercept\Library\GithubRequests;
  *
  * @@@@ WARNING! These tests trigger real requests! @@@@
  *
- * @package T3G\Intercept\Tests\Integration\Library
+ * @package T3G\Intercept\Tests\Integration\Requests
  */
-class GithubRequestsTest extends \PHPUnit_Framework_TestCase
+class RequestTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -26,7 +26,7 @@ class GithubRequestsTest extends \PHPUnit_Framework_TestCase
     {
         $loggerProphecy = $this->prophesize(LoggerInterface::class);
 
-        $githubRequests = new GithubRequests($loggerProphecy->reveal());
+        $githubRequests = new Request($loggerProphecy->reveal());
         $url = 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1';
         $response = $githubRequests->getIssueInformation($url);
         self::assertSame(200, $response->getStatusCode());
