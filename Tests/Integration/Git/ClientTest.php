@@ -24,8 +24,12 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $userData = ['user' => 'Ilona Important', 'email' => 'ilona@example.com'];
 
-        $client = new Client();
-        $client->setRepositoryPath('/Users/psychomieze/Sites/typo3.cms');
+        $client = new Client('/Users/psychomieze/Sites/typo3.cms');
         $client->commitPatchAsUser($localDiff, $userData, $message);
+        $client->pushToGerrit();
+
+
+        self::assertContains('HEAD45eo', $GLOBALS['gitOutput']);
+
     }
 }

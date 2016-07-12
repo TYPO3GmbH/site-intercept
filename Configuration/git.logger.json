@@ -1,0 +1,11 @@
+{
+  "Handlers": [
+    {
+      "class": "\\Monolog\\Handler\\StreamHandler",
+      "arguments": {
+        "path": "Log/Github2Gerrit.log",
+        "level": "DEBUG"
+      }
+    }
+  ]
+}

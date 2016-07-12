@@ -43,6 +43,7 @@ class GithubToGerritController
 
         $gitClient = new Client();
         $gitClient->commitPatchAsUser($localDiff, $userData, $commitMessage);
+        $gitClient->pushToGerrit();
 
     }
 

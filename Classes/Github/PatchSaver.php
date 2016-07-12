@@ -3,7 +3,12 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Github;
 
-
+/**
+ * Class PatchSaver
+ *
+ * @codeCoverageIgnore tested via integration tests only
+ * @package T3G\Intercept\Github
+ */
 class PatchSaver
 {
 

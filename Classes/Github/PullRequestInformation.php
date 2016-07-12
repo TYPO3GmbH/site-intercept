@@ -3,9 +3,13 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Github;
 
+/**
+ * Class PullRequestInformation
+ *
+ * @package T3G\Intercept\Github
+ */
 class PullRequestInformation
 {
-
 
     public function transform(string $requestPayload) : array
     {

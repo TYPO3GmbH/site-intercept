@@ -3,10 +3,15 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Forge;
 
-
 use Psr\Log\LoggerInterface;
 use T3G\Intercept\Traits\Logger;
 
+/**
+ * Forge client - handles all interactions with forge
+ *
+ * @codeCoverageIgnore tested via integration tests only
+ * @package T3G\Intercept\Forge
+ */
 class Client
 {
     use Logger;
