@@ -11,7 +11,7 @@ class PullRequestInformation
     {
         $fullPullRequestInformation = json_decode($requestPayload, true);
         $pullRequestInformation = [
-            'patchUrl' => $fullPullRequestInformation['pull_request']['patch_url'],
+            'diffUrl' => $fullPullRequestInformation['pull_request']['diff_url'],
             'userUrl' => $fullPullRequestInformation['pull_request']['user']['url'],
             'issueUrl' => $fullPullRequestInformation['pull_request']['issue_url']
         ];

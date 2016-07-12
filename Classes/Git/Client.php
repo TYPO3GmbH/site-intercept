@@ -18,7 +18,20 @@ class Client
         $this->repositoryPath = $path;
     }
 
-    public function getCleanWorkingCopy()
+    public function commitPatchAsUser(string $patchFile, array $userData, string $commitMessage)
+    {
+        $workingCopy = $this->getCleanWorkingCopy();
+        $workingCopy->apply($patchFile);
+        $workingCopy->add('.');
+        $workingCopy->commit(
+            [
+                'author' => '"' . $userData['user'] . '<' . $userData['email'] . '>"',
+                'm' => $commitMessage
+            ]
+        );
+    }
+
+    private function getCleanWorkingCopy()
     {
         $client = new GitWrapper();
         $workingCopy = $client->workingCopy($this->repositoryPath);
@@ -27,6 +40,7 @@ class Client
             $workingCopy->pull();
         }
         $workingCopy->reset(['hard' =>true]);
+
         return $workingCopy;
     }
 

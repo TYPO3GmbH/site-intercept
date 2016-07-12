@@ -31,7 +31,7 @@ class PullRequestInformationTest extends \PHPUnit_Framework_TestCase
     public function transformExtractsPatchUrl()
     {
         $result = $this->githubPullRequestInformation->transform($this->requestPayload);
-        self::assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1.patch', $result['patchUrl']);
+        self::assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1.diff', $result['diffUrl']);
     }
 
     /**
