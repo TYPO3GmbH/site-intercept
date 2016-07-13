@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 class IssueInformation
 {
 
-    public function transform(ResponseInterface $response) : array
+    public function transformResponse(ResponseInterface $response) : array
     {
         $responseBody = (string)$response->getBody();
         $fullIssueInformation = json_decode($responseBody, true);

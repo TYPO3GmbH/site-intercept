@@ -2,7 +2,6 @@
 
 namespace T3G\Intercept\Github;
 
-
 use GuzzleHttp\Client as GuzzleClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -25,6 +24,8 @@ class Client
      */
     protected $client;
 
+    protected $accessKey = '7ec461d8d612c343d225f8b126866b59cec50100';
+
     public function __construct(LoggerInterface $logger = null)
     {
         $this->setLogger($logger);
@@ -37,5 +38,25 @@ class Client
         return $this->client->get($url);
     }
 
+    public function patch(string $url, array $data) : ResponseInterface
+    {
+        $this->logger->info('PATCH request to:' . $url);
+        $url .= '?access_token=' . $this->accessKey;
+        return $this->client->patch($url, ['json' => $data]);
+    }
+
+    public function post(string $url, array $data)
+    {
+        $this->logger->info('POST request to:' . $url);
+        $url .= '?access_token=' . $this->accessKey;
+        return $this->client->post($url, ['json' => $data]);
+    }
+
+    public function put(string $url)
+    {
+        $this->logger->info('PUT request to:' . $url);
+        $url .= '?access_token=' . $this->accessKey;
+        return $this->client->put($url);
+    }
 
 }

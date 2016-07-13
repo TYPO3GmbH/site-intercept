@@ -6,59 +6,52 @@ namespace T3G\Intercept;
 use T3G\Intercept\Forge\Client as ForgeClient;
 use T3G\Intercept\Gerrit\CommitMessageCreator;
 use T3G\Intercept\Git\Client;
-use T3G\Intercept\Github\IssueInformation;
 use T3G\Intercept\Github\PatchSaver;
-use T3G\Intercept\Github\PullRequestInformation;
-use T3G\Intercept\Github\UserInformation;
-use T3G\Intercept\Github\Client as GithubClient;
+use T3G\Intercept\Github\PullRequest;
 
+/**
+ * Class GithubToGerritController
+ *
+ * @codeCoverageIgnore Integration tests only
+ * @package T3G\Intercept
+ */
 class GithubToGerritController
 {
 
-    protected $githubClient;
-    protected $forgeClient;
+    /**
+     * @var string
+     */
+    private $repositoryPath;
 
-    public function __construct()
+    public function __construct(string $repositoryPath = '')
     {
-        $this->githubClient = new GithubClient();
-        $this->forgeClient = new ForgeClient();
+        $this->repositoryPath = $repositoryPath;
     }
 
     public function transformPullRequestToGerritReview(string $payload)
     {
-        $pullRequestInformation = new PullRequestInformation();
-        $pullRequestUrls = $pullRequestInformation->transform($payload);
+        $pullRequestInformation = new PullRequest($payload);
 
-        $issueData = $this->getIssueData($pullRequestUrls['issueUrl']);
-        $userData = $this->getUserData($pullRequestUrls['userUrl']);
+        $issueData = $pullRequestInformation->getIssueData();
+        $userData = $pullRequestInformation->getUserData();
 
-        $result = $this->forgeClient->createIssue($issueData['title'], $issueData['body']);
+        $forgeClient = new ForgeClient();
+        $result = $forgeClient->createIssue($issueData['title'], $issueData['body']);
         $issueNumber = (int)$result->id;
 
         $commitMessageCreator = new CommitMessageCreator();
         $commitMessage = $commitMessageCreator->create($issueData['title'], $issueData['body'], $issueNumber);
 
         $patchSaver = new PatchSaver();
-        $localDiff = $patchSaver->getLocalDiff($pullRequestUrls['diffUrl']);
+        $localDiff = $patchSaver->getLocalDiff($pullRequestInformation->diffUrl);
 
-        $gitClient = new Client();
+        $gitClient = new Client($this->repositoryPath);
         $gitClient->commitPatchAsUser($localDiff, $userData, $commitMessage);
         $gitClient->pushToGerrit();
 
+        $pullRequestInformation->closePullRequest();
     }
 
 
-    protected function getIssueData(string $issueUrl) : array
-    {
-        $issueResponse = $this->githubClient->get($issueUrl);
-        $issueInformation = new IssueInformation();
-        return $issueInformation->transform($issueResponse);
-    }
 
-    protected function getUserData(string $userUrl)
-    {
-        $userResponse = $this->githubClient->get($userUrl);
-        $userInformation = new UserInformation();
-        return $userInformation->transform($userResponse);
-    }
 }

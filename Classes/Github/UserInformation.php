@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class UserInformation
 {
-    public function transform(ResponseInterface $response)
+    public function transformResponse(ResponseInterface $response)
     {
         $userInformation = [
             'email' => 'noreply@typo3.org'

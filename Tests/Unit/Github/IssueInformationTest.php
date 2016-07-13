@@ -17,7 +17,7 @@ class IssueInformationTest extends \PHPUnit_Framework_TestCase
         $responseProphecy = $this->prophesize(ResponseInterface::class);
         $responseProphecy->getBody()->willReturn(file_get_contents(BASEPATH . '/Tests/Fixtures/GithubIssueInformation.json'));
         $issueInformation = new IssueInformation();
-        $result = $issueInformation->transform($responseProphecy->reveal());
+        $result = $issueInformation->transformResponse($responseProphecy->reveal());
 
         self::assertSame('issue title', $result['title']);
         self::assertSame('updated body', $result['body']);

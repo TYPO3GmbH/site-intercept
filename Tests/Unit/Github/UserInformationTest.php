@@ -17,7 +17,7 @@ class UserInformationTest extends \PHPUnit_Framework_TestCase
         $response = $this->prophesize(ResponseInterface::class);
         $response->getBody()->willReturn(file_get_contents(BASEPATH . '/Tests/Fixtures/GithubUserInformation.json'));
         $userInformation = new UserInformation();
-        $info = $userInformation->transform($response->reveal());
+        $info = $userInformation->transformResponse($response->reveal());
         self::assertSame('psychomieze', $info['user']);
         self::assertSame('susanne.moog@gmail.com', $info['email']);
     }
