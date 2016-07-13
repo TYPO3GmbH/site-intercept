@@ -21,4 +21,18 @@ class UserInformationTest extends \PHPUnit_Framework_TestCase
         self::assertSame('psychomieze', $info['user']);
         self::assertSame('susanne.moog@gmail.com', $info['email']);
     }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function transformUsesNameIfAvailable()
+    {
+        $response = $this->prophesize(ResponseInterface::class);
+        $response->getBody()->willReturn(file_get_contents(BASEPATH . '/Tests/Fixtures/GithubUserInformationWithNameWithoutEmail.json'));
+        $userInformation = new UserInformation();
+        $info = $userInformation->transformResponse($response->reveal());
+        self::assertSame('Susanne Moog', $info['user']);
+        self::assertSame('noreply@example.com', $info['email']);
+    }
 }

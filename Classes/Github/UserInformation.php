@@ -10,11 +10,11 @@ class UserInformation
     public function transformResponse(ResponseInterface $response)
     {
         $userInformation = [
-            'email' => 'noreply@typo3.org'
+            'email' => 'noreply@example.com'
         ];
         $responseBody = (string)$response->getBody();
         $fullUserInformation = json_decode($responseBody, true);
-        $userInformation['user'] = $fullUserInformation['login'];
+        $userInformation['user'] = $fullUserInformation['name'] ?: $fullUserInformation['login'];
         if (isset($fullUserInformation['email'])) {
             $userInformation['email'] = $fullUserInformation['email'];
         }
