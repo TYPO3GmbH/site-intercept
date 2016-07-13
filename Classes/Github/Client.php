@@ -24,7 +24,7 @@ class Client
      */
     protected $client;
 
-    protected $accessKey = '7ec461d8d612c343d225f8b126866b59cec50100';
+    protected $accessKey = '5c91d191a753736e5024345d683db45e448ac13d';
 
     public function __construct(LoggerInterface $logger = null)
     {

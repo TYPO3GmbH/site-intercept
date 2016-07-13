@@ -24,7 +24,7 @@ class GithubToGerritController
      */
     private $repositoryPath;
 
-    public function __construct(string $repositoryPath = '')
+    public function __construct(string $repositoryPath)
     {
         $this->repositoryPath = $repositoryPath;
     }
