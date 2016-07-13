@@ -61,7 +61,10 @@ To ssh://maddy2101@review.typo3.org:29418/Packages/TYPO3.CMS.git
      */
     public function transformExtractsIssueUrl()
     {
-        self::assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1', $this->githubPullRequest->issueUrl);
+        self::assertSame(
+            'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1',
+            $this->githubPullRequest->issueUrl
+        );
     }
 
     /**
@@ -79,7 +82,10 @@ To ssh://maddy2101@review.typo3.org:29418/Packages/TYPO3.CMS.git
      */
     public function transformExtractsPullRequestUrl()
     {
-        self::assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1', $this->githubPullRequest->pullRequestUrl);
+        self::assertSame(
+            'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1',
+            $this->githubPullRequest->pullRequestUrl
+        );
     }
 
     /**
@@ -88,7 +94,10 @@ To ssh://maddy2101@review.typo3.org:29418/Packages/TYPO3.CMS.git
      */
     public function transformExtractsCommentsUrl()
     {
-        self::assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments', $this->githubPullRequest->commentsUrl);
+        self::assertSame(
+            'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments',
+            $this->githubPullRequest->commentsUrl
+        );
     }
 
 
@@ -119,7 +128,10 @@ To ssh://maddy2101@review.typo3.org:29418/Packages/TYPO3.CMS.git
 
         $this->githubPullRequest->closePullRequest();
 
-        $this->githubClient->post(Argument::any(), Argument::any(), Argument::containingString('https://review.typo3.org/48929'))->shouldHaveBeenCalled();
+        $this->githubClient->post(
+            Argument::any(),
+            Argument::withEntry('body', Argument::containingString('https://review.typo3.org/48929'))
+        )->shouldHaveBeenCalled();
     }
 
     /**
@@ -138,8 +150,7 @@ To ssh://maddy2101@review.typo3.org:29418/Packages/TYPO3.CMS.git
 
         $this->githubClient->post(
             Argument::any(),
-            Argument::any(),
-            Argument::containingString($contributionLink)
+            Argument::withEntry('body', Argument::containingString($contributionLink))
         )->shouldHaveBeenCalled();;
     }
 
@@ -167,7 +178,9 @@ To ssh://maddy2101@review.typo3.org:29418/Packages/TYPO3.CMS.git
     public function getIssueDataFetchesIssueDataAndTransformsIt()
     {
         $responseProphecy = $this->prophesize(ResponseInterface::class);
-        $responseProphecy->getBody()->willReturn(file_get_contents(BASEPATH . '/Tests/Fixtures/GithubIssueInformation.json'));
+        $responseProphecy->getBody()->willReturn(
+            file_get_contents(BASEPATH . '/Tests/Fixtures/GithubIssueInformation.json')
+        );
         $this->githubClient->get(Argument::cetera())->willReturn($responseProphecy->reveal());
         $issueData = $this->githubPullRequest->getIssueData();
 
