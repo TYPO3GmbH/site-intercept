@@ -1,11 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept\Tests\Unit;
+namespace T3G\Intercept\Tests\Unit\Slack;
 
-use T3G\Intercept\SlackMessageParser;
+use T3G\Intercept\Slack\MessageParser;
 
-class SlackMessageParserTest extends \PHPUnit_Framework_TestCase
+class MessageParserTest extends \PHPUnit_Framework_TestCase
 {
 
 
@@ -21,7 +21,7 @@ class SlackMessageParserTest extends \PHPUnit_Framework_TestCase
             "color":"good","text":"<https://bamboo.typo3.com/browse/T3G-AP-25|T3G \u203a Apparel \u203a #25> passed. 6 passed. Manual run by <https://bamboo.typo3.com/browse/user/susanne.moog|Susanne Moog>","fallback":"T3G \u203a Apparel \u203a #25 passed. 6 passed. Manual run by Susanne Moog"}],"username":"Bamboo"}'
         ];
 
-        $slackMessageParser = new SlackMessageParser();
+        $slackMessageParser = new MessageParser();
         $buildKey = $slackMessageParser->parseMessage();
 
         self::assertSame('T3G-AP-25', $buildKey);
@@ -35,7 +35,7 @@ class SlackMessageParserTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $slackMessageParser = new SlackMessageParser();
+        $slackMessageParser = new MessageParser();
         $slackMessageParser->parseMessage();
     }
 }

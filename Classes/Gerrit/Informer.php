@@ -1,10 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept;
+namespace T3G\Intercept\Gerrit;
 
-use T3G\Intercept\Library\CurlGerritPostRequest;
 use T3G\Intercept\Utility\TimeUtility;
+use T3G\Intercept\Gerrit\Client;
+
 
 /**
  * Class GerritInformer
@@ -14,16 +15,16 @@ use T3G\Intercept\Utility\TimeUtility;
  *
  * @package T3G\Intercept
  */
-class GerritInformer
+class Informer
 {
     /**
-     * @var \T3G\Intercept\Library\CurlGerritPostRequest
+     * @var Client
      */
     private $requester;
 
-    public function __construct(CurlGerritPostRequest $requester = null)
+    public function __construct(Client $requester = null)
     {
-        $this->requester = $requester ?: new CurlGerritPostRequest();
+        $this->requester = $requester ?: new Client();
     }
 
     /**
@@ -48,7 +49,10 @@ class GerritInformer
 
     private function getMessage(array $buildInformation) : string
     {
-        $messageParts[] = "Completed build in " . TimeUtility::convertSecondsToHumanReadable($buildInformation['buildDurationInSeconds']) . ' on '  . $buildInformation['prettyBuildCompletedTime'];
+        $messageParts[] = "Completed build in " .
+                          TimeUtility::convertSecondsToHumanReadable($buildInformation['buildDurationInSeconds']) .
+                          ' on ' .
+                          $buildInformation['prettyBuildCompletedTime'];
         $messageParts[] = "Test Summary: " . $buildInformation['buildTestSummary'];
         $messageParts[] = "Find logs and detail information at " . $buildInformation['buildUrl'];
         return join("\n", $messageParts);

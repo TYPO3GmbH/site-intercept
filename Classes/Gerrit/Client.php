@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept\Library;
+namespace T3G\Intercept\Gerrit;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use T3G\Intercept\Traits\Logger;
@@ -14,9 +14,9 @@ use T3G\Intercept\Traits\Logger;
  * Responsible for all requests sent to Gerrit
  *
  * @codeCoverageIgnore tested via integration tests only
- * @package T3G\Intercept\Library
+ * @package T3G\Intercept\Requests
  */
-class CurlGerritPostRequest
+class Client
 {
     use Logger;
 
@@ -38,7 +38,7 @@ class CurlGerritPostRequest
     public function __construct(LoggerInterface $logger = null)
     {
         $this->setLogger($logger);
-        $this->client = new Client(['base_uri' => $this->baseUrl]);
+        $this->client = new GuzzleClient(['base_uri' => $this->baseUrl]);
     }
 
     /**

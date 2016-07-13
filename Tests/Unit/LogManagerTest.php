@@ -24,4 +24,18 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
             self::assertContains("InterceptTest.log", $handler->path);
         }
     }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function logManagerLoadsConfigByNameIfExists()
+    {
+        $logManager = new LogManager();
+        $logger = $logManager->getLogger('git');
+        $handlers = $logger->getHandlers();
+        foreach ($handlers as $handler) {
+            self::assertContains('Github2Gerrit', $handler->getUrl());
+        }
+    }
 }

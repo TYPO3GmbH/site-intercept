@@ -1,13 +1,13 @@
 <?php
 declare(strict_types = 1);
-namespace T3G\Intercept\Tests\Unit;
+namespace T3G\Intercept\Tests\Unit\Gerrit;
 
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
-use T3G\Intercept\GerritInformer;
-use T3G\Intercept\Library\CurlGerritPostRequest;
+use T3G\Intercept\Gerrit\Informer;
+use T3G\Intercept\Gerrit\Client;
 
-class GerritInformerTest extends \PHPUnit_Framework_TestCase
+class InformerTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -16,7 +16,7 @@ class GerritInformerTest extends \PHPUnit_Framework_TestCase
      */
     public function voteOnGerritSendsRequestToVote_Success()
     {
-        $curlGerritPostRequest = $this->prophesize(CurlGerritPostRequest::class);
+        $curlGerritPostRequest = $this->prophesize(Client::class);
         $curlGerritPostRequest->postRequest(Argument::cetera())->willReturn(new Response());
 
         $message = "Completed build in 21s on Sat, 18 Jun, 06:59 PM\nTest Summary: 6 passed\nFind logs and detail information at https://bamboo.typo3.com/browse/T3G-AP-25";
@@ -36,7 +36,7 @@ class GerritInformerTest extends \PHPUnit_Framework_TestCase
             'buildDurationInSeconds' => 21
         ];
 
-        $gerritInformer = new GerritInformer($curlGerritPostRequest->reveal());
+        $gerritInformer = new Informer($curlGerritPostRequest->reveal());
         $gerritInformer->voteOnGerrit($buildInformation);
 
         $curlGerritPostRequest->postRequest('changes/12345/revisions/3/review', $postFields)->shouldHaveBeenCalled();
