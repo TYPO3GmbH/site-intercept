@@ -7,6 +7,7 @@ namespace T3G\Intercept\Tests\Unit\Github;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
+use T3G\Intercept\Exception\DoNotCareException;
 use T3G\Intercept\Github\Client;
 use T3G\Intercept\Github\PullRequest;
 
@@ -203,5 +204,18 @@ To ssh://maddy2101@review.typo3.org:29418/Packages/TYPO3.CMS.git
 
         $this->githubClient->get($this->githubPullRequest->userUrl)->shouldHaveBeenCalled();
         self::assertSame('psychomieze', $issueData['user']);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function pullRequestConstructorThrowsExceptionIfActionIsNotForANewPullRequest()
+    {
+        $dummyPayload = [
+            'action' => 'closed'
+        ];
+        $this->expectException(DoNotCareException::class);
+        new PullRequest(json_encode($dummyPayload));
     }
 }

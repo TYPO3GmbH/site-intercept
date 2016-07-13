@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept;
 
+use T3G\Intercept\Exception\DoNotCareException;
 use T3G\Intercept\Forge\Client as ForgeClient;
 use T3G\Intercept\Gerrit\CommitMessageCreator;
 use T3G\Intercept\Git\Client;
@@ -30,7 +31,11 @@ class GithubToGerritController
 
     public function transformPullRequestToGerritReview(string $payload)
     {
-        $pullRequestInformation = new PullRequest($payload);
+        try {
+            $pullRequestInformation = new PullRequest($payload);
+        } catch (DoNotCareException $e) {
+            return;
+        }
 
         $issueData = $pullRequestInformation->getIssueData();
         $userData = $pullRequestInformation->getUserData();

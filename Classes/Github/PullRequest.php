@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Github;
 
+use T3G\Intercept\Exception\DoNotCareException;
+
 /**
  * Class PullRequestInformation
  *
@@ -27,11 +29,15 @@ class PullRequest
      *
      * @param string $requestPayload
      * @param \T3G\Intercept\Github\Client $client
+     * @throws \T3G\Intercept\Exception\DoNotCareException
      */
     public function __construct(string $requestPayload, Client $client = null)
     {
         $this->client = $client ?: new Client();
         $fullPullRequestInformation = json_decode($requestPayload, true);
+        if($fullPullRequestInformation['action'] !== 'opened') {
+            throw new DoNotCareException();
+        }
         $this->diffUrl = $fullPullRequestInformation['pull_request']['diff_url'];
         $this->userUrl = $fullPullRequestInformation['pull_request']['user']['url'];
         $this->issueUrl = $fullPullRequestInformation['pull_request']['issue_url'];
