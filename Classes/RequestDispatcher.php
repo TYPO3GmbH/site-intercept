@@ -38,8 +38,8 @@ class RequestDispatcher
     public function dispatch()
     {
         try {
-            if (!empty($_GET['github']) && !empty($_POST['payload'])) {
-                $this->githubToGerritController->transformPullRequestToGerritReview($_POST['payload']);
+            if (!empty($_GET['github'])) {
+                $this->githubToGerritController->transformPullRequestToGerritReview(file_get_contents("php://input"));
             } else {
                 if (!empty($_POST['payload'])) {
                     $this->interceptController->postBuildAction();

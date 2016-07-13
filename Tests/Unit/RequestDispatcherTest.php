@@ -114,10 +114,9 @@ class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
     public function dispatchDispatchesToGithubController()
     {
         $_GET = ['github' => 1];
-        $_POST = ['payload' => 'some string'];
 
         $this->requestDispatcher->dispatch();
 
-        $this->githubToGerritController->transformPullRequestToGerritReview('some string')->shouldHaveBeenCalled();
+        $this->githubToGerritController->transformPullRequestToGerritReview(Argument::any())->shouldHaveBeenCalled();
     }
 }
