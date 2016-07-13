@@ -1,12 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: psychomieze
- * Date: 23/06/16
- * Time: 09:09
- */
+declare(strict_types = 1);
 
-namespace T3G\Intercept\Tests;
+namespace T3G\Intercept\Tests\Unit;
 
 use Noodlehaus\Config;
 use T3G\Intercept\LogManager;
@@ -27,6 +22,20 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
         foreach ($handlers as $handler) {
             self::assertSame("WARNING", $handler->level);
             self::assertContains("InterceptTest.log", $handler->path);
+        }
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function logManagerLoadsConfigByNameIfExists()
+    {
+        $logManager = new LogManager();
+        $logger = $logManager->getLogger('git');
+        $handlers = $logger->getHandlers();
+        foreach ($handlers as $handler) {
+            self::assertContains('Github2Gerrit', $handler->getUrl());
         }
     }
 }

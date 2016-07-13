@@ -16,9 +16,14 @@ use Noodlehaus\Config;
 class LogManager
 {
 
-    public function getLogger($name, Config $config = null)
+    /**
+     * @param string $name
+     * @param \Noodlehaus\Config|null $config
+     * @return \Monolog\Logger
+     */
+    public function getLogger(string $name, Config $config = null)
     {
-        $config = $config ?: Config::load(BASEPATH . '/Configuration/logger.dist.json');
+        $config = $this->getConfig($name, $config);
         $logger = new Logger($name);
         $handlers = $config->get('Handlers');
         foreach ($handlers as $handler) {
@@ -28,6 +33,24 @@ class LogManager
             $logger->pushHandler(new $handler['class'](...array_values($handler['arguments'])));
         }
         return $logger;
+    }
+
+    /**
+     * @param string $name
+     * @param \Noodlehaus\Config $config
+     * @return \Noodlehaus\Config
+     */
+    protected function getConfig(string $name, Config $config = null)
+    {
+        if ($config === null) {
+            $filename = BASEPATH . '/Configuration/' . $name . '.logger.json';
+            if (file_exists($filename)) {
+                $config = Config::load($filename);
+            } else {
+                $config = Config::load(BASEPATH . '/Configuration/logger.dist.json');
+            }
+        }
+        return $config;
     }
 
 

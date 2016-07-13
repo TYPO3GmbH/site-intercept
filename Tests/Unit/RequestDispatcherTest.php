@@ -1,15 +1,18 @@
 <?php
 declare(strict_types = 1);
-namespace T3G\Tests;
+namespace T3G\Intercept\Tests\Unit;
 
 use Monolog\Logger;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use T3G\Intercept\GithubToGerritController;
 use T3G\Intercept\InterceptController;
 use T3G\Intercept\RequestDispatcher;
 
 class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
 {
+    protected $githubToGerritController;
+    protected $logger;
 
     /**
      * @var RequestDispatcher
@@ -25,7 +28,9 @@ class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->interceptController = $this->prophesize(InterceptController::class);
-        $this->requestDispatcher = new RequestDispatcher($this->interceptController->reveal());
+        $this->githubToGerritController = $this->prophesize(GithubToGerritController::class);
+        $this->logger = $this->prophesize(Logger::class);
+        $this->requestDispatcher = new RequestDispatcher($this->interceptController->reveal(), $this->githubToGerritController->reveal(), $this->logger->reveal());
     }
 
     /**
@@ -63,11 +68,9 @@ class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function dispatchLogsRequestsItCouldNotDispatch()
     {
-        $logger = $this->prophesize(Logger::class);
-        $requestDispatcher = new RequestDispatcher($this->interceptController->reveal(), $logger->reveal());
         $_REQUEST['something'] = 'else';
-        $requestDispatcher->dispatch();
-        $logger->warning(Argument::containingString('something'))->shouldHaveBeenCalled();
+        $this->requestDispatcher->dispatch();
+        $this->logger->warning(Argument::containingString('something'))->shouldHaveBeenCalled();
     }
 
     /**
@@ -81,11 +84,9 @@ class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
             'changeUrl' => 'https://review.typo3.org/48574/',
             'branch' => 'master'
         ];
-        $logger = $this->prophesize(Logger::class);
-        $requestDispatcher = new RequestDispatcher($this->interceptController->reveal(), $logger->reveal());
-        $requestDispatcher->dispatch();
-        $logger->warning(Argument::any())->shouldNotHaveBeenCalled();
-        $logger->error(Argument::any())->shouldNotHaveBeenCalled();
+        $this->requestDispatcher->dispatch();
+        $this->logger->warning(Argument::any())->shouldNotHaveBeenCalled();
+        $this->logger->error(Argument::any())->shouldNotHaveBeenCalled();
     }
 
     /**
@@ -96,16 +97,27 @@ class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $this->interceptController->newBuildAction()->willThrow(\InvalidArgumentException::class);
 
-        $logger = $this->prophesize(Logger::class);
-        $requestDispatcher = new RequestDispatcher($this->interceptController->reveal(), $logger->reveal());
-
         $_POST = [
             'patchset' => '3',
             'changeUrl' => 'https://review.typo3.org/48574/',
             'branch' => 'master'
         ];
 
-        $requestDispatcher->dispatch();
-        $logger->error(Argument::containingString('ERROR'))->shouldHaveBeenCalled();
+        $this->requestDispatcher->dispatch();
+        $this->logger->error(Argument::containingString('ERROR'))->shouldHaveBeenCalled();
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function dispatchDispatchesToGithubController()
+    {
+        $_GET = ['github' => 1];
+        $_POST = ['payload' => 'some string'];
+
+        $this->requestDispatcher->dispatch();
+
+        $this->githubToGerritController->transformPullRequestToGerritReview('some string')->shouldHaveBeenCalled();
     }
 }

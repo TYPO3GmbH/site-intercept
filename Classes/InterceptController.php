@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept;
 
-use T3G\Intercept\Library\CurlBambooRequests;
+use T3G\Intercept\Bamboo\Client;
+use T3G\Intercept\Bamboo\StatusInformation;
+use T3G\Intercept\Gerrit\Informer;
+use T3G\Intercept\Slack\MessageParser;
 
 /**
  * Class InterceptController
@@ -14,35 +17,35 @@ class InterceptController
 {
 
     /**
-     * @var \T3G\Intercept\Library\CurlBambooRequests
+     * @var Client
      */
     private $bambooRequests;
 
     /**
-     * @var \T3G\Intercept\SlackMessageParser
+     * @var \T3G\Intercept\Slack\MessageParser
      */
     private $slackMessageParser;
 
     /**
-     * @var \T3G\Intercept\BambooStatusInformation
+     * @var \T3G\Intercept\Bamboo\StatusInformation
      */
     private $bambooStatusInformation;
 
     /**
-     * @var \T3G\Intercept\GerritInformer
+     * @var \T3G\Intercept\Gerrit\Informer
      */
     private $gerritInformer;
 
     public function __construct(
-        CurlBambooRequests $bambooRequests = null,
-        SlackMessageParser $slackMessageParser = null,
-        BambooStatusInformation $bambooStatusInformation = null,
-        GerritInformer $gerritInformer = null
+        Client $bambooRequests = null,
+        MessageParser $slackMessageParser = null,
+        StatusInformation $bambooStatusInformation = null,
+        Informer $gerritInformer = null
     ) {
-        $this->bambooRequests = $bambooRequests ?: new CurlBambooRequests();
-        $this->slackMessageParser = $slackMessageParser ?: new SlackMessageParser();
-        $this->bambooStatusInformation = $bambooStatusInformation ?: new BambooStatusInformation();
-        $this->gerritInformer = $gerritInformer ?: new GerritInformer();
+        $this->bambooRequests = $bambooRequests ?: new Client();
+        $this->slackMessageParser = $slackMessageParser ?: new MessageParser();
+        $this->bambooStatusInformation = $bambooStatusInformation ?: new StatusInformation();
+        $this->gerritInformer = $gerritInformer ?: new Informer();
     }
 
     /**

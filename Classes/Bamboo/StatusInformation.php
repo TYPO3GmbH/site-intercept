@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Intercept;
+namespace T3G\Intercept\Bamboo;
 
-use T3G\Intercept\Library\CurlBambooRequests;
+use T3G\Intercept\Requests\CurlBambooRequests;
 
 /**
  * Class BambooStatusInformation
@@ -13,24 +13,24 @@ use T3G\Intercept\Library\CurlBambooRequests;
  *
  * @package T3G\Intercept
  */
-class BambooStatusInformation
+class StatusInformation
 {
 
     /**
-     * @var \T3G\Intercept\Library\CurlBambooRequests
+     * @var Client
      */
     private $requester;
 
-    public function __construct(CurlBambooRequests $requester = null)
+    public function __construct(Client $requester = null)
     {
-        $this->requester = $requester ?: new CurlBambooRequests();
+        $this->requester = $requester ?: new Client();
     }
 
     public function transform(string $buildKey) : array
     {
-        $jsonResponse = $this->requester->getBuildStatus($buildKey);
+        $jsonResponse = $this->requester->getBuildStatus($buildKey)->getBody();
         $result = [];
-        $response = json_decode($jsonResponse, true);
+        $response = json_decode((string)$jsonResponse, true);
         $result = $this->getInformationFromLabels($response, $result);
         $result['buildUrl'] = 'https://bamboo.typo3.com/browse/' . $response['buildResultKey'];
         $result['success'] = $response['successful'];
