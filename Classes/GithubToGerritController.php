@@ -19,16 +19,6 @@ use T3G\Intercept\Github\PullRequest;
 class GithubToGerritController
 {
 
-    /**
-     * @var string
-     */
-    private $repositoryPath;
-
-    public function __construct(string $repositoryPath)
-    {
-        $this->repositoryPath = $repositoryPath;
-    }
-
     public function transformPullRequestToGerritReview(string $payload)
     {
         try {
@@ -50,7 +40,7 @@ class GithubToGerritController
         $patchSaver = new PatchSaver();
         $localDiff = $patchSaver->getLocalDiff($pullRequestInformation->diffUrl);
 
-        $gitClient = new Client($this->repositoryPath);
+        $gitClient = new Client();
         $gitClient->commitPatchAsUser($localDiff, $userData, $commitMessage);
         $gitClient->pushToGerrit();
 
