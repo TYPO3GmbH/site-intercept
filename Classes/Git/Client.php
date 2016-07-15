@@ -25,6 +25,7 @@ class Client
     {
         $gitOutputListener = new GitOutputListener();
         $client = new GitWrapper();
+        $client->setEnvVar('HOME', getenv('GITHOME'));
         $client->setPrivateKey(getenv('PATH_TO_PRIVATE_KEY'));
         $client->addOutputListener($gitOutputListener);
         $client->addLoggerListener($this->getListener());
