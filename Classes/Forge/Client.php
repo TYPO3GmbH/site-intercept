@@ -18,14 +18,13 @@ class Client
 
     protected $client;
     protected $url = 'https://forge.typo3.org';
-    protected $accessToken = '2b0f2e95e8f62afa864734191003196f37ff5590';
     protected $project = 'Core';
     protected $projectId = 27;
 
     public function __construct(LoggerInterface $logger = null)
     {
         $this->setLogger($logger);
-        $this->client = new \Redmine\Client($this->url, $this->accessToken);
+        $this->client = new \Redmine\Client($this->url, getenv('FORGE_ACCESS_TOKEN'));
     }
 
     public function createIssue(string $title, string $body) : \SimpleXMLElement

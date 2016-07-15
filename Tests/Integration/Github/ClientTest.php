@@ -28,7 +28,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $githubRequests = new Client($loggerProphecy->reveal());
         $url = 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1';
-        $githubRequests->get($url);
+        $response = $githubRequests->get($url);
+        self::assertSame($response->getStatusCode(), 200);
     }
 
     /**
@@ -43,7 +44,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         ];
 
         $client = new Client();
-        $client->patch($url, $data);
+        $response = $client->patch($url, $data);
+        self::assertSame($response->getStatusCode(), 200);
     }
 
     /**

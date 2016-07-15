@@ -31,7 +31,7 @@ class RequestDispatcher
         Logger $logger = null
     ) {
         $this->interceptController = $interceptController ?: new InterceptController();
-        $this->githubToGerritController = $githubToGerritController ?: new GithubToGerritController('/srv/www/TYPO3.CMS');
+        $this->githubToGerritController = $githubToGerritController ?: new GithubToGerritController();
         $this->setLogger($logger);
     }
 

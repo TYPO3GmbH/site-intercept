@@ -14,7 +14,8 @@
     "hassankhan/config": "0.10.0",
     "guzzlehttp/guzzle": "^6.2",
     "kbsali/redmine-api": "~1.0",
-    "cpliakas/git-wrapper": "^1.7"
+    "cpliakas/git-wrapper": "^1.7",
+    "vlucas/phpdotenv": "^2.3"
   },
   "require-dev": {
     "phpunit/phpunit": "5.4.6"
