@@ -27,6 +27,7 @@ class Client
         $client = new GitWrapper();
         $client->addLoggerListener($this->getListener());
         $client->addOutputListener($gitOutputListener);
+        $client->setPrivateKey(getenv('PATH_TO_PRIVATE_KEY'));
         $this->workingCopy = $client->workingCopy(getenv('PATH_TO_CORE_GIT_CHECKOUT'));
         $this->workingCopy
             ->clean('-d', '-f')
