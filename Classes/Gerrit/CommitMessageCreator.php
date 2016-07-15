@@ -7,18 +7,19 @@ class CommitMessageCreator
 {
 
     const MAX_CHARS_PER_LINE = 74;
+    const LF = "\n";
     const DOUBLE_LF = "\n\n";
 
     public function create(string $subject, string $body, int $issueNumber)
     {
         $subject = $this->formatSubject($subject);
         $body = $this->formatBody($body);
-        $releases = 'Releases: master';
+        $releases = $this->getReleasesLine($body);
         $resolves = 'Resolves: #' . $issueNumber;
 
         $message = $subject . self::DOUBLE_LF .
                    $body . self::DOUBLE_LF .
-                   $releases . self::DOUBLE_LF .
+                   $releases . self::LF .
                    $resolves;
 
         return $message;
@@ -28,20 +29,22 @@ class CommitMessageCreator
      * @param string $body
      * @return string
      */
+    protected function getReleasesLine(string $body)
+    {
+        $release = '';
+        if(preg_match('/^Releases\:\s\w+$/m', $body) < 1) {
+            $release = 'Releases: master';
+        }
+        return $release;
+    }
+
+    /**
+     * @param string $body
+     * @return string
+     */
     protected function formatBody(string $body)
     {
-        $lines = explode("\n", $body);
-        $formattedBody = '';
-        foreach ($lines as $line) {
-            if (strlen($line) > self::MAX_CHARS_PER_LINE) {
-                $chunks = str_split($line, self::MAX_CHARS_PER_LINE);
-                $formattedBody .= implode("\n", $chunks);
-            } else {
-                $formattedBody .= $line;
-            }
-            $formattedBody .= "\n";
-        }
-        return $formattedBody;
+        return wordwrap($body, self::MAX_CHARS_PER_LINE, "\n", true);
     }
 
     /**
@@ -50,7 +53,9 @@ class CommitMessageCreator
      */
     protected function formatSubject(string $subject)
     {
-        $subject = '[TASK] ' . $subject;
+        if (preg_match('/^\[.+?\]/', $subject) < 1) {
+            $subject = '[TASK] ' . $subject;
+        }
         if (strlen($subject) > self::MAX_CHARS_PER_LINE) {
             $subject = substr($subject, 0, self::MAX_CHARS_PER_LINE);
         }

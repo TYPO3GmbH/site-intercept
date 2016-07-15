@@ -70,4 +70,33 @@ class CommitMessageCreatorTest extends \PHPUnit_Framework_TestCase
             self::assertLessThanOrEqual(CommitMessageCreator::MAX_CHARS_PER_LINE, strlen($line));
         }
     }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function commitMessageSubjectOnlyGetsPrefixedIfNoPrefixExists()
+    {
+        $subject = '[BUGFIX] My bug fix';
+
+        $message = $this->commitMessageCreator->create($subject, $this->body, $this->issueNumber);
+
+        list($subjectLine, $lines) = explode("\n", $message);
+
+        self::assertSame($subject, $subjectLine);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function commitMessageReleasesLineOnlyGetsAddedIfNotAlreadyPresent()
+    {
+        $body = 'foo bar ' . CommitMessageCreator::DOUBLE_LF . 'Releases: master';
+
+        $message = $this->commitMessageCreator->create($this->subject, $body, $this->issueNumber);
+
+        $substr_count = substr_count($message, 'Releases:');
+        self::assertSame(1, $substr_count);
+    }
 }
