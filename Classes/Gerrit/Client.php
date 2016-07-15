@@ -57,7 +57,7 @@ class Client
             $apiPath,
             [
                 'headers' => [
-                    'authorization' => 'Basic dHlwbzNjb21fYmFtYm9vOjBMZnhjbFVackVRSWhDM2JmZ0lSZTJNUVBnc1I1cEljcWIvZ2dZUy9Kdw==',
+                    'authorization' => getenv('GERRIT_AUTHORIZATION'),
                     'cache-control' => 'no-cache',
                     'content-type' => 'application/json'
                 ],

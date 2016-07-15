@@ -3,8 +3,6 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Bamboo;
 
-use T3G\Intercept\Requests\CurlBambooRequests;
-
 /**
  * Class BambooStatusInformation
  *

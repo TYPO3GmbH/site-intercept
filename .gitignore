@@ -5,5 +5,5 @@ atlassian-ide-plugin.xml
 
 /vendor/
 /Log/Intercept.log
-/Lock/GerritOutput
 /Log/Github2Gerrit.log
+.env

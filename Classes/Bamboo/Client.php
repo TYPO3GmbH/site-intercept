@@ -46,7 +46,7 @@ class Client
         $this->logger->info('cURL request to uri' . $this->baseUrl . $uri);
         $response = $this->client->get($uri, ['headers' => [
             'accept' => 'application/json',
-            'authorization' => 'Basic d2I6dHk5MDMhISEx',
+            'authorization' => getenv('BAMBOO_AUTHORIZATION'),
             'cache-control' => 'no-cache',
             'content-type' => 'application/json',
             'x-atlassian-token' => 'nocheck'
@@ -72,7 +72,7 @@ class Client
         $this->logger->info('cURL request to url' . $this->baseUrl);
 
         return $this->client->post($uri, ['headers' => [
-                    'authorization' => 'Basic d2I6dHk5MDMhISEx',
+                    'authorization' => getenv('BAMBOO_AUTHORIZATION'),
                     'cache-control' => 'no-cache',
                     'x-atlassian-token' => 'nocheck'
                 ],

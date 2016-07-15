@@ -21,13 +21,13 @@ class Client
      */
     protected $workingCopy;
 
-    public function __construct(string $repositoryPath)
+    public function __construct()
     {
         $gitOutputListener = new GitOutputListener();
         $client = new GitWrapper();
         $client->addLoggerListener($this->getListener());
         $client->addOutputListener($gitOutputListener);
-        $this->workingCopy = $client->workingCopy($repositoryPath);
+        $this->workingCopy = $client->workingCopy(getenv('PATH_TO_CORE_GIT_CHECKOUT'));
         $this->workingCopy
             ->clean('-d', '-f')
             ->reset('--hard', 'origin/master')

@@ -24,12 +24,13 @@ class Client
      */
     protected $client;
 
-    protected $accessKey = '5c91d191a753736e5024345d683db45e448ac13d';
+    protected $accessKey;
 
     public function __construct(LoggerInterface $logger = null)
     {
         $this->setLogger($logger);
         $this->client = new GuzzleClient();
+        $this->accessKey = getenv('GITHUB_ACCESS_TOKEN');
     }
 
     public function get(string $url) : ResponseInterface
