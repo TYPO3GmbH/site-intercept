@@ -25,13 +25,13 @@ class Client
     {
         $gitOutputListener = new GitOutputListener();
         $client = new GitWrapper();
+        $client->setEnvVar('HOME', getenv('GITHOME'));
         $client->setPrivateKey(getenv('PATH_TO_PRIVATE_KEY'));
         $client->addOutputListener($gitOutputListener);
         $client->addLoggerListener($this->getListener());
         $client->git('config --global user.name "TYPO3.com Service"');
         $client->git('config --global user.email noreply@typo3.com');
         $client->git('config url."ssh://typo3com_bamboo@review.typo3.org:29418".pushInsteadOf git://git.typo3.org');
-        $client->setEnvVar('HOME', getenv('GITHOME'));
         $this->workingCopy = $client->workingCopy(getenv('PATH_TO_CORE_GIT_CHECKOUT'));
         $this->workingCopy
             ->clean('-d', '-f')
