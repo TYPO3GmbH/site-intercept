@@ -25,7 +25,10 @@ class Client
      */
     protected $client;
     protected $baseUrl = 'https://bamboo.typo3.com/rest/api/';
-    protected $projectKey = 'CORE-GTC';
+    protected $branchToProjectKey = [
+        'master' => 'CORE-GTC',
+        'TYPO3_7-6' => 'CORE-GTC76'
+    ];
 
     public function __construct(LoggerInterface $logger = null)
     {
@@ -60,11 +63,19 @@ class Client
      *
      * @param string $changeUrl
      * @param int $patchset
+     * @param string $branch Branch name, eg. "master" or "TYPO3_7-6"
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function triggerNewCoreBuild(string $changeUrl, int $patchset)
+    public function triggerNewCoreBuild(string $changeUrl, int $patchset, string $branch)
     {
-        $apiPath = 'latest/queue/' . $this->projectKey;
+        if (!array_key_exists($branch, $this->branchToProjectKey)) {
+            throw new \InvalidArgumentException(
+                'Branch ' . $branch . ' does not point to a bamboo project name',
+                1472210110
+            );
+        }
+
+        $apiPath = 'latest/queue/' . (string)$this->branchToProjectKey[$branch];
         $apiPathParams = '?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=' .
                          urlencode($changeUrl) . '&bamboo.variable.patchset=' . $patchset;
         $uri = $apiPath . $apiPathParams;
@@ -81,11 +92,11 @@ class Client
     }
 
     /**
-     * @param string $projectKey
+     * @param array $branchToProjectKey Mapping information
      * @internal
      */
-    public function setProjectKey(string $projectKey)
+    public function setBranchToProjectKey(array $branchToProjectKey)
     {
-        $this->projectKey = $projectKey;
+        $this->branchToProjectKey = $branchToProjectKey;
     }
 }
