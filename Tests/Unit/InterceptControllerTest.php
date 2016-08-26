@@ -26,7 +26,7 @@ class InterceptControllerTest extends \PHPUnit_Framework_TestCase
         $interceptController = new InterceptController($requester->reveal());
         $interceptController->newBuildAction();
 
-        $requester->triggerNewCoreBuild($changeUrl, $patchset)->shouldHaveBeenCalled();
+        $requester->triggerNewCoreBuild($changeUrl, $patchset, 'master')->shouldHaveBeenCalled();
     }
 
     /**
