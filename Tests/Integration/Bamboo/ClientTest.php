@@ -38,8 +38,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function triggerNewBuild()
     {
         // Trigger test build in lollis test build project not in "real" core project
-        $this->curlBambooRequests->setProjectKey('CORE-TL');
-        $response = $this->curlBambooRequests->triggerNewCoreBuild('foo', 3);
+        $this->curlBambooRequests->setBranchToProjectKey(['master' => 'CORE-TL']);
+        $response = $this->curlBambooRequests->triggerNewCoreBuild('foo', 3, 'master');
         self::assertSame(200, $response->getStatusCode());
     }
 
