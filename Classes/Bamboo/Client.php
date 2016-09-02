@@ -47,13 +47,16 @@ class Client
 
         $uri = $apiPath . $apiPathParams;
         $this->logger->info('cURL request to uri' . $this->baseUrl . $uri);
-        $response = $this->client->get($uri, ['headers' => [
-            'accept' => 'application/json',
-            'authorization' => getenv('BAMBOO_AUTHORIZATION'),
-            'cache-control' => 'no-cache',
-            'content-type' => 'application/json',
-            'x-atlassian-token' => 'nocheck'
-        ]]);
+        $response = $this->client->get($uri, [
+            'headers' => [
+                'accept' => 'application/json',
+                'authorization' => getenv('BAMBOO_AUTHORIZATION'),
+                'cache-control' => 'no-cache',
+                'content-type' => 'application/json',
+                'x-atlassian-token' => 'nocheck'
+            ],
+            'verify' => false
+        ]);
 
         return $response;
     }
@@ -87,6 +90,7 @@ class Client
                     'cache-control' => 'no-cache',
                     'x-atlassian-token' => 'nocheck'
                 ],
+                'verify' => false
             ]
         );
     }
