@@ -27,7 +27,8 @@ class Client
     protected $baseUrl = 'https://bamboo.typo3.com/rest/api/';
     protected $branchToProjectKey = [
         'master' => 'CORE-GTC',
-        'TYPO3_7-6' => 'CORE-GTC76'
+        'TYPO3_7-6' => 'CORE-GTC76',
+        'TYPO3_6-2' => 'CORE-GTC6'
     ];
 
     public function __construct(LoggerInterface $logger = null)
