@@ -14,7 +14,8 @@ class IssueInformation
         $fullIssueInformation = json_decode($responseBody, true);
         $issueInformation = [
             'title' => $fullIssueInformation['title'],
-            'body' => $fullIssueInformation['body']
+            'body' => $fullIssueInformation['body'],
+            'url' => $fullIssueInformation['url']
         ];
         return $issueInformation;
     }

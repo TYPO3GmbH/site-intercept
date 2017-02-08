@@ -27,14 +27,16 @@ class Client
         $this->client = new \Redmine\Client($this->url, getenv('FORGE_ACCESS_TOKEN'));
     }
 
-    public function createIssue(string $title, string $body) : \SimpleXMLElement
+    public function createIssue(string $title, string $body, string $url) : \SimpleXMLElement
     {
+        $description = $body;
+        $description .= "\r\n This issue was automatically created from " . $url;
         return $this->client->issue->create(
             [
                 'project_id' => $this->projectId,
                 'tracker_id' => 4,
                 'subject' => $title,
-                'description' => $body,
+                'description' => $description,
                 'custom_fields' => [
                     [
                         'id' => 4,

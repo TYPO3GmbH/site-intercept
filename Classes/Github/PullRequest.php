@@ -18,6 +18,8 @@ class PullRequest
     public $issueUrl;
     public $pullRequestUrl;
     public $commentsUrl;
+    public $branch;
+
     /**
      * @var \T3G\Intercept\Github\Client
      */
@@ -38,6 +40,7 @@ class PullRequest
         if($fullPullRequestInformation['action'] !== 'opened') {
             throw new DoNotCareException();
         }
+        $this->branch = $fullPullRequestInformation['pull_request']['base']['ref'];
         $this->diffUrl = $fullPullRequestInformation['pull_request']['diff_url'];
         $this->userUrl = $fullPullRequestInformation['pull_request']['user']['url'];
         $this->issueUrl = $fullPullRequestInformation['pull_request']['issue_url'];
