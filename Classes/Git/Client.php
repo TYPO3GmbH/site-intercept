@@ -21,7 +21,7 @@ class Client
      */
     protected $workingCopy;
 
-    public function __construct()
+    public function __construct(string $branch = 'master')
     {
         $gitOutputListener = new GitOutputListener();
         $client = new GitWrapper();
@@ -35,7 +35,9 @@ class Client
         $this->workingCopy = $client->workingCopy(getenv('PATH_TO_CORE_GIT_CHECKOUT'));
         $this->workingCopy
             ->clean('-d', '-f')
-            ->reset('--hard', 'origin/master')
+            ->reset('--hard')
+            ->checkout($branch)
+            ->reset('--hard', 'origin/' . $branch)
             ->fetch();
         if (!$this->workingCopy->isUpToDate()) {
             $this->workingCopy->pull();
