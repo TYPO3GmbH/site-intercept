@@ -49,7 +49,7 @@ class InterceptController
     }
 
     /**
-     * Action to execute after a new patchset was uploaded to gerrit
+     * Action to execute after a new patch set has been uploaded to gerrit
      * Is triggered by the gerrit patchset-created hook
      */
     public function newBuildAction()
@@ -59,6 +59,9 @@ class InterceptController
         $branch = $_POST['branch'];
         if ($branch === 'master' || $branch === 'TYPO3_7-6' || $branch === 'TYPO3_6-2') {
             $this->bambooRequests->triggerNewCoreBuild($changeUrl, $patchSet, $branch);
+        }
+        if ($branch === 'master') {
+            $this->bambooRequests->triggerNewCoreBuild($changeUrl, $patchSet, 'master-testbed-lolli');
         }
     }
 

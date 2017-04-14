@@ -27,6 +27,7 @@ class Client
     protected $baseUrl = 'https://bamboo.typo3.com/rest/api/';
     protected $branchToProjectKey = [
         'master' => 'CORE-GTC',
+        'master-testbed-lolli' => 'CORE-TL',
         'TYPO3_7-6' => 'CORE-GTC76',
         'TYPO3_6-2' => 'CORE-GTC6'
     ];
@@ -81,12 +82,15 @@ class Client
 
         $apiPath = 'latest/queue/' . (string)$this->branchToProjectKey[$branch];
         $apiPathParams = '?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=' .
-                         urlencode($changeUrl) . '&bamboo.variable.patchset=' . $patchset;
+            urlencode($changeUrl) . '&bamboo.variable.patchset=' . $patchset;
         $uri = $apiPath . $apiPathParams;
 
-        $this->logger->info('cURL request to url' . $this->baseUrl);
+        $this->logger->info('cURL request to url ' . $this->baseUrl);
 
-        return $this->client->post($uri, ['headers' => [
+        return $this->client->post(
+            $uri,
+            [
+                'headers' => [
                     'authorization' => getenv('BAMBOO_AUTHORIZATION'),
                     'cache-control' => 'no-cache',
                     'x-atlassian-token' => 'nocheck'
