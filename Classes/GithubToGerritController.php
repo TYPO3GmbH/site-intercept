@@ -31,7 +31,7 @@ class GithubToGerritController
         $userData = $pullRequestInformation->getUserData();
 
         $forgeClient = new ForgeClient();
-        $result = $forgeClient->createIssue($issueData['title'], $issueData['body']);
+        $result = $forgeClient->createIssue($issueData['title'], $issueData['body'], $issueData['url']);
         $issueNumber = (int)$result->id;
 
         $commitMessageCreator = new CommitMessageCreator();
@@ -40,7 +40,7 @@ class GithubToGerritController
         $patchSaver = new PatchSaver();
         $localDiff = $patchSaver->getLocalDiff($pullRequestInformation->diffUrl);
 
-        $gitClient = new Client();
+        $gitClient = new Client($pullRequestInformation->branch);
         $gitClient->commitPatchAsUser($localDiff, $userData, $commitMessage);
         $gitClient->pushToGerrit();
 

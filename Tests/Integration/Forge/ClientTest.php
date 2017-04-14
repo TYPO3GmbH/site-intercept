@@ -17,7 +17,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $logger = $this->prophesize(LoggerInterface::class);
         $client = new Client($logger->reveal());
-        $result = $client->createIssue('test title', 'test body');
+        $result = $client->createIssue('test title', 'test body', 'http://google.de');
         self::assertInternalType('int', $result->id);
     }
 }

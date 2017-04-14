@@ -15,7 +15,7 @@ class GithubToGerritControllerTest extends \PHPUnit_Framework_TestCase
     public function githubToGerritIntegrationTest()
     {
         $payload = file_get_contents(BASEPATH . '/Tests/Fixtures/GithubPullRequestHookPayload.json');
-        $githubToGerritController = new GithubToGerritController('/Users/psychomieze/Sites/typo3.cms');
+        $githubToGerritController = new GithubToGerritController('/Volumes/CS/Sites/typo3.cms');
         $githubToGerritController->transformPullRequestToGerritReview($payload);
     }
 }
