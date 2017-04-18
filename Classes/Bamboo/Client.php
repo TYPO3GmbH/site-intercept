@@ -28,6 +28,7 @@ class Client
     protected $branchToProjectKey = [
         'master' => 'CORE-GTC',
         'master-testbed-lolli' => 'CORE-TL',
+        'TYPO3_8-7' => 'CORE-GTC87',
         'TYPO3_7-6' => 'CORE-GTC76',
         'TYPO3_6-2' => 'CORE-GTC6'
     ];
