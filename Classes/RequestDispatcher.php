@@ -17,22 +17,30 @@ class RequestDispatcher
     use Traits\Logger;
 
     /**
-     * @var \T3G\Intercept\InterceptController
+     * @var InterceptController
      */
     private $interceptController;
+
     /**
-     * @var \T3G\Intercept\GithubToGerritController
+     * @var GithubToGerritController
      */
     private $githubToGerritController;
+
+    /**
+     * @var GitSubtreeSplitController
+     */
+    private $gitSubtreeSplitController;
 
     public function __construct(
         InterceptController $interceptController = null,
         GithubToGerritController $githubToGerritController = null,
-        Logger $logger = null
+        Logger $logger = null,
+        GitSubtreeSplitController $gitSubtreeSplitController = null
     ) {
         $this->interceptController = $interceptController ?: new InterceptController();
         $this->githubToGerritController = $githubToGerritController ?: new GithubToGerritController();
         $this->setLogger($logger);
+        $this->gitSubtreeSplitController = $gitSubtreeSplitController ?: new GitSubtreeSplitController();
     }
 
     public function dispatch()
@@ -40,6 +48,8 @@ class RequestDispatcher
         try {
             if (!empty($_GET['github'])) {
                 $this->githubToGerritController->transformPullRequestToGerritReview(file_get_contents("php://input"));
+            } elseif (!empty($_GET['gitsplit'])) {
+                $this->gitSubtreeSplitController->split(file_get_contents("php://input"));
             } else {
                 if (!empty($_POST['payload'])) {
                     $this->interceptController->postBuildAction();

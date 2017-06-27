@@ -1,5 +1,5 @@
 .idea
-bin/
+bin/phpunit
 # JIRA plugin
 atlassian-ide-plugin.xml
 
