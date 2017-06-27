@@ -9,12 +9,9 @@ function splitForBranch {
     local SPLITTER="$3"
     local EXTENSIONS="$4"
 
-    echo
-    echo
     echo "Handling core branch ${LOCALBRANCH} splitting to target branch ${REMOTEBRANCH}"
 
     for EXTENSION in ${EXTENSIONS}; do
-        echo
         echo "Splitting extension ${EXTENSION}"
 
         # Split operation creating commit objects and giving last SHA1 commit hash

@@ -42,10 +42,12 @@ class GitSubtreeSplitController
 
         $execOutput = [];
         $execReturn = 0;
-        exec(__DIR__ . '/../bin/split.sh ' . escapeshellarg($sourceBranch) . ' ' . escapeshellarg($targetBranch), $execOutput, $execReturn);
+        exec(__DIR__ . '/../bin/split.sh ' . escapeshellarg($sourceBranch) . ' ' . escapeshellarg($targetBranch) . ' 2>&1', $execOutput, $execReturn);
 
+        var_dump($execOutput);
         $this->logger->info(
-            'github git split from ' . $sourceBranch . ' to ' . $targetBranch . ' script return ' . $execReturn . ' with script payload ' . print_r($execOutput, true)
+            'github git split from ' . $sourceBranch . ' to ' . $targetBranch . ' script return ' . $execReturn . ' with script payload:'
         );
+        $this->logger->info(print_r($execOutput, true));
     }
 }
