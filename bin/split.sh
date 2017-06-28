@@ -20,7 +20,7 @@ function splitForBranch {
         # Add target extension remote if needed
         if [[ $(git remote | grep "^${EXTENSION}\$" | wc -l) -eq 0 ]]; then
             echo "Adding remote"
-            git remote add ${EXTENSION} git@github.com:lolli42/${EXTENSION}.git
+            git remote add ${EXTENSION} git@github.com:TYPO3-CMS/${EXTENSION}.git
         fi
         # Update remote
         git fetch ${EXTENSION}
