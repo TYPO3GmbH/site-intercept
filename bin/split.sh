@@ -67,7 +67,9 @@ case "$(uname)" in
         ;;
 esac
 
+# List of extensions depends on branch
+git checkout ${1}
 EXTENSIONS=`ls typo3/sysext`
 
-# Handle master branch
-splitForBranch $1 $2 "${SPLITTER}" "${EXTENSIONS}"
+# Split it
+splitForBranch "${1}" "${2}" "${SPLITTER}" "${EXTENSIONS}"
