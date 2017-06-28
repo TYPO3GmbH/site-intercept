@@ -40,7 +40,7 @@ fi
 # Go to current dir this script is in
 cd "$(dirname "$0")"
 
-BASEREMOTE=git://git.typo3.org/Packages/TYPO3.CMS.git
+BASEREMOTE=git@github.com:TYPO3/TYPO3.CMS.git
 REPODIR="../../TYPO3.CMS-split"
 
 # Initial clone or update pull
