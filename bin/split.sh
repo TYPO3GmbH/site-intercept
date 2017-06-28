@@ -67,9 +67,7 @@ case "$(uname)" in
         ;;
 esac
 
-# temp uncomment
-#EXTENSIONS=`ls typo3/sysext`
-EXTENSIONS="saltedpasswords"
+EXTENSIONS=`ls typo3/sysext`
 
 # Handle master branch
 splitForBranch $1 $2 "${SPLITTER}" "${EXTENSIONS}"
