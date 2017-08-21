@@ -21,5 +21,6 @@ class IssueInformationTest extends \PHPUnit_Framework_TestCase
 
         self::assertSame('issue title', $result['title']);
         self::assertSame('updated body', $result['body']);
+        self::assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1', $result['url']);
     }
 }

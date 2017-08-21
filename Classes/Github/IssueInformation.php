@@ -15,7 +15,7 @@ class IssueInformation
         $issueInformation = [
             'title' => $fullIssueInformation['title'],
             'body' => $fullIssueInformation['body'],
-            'url' => $fullIssueInformation['url']
+            'url' => $fullIssueInformation['html_url']
         ];
         return $issueInformation;
     }
