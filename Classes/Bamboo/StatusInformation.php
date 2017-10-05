@@ -60,8 +60,8 @@ class StatusInformation
         foreach ($labels as $label) {
             $name = $label['name'];
             foreach ($resultKeys as $key) {
-                $key = trim('_', $key);
                 // A hack to cope with a bamboo hack which prefixes or suffixes keys with underscore '_'
+                $name = trim($name, '_');
                 if (strpos($name, $key) === 0) {
                     $result[$key] = $this->extractValueForNameFromMinusSeparatedString($name);
                 }
