@@ -60,9 +60,6 @@ class InterceptController
         if ($branch === 'master' || $branch === 'TYPO3_7-6' || $branch === 'TYPO3_6-2' || $branch === 'TYPO3_8-7') {
             $this->bambooRequests->triggerNewCoreBuild($changeUrl, $patchSet, $branch);
         }
-        if ($branch === 'master') {
-            $this->bambooRequests->triggerNewCoreBuild($changeUrl, $patchSet, 'master-testbed-lolli');
-        }
     }
 
     /**
