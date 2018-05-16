@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Integration\Bamboo;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use T3G\Intercept\Bamboo\Client;
 
@@ -13,7 +14,7 @@ use T3G\Intercept\Bamboo\Client;
  *
  * @package T3G\Intercept\Tests\Functional\Requests
  */
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends TestCase
 {
     /**
      * @var Client

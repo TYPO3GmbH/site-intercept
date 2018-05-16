@@ -3,9 +3,10 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Unit\Slack;
 
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\Slack\MessageParser;
 
-class MessageParserTest extends \PHPUnit_Framework_TestCase
+class MessageParserTest extends TestCase
 {
 
 

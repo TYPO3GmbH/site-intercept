@@ -1,5 +1,5 @@
 {
-  "name": "T3G/BuildInformationService",
+  "name": "t3g/build-information-service",
   "description": "",
   "minimum-stability": "dev",
   "license": "proprietary",
@@ -10,18 +10,24 @@
     }
   ],
   "require": {
-    "monolog/monolog": "*",
-    "hassankhan/config": "0.10.0",
-    "guzzlehttp/guzzle": "^6.2",
-    "kbsali/redmine-api": "~1.0",
     "cpliakas/git-wrapper": "^1.7",
+    "guzzlehttp/guzzle": "^6.2",
+    "hassankhan/config": "0.10.0",
+    "kbsali/redmine-api": "~1.0",
+    "monolog/monolog": "*",
     "vlucas/phpdotenv": "^2.3"
   },
   "require-dev": {
-    "phpunit/phpunit": "5.4.6"
+    "phpunit/phpunit": "^6",
+    "roave/security-advisories": "dev-master"
   },
   "config": {
-    "bin-dir": "bin/"
+    "bin-dir": "bin/",
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "7.2.4"
+    }
   },
   "autoload": {
     "psr-4": {

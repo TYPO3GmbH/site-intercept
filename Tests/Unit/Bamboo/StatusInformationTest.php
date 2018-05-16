@@ -3,11 +3,12 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit\Bamboo;
 
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use T3G\Intercept\Bamboo\Client;
 use T3G\Intercept\Bamboo\StatusInformation;
 
-class StatusInformationTest extends \PHPUnit_Framework_TestCase
+class StatusInformationTest extends TestCase
 {
     /**
      * @test

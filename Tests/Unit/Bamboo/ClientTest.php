@@ -2,11 +2,10 @@
 declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit\Bamboo;
 
-use GuzzleHttp\Psr7\Response;
-use Prophecy\Argument;
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\Bamboo\Client;
 
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends TestCase
 {
     /**
      * @test

@@ -3,10 +3,11 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Unit\Github;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use T3G\Intercept\Github\IssueInformation;
 
-class IssueInformationTest extends \PHPUnit_Framework_TestCase
+class IssueInformationTest extends TestCase
 {
     /**
      * @test

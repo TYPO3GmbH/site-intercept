@@ -3,10 +3,11 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Integration\Forge;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use T3G\Intercept\Forge\Client;
 
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends TestCase
 {
 
     /**

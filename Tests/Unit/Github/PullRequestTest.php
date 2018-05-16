@@ -5,13 +5,14 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit\Github;
 
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
 use T3G\Intercept\Exception\DoNotCareException;
 use T3G\Intercept\Github\Client;
 use T3G\Intercept\Github\PullRequest;
 
-class PullRequestTest extends \PHPUnit_Framework_TestCase
+class PullRequestTest extends TestCase
 {
     protected $githubClient;
     /**

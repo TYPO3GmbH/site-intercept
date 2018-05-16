@@ -3,11 +3,12 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Integration\Git;
 
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\Gerrit\CommitMessageCreator;
 use T3G\Intercept\Git\Client;
 use T3G\Intercept\Github\PatchSaver;
 
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends TestCase
 {
     /**
      * @test
