@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Fixtures;
 
+use Monolog\Formatter\FormatterInterface;
+
 class TestLogHandler implements \Monolog\Handler\HandlerInterface
 {
     /**
@@ -35,7 +37,19 @@ class TestLogHandler implements \Monolog\Handler\HandlerInterface
     {
     }
 
-    public function close()
+    public function pushProcessor($callback)
+    {
+    }
+
+    public function popProcessor()
+    {
+    }
+
+    public function setFormatter(FormatterInterface $formatter)
+    {
+    }
+
+    public function getFormatter()
     {
     }
 }
