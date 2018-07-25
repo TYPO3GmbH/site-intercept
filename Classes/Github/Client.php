@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the package t3g/build-information-service.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\Intercept\Github;
 
 use GuzzleHttp\Client as GuzzleClient;
@@ -13,7 +20,6 @@ use T3G\Intercept\Traits\Logger;
  * Responsible for all requests sent to Github
  *
  * @codeCoverageIgnore tested via integration tests only
- * @package T3G\Intercept\Requests
  */
 class Client
 {
@@ -59,5 +65,4 @@ class Client
         $url .= '?access_token=' . $this->accessKey;
         return $this->client->put($url);
     }
-
 }

@@ -1,6 +1,13 @@
 <?php
 declare(strict_types = 1);
 
+/*
+ * This file is part of the package t3g/build-information-service.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\Intercept;
 
 use T3G\Intercept\Exception\DoNotCareException;
@@ -14,11 +21,9 @@ use T3G\Intercept\Github\PullRequest;
  * Class GithubToGerritController
  *
  * @codeCoverageIgnore Integration tests only
- * @package T3G\Intercept
  */
 class GithubToGerritController
 {
-
     public function transformPullRequestToGerritReview(string $payload)
     {
         try {
@@ -46,7 +51,4 @@ class GithubToGerritController
 
         $pullRequestInformation->closePullRequest();
     }
-
-
-
 }
