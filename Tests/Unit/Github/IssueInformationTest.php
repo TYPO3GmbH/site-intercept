@@ -3,10 +3,11 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Unit\Github;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use T3G\Intercept\Github\IssueInformation;
 
-class IssueInformationTest extends \PHPUnit_Framework_TestCase
+class IssueInformationTest extends TestCase
 {
     /**
      * @test
@@ -21,5 +22,6 @@ class IssueInformationTest extends \PHPUnit_Framework_TestCase
 
         self::assertSame('issue title', $result['title']);
         self::assertSame('updated body', $result['body']);
+        self::assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1', $result['url']);
     }
 }

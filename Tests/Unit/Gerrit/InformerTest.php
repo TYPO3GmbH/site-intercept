@@ -3,11 +3,12 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit\Gerrit;
 
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use T3G\Intercept\Gerrit\Informer;
 use T3G\Intercept\Gerrit\Client;
 
-class InformerTest extends \PHPUnit_Framework_TestCase
+class InformerTest extends TestCase
 {
 
     /**

@@ -2,13 +2,14 @@
 declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\Bamboo\Client;
 use T3G\Intercept\Bamboo\StatusInformation;
 use T3G\Intercept\Gerrit\Informer;
 use T3G\Intercept\InterceptController;
 use T3G\Intercept\Slack\MessageParser;
 
-class InterceptControllerTest extends \PHPUnit_Framework_TestCase
+class InterceptControllerTest extends TestCase
 {
     /**
      * @test

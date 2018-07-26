@@ -4,9 +4,10 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit\Git;
 
 use GitWrapper\Event\GitOutputEvent;
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\Git\GitOutputListener;
 
-class GitOutputListenerTest extends \PHPUnit_Framework_TestCase
+class GitOutputListenerTest extends TestCase
 {
 
     public function setUp()

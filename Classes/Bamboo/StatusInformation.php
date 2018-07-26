@@ -1,6 +1,13 @@
 <?php
 declare(strict_types = 1);
 
+/*
+ * This file is part of the package t3g/build-information-service.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\Intercept\Bamboo;
 
 /**
@@ -9,7 +16,6 @@ namespace T3G\Intercept\Bamboo;
  * Responsible for:
  * * Extracting and transforming bamboo status information
  *
- * @package T3G\Intercept
  */
 class StatusInformation
 {
@@ -60,6 +66,8 @@ class StatusInformation
         foreach ($labels as $label) {
             $name = $label['name'];
             foreach ($resultKeys as $key) {
+                // A hack to cope with a bamboo hack which prefixes or suffixes keys with underscore '_'
+                $name = trim($name, '_');
                 if (strpos($name, $key) === 0) {
                     $result[$key] = $this->extractValueForNameFromMinusSeparatedString($name);
                 }

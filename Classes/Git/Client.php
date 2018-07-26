@@ -1,6 +1,13 @@
 <?php
 declare(strict_types = 1);
 
+/*
+ * This file is part of the package t3g/build-information-service.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\Intercept\Git;
 
 use GitWrapper\Event\GitLoggerListener;
@@ -11,7 +18,6 @@ use T3G\Intercept\LogManager;
  * Class Client
  *
  * @codeCoverageIgnore tested by integration tests only
- * @package T3G\Intercept\Git
  */
 class Client
 {
@@ -65,10 +71,8 @@ class Client
             );
     }
 
-
     public function pushToGerrit()
     {
         $this->workingCopy->push('origin', 'HEAD:refs/for/master');
     }
-
 }

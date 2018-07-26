@@ -3,9 +3,10 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Integration;
 
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\GithubToGerritController;
 
-class GithubToGerritControllerTest extends \PHPUnit_Framework_TestCase
+class GithubToGerritControllerTest extends TestCase
 {
 
     /**

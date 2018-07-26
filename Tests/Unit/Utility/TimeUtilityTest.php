@@ -3,9 +3,10 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit\Utility;
 
 
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\Utility\TimeUtility;
 
-class TimeUtilityTest extends \PHPUnit_Framework_TestCase
+class TimeUtilityTest extends TestCase
 {
     /**
      * @test

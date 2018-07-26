@@ -1,7 +1,6 @@
 {
-  "name": "T3G/BuildInformationService",
+  "name": "t3g/build-information-service",
   "description": "",
-  "minimum-stability": "dev",
   "license": "proprietary",
   "authors": [
     {
@@ -10,18 +9,38 @@
     }
   ],
   "require": {
-    "monolog/monolog": "*",
-    "hassankhan/config": "0.10.0",
-    "guzzlehttp/guzzle": "^6.2",
-    "kbsali/redmine-api": "~1.0",
     "cpliakas/git-wrapper": "^1.7",
+    "guzzlehttp/guzzle": "^6.2",
+    "hassankhan/config": "0.10.0",
+    "kbsali/redmine-api": "~1.0",
+    "monolog/monolog": "^1.23",
+    "psr/http-message": "^1",
+    "psr/log": "^1",
     "vlucas/phpdotenv": "^2.3"
   },
   "require-dev": {
-    "phpunit/phpunit": "5.4.6"
+    "friendsofphp/php-cs-fixer": "^2.12",
+    "phpunit/phpunit": "^6",
+    "roave/security-advisories": "dev-master"
   },
   "config": {
-    "bin-dir": "bin/"
+    "bin-dir": "bin/",
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "7.2.4"
+    }
+  },
+  "scripts": {
+    "t3g:test:php:unit": [
+      "phpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml"
+    ],
+    "t3g:test": [
+      "@t3g:test:php:unit"
+    ],
+    "t3g:cgl": [
+      "php-cs-fixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xml"
+    ]
   },
   "autoload": {
     "psr-4": {

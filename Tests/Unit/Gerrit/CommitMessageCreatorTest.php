@@ -3,9 +3,10 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Unit\Gerrit;
 
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\Gerrit\CommitMessageCreator;
 
-class CommitMessageCreatorTest extends \PHPUnit_Framework_TestCase
+class CommitMessageCreatorTest extends TestCase
 {
     protected $subject = 'Subject: This is a test';
     protected $body = 'This is the body of my message';

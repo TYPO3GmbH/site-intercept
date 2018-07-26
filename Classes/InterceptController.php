@@ -1,6 +1,13 @@
 <?php
 declare(strict_types = 1);
 
+/*
+ * This file is part of the package t3g/build-information-service.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\Intercept;
 
 use T3G\Intercept\Bamboo\Client;
@@ -11,7 +18,6 @@ use T3G\Intercept\Slack\MessageParser;
 /**
  * Class InterceptController
  *
- * @package T3G\Intercept
  */
 class InterceptController
 {
@@ -59,9 +65,6 @@ class InterceptController
         $branch = $_POST['branch'];
         if ($branch === 'master' || $branch === 'TYPO3_7-6' || $branch === 'TYPO3_6-2' || $branch === 'TYPO3_8-7') {
             $this->bambooRequests->triggerNewCoreBuild($changeUrl, $patchSet, $branch);
-        }
-        if ($branch === 'master') {
-            $this->bambooRequests->triggerNewCoreBuild($changeUrl, $patchSet, 'master-testbed-lolli');
         }
     }
 

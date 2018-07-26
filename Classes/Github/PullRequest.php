@@ -1,6 +1,13 @@
 <?php
 declare(strict_types = 1);
 
+/*
+ * This file is part of the package t3g/build-information-service.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\Intercept\Github;
 
 use T3G\Intercept\Exception\DoNotCareException;
@@ -8,7 +15,6 @@ use T3G\Intercept\Exception\DoNotCareException;
 /**
  * Class PullRequestInformation
  *
- * @package T3G\Intercept\Github
  */
 class PullRequest
 {
@@ -25,7 +31,6 @@ class PullRequest
      */
     private $client;
 
-
     /**
      * PullRequest constructor.
      *
@@ -37,7 +42,7 @@ class PullRequest
     {
         $this->client = $client ?: new Client();
         $fullPullRequestInformation = json_decode($requestPayload, true);
-        if($fullPullRequestInformation['action'] !== 'opened') {
+        if ($fullPullRequestInformation['action'] !== 'opened') {
             throw new DoNotCareException();
         }
         $this->branch = $fullPullRequestInformation['pull_request']['base']['ref'];

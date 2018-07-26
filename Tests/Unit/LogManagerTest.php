@@ -4,9 +4,10 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit;
 
 use Noodlehaus\Config;
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\LogManager;
 
-class LogManagerTest extends \PHPUnit_Framework_TestCase
+class LogManagerTest extends TestCase
 {
     /**
      * @test

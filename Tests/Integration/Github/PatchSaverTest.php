@@ -3,9 +3,10 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept\Tests\Integration\Github;
 
+use PHPUnit\Framework\TestCase;
 use T3G\Intercept\Github\PatchSaver;
 
-class PatchSaverTest extends \PHPUnit_Framework_TestCase
+class PatchSaverTest extends TestCase
 {
 
     /**

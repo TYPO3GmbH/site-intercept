@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Integration\Github;
 
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use T3G\Intercept\Github\Client;
 
@@ -15,7 +16,7 @@ use T3G\Intercept\Github\Client;
  *
  * @package T3G\Intercept\Tests\Integration\Requests
  */
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends TestCase
 {
 
     /**

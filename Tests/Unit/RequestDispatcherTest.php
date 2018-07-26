@@ -3,13 +3,14 @@ declare(strict_types = 1);
 namespace T3G\Intercept\Tests\Unit;
 
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use T3G\Intercept\GithubToGerritController;
 use T3G\Intercept\InterceptController;
 use T3G\Intercept\RequestDispatcher;
 
-class RequestDispatcherTest extends \PHPUnit_Framework_TestCase
+class RequestDispatcherTest extends TestCase
 {
     protected $githubToGerritController;
     protected $logger;
