@@ -9,3 +9,4 @@ For a detailed description of the process, see [TYPO3s Wiki](https://confluence.
 ## Prerequisites
 
 * Author of the pull request has an email address available through the API
+
