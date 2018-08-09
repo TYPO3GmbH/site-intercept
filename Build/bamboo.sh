@@ -26,7 +26,7 @@ runComposer install --no-interaction --no-progress
 
 # CGL Checks
 # Disabled for now since php-cs-fixer is not available
-runPhpCsFixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xmlcomposer
+runPhpCsFixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xml
 
 # Unit tests
 runPhpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml
