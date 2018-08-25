@@ -29,4 +29,4 @@ runComposer install --no-interaction --no-progress
 runPhpCsFixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xml
 
 # Unit tests
-runPhpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml
+runPhpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml  --coverage-clover logs/coverage.xml --coverage-html logs/coverage/
