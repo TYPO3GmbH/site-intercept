@@ -25,7 +25,7 @@ class PushEvent
      *
      * @param string $requestPayload
      */
-    public function __construct(string $requestPayload, Client $client = null)
+    public function __construct(string $requestPayload)
     {
         $fullPullRequestInformation = json_decode($requestPayload, true);
         $this->ref = $fullPullRequestInformation['ref'];

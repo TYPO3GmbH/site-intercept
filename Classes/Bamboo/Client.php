@@ -13,6 +13,7 @@ namespace T3G\Intercept\Bamboo;
 use GuzzleHttp\Client as GuzzleClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use T3G\Intercept\Github\DocumentationRenderingRequest;
 use T3G\Intercept\Traits\Logger;
 
 /**
@@ -39,10 +40,10 @@ class Client
         'TYPO3_6-2' => 'CORE-GTC6'
     ];
 
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(LoggerInterface $logger = null, GuzzleClient $client = null)
     {
         $this->setLogger($logger);
-        $this->client = new GuzzleClient(['base_uri' => $this->baseUrl]);
+        $this->client = $client ?: new GuzzleClient(['base_uri' => $this->baseUrl]);
     }
 
     /**
@@ -93,7 +94,29 @@ class Client
         $uri = $apiPath . $apiPathParams;
 
         $this->logger->info('cURL request to url ' . $this->baseUrl);
+        return $this->sendBambooPost($uri);
+    }
 
+    /**
+     * Triggers new build in project CORE-DR
+     */
+    public function triggerDocumentationPlan(
+        DocumentationRenderingRequest $documentationRenderingRequest
+    ): ResponseInterface {
+        $uri = 'latest/queue/CORE-DR?' . implode('&', [
+            'stage=',
+            'executeAllStages=',
+            'os_authType=basic',
+            'bamboo.variable.VERSION_NUMBER=' . urlencode($documentationRenderingRequest->getVersionNumber()),
+            'bamboo.variable.REPOSITORY_URL=' . urlencode($documentationRenderingRequest->getRepositoryUrl()),
+        ]);
+
+        $this->logger->info('cURL request to url ' . $this->baseUrl);
+        return $this->sendBambooPost($uri);
+    }
+
+    protected function sendBambooPost(string $uri): ResponseInterface
+    {
         return $this->client->post(
             $uri,
             [

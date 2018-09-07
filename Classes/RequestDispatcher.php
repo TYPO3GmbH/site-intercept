@@ -37,30 +37,39 @@ class RequestDispatcher
      */
     private $gitSubtreeSplitController;
 
+    /**
+     * @var string
+     */
+    protected $payloadStream = 'php://input';
+
     public function __construct(
         InterceptController $interceptController = null,
         GithubToGerritController $githubToGerritController = null,
         Logger $logger = null,
-        GitSubtreeSplitController $gitSubtreeSplitController = null
+        GitSubtreeSplitController $gitSubtreeSplitController = null,
+        DocumentationRenderingController $documentationRenderingController = null
     ) {
         $this->interceptController = $interceptController ?: new InterceptController();
         $this->githubToGerritController = $githubToGerritController ?: new GithubToGerritController();
         $this->setLogger($logger);
         $this->gitSubtreeSplitController = $gitSubtreeSplitController ?: new GitSubtreeSplitController();
+        $this->documentationRenderingController = $documentationRenderingController ?: new DocumentationRenderingController();
     }
 
     public function dispatch()
     {
         try {
             if (!empty($_GET['github'])) {
-                // @todo: See if gerrit pull request is called here, or if we want to trigger docs rendering
-                //$payload = json_decode(file_get_contents('php://input'));
-                //if (!empty($payload['action'] !== 'opened') && !empty($payload['pull_request']))
-                // create DocumentationRenderingController, extracts branch, tag and repository url
-                // extend github/PushEvent, new method triggerDocumentationPlan() in bamboo/Client.php
-                $this->githubToGerritController->transformPullRequestToGerritReview(file_get_contents('php://input'));
+                // See if gerrit pull request is called here, or if we want to trigger docs rendering
+                $payload = json_decode(file_get_contents($this->payloadStream), true);
+                if (!empty($payload['action']) && $payload['action'] === 'opened' && !empty($payload['pull_request'])) {
+                    $this->githubToGerritController->transformPullRequestToGerritReview(file_get_contents($this->payloadStream));
+                } else {
+                    // TODO: Also add check, inside pullrequest model? That this is not called for other github repositories
+                    $this->documentationRenderingController->transformGithubWebhookIntoRenderingRequest(file_get_contents($this->payloadStream));
+                }
             } elseif (!empty($_GET['gitsplit'])) {
-                $this->gitSubtreeSplitController->split(file_get_contents('php://input'));
+                $this->gitSubtreeSplitController->split(file_get_contents($this->payloadStream));
             } else {
                 if (!empty($_POST['payload'])) {
                     $this->interceptController->postBuildAction();
@@ -75,5 +84,15 @@ class RequestDispatcher
         } catch (\Exception $e) {
             $this->logger->error('ERROR:"' . $e->getMessage() . '"" in ' . $e->getFile() . ' line ' . $e->getLine());
         }
+    }
+
+    /**
+     * Used for testing.
+     *
+     * @internal
+     */
+    public function setPayloadStream(string $payloadStream)
+    {
+        $this->payloadStream = $payloadStream;
     }
 }

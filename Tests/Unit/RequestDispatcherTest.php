@@ -6,13 +6,19 @@ use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use T3G\Intercept\DocumentationRenderingController;
+use T3G\Intercept\GitSubtreeSplitController;
 use T3G\Intercept\GithubToGerritController;
 use T3G\Intercept\InterceptController;
 use T3G\Intercept\RequestDispatcher;
 
 class RequestDispatcherTest extends TestCase
 {
+    /**
+     * @var GithubToGerritController|ObjectProphecy
+     */
     protected $githubToGerritController;
+
     protected $logger;
 
     /**
@@ -25,13 +31,30 @@ class RequestDispatcherTest extends TestCase
      */
     protected $interceptController;
 
+    /**
+     * @var GitSubtreeSplitController|ObjectProphecy
+     */
+    protected $gitSubtreeSplitController;
+
+    /**
+     * @var DocumentationRenderingController|ObjectProphecy
+     */
+    protected $documentationRenderingController;
 
     public function setUp()
     {
         $this->interceptController = $this->prophesize(InterceptController::class);
         $this->githubToGerritController = $this->prophesize(GithubToGerritController::class);
+        $this->documentationRenderingController = $this->prophesize(DocumentationRenderingController::class);
+        $this->gitSubtreeSplitController = $this->prophesize(GitSubtreeSplitController::class);
         $this->logger = $this->prophesize(Logger::class);
-        $this->requestDispatcher = new RequestDispatcher($this->interceptController->reveal(), $this->githubToGerritController->reveal(), $this->logger->reveal());
+        $this->requestDispatcher = new RequestDispatcher(
+            $this->interceptController->reveal(),
+            $this->githubToGerritController->reveal(),
+            $this->logger->reveal(),
+            $this->gitSubtreeSplitController->reveal(),
+            $this->documentationRenderingController->reveal()
+        );
     }
 
     /**
@@ -115,9 +138,35 @@ class RequestDispatcherTest extends TestCase
     public function dispatchDispatchesToGithubController()
     {
         $_GET = ['github' => 1];
+        $stream = dirname(__FILE__) . '/tempfile.txt';
+        file_put_contents($stream, json_encode([
+            'action' => 'opened',
+            'pull_request' => 'something',
+        ]));
 
+        $this->requestDispatcher->setPayloadStream($stream);
         $this->requestDispatcher->dispatch();
 
         $this->githubToGerritController->transformPullRequestToGerritReview(Argument::any())->shouldHaveBeenCalled();
+
+        unlink($stream);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function dispatchDispatchesToDocumentationRenderingController()
+    {
+        $_GET = ['github' => 1];
+        $stream = dirname(__FILE__) . '/tempfile.txt';
+        file_put_contents($stream, json_encode([]));
+
+        $this->requestDispatcher->setPayloadStream($stream);
+        $this->requestDispatcher->dispatch();
+
+        $this->documentationRenderingController->transformGithubWebhookIntoRenderingRequest(Argument::any())->shouldHaveBeenCalled();
+
+        unlink($stream);
     }
 }
