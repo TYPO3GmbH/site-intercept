@@ -64,7 +64,25 @@ class DocumentationRenderingRequestTest extends TestCase
                         'clone_url' => 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git',
                     ],
                 ],
-                '9.4',
+                '9.4.2',
+            ],
+            'Release v9.4.2' => [
+                'input' => [
+                    'ref' => 'refs/tags/v9.4.2',
+                    'repository' => [
+                        'clone_url' => 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git',
+                    ],
+                ],
+                'v9.4.2',
+            ],
+            'Release something' => [
+                'input' => [
+                    'ref' => 'refs/tags/something',
+                    'repository' => [
+                        'clone_url' => 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git',
+                    ],
+                ],
+                'something',
             ],
         ];
     }

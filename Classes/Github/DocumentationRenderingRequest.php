@@ -43,13 +43,10 @@ class DocumentationRenderingRequest extends PushEvent
 
     protected function getVersionNumberFromRef(string $ref): string
     {
-        $versionNumber = $this->getBranchName();
-
         if (strpos($ref, 'refs/tags/') === 0) {
-            $numberParts = explode('.', str_replace('refs/tags/', '', $ref));
-            $versionNumber = implode('.', [$numberParts[0], $numberParts[1]]);
+            return str_replace('refs/tags/', '', $ref);
         }
 
-        return $versionNumber;
+        return $this->getBranchName();
     }
 }
