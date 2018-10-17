@@ -38,6 +38,11 @@ class RequestDispatcher
     private $gitSubtreeSplitController;
 
     /**
+     * @var DocumentationRenderingController
+     */
+    private $DocumentationRenderingController;
+
+    /**
      * @var string
      */
     protected $payloadStream = 'php://input';
