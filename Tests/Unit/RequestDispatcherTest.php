@@ -158,7 +158,7 @@ class RequestDispatcherTest extends TestCase
      */
     public function dispatchDispatchesToDocumentationRenderingController()
     {
-        $_GET = ['github' => 1];
+        $_GET = ['docs' => 1];
         $stream = dirname(__FILE__) . '/tempfile.txt';
         file_put_contents($stream, json_encode([]));
 

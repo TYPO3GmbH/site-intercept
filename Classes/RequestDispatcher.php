@@ -60,15 +60,16 @@ class RequestDispatcher
     {
         try {
             if (!empty($_GET['github'])) {
-                // See if gerrit pull request is called here, or if we want to trigger docs rendering
+                // See if gerrit pull request is called here
                 $payload = json_decode(file_get_contents($this->payloadStream), true);
                 if (!empty($payload['action']) && $payload['action'] === 'opened' && !empty($payload['pull_request'])) {
                     $this->githubToGerritController->transformPullRequestToGerritReview(file_get_contents($this->payloadStream));
-                } else {
-                    // TODO: Also add check, inside pullrequest model? That this is not called for other github repositories
-                    $this->documentationRenderingController->transformGithubWebhookIntoRenderingRequest(file_get_contents($this->payloadStream));
                 }
-            } elseif (!empty($_GET['gitsplit'])) {
+            } else if (!empty($_GET['docs'])) {
+                // See if docs rendering request is called here
+                // TODO: Also add check, inside pullrequest model? That this is not called for other github repositories
+                $this->documentationRenderingController->transformGithubWebhookIntoRenderingRequest(file_get_contents($this->payloadStream));
+            } else if (!empty($_GET['gitsplit'])) {
                 $this->gitSubtreeSplitController->split(file_get_contents($this->payloadStream));
             } else {
                 if (!empty($_POST['payload'])) {
