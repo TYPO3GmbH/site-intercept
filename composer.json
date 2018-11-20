@@ -30,6 +30,9 @@
     "optimize-autoloader": true,
     "platform": {
       "php": "7.2.4"
+    },
+    "preferred-install": {
+      "*": "dist"
     }
   },
   "scripts": {
