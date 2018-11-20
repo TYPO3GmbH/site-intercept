@@ -4,6 +4,7 @@
 bin/console
 bin/php-cs-fixer
 bin/phpunit
+bin/php-parse
 # JIRA plugin
 atlassian-ide-plugin.xml
 
