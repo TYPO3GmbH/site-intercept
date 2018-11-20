@@ -9,6 +9,7 @@
     }
   ],
   "require": {
+    "ext-json": "*",
     "cpliakas/git-wrapper": "^1.7",
     "guzzlehttp/guzzle": "^6.2",
     "hassankhan/config": "0.10.0",
