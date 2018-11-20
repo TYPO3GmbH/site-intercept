@@ -17,6 +17,10 @@
     "monolog/monolog": "^1.23",
     "psr/http-message": "^1",
     "psr/log": "^1",
+    "symfony/console": "^4.1",
+    "symfony/flex": "^1.1",
+    "symfony/framework-bundle": "^4.1",
+    "symfony/yaml": "^4.1",
     "vlucas/phpdotenv": "^2.3"
   },
   "require-dev": {
@@ -44,7 +48,11 @@
     ],
     "t3g:cgl": [
       "php-cs-fixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xml"
-    ]
+    ],
+    "auto-scripts": {
+      "cache:clear": "symfony-cmd",
+      "assets:install %PUBLIC_DIR%": "symfony-cmd"
+    }
   },
   "replace": {
     "paragonie/random_compat": "2.*",
