@@ -1,7 +1,7 @@
 {
   "name": "t3g/build-information-service",
   "description": "",
-  "license": "proprietary",
+  "license": "GPL-2.0-or-later",
   "authors": [
     {
       "name": "Susanne Moog",
