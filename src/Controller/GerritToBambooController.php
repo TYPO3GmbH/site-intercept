@@ -9,7 +9,7 @@ namespace App\Controller;
  * LICENSE file that was distributed with this source code.
  */
 
-use App\Service\Bamboo\BambooClientService;
+use App\Service\BambooService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,16 +26,16 @@ class GerritToBambooController extends AbstractController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function index(Request $request, BambooClientService $bambooClientService)
+    public function index(Request $request, BambooService $bambooService)
     {
         $changeUrl = $request->request->get('changeUrl');
-        $patchSet = $request->request->get('patchset');
+        $patchSet = (int)$request->request->get('patchset');
         $branch = $request->request->get('branch');
         if ($branch === 'master'
             || $branch === 'TYPO3_8-7'
             || $branch === 'TYPO3_7-6'
         ) {
-            $bambooClientService->triggerNewCoreBuild($changeUrl, $patchSet, $branch);
+            $bambooService->triggerNewCoreBuild($changeUrl, $patchSet, $branch);
         }
 
         return $this->json([

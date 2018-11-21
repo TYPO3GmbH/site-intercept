@@ -1,5 +1,6 @@
 <?php
 declare(strict_types = 1);
+namespace App\Service;
 
 /*
  * This file is part of the package t3g/build-information-service.
@@ -8,8 +9,7 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Service\Bamboo;
-
+use App\Client\BambooClient;
 use GuzzleHttp\Client as GuzzleClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -19,7 +19,7 @@ use T3G\Intercept\Github\DocumentationRenderingRequest;
  * Responsible for all requests sent to bamboo
  * @codeCoverageIgnore tested via integration tests only
  */
-class BambooClientService
+class BambooService
 {
     /**
      * @var LoggerInterface
@@ -27,7 +27,7 @@ class BambooClientService
     protected $logger;
 
     /**
-     * @var \GuzzleHttp\Client
+     * @var \App\Client\BambooClient
      */
     protected $client;
 
@@ -46,10 +46,16 @@ class BambooClientService
         'TYPO3_7-6' => 'CORE-GTC76'
     ];
 
-    public function __construct(LoggerInterface $logger, GuzzleClient $client)
+    /**
+     * BambooService constructor.
+     *
+     * @param LoggerInterface $logger
+     * @param BambooClient $client
+     */
+    public function __construct(LoggerInterface $logger, BambooClient $client)
     {
         $this->logger = $logger;
-        $this->client = $client ?: new GuzzleClient(['base_uri' => $this->baseUrl]);
+        $this->client = $client;
     }
 
     /**
