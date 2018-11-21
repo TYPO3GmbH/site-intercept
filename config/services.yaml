@@ -29,3 +29,22 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     App\Client\BambooClient: '@eight_points_guzzle.client.bamboo'
+
+    # graylog log setup and enrichment of log rows with static
+    # data for easy search on elk.typo3.com. Works on dev / local too since
+    # errors are ignored when sending.
+    gelf.publisher:
+        class: Gelf\Publisher
+        arguments: ['@gelf.ignore_error_transport']
+    gelf.ignore_error_transport:
+        class: Gelf\Transport\IgnoreErrorTransportWrapper
+        arguments: ['@gelf.transport']
+    gelf.transport:
+        class: Gelf\Transport\HttpTransport
+        arguments: ['%env(GRAYLOG_HOST)%', '%env(int:GRAYLOG_PORT)%']
+    monolog.processor.add_field_processor:
+        class: App\Monolog\Processor\AddFieldProcessor
+        arguments:
+            - { application: '%env(GRAYLOG_APPLICATION)%', evn: '%env(APP_ENV)%' }
+        tags:
+            - { name: monolog.processor, handler: 'graylog' }

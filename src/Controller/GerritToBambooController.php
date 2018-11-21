@@ -3,7 +3,7 @@ declare(strict_types = 1);
 namespace App\Controller;
 
 /*
- * This file is part of the package t3g/build-information-service.
+ * This file is part of the package t3g/intercept.
  *
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
@@ -12,6 +12,7 @@ namespace App\Controller;
 use App\Service\BambooService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -24,9 +25,10 @@ class GerritToBambooController extends AbstractController
     /**
      * @Route("/gerrit", name="gerrit_to_bamboo")
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @param BambooService $bambooService
+     * @return Response
      */
-    public function index(Request $request, BambooService $bambooService)
+    public function index(Request $request, BambooService $bambooService): Response
     {
         $changeUrl = $request->request->get('changeUrl');
         $patchSet = (int)$request->request->get('patchset');
@@ -37,10 +39,6 @@ class GerritToBambooController extends AbstractController
         ) {
             $bambooService->triggerNewCoreBuild($changeUrl, $patchSet, $branch);
         }
-
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/GerritToBambooController.php',
-        ]);
+        return Response::create();
     }
 }

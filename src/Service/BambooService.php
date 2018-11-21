@@ -3,14 +3,13 @@ declare(strict_types = 1);
 namespace App\Service;
 
 /*
- * This file is part of the package t3g/build-information-service.
+ * This file is part of the package t3g/intercept.
  *
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  */
 
 use App\Client\BambooClient;
-use GuzzleHttp\Client as GuzzleClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use T3G\Intercept\Github\DocumentationRenderingRequest;
@@ -24,17 +23,17 @@ class BambooService
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * @var \App\Client\BambooClient
      */
-    protected $client;
+    private $client;
 
     /**
      * @var string Main bamboo rst api url
      */
-    protected $baseUrl = 'https://bamboo.typo3.com/rest/api/';
+    private $baseUrl = 'https://bamboo.typo3.com/rest/api/';
 
     /**
      * @var array Map gerrit branches to bamboo plan keys
@@ -84,14 +83,14 @@ class BambooService
     }
 
     /**
-     * Triggers new build in project CORE-GTC
+     * Triggers a new build in one of the bamboo core pre-merge branch projects
      *
      * @param string $changeUrl
-     * @param int $patchset
+     * @param int $patchSet
      * @param string $branch Branch name, eg. "master" or "TYPO3_7-6"
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
-    public function triggerNewCoreBuild(string $changeUrl, int $patchset, string $branch)
+    public function triggerNewCoreBuild(string $changeUrl, int $patchSet, string $branch): ResponseInterface
     {
         if (!array_key_exists($branch, $this->branchToProjectKey)) {
             throw new \InvalidArgumentException(
@@ -102,10 +101,9 @@ class BambooService
 
         $apiPath = 'latest/queue/' . (string)$this->branchToProjectKey[$branch];
         $apiPathParams = '?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=' .
-            urlencode($changeUrl) . '&bamboo.variable.patchset=' . $patchset;
+            urlencode($changeUrl) . '&bamboo.variable.patchset=' . $patchSet;
         $uri = $apiPath . $apiPathParams;
 
-        $this->logger->info('cURL request to url ' . $this->baseUrl);
         return $this->sendBambooPost($uri);
     }
 
@@ -127,6 +125,12 @@ class BambooService
         return $this->sendBambooPost($uri);
     }
 
+    /**
+     * Execute http request to bamboo
+     *
+     * @param string $uri
+     * @return ResponseInterface
+     */
     protected function sendBambooPost(string $uri): ResponseInterface
     {
         return $this->client->post(

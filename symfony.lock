@@ -44,6 +44,9 @@
             "ref": "81dee417d2cc60cd1c9d6208dff2ec22a1103e93"
         }
     },
+    "graylog2/gelf-php": {
+        "version": "1.6.1"
+    },
     "guzzlehttp/guzzle": {
         "version": "6.3.3"
     },
@@ -67,6 +70,9 @@
     },
     "nikic/php-parser": {
         "version": "v4.1.0"
+    },
+    "paragonie/constant_time_encoding": {
+        "version": "v2.2.2"
     },
     "phar-io/manifest": {
         "version": "1.0.1"
