@@ -8,41 +8,47 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace T3G\Intercept\Bamboo;
+namespace App\Service\Bamboo;
 
 use GuzzleHttp\Client as GuzzleClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use T3G\Intercept\Github\DocumentationRenderingRequest;
-use T3G\Intercept\Traits\Logger;
 
 /**
- * Class CurlBambooRequests
- *
  * Responsible for all requests sent to bamboo
- *
  * @codeCoverageIgnore tested via integration tests only
  */
-class Client
+class BambooClientService
 {
-    use Logger;
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @var \GuzzleHttp\Client
      */
     protected $client;
+
+    /**
+     * @var string Main bamboo rst api url
+     */
     protected $baseUrl = 'https://bamboo.typo3.com/rest/api/';
+
+    /**
+     * @var array Map gerrit branches to bamboo plan keys
+     */
     protected $branchToProjectKey = [
         'master' => 'CORE-GTC',
         'master-testbed-lolli' => 'CORE-TL',
         'TYPO3_8-7' => 'CORE-GTC87',
-        'TYPO3_7-6' => 'CORE-GTC76',
-        'TYPO3_6-2' => 'CORE-GTC6'
+        'TYPO3_7-6' => 'CORE-GTC76'
     ];
 
-    public function __construct(LoggerInterface $logger = null, GuzzleClient $client = null)
+    public function __construct(LoggerInterface $logger, GuzzleClient $client)
     {
-        $this->setLogger($logger);
+        $this->logger = $logger;
         $this->client = $client ?: new GuzzleClient(['base_uri' => $this->baseUrl]);
     }
 
