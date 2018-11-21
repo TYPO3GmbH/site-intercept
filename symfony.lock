@@ -26,6 +26,15 @@
     "doctrine/lexer": {
         "version": "v1.0.1"
     },
+    "eightpoints/guzzle-bundle": {
+        "version": "7.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "7.0",
+            "ref": "e5e657ce5a4ebc99f3c76916938aa0a5f8ef7736"
+        }
+    },
     "friendsofphp/php-cs-fixer": {
         "version": "2.2",
         "recipe": {
@@ -34,6 +43,15 @@
             "version": "2.2",
             "ref": "81dee417d2cc60cd1c9d6208dff2ec22a1103e93"
         }
+    },
+    "guzzlehttp/guzzle": {
+        "version": "6.3.3"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "1.4.2"
     },
     "hassankhan/config": {
         "version": "0.10.0"
@@ -177,6 +195,9 @@
         "version": "v4.1.7"
     },
     "symfony/event-dispatcher": {
+        "version": "v4.1.7"
+    },
+    "symfony/expression-language": {
         "version": "v4.1.7"
     },
     "symfony/filesystem": {
