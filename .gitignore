@@ -12,7 +12,6 @@ atlassian-ide-plugin.xml
 /logs
 /Log/Intercept.log
 /Log/Github2Gerrit.log
-.env
 
 ###> symfony/framework-bundle ###
 /.env.local
