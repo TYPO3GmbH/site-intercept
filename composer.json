@@ -14,7 +14,6 @@
     "eightpoints/guzzle-bundle": "^7.4",
     "hassankhan/config": "0.10.0",
     "kbsali/redmine-api": "~1.0",
-    "monolog/monolog": "^1.23",
     "psr/http-message": "^1",
     "psr/log": "^1",
     "symfony/console": "^4.1",
