@@ -1,5 +1,5 @@
 {
-  "name": "t3g/build-information-service",
+  "name": "t3g/intercept",
   "description": "",
   "license": "GPL-2.0-or-later",
   "authors": [
@@ -69,13 +69,11 @@
   },
   "autoload": {
     "psr-4": {
-      "T3G\\Intercept\\": "Classes/",
       "App\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "T3G\\Intercept\\Tests\\": "Tests/",
       "App\\Tests\\": "tests/"
     }
   },
