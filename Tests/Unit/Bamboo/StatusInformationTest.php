@@ -6,7 +6,7 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use T3G\Intercept\Bamboo\Client;
-use T3G\Intercept\Bamboo\StatusInformation;
+use T3G\Intercept\Bamboo\BambooBuildStatusExtractor;
 
 class StatusInformationTest extends TestCase
 {
@@ -21,7 +21,7 @@ class StatusInformationTest extends TestCase
         $responseProphecy->getBody(Argument::any())->willReturn(\GuzzleHttp\Psr7\stream_for($exampleResponse));
         $curlBambooRequest = $this->prophesize(Client::class);
         $curlBambooRequest->getBuildStatus(Argument::any())->willReturn($responseProphecy->reveal());
-        $bambooInformationRequestBuilder = new StatusInformation($curlBambooRequest->reveal());
+        $bambooInformationRequestBuilder = new BambooBuildStatusExtractor($curlBambooRequest->reveal());
         $result = $bambooInformationRequestBuilder->transform('CORE-GTC-42');
 
         $expected = [
@@ -48,7 +48,7 @@ class StatusInformationTest extends TestCase
         $responseProphecy->getBody(Argument::any())->willReturn(\GuzzleHttp\Psr7\stream_for($exampleResponse));
         $curlBambooRequest = $this->prophesize(Client::class);
         $curlBambooRequest->getBuildStatus(Argument::any())->willReturn($responseProphecy->reveal());
-        $bambooInformationRequestBuilder = new StatusInformation($curlBambooRequest->reveal());
+        $bambooInformationRequestBuilder = new BambooBuildStatusExtractor($curlBambooRequest->reveal());
         $result = $bambooInformationRequestBuilder->transform('CORE-GTC-42');
 
         $expected = [

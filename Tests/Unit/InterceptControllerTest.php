@@ -4,7 +4,7 @@ namespace T3G\Intercept\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use T3G\Intercept\Bamboo\Client;
-use T3G\Intercept\Bamboo\StatusInformation;
+use T3G\Intercept\Bamboo\BambooBuildStatusExtractor;
 use T3G\Intercept\Gerrit\Informer;
 use T3G\Intercept\InterceptController;
 use T3G\Intercept\Slack\MessageParser;
@@ -39,7 +39,7 @@ class InterceptControllerTest extends TestCase
         $buildKey = 'CORE-GTC-48';
         $buildStatusInformation = ['successful' => true];
         $slackMessageParser = $this->prophesize(MessageParser::class);
-        $bambooStatusInformation = $this->prophesize(StatusInformation::class);
+        $bambooStatusInformation = $this->prophesize(BambooBuildStatusExtractor::class);
         $gerritInformer = $this->prophesize(Informer::class);
 
         $slackMessageParser->parseMessage()->willReturn($buildKey);

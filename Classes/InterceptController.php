@@ -11,7 +11,7 @@ declare(strict_types = 1);
 namespace T3G\Intercept;
 
 use T3G\Intercept\Bamboo\Client;
-use T3G\Intercept\Bamboo\StatusInformation;
+use T3G\Intercept\Bamboo\BambooBuildStatusExtractor;
 use T3G\Intercept\Gerrit\Informer;
 use T3G\Intercept\Slack\MessageParser;
 
@@ -33,7 +33,7 @@ class InterceptController
     private $slackMessageParser;
 
     /**
-     * @var \T3G\Intercept\Bamboo\StatusInformation
+     * @var \T3G\Intercept\Bamboo\BambooBuildStatusExtractor
      */
     private $bambooStatusInformation;
 
@@ -45,12 +45,12 @@ class InterceptController
     public function __construct(
         Client $bambooRequests = null,
         MessageParser $slackMessageParser = null,
-        StatusInformation $bambooStatusInformation = null,
+        BambooBuildStatusExtractor $bambooStatusInformation = null,
         Informer $gerritInformer = null
     ) {
         $this->bambooRequests = $bambooRequests ?: new Client();
         $this->slackMessageParser = $slackMessageParser ?: new MessageParser();
-        $this->bambooStatusInformation = $bambooStatusInformation ?: new StatusInformation();
+        $this->bambooStatusInformation = $bambooStatusInformation ?: new BambooBuildStatusExtractor();
         $this->gerritInformer = $gerritInformer ?: new Informer();
     }
 

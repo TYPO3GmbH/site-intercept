@@ -10,9 +10,8 @@ namespace App\Service;
  */
 
 use App\Client\BambooClient;
-use App\Extractor\GithubPushEventDocsInformationExtractor;
+use App\Extractor\GithubPushEventDocsInformation;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Check and prepare requests sent to bamboo
@@ -20,19 +19,9 @@ use Psr\Log\LoggerInterface;
 class BambooService
 {
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var \App\Client\BambooClient
+     * @var BambooClient
      */
     private $client;
-
-    /**
-     * @var string Main bamboo rst api url
-     */
-    private $baseUrl = 'https://bamboo.typo3.com/rest/api/';
 
     /**
      * @var array Map gerrit branches to bamboo plan keys
@@ -47,17 +36,18 @@ class BambooService
     /**
      * BambooService constructor.
      *
-     * @param LoggerInterface $logger
      * @param BambooClient $client
      */
-    public function __construct(LoggerInterface $logger, BambooClient $client)
+    public function __construct(BambooClient $client)
     {
-        $this->logger = $logger;
         $this->client = $client;
     }
 
     /**
-     * @param string $buildKey
+     * Fetch details of a recent build. Used by bamboo post build controller
+     * to create a vote on gerrit based on these details.
+     *
+     * @param string $buildKey Project-Plan-BuildNumber, eg. CORE-GTC-30244
      * @return ResponseInterface
      */
     public function getBuildStatus(string $buildKey) : ResponseInterface
@@ -66,7 +56,6 @@ class BambooService
         $apiPathParams = '?os_authType=basic&expand=labels';
 
         $uri = $apiPath . $apiPathParams;
-        $this->logger->info('cURL request to uri' . $this->baseUrl . $uri);
         $response = $this->client->get($uri, [
             'headers' => [
                 'accept' => 'application/json',
@@ -109,18 +98,18 @@ class BambooService
     /**
      * Triggers new build in project CORE-DR
      *
-     * @param GithubPushEventDocsInformationExtractor $pushEventInformation
+     * @param GithubPushEventDocsInformation $pushEventInformation
      * @return ResponseInterface
      */
     public function triggerDocumentationPlan(
-        GithubPushEventDocsInformationExtractor $pushEventInformation
+        GithubPushEventDocsInformation $pushEventInformation
     ): ResponseInterface {
         $uri = 'latest/queue/CORE-DR?' . implode('&', [
             'stage=',
             'executeAllStages=',
             'os_authType=basic',
-            'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->getVersionNumber()),
-            'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->getRepositoryUrl()),
+            'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->versionNumber),
+            'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->repositoryUrl),
         ]);
         return $this->sendBambooPost($uri);
     }
@@ -131,7 +120,7 @@ class BambooService
      * @param string $uri
      * @return ResponseInterface
      */
-    protected function sendBambooPost(string $uri): ResponseInterface
+    private function sendBambooPost(string $uri): ResponseInterface
     {
         return $this->client->post(
             $uri,
@@ -148,7 +137,7 @@ class BambooService
 
     /**
      * @param array $branchToProjectKey Mapping information
-     * @internal
+     * @internal For testing
      */
     public function setBranchToProjectKey(array $branchToProjectKey)
     {

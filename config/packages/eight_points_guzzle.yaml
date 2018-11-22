@@ -6,3 +6,6 @@ eight_points_guzzle:
             # Write here the host where to do requests
             base_url: "https://bamboo.typo3.com/rest/api/"
             class: App\Client\BambooClient
+        gerrit:
+            base_url: "https://review.typo3.org/a/"
+            class: App\Client\GerritClient

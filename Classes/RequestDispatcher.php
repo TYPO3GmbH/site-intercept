@@ -10,8 +10,6 @@ declare(strict_types = 1);
 
 namespace T3G\Intercept;
 
-use Monolog\Logger;
-
 /**
  * Class RequestDispatcher
  *
@@ -20,13 +18,6 @@ use Monolog\Logger;
  */
 class RequestDispatcher
 {
-    use Traits\Logger;
-
-    /**
-     * @var InterceptController
-     */
-    private $interceptController;
-
     /**
      * @var GithubToGerritController
      */
@@ -38,27 +29,16 @@ class RequestDispatcher
     private $gitSubtreeSplitController;
 
     /**
-     * @var DocumentationRenderingController
-     */
-    private $documentationRenderingController;
-
-    /**
      * @var string
      */
     protected $payloadStream = 'php://input';
 
     public function __construct(
-        InterceptController $interceptController = null,
         GithubToGerritController $githubToGerritController = null,
-        Logger $logger = null,
-        GitSubtreeSplitController $gitSubtreeSplitController = null,
-        DocumentationRenderingController $documentationRenderingController = null
+        GitSubtreeSplitController $gitSubtreeSplitController = null
     ) {
-        $this->interceptController = $interceptController ?: new InterceptController();
         $this->githubToGerritController = $githubToGerritController ?: new GithubToGerritController();
-        $this->setLogger($logger);
         $this->gitSubtreeSplitController = $gitSubtreeSplitController ?: new GitSubtreeSplitController();
-        $this->documentationRenderingController = $documentationRenderingController ?: new DocumentationRenderingController();
     }
 
     public function dispatch()
@@ -72,17 +52,8 @@ class RequestDispatcher
                 }
             } elseif (!empty($_GET['gitsplit'])) {
                 $this->gitSubtreeSplitController->split(file_get_contents($this->payloadStream));
-            } else {
-                if (!empty($_POST['payload'])) {
-                    $this->interceptController->postBuildAction();
-                } else {
-                    $this->logger->warning(
-                        'Could not dispatch request. Request Data:' . "\n" . var_export($_REQUEST, true)
-                    );
-                }
             }
         } catch (\Exception $e) {
-            $this->logger->error('ERROR:"' . $e->getMessage() . '"" in ' . $e->getFile() . ' line ' . $e->getLine());
         }
     }
 

@@ -10,7 +10,7 @@ namespace App\Controller;
  */
 
 use App\Exception\DoNotCareException;
-use App\Extractor\GithubPushEventDocsInformationExtractor;
+use App\Extractor\GithubPushEventDocsInformation;
 use App\Service\BambooService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +34,7 @@ class DocsToBambooController extends AbstractController
     {
         $payload = $request->getContent();
         try {
-            $pushEventInformation = new GithubPushEventDocsInformationExtractor($payload);
+            $pushEventInformation = new GithubPushEventDocsInformation($payload);
             $bambooService->triggerDocumentationPlan($pushEventInformation);
         } catch (DoNotCareException $e) {
             // Hook payload could not be identified as hook that

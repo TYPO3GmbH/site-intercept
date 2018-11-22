@@ -1,19 +1,21 @@
 <?php
 declare(strict_types = 1);
+namespace App\Utility;
 
 /*
- * This file is part of the package t3g/build-information-service.
+ * This file is part of the package t3g/intercept.
  *
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  */
 
-namespace T3G\Intercept\Utility;
-
+/**
+ * Helper class for time formatting
+ */
 class TimeUtility
 {
     /**
-     * Used to transform seconds given as integers
+     * Used to transform seconds given as integers to something readable.
      *
      * @param int $seconds
      * @return string
