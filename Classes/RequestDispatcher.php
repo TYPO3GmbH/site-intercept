@@ -24,21 +24,14 @@ class RequestDispatcher
     private $githubToGerritController;
 
     /**
-     * @var GitSubtreeSplitController
-     */
-    private $gitSubtreeSplitController;
-
-    /**
      * @var string
      */
     protected $payloadStream = 'php://input';
 
     public function __construct(
-        GithubToGerritController $githubToGerritController = null,
-        GitSubtreeSplitController $gitSubtreeSplitController = null
+        GithubToGerritController $githubToGerritController = null
     ) {
         $this->githubToGerritController = $githubToGerritController ?: new GithubToGerritController();
-        $this->gitSubtreeSplitController = $gitSubtreeSplitController ?: new GitSubtreeSplitController();
     }
 
     public function dispatch()
@@ -50,8 +43,6 @@ class RequestDispatcher
                 if (!empty($payload['action']) && $payload['action'] === 'opened' && !empty($payload['pull_request'])) {
                     $this->githubToGerritController->transformPullRequestToGerritReview(file_get_contents($this->payloadStream));
                 }
-            } elseif (!empty($_GET['gitsplit'])) {
-                $this->gitSubtreeSplitController->split(file_get_contents($this->payloadStream));
             }
         } catch (\Exception $e) {
         }
