@@ -32,11 +32,7 @@ class BambooPostBuildController extends AbstractController
      * @param GerritService $gerritService
      * @return Response
      */
-    public function index(
-        Request $request,
-        BambooService $bambooService,
-        GerritService $gerritService
-    ): Response
+    public function index(Request $request, BambooService $bambooService, GerritService $gerritService): Response
     {
         $buildKey = (new BambooSlackMessage($request->request->get('payload')))->buildKey;
         $rawBuildDetails = $bambooService->getBuildStatus($buildKey);

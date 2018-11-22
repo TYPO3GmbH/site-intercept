@@ -15,7 +15,7 @@ function splitForBranch {
         echo "Splitting extension ${EXTENSION}"
 
         # Split operation creating commit objects and giving last SHA1 commit hash
-        SHA1=`./../intercept/bin/${SPLITTER} --prefix=typo3/sysext/${EXTENSION} --origin=origin/${LOCALBRANCH}`
+        SHA1=`./../../bin/${SPLITTER} --prefix=typo3/sysext/${EXTENSION} --origin=origin/${LOCALBRANCH}`
 
         # Add target extension remote if needed
         if [[ $(git remote | grep "^${EXTENSION}\$" | wc -l) -eq 0 ]]; then
@@ -30,24 +30,25 @@ function splitForBranch {
     done
 }
 
-
 # Exit if not two argument are given
 if [[ $# -ne 2 ]]; then
     echo "usage: $0 <sourceBranchName> <targetBranchName>"
     exit 1
 fi
 
-# Go to current dir this script is in
-cd "$(dirname "$0")"
+# Go to the directory this script is located, so everything else is relative
+# to this dir, no matter from where this script is called.
+THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+cd "$THIS_SCRIPT_DIR" || exit 1
 
 BASEREMOTE=git@github.com:TYPO3/TYPO3.CMS.git
-REPODIR="../../TYPO3.CMS-split"
+REPODIR="../var/TYPO3.CMS-split"
 
 # Initial clone or update pull
 if [[ -d ${REPODIR} ]]; then
     git -C ${REPODIR} pull
 else
-    git clone $BASEREMOTE ${REPODIR}
+    git clone ${BASEREMOTE} ${REPODIR}
 fi
 
 # Go to repo checkout
