@@ -1,15 +1,17 @@
 <?php
 declare(strict_types = 1);
+namespace App\Exception;
 
 /*
- * This file is part of the package t3g/build-information-service.
+ * This file is part of the package t3g/intercept.
  *
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  */
 
-namespace T3G\Intercept\Exception;
-
+/**
+ * Exception thrown if classes are not responsible.
+ */
 class DoNotCareException extends \Exception
 {
 }

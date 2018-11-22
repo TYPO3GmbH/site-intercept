@@ -55,20 +55,6 @@ class InterceptController
     }
 
     /**
-     * Action to execute after a new patch set has been uploaded to gerrit
-     * Is triggered by the gerrit patchset-created hook
-     */
-    public function newBuildAction()
-    {
-        $changeUrl = $_POST['changeUrl'];
-        $patchSet = (int)$_POST['patchset'];
-        $branch = $_POST['branch'];
-        if ($branch === 'master' || $branch === 'TYPO3_7-6' || $branch === 'TYPO3_6-2' || $branch === 'TYPO3_8-7') {
-            $this->bambooRequests->triggerNewCoreBuild($changeUrl, $patchSet, $branch);
-        }
-    }
-
-    /**
      * Action to execute after a build was finished
      * We are notified via a slack message hook
      */

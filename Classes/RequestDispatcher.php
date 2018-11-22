@@ -70,16 +70,11 @@ class RequestDispatcher
                 if (!empty($payload['action']) && $payload['action'] === 'opened' && !empty($payload['pull_request'])) {
                     $this->githubToGerritController->transformPullRequestToGerritReview(file_get_contents($this->payloadStream));
                 }
-            } elseif (!empty($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] === 'docs-hook.typo3.org') {
-                // See if docs rendering request is called here
-                $this->documentationRenderingController->transformGithubWebhookIntoRenderingRequest(file_get_contents($this->payloadStream));
             } elseif (!empty($_GET['gitsplit'])) {
                 $this->gitSubtreeSplitController->split(file_get_contents($this->payloadStream));
             } else {
                 if (!empty($_POST['payload'])) {
                     $this->interceptController->postBuildAction();
-                } elseif (!empty($_POST['changeUrl']) && !empty($_POST['patchset']) && !empty($_POST['branch'])) {
-                    $this->interceptController->newBuildAction();
                 } else {
                     $this->logger->warning(
                         'Could not dispatch request. Request Data:' . "\n" . var_export($_REQUEST, true)

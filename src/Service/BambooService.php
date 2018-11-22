@@ -10,13 +10,12 @@ namespace App\Service;
  */
 
 use App\Client\BambooClient;
+use App\Extractor\GithubPushEventDocsInformationExtractor;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use T3G\Intercept\Github\DocumentationRenderingRequest;
 
 /**
- * Responsible for all requests sent to bamboo
- * @codeCoverageIgnore tested via integration tests only
+ * Check and prepare requests sent to bamboo
  */
 class BambooService
 {
@@ -38,7 +37,7 @@ class BambooService
     /**
      * @var array Map gerrit branches to bamboo plan keys
      */
-    protected $branchToProjectKey = [
+    private $branchToProjectKey = [
         'master' => 'CORE-GTC',
         'master-testbed-lolli' => 'CORE-TL',
         'TYPO3_8-7' => 'CORE-GTC87',
@@ -109,19 +108,20 @@ class BambooService
 
     /**
      * Triggers new build in project CORE-DR
+     *
+     * @param GithubPushEventDocsInformationExtractor $pushEventInformation
+     * @return ResponseInterface
      */
     public function triggerDocumentationPlan(
-        DocumentationRenderingRequest $documentationRenderingRequest
+        GithubPushEventDocsInformationExtractor $pushEventInformation
     ): ResponseInterface {
         $uri = 'latest/queue/CORE-DR?' . implode('&', [
             'stage=',
             'executeAllStages=',
             'os_authType=basic',
-            'bamboo.variable.VERSION_NUMBER=' . urlencode($documentationRenderingRequest->getVersionNumber()),
-            'bamboo.variable.REPOSITORY_URL=' . urlencode($documentationRenderingRequest->getRepositoryUrl()),
+            'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->getVersionNumber()),
+            'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->getRepositoryUrl()),
         ]);
-
-        $this->logger->info('cURL request to url ' . $this->baseUrl);
         return $this->sendBambooPost($uri);
     }
 
