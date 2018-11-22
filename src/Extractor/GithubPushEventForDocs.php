@@ -15,7 +15,7 @@ use App\Exception\DoNotCareException;
  * Extract information from a github push event hook
  * needed to trigger a bamboo docs render build
  */
-class GithubPushEventDocsInformation
+class GithubPushEventForDocs
 {
     /**
      * @var string A tag or a branch name
@@ -31,12 +31,12 @@ class GithubPushEventDocsInformation
      * Extract information needed by docs trigger from a github PR
      * or throw an exception if not responsible
      *
-     * @param string $requestPayload
+     * @param string $payload
      * @throws DoNotCareException
      */
-    public function __construct(string $requestPayload)
+    public function __construct(string $payload)
     {
-        $fullPullRequestInformation = json_decode($requestPayload, true);
+        $fullPullRequestInformation = json_decode($payload, true);
         $this->versionNumber = $this->getVersionNumberFromRef($fullPullRequestInformation['ref']);
         $this->repositoryUrl = $fullPullRequestInformation['repository']['clone_url'];
         if (empty($this->versionNumber) || empty($this->repositoryUrl)) {

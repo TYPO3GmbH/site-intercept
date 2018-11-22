@@ -29,6 +29,7 @@ class BambooPostBuildController extends AbstractController
      * @Route("/bamboo", name="bamboo_build_done")
      * @param Request $request
      * @param BambooService $bambooService
+     * @param GerritService $gerritService
      * @return Response
      */
     public function index(

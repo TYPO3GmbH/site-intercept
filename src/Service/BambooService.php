@@ -10,7 +10,8 @@ namespace App\Service;
  */
 
 use App\Client\BambooClient;
-use App\Extractor\GithubPushEventDocsInformation;
+use App\Extractor\GerritPushEvent;
+use App\Extractor\GithubPushEventForDocs;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -73,13 +74,12 @@ class BambooService
     /**
      * Triggers a new build in one of the bamboo core pre-merge branch projects
      *
-     * @param string $changeUrl
-     * @param int $patchSet
-     * @param string $branch Branch name, eg. "master" or "TYPO3_7-6"
+     * @param GerritPushEvent $pushEvent
      * @return ResponseInterface
      */
-    public function triggerNewCoreBuild(string $changeUrl, int $patchSet, string $branch): ResponseInterface
+    public function triggerNewCoreBuild(GerritPushEvent $pushEvent): ResponseInterface
     {
+        $branch = $pushEvent->branch;
         if (!array_key_exists($branch, $this->branchToProjectKey)) {
             throw new \InvalidArgumentException(
                 'Branch ' . $branch . ' does not point to a bamboo project name',
@@ -88,8 +88,11 @@ class BambooService
         }
 
         $apiPath = 'latest/queue/' . (string)$this->branchToProjectKey[$branch];
-        $apiPathParams = '?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=' .
-            urlencode($changeUrl) . '&bamboo.variable.patchset=' . $patchSet;
+        $apiPathParams = '?stage='
+            . '&os_authType=basic'
+            . '&executeAllStages=&'
+            . 'bamboo.variable.changeUrl=' . urlencode($pushEvent->changeUrl)
+            . '&bamboo.variable.patchset=' . (string)$pushEvent->patchSet;
         $uri = $apiPath . $apiPathParams;
 
         return $this->sendBambooPost($uri);
@@ -98,12 +101,10 @@ class BambooService
     /**
      * Triggers new build in project CORE-DR
      *
-     * @param GithubPushEventDocsInformation $pushEventInformation
+     * @param GithubPushEventForDocs $pushEventInformation
      * @return ResponseInterface
      */
-    public function triggerDocumentationPlan(
-        GithubPushEventDocsInformation $pushEventInformation
-    ): ResponseInterface {
+    public function triggerDocumentationPlan(GithubPushEventForDocs $pushEventInformation): ResponseInterface {
         $uri = 'latest/queue/CORE-DR?' . implode('&', [
             'stage=',
             'executeAllStages=',

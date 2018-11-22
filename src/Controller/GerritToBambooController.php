@@ -9,6 +9,7 @@ namespace App\Controller;
  * LICENSE file that was distributed with this source code.
  */
 
+use App\Extractor\GerritPushEvent;
 use App\Service\BambooService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,14 +31,13 @@ class GerritToBambooController extends AbstractController
      */
     public function index(Request $request, BambooService $bambooService): Response
     {
-        $changeUrl = $request->request->get('changeUrl');
-        $patchSet = (int)$request->request->get('patchset');
-        $branch = $request->request->get('branch');
+        $pushInformation = new GerritPushEvent($request);
+        $branch = $pushInformation->branch;
         if ($branch === 'master'
             || $branch === 'TYPO3_8-7'
             || $branch === 'TYPO3_7-6'
         ) {
-            $bambooService->triggerNewCoreBuild($changeUrl, $patchSet, $branch);
+            $bambooService->triggerNewCoreBuild($pushInformation);
         }
         return Response::create();
     }
