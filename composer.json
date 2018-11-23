@@ -9,11 +9,11 @@
     }
   ],
   "require": {
+    "ext-SimpleXML": "*",
     "ext-json": "*",
     "cpliakas/git-wrapper": "^2.1",
     "eightpoints/guzzle-bundle": "^7.4",
     "graylog2/gelf-php": "^1.6",
-    "hassankhan/config": "0.10.0",
     "kbsali/redmine-api": "~1.0",
     "psr/http-message": "^1",
     "psr/log": "^1",
@@ -22,8 +22,7 @@
     "symfony/flex": "^1.1",
     "symfony/framework-bundle": "^4.1",
     "symfony/monolog-bundle": "^3.3",
-    "symfony/yaml": "^4.1",
-    "vlucas/phpdotenv": "^2.3"
+    "symfony/yaml": "^4.1"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.12",

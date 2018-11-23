@@ -14,11 +14,17 @@ services:
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
 
+        bind:
+            # Absolute path to local directory where github core pull request files are put
+            $pullRequestPatchPath: '%kernel.project_dir%/var/patches/'
+            # Absolute path to local core checkout github pull requests are applied to
+            $pullRequestCorePath: '%kernel.project_dir%/var/git-core-pr/'
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php,Client}'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php,ForgeService}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -30,6 +36,7 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Client\BambooClient: '@eight_points_guzzle.client.bamboo'
     App\Client\GerritClient: '@eight_points_guzzle.client.gerrit'
+    App\Client\GeneralClient: '@eight_points_guzzle.client.general'
 
     # graylog log setup and enrichment of log rows with static
     # data for easy search on elk.typo3.com. Works on dev / local too since

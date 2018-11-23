@@ -9,3 +9,5 @@ eight_points_guzzle:
         gerrit:
             base_url: "https://review.typo3.org/a/"
             class: App\Client\GerritClient
+        general:
+            class: App\Client\GeneralClient

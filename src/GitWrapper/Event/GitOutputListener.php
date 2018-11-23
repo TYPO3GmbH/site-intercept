@@ -1,20 +1,26 @@
 <?php
 declare(strict_types = 1);
+namespace App\GitWrapper\Event;
 
 /*
- * This file is part of the package t3g/build-information-service.
+ * This file is part of the package t3g/intercept.
  *
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  */
 
-namespace T3G\Intercept\Git;
-
 use GitWrapper\Event\GitOutputEvent;
 use GitWrapper\Event\GitOutputListenerInterface;
 
+/**
+ * A listener for git wrapper that captures stderr output, too.
+ */
 class GitOutputListener implements GitOutputListenerInterface
 {
+    /**
+     * @var string Output including stderr
+     */
+    public $output = '';
 
     /**
      * Looks ugly, but as gerrit uses stderr to output the link to the review system - even if nothing
@@ -22,8 +28,8 @@ class GitOutputListener implements GitOutputListenerInterface
      *
      * @param \GitWrapper\Event\GitOutputEvent $event
      */
-    public function handleOutput(GitOutputEvent $event)
+    public function handleOutput(GitOutputEvent $event): void
     {
-        $GLOBALS['gitOutput'] .= $event->getBuffer();
+        $this->output .= $event->getBuffer();
     }
 }

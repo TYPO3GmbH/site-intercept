@@ -10,8 +10,8 @@ namespace App\Service;
  */
 
 use App\Client\GerritClient;
+use App\Creator\GerritBuildStatusMessage;
 use App\Extractor\BambooBuildStatus;
-use App\Utility\TimeUtility;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -39,40 +39,24 @@ class GerritService
      * finished that has been triggered by a gerrit push.
      *
      * @param BambooBuildStatus $buildInformation
+     * @param GerritBuildStatusMessage $message
      * @return ResponseInterface
      */
-    public function voteOnGerrit(BambooBuildStatus $buildInformation): ResponseInterface
+    public function voteOnGerrit(BambooBuildStatus $buildInformation, GerritBuildStatusMessage $message): ResponseInterface
     {
         $apiPath = 'changes/' . $buildInformation->change
             . '/revisions/' . $buildInformation->patchSet
             . '/review';
 
         $verification = $buildInformation->success ? '+1' : '-1';
-        $message = $this->getMessage($buildInformation);
 
         $postFields = [
-            'message' => $message,
+            'message' => $message->message,
             'labels' => [
                 'Verified' => $verification
             ]
         ];
         return $this->sendGerritPost($apiPath, $postFields);
-    }
-
-    /**
-     * Create a readable message to be shown on gerrit
-     *
-     * @param BambooBuildStatus $buildInformation
-     * @return string
-     */
-    private function getMessage(BambooBuildStatus $buildInformation): string
-    {
-        $messageParts[] = 'Completed build in '
-            . TimeUtility::convertSecondsToHumanReadable($buildInformation->buildDurationInSeconds)
-            . ' on ' . $buildInformation->prettyBuildCompletedTime;
-        $messageParts[] = 'Test Summary: ' . $buildInformation->testSummary;
-        $messageParts[] = 'Find logs and detail information at ' . $buildInformation->buildUrl;
-        return implode("\n", $messageParts);
     }
 
     /**

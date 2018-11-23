@@ -104,7 +104,8 @@ class BambooService
      * @param GithubPushEventForDocs $pushEventInformation
      * @return ResponseInterface
      */
-    public function triggerDocumentationPlan(GithubPushEventForDocs $pushEventInformation): ResponseInterface {
+    public function triggerDocumentationPlan(GithubPushEventForDocs $pushEventInformation): ResponseInterface
+    {
         $uri = 'latest/queue/CORE-DR?' . implode('&', [
             'stage=',
             'executeAllStages=',

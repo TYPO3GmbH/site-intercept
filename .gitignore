@@ -1,17 +1,12 @@
 .idea
-.php_cs.cache
 
 bin/console
 bin/php-cs-fixer
 bin/phpunit
 bin/php-parse
+
 # JIRA plugin
 atlassian-ide-plugin.xml
-
-/vendor/
-/logs
-/Log/Intercept.log
-/Log/Github2Gerrit.log
 
 ###> symfony/framework-bundle ###
 /.env.local

@@ -28,17 +28,17 @@ class GithubPushEventForDocs
     public $repositoryUrl = '';
 
     /**
-     * Extract information needed by docs trigger from a github PR
-     * or throw an exception if not responsible
+     * Extract information needed by docs trigger from a github
+     * push event or throw an exception if not responsible
      *
      * @param string $payload
      * @throws DoNotCareException
      */
     public function __construct(string $payload)
     {
-        $fullPullRequestInformation = json_decode($payload, true);
-        $this->versionNumber = $this->getVersionNumberFromRef($fullPullRequestInformation['ref']);
-        $this->repositoryUrl = $fullPullRequestInformation['repository']['clone_url'];
+        $payload = json_decode($payload, true);
+        $this->versionNumber = $this->getVersionNumberFromRef($payload['ref']);
+        $this->repositoryUrl = $payload['repository']['clone_url'];
         if (empty($this->versionNumber) || empty($this->repositoryUrl)) {
             throw new DoNotCareException();
         }

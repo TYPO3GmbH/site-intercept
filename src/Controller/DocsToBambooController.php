@@ -32,9 +32,8 @@ class DocsToBambooController extends AbstractController
      */
     public function index(Request $request, BambooService $bambooService): Response
     {
-        $payload = $request->getContent();
         try {
-            $pushEventInformation = new GithubPushEventForDocs($payload);
+            $pushEventInformation = new GithubPushEventForDocs($request->getContent());
             $bambooService->triggerDocumentationPlan($pushEventInformation);
         } catch (DoNotCareException $e) {
             // Hook payload could not be identified as hook that

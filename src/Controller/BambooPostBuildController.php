@@ -9,6 +9,7 @@ namespace App\Controller;
  * LICENSE file that was distributed with this source code.
  */
 
+use App\Creator\GerritBuildStatusMessage;
 use App\Extractor\BambooBuildStatus;
 use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
@@ -40,7 +41,8 @@ class BambooPostBuildController extends AbstractController
 
         if (!empty($buildDetails->change) && !empty($buildDetails->patchSet)) {
             // Vote on gerrit if this build has been triggered by a gerrit push
-            $gerritService->voteOnGerrit($buildDetails);
+            $message = new GerritBuildStatusMessage($buildDetails);
+            $gerritService->voteOnGerrit($buildDetails, $message);
         }
 
         return Response::create();
