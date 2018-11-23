@@ -27,8 +27,7 @@
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.12",
     "phpunit/phpunit": "^6",
-    "roave/security-advisories": "dev-master",
-    "symfony/maker-bundle": "^1.9"
+    "roave/security-advisories": "dev-master"
   },
   "config": {
     "bin-dir": "bin/",
