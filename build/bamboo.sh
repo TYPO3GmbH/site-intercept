@@ -23,7 +23,7 @@ runLint
 runComposer install --no-interaction --no-progress
 
 # CGL Checks
-runPhpCsFixer fix --config Build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml
+runPhpCsFixer fix --config build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml
 
 # Unit tests
-runPhpunit -c Build/UnitTests.xml --log-junit var/phpunit/phpunit.xml  --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/
+runPhpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml  --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/
