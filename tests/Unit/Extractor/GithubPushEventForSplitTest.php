@@ -50,4 +50,14 @@ class GithubPushEventForSplitTest extends TestCase
         $payload = [ 'ref' => 'refs/heads/TYPO3_7-6' ];
         new GithubPushEventForSplit(json_encode($payload));
     }
+
+    /**
+     * @test
+     */
+    public function constructorThrowsWithInvalidRef()
+    {
+        $this->expectException(DoNotCareException::class);
+        $payload = [ 'ref' => 'refs/heads/' ];
+        new GithubPushEventForSplit(json_encode($payload));
+    }
 }

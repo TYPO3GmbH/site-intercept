@@ -15,6 +15,8 @@ use GitWrapper\Event\GitOutputListenerInterface;
 
 /**
  * A listener for git wrapper that captures stderr output, too.
+ *
+ * @codeCoverageIgnore Can not be tested since GitOutputEvent is final :(
  */
 class GitOutputListener implements GitOutputListenerInterface
 {

@@ -20,7 +20,23 @@ class GerritCommitMessageTest extends TestCase
         $forgeIssue = $this->prophesize(ForgeNewIssue::class);
         $forgeIssue->id = '4711';
         $subject = new GerritCommitMessage($pullRequestProphecy->reveal(), $forgeIssue->reveal());
-        $this->assertRegExp('/Patch title/', $subject->message);
+        $this->assertRegExp('/\[TASK\] Patch title/', $subject->message);
+        $this->assertRegExp('/Patch body/', $subject->message);
+        $this->assertRegExp('/4711/', $subject->message);
+    }
+
+    /**
+     * @test
+     */
+    public function messageStripsLongTitle()
+    {
+        $pullRequestProphecy = $this->prophesize(GithubPullRequestIssue::class);
+        $pullRequestProphecy->title = '0123456789012345678901234567890123456789012345678901234567890123456789';
+        $pullRequestProphecy->body = '[TASK] Patch body';
+        $forgeIssue = $this->prophesize(ForgeNewIssue::class);
+        $forgeIssue->id = '4711';
+        $subject = new GerritCommitMessage($pullRequestProphecy->reveal(), $forgeIssue->reveal());
+        $this->assertRegExp('/\[TASK\] 0123456789012345678901234567890123456789012345678901234567890123456/', $subject->message);
         $this->assertRegExp('/Patch body/', $subject->message);
         $this->assertRegExp('/4711/', $subject->message);
     }
