@@ -22,6 +22,8 @@ use Symfony\Component\Routing\Annotation\Route;
  * Git sub tree split core to single repositories at
  * https://github.com/typo3-cms. Triggered by github hook on
  * https://github.com/TYPO3/TYPO3.CMS.
+ *
+ * @codeCoverageIgnore
  */
 class GitSubtreeSplitController extends AbstractController
 {
