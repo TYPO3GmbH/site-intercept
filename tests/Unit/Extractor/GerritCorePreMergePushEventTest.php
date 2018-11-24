@@ -3,12 +3,12 @@ declare(strict_types = 1);
 namespace App\Tests\Unit\Extractor;
 
 use App\Exception\DoNotCareException;
-use App\Extractor\GerritPushEvent;
+use App\Extractor\GerritCorePreMergePushEvent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
-class GerritPushEventTest extends TestCase
+class GerritCorePreMergePushEventTest extends TestCase
 {
     /**
      * @test
@@ -21,7 +21,7 @@ class GerritPushEventTest extends TestCase
         $post->get('changeUrl')->willReturn('https://review.typo3.org/48574/');
         $post->get('patchset')->willReturn('42');
         $post->get('branch')->willReturn('master');
-        $subject = new GerritPushEvent($request->reveal());
+        $subject = new GerritCorePreMergePushEvent($request->reveal());
         $this->assertSame('https://review.typo3.org/48574/', $subject->changeUrl);
         $this->assertSame(42, $subject->patchSet);
         $this->assertSame('master', $subject->branch);
@@ -39,7 +39,7 @@ class GerritPushEventTest extends TestCase
         $post->get('changeUrl')->willReturn('https://review.typo3.org/48574/');
         $post->get('patchset')->willReturn('42');
         $post->get('branch')->willReturn('some-other-branch');
-        new GerritPushEvent($request->reveal());
+        new GerritCorePreMergePushEvent($request->reveal());
     }
 
     /**
@@ -54,6 +54,6 @@ class GerritPushEventTest extends TestCase
         $post->get('changeUrl')->willReturn('https://review.typo3.org/48574/');
         $post->get('patchset')->willReturn('');
         $post->get('branch')->willReturn('master');
-        new GerritPushEvent($request->reveal());
+        new GerritCorePreMergePushEvent($request->reveal());
     }
 }

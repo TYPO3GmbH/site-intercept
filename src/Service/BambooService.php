@@ -13,7 +13,7 @@ namespace App\Service;
 use App\Client\BambooClient;
 use App\Extractor\BambooBuildStatus;
 use App\Extractor\BambooSlackMessage;
-use App\Extractor\GerritPushEvent;
+use App\Extractor\GerritCorePreMergePushEvent;
 use App\Extractor\GithubPushEventForDocs;
 use Psr\Http\Message\ResponseInterface;
 
@@ -26,16 +26,6 @@ class BambooService
      * @var BambooClient
      */
     private $client;
-
-    /**
-     * @var array Map gerrit branches to bamboo plan keys
-     */
-    private $branchToProjectKey = [
-        'master' => 'CORE-GTC',
-        'master-testbed-lolli' => 'CORE-TL',
-        'TYPO3_8-7' => 'CORE-GTC87',
-        'TYPO3_7-6' => 'CORE-GTC76'
-    ];
 
     /**
      * BambooService constructor.
@@ -76,20 +66,12 @@ class BambooService
     /**
      * Triggers a new build in one of the bamboo core pre-merge branch projects
      *
-     * @param GerritPushEvent $pushEvent
+     * @param GerritCorePreMergePushEvent $pushEvent
      * @return ResponseInterface
      */
-    public function triggerNewCoreBuild(GerritPushEvent $pushEvent): ResponseInterface
+    public function triggerNewCoreBuild(GerritCorePreMergePushEvent $pushEvent): ResponseInterface
     {
-        $branch = $pushEvent->branch;
-        if (!array_key_exists($branch, $this->branchToProjectKey)) {
-            throw new \InvalidArgumentException(
-                'Branch ' . $branch . ' does not point to a bamboo project name',
-                1472210110
-            );
-        }
-
-        $apiPath = 'latest/queue/' . (string)$this->branchToProjectKey[$branch];
+        $apiPath = 'latest/queue/' . $pushEvent->bambooProject;
         $apiPathParams = '?stage='
             . '&os_authType=basic'
             . '&executeAllStages=&'

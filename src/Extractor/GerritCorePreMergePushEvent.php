@@ -18,8 +18,17 @@ use Symfony\Component\HttpFoundation\Request;
  * needed to trigger a bamboo pre-merge build. Throws
  * exceptions if not responsible.
  */
-class GerritPushEvent
+class GerritCorePreMergePushEvent
 {
+    /**
+     * @var array Map gerrit branches to bamboo plan keys
+     */
+    private $branchToProjectKey = [
+        'master' => 'CORE-GTC',
+        'TYPO3_8-7' => 'CORE-GTC87',
+        'TYPO3_7-6' => 'CORE-GTC76'
+    ];
+
     /**
      * @var string The change url, eg. 'https://review.typo3.org/48574/'
      */
@@ -36,6 +45,11 @@ class GerritPushEvent
     public $branch;
 
     /**
+     * @var string The bamboo project that relates to given core pre-merge branch
+     */
+    public $bambooProject;
+
+    /**
      * Extract information needed from a gerrit push event hook
      *
      * @param Request $request
@@ -50,6 +64,7 @@ class GerritPushEvent
         if ($branch !== 'master' && $branch !== 'TYPO3_8-7' && $branch !== 'TYPO3_7-6') {
             throw new DoNotCareException();
         }
+        $this->bambooProject = $this->branchToProjectKey[$branch];
         if (empty($this->changeUrl) || empty($this->patchSet)) {
             throw new \RuntimeException();
         }
