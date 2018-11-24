@@ -21,7 +21,7 @@ class TimeUtility
      * @param int $seconds
      * @return string
      */
-    public static function convertSecondsToHumanReadable(int $seconds) : string
+    public static function convertSecondsToHumanReadable(int $seconds): string
     {
         $startTime = new \DateTime('@' . 0);
         $givenSeconds = new \DateTime('@' . $seconds);

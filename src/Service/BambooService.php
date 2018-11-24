@@ -52,7 +52,7 @@ class BambooService
      * @param string $buildKey Project-Plan-BuildNumber, eg. CORE-GTC-30244
      * @return ResponseInterface
      */
-    public function getBuildStatus(string $buildKey) : ResponseInterface
+    public function getBuildStatus(string $buildKey): ResponseInterface
     {
         $apiPath = 'latest/result/' . $buildKey;
         $apiPathParams = '?os_authType=basic&expand=labels';
