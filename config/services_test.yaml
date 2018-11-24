@@ -3,3 +3,9 @@ services:
         public: true
     App\Client\GerritClient:
         public: true
+    App\Client\GeneralClient:
+        public: true
+    App\Client\ForgeClient:
+        public: true
+    App\Service\LocalCoreGitService:
+        public: true

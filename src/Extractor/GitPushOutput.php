@@ -17,7 +17,7 @@ namespace App\Extractor;
 class GitPushOutput
 {
     /**
-     * @var string Review extracted from a git push output
+     * @var string Review extracted from a git push output, eg. 'https://review.typo3.org/12345'
      */
     public $reviewUrl;
 

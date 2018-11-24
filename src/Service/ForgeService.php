@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Client\ForgeClient;
 use App\Extractor\ForgeNewIssue;
 use App\Extractor\GithubPullRequestIssue;
 
@@ -31,6 +32,16 @@ class ForgeService
     private $projectId = 27;
 
     /**
+     * BambooService constructor.
+     *
+     * @param ForgeClient $client
+     */
+    public function __construct(ForgeClient $client)
+    {
+        $this->client = $client;
+    }
+
+    /**
      * Create a new issue on forge based on github pull request information.
      * Used by github pull request controller.
      *
@@ -39,10 +50,9 @@ class ForgeService
      */
     public function createIssue(GithubPullRequestIssue $issueDetails): ForgeNewIssue
     {
-        $client = new \Redmine\Client($this->url, getenv('FORGE_ACCESS_TOKEN'));
         $description = $issueDetails->body;
-        $description .= "\r\n This issue was automatically created from " . $issueDetails->url;
-        $response = $client->issue->create(
+        $description .= "\n\nThis issue was automatically created from " . $issueDetails->url;
+        $response = $this->client->issue->create(
             [
                 'project_id' => $this->projectId,
                 'tracker_id' => 4,

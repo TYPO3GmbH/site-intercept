@@ -9,8 +9,7 @@ return Request::create(
     [],
     [],
     [],
-    '
-    {
+    '{
       "ref": "refs/heads/latest",
       "before": "5c8463e02ff0db554b1599859542c293e39cadb3",
       "after": "661acb43810dfb3463ce5663a585ae10225e3e53",
@@ -211,6 +210,5 @@ return Request::create(
         "type": "User",
         "site_admin": false
       }
-    }
-    '
+    }'
 );

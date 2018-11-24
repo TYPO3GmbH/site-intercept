@@ -1,4 +1,11 @@
-From b24a8c17d3dbf878a134254c29505681dab4630b Mon Sep 17 00:00:00 2001
+<?php
+
+use GuzzleHttp\Psr7\Response;
+
+return new Response(
+    200,
+    [],
+    'From b24a8c17d3dbf878a134254c29505681dab4630b Mon Sep 17 00:00:00 2001
 From: neustawebdeploy <mlist-web-deploy@neusta.de>
 Date: Wed, 6 Jul 2016 16:55:18 +0200
 Subject: [PATCH] Create TestBlubbub.md
@@ -18,3 +25,5 @@ index 0000000..d5e61b4
 +============
 +
 +hmm hmm.
+'
+);

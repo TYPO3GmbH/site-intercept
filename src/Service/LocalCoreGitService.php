@@ -24,6 +24,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Apply patches to local core checkout and push to gerrit
+ *
+ * @codeCoverageIgnore GitWrapper and friends are unmockable due to final keyword :(
  */
 class LocalCoreGitService
 {
