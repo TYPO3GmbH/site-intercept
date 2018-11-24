@@ -29,4 +29,20 @@ class DocsToBambooControllerTest extends TestCase
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
     }
+
+    /**
+     * @test
+     */
+    public function bambooBuildIsNotTriggered()
+    {
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $bambooClient = $this->prophesize(BambooClient::class);
+        $bambooClient->post(Argument::cetera())->shouldNotBeCalled();
+        $container->set('App\Client\BambooClient', $bambooClient->reveal());
+        $request = require __DIR__ . '/Fixtures/DocsToBambooBadRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+    }
 }
