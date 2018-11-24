@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Exception\DoNotCareException;
 use App\Extractor\GerritPushEvent;
 use App\Service\BambooService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,13 +33,12 @@ class GerritToBambooController extends AbstractController
      */
     public function index(Request $request, BambooService $bambooService): Response
     {
-        $pushInformation = new GerritPushEvent($request);
-        $branch = $pushInformation->branch;
-        if ($branch === 'master'
-            || $branch === 'TYPO3_8-7'
-            || $branch === 'TYPO3_7-6'
-        ) {
+        try {
+            $pushInformation = new GerritPushEvent($request);
             $bambooService->triggerNewCoreBuild($pushInformation);
+        } catch (DoNotCareException $e) {
+            // Do not care if pushed to some other branch than the
+            // ones we do want to handle.
         }
         return Response::create();
     }
