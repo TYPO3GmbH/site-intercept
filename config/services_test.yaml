@@ -1,0 +1,3 @@
+services:
+    App\Client\BambooClient:
+        public: true
