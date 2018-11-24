@@ -36,9 +36,8 @@ class BambooPostBuildController extends AbstractController
      */
     public function index(Request $request, BambooService $bambooService, GerritService $gerritService): Response
     {
-        $buildKey = (new BambooSlackMessage($request->request->get('payload')))->buildKey;
-        $rawBuildDetails = $bambooService->getBuildStatus($buildKey);
-        $buildDetails = new BambooBuildStatus((string)$rawBuildDetails->getBody());
+        $slackMessage = new BambooSlackMessage($request);
+        $buildDetails = $bambooService->getBuildStatus($slackMessage);
 
         if (!empty($buildDetails->change) && !empty($buildDetails->patchSet)) {
             // Vote on gerrit if this build has been triggered by a gerrit push

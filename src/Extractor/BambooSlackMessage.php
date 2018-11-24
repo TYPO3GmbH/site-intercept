@@ -10,6 +10,8 @@ declare(strict_types = 1);
 
 namespace App\Extractor;
 
+use Symfony\Component\HttpFoundation\Request;
+
 /**
  * Parses the slack message format send to us via Bamboo Slack Notification hook
  */
@@ -23,11 +25,12 @@ class BambooSlackMessage
     /**
      * Extract relevant information from a bamboo created slack message
      *
-     * @param string $payload
+     * @param Request $request
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $payload)
+    public function __construct(Request $request)
     {
+        $payload = $request->request->get('payload');
         if (
             !empty($payload) &&
             preg_match('/<https:\/\/bamboo\.typo3\.com\/browse\/(?<buildKey>.*?)\|/', $payload, $matches)

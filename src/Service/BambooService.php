@@ -11,6 +11,8 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Client\BambooClient;
+use App\Extractor\BambooBuildStatus;
+use App\Extractor\BambooSlackMessage;
 use App\Extractor\GerritPushEvent;
 use App\Extractor\GithubPushEventForDocs;
 use Psr\Http\Message\ResponseInterface;
@@ -49,12 +51,12 @@ class BambooService
      * Fetch details of a recent build. Used by bamboo post build controller
      * to create a vote on gerrit based on these details.
      *
-     * @param string $buildKey Project-Plan-BuildNumber, eg. CORE-GTC-30244
-     * @return ResponseInterface
+     * @param BambooSlackMessage $slackMessage
+     * @return BambooBuildStatus
      */
-    public function getBuildStatus(string $buildKey): ResponseInterface
+    public function getBuildStatus(BambooSlackMessage $slackMessage): BambooBuildStatus
     {
-        $apiPath = 'latest/result/' . $buildKey;
+        $apiPath = 'latest/result/' . $slackMessage->buildKey;
         $apiPathParams = '?os_authType=basic&expand=labels';
 
         $uri = $apiPath . $apiPathParams;
@@ -69,7 +71,7 @@ class BambooService
             'verify' => false
         ]);
 
-        return $response;
+        return new BambooBuildStatus((string)$response->getBody());
     }
 
     /**
