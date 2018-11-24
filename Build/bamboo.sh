@@ -10,10 +10,8 @@ set -e
 set -x
 
 # Create log directory
-mkdir -p logs
-
-# Set Environment Variables
-touch .env
+mkdir -p var/php-cs-fixer/
+mkdir -p var/phpunit/
 
 # lint, phpunit, composer in docker helper functions
 source Build/bamboo-container-functions.sh
@@ -25,7 +23,7 @@ runLint
 runComposer install --no-interaction --no-progress
 
 # CGL Checks
-runPhpCsFixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xml
+runPhpCsFixer fix --config Build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml
 
 # Unit tests
-runPhpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml  --coverage-clover logs/coverage.xml --coverage-html logs/coverage/
+runPhpunit -c Build/UnitTests.xml --log-junit var/phpunit/phpunit.xml  --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/
