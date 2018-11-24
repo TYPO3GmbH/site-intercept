@@ -1,6 +1,5 @@
 <?php
 declare(strict_types = 1);
-namespace App\Extractor;
 
 /*
  * This file is part of the package t3g/intercept.
@@ -9,8 +8,7 @@ namespace App\Extractor;
  * LICENSE file that was distributed with this source code.
  */
 
-use App\Exception\DoNotCareException;
-use Psr\Http\Message\ResponseInterface;
+namespace App\Extractor;
 
 /**
  * Forge issue response object with validation. Created by a

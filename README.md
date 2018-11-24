@@ -1,12 +1,15 @@
 # TYPO3 Intercept
 
-This is a standalone PHP application to communicate between TYPO3s Bamboo CI and Gerrit.
+Intercept is a small middleware that communicates between various services
+used in TYPO3 core or core-near world.
 
-For a detailed description of the process, see [TYPO3s Wiki](https://confluence.typo3.com/display/TC/Process+Flow+pre-merge+Tests)
+Some processes and stats can be found in at
+[TYPO3s Wiki](https://confluence.typo3.com/display/TC/Process+Flow+pre-merge+Tests).
 
-# Github to Gerrit
 
-## Prerequisites
+## Gerrit to bamboo
 
-* Author of the pull request has an email address available through the API
+A hook in gerrit calls intercept for each (core) push, intercept then
+triggers the according bamboo core pre-merge test plan, depending on
+given core branch.
 

@@ -21,7 +21,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 $header = <<<EOF
-This file is part of the package t3g/build-information-service.
+This file is part of the package t3g/intercept.
 
 For the full copyright and license information, please read the
 LICENSE file that was distributed with this source code.
@@ -64,5 +64,5 @@ return PhpCsFixer\Config::create()
     ])
     ->setFinder(
         PhpCsFixer\Finder::create()
-            ->in('Classes')
+            ->in('src')
     );

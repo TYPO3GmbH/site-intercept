@@ -1,6 +1,5 @@
 <?php
 declare(strict_types = 1);
-namespace App\Controller;
 
 /*
  * This file is part of the package t3g/intercept.
@@ -8,6 +7,8 @@ namespace App\Controller;
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  */
+
+namespace App\Controller;
 
 use App\Extractor\GerritPushEvent;
 use App\Service\BambooService;

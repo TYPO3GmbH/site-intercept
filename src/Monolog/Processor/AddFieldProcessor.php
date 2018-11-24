@@ -1,6 +1,5 @@
 <?php
 declare(strict_types = 1);
-namespace App\Monolog\Processor;
 
 /*
  * This file is part of the package t3g/intercept.
@@ -9,6 +8,7 @@ namespace App\Monolog\Processor;
  * LICENSE file that was distributed with this source code.
  */
 
+namespace App\Monolog\Processor;
 
 /**
  * Adds key / values to a log record. Used by graylog logging

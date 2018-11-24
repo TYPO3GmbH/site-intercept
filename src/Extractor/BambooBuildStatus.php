@@ -1,6 +1,5 @@
 <?php
 declare(strict_types = 1);
-namespace App\Extractor;
 
 /*
  * This file is part of the package t3g/intercept.
@@ -9,6 +8,7 @@ namespace App\Extractor;
  * LICENSE file that was distributed with this source code.
  */
 
+namespace App\Extractor;
 
 /**
  * Extract details from bamboo build status. Used by Bamboo post build
