@@ -24,7 +24,7 @@ class GithubPushEventForDocs
     public $versionNumber = '';
 
     /**
-     * @var string Full repository url to clone
+     * @var string Repository url to clone, eg. 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git'
      */
     public $repositoryUrl = '';
 
