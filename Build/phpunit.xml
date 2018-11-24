@@ -13,8 +13,11 @@
     </php>
 
     <testsuites>
-        <testsuite name="Intercept Test Suite">
+        <testsuite name="Unit test suite">
             <directory>../tests/Unit/</directory>
+        </testsuite>
+        <testsuite name="Functional test suite">
+            <directory>../tests/Functional/</directory>
         </testsuite>
     </testsuites>
 
