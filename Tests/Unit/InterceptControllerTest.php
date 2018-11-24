@@ -15,25 +15,6 @@ class InterceptControllerTest extends TestCase
      * @test
      * @return void
      */
-    public function newBuildActionTriggersNewBuildViaCurl(){
-        $changeUrl = 'https://review.typo3.org/48574/';
-        $patchset = 3;
-        $_POST['changeUrl'] = $changeUrl;
-        $_POST['patchset'] = (string)$patchset;
-        $_POST['branch'] = 'master';
-
-        $requester = $this->prophesize(Client::class);
-
-        $interceptController = new InterceptController($requester->reveal());
-        $interceptController->newBuildAction();
-
-        $requester->triggerNewCoreBuild($changeUrl, $patchset, 'master')->shouldHaveBeenCalled();
-    }
-
-    /**
-     * @test
-     * @return void
-     */
     public function postBuildActionVotesOnGerrit()
     {
         $buildKey = 'CORE-GTC-48';
