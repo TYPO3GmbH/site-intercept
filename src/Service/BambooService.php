@@ -68,7 +68,6 @@ class BambooService
                 'content-type' => 'application/json',
                 'x-atlassian-token' => 'nocheck'
             ],
-            'verify' => false
         ]);
 
         return new BambooBuildStatus((string)$response->getBody());
@@ -135,17 +134,7 @@ class BambooService
                     'cache-control' => 'no-cache',
                     'x-atlassian-token' => 'nocheck'
                 ],
-                'verify' => false
             ]
         );
-    }
-
-    /**
-     * @param array $branchToProjectKey Mapping information
-     * @internal For testing
-     */
-    public function setBranchToProjectKey(array $branchToProjectKey)
-    {
-        $this->branchToProjectKey = $branchToProjectKey;
     }
 }

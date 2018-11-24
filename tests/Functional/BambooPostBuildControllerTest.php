@@ -12,7 +12,7 @@ class BambooPostBuildControllerTest extends TestCase
     /**
      * @test
      */
-    public function bambooBuildIsTriggered()
+    public function gerritVoteIsCalled()
     {
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
