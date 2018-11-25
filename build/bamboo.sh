@@ -14,7 +14,7 @@ mkdir -p var/php-cs-fixer/
 mkdir -p var/phpunit/
 
 # lint, phpunit, composer in docker helper functions
-source Build/bamboo-container-functions.sh
+source build/bamboo-container-functions.sh
 
 # Check for PHP Errors
 runLint
