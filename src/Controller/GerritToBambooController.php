@@ -28,7 +28,6 @@ class GerritToBambooController extends AbstractController
     /**
      * @Route("/gerrit", name="gerrit_to_bamboo")
      * @Route("/", host="intercept.typo3.com", name="legacy_gerrit_to_bamboo")
-     * @Route("/index.php", host="intercept.typo3.com", name="legacy2_gerrit_to_bamboo")
      * @param Request $request
      * @param BambooService $bambooService
      * @return Response
