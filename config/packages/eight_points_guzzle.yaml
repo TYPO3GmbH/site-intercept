@@ -2,8 +2,8 @@
 # https://github.com/8p/EightPointsGuzzleBundle/blob/master/src/Resources/doc/configuration-reference.md
 eight_points_guzzle:
 
-    eight_points_guzzle:
-        logging: true
+    # Enable logging in prod, too. default: %kernel.debug%
+    logging: true
 
     clients:
         bamboo:
