@@ -17,6 +17,7 @@
     "kbsali/redmine-api": "~1.0",
     "psr/http-message": "^1",
     "psr/log": "^1",
+    "sensio/framework-extra-bundle": "^5.2",
     "symfony/console": "^4.1",
     "symfony/dotenv": "^4.1",
     "symfony/flex": "^1.1",
