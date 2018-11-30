@@ -4,6 +4,7 @@ services:
     restart: always
     image: typo3gmbh/php72:latest
     user: "${RABBITMQ_WORKER_USER}:${RABBITMQ_WORKER_GROUP}"
+    hostname: intercept-split-worker
     volumes:
     - ./:/app
     - /etc/passwd:/etc/passwd:ro
