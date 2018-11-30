@@ -3,7 +3,7 @@ services:
   git-core-split-worker:
     restart: always
     image: typo3gmbh/php72:latest
-    user: ${RABBITMQ_WORKER_USER}:${RABBITMQ_WORKER_GROUP}
+    user: "${RABBITMQ_WORKER_USER}:${RABBITMQ_WORKER_GROUP}"
     volumes:
     - ./:/app
     - /etc/passwd:/etc/passwd:ro
