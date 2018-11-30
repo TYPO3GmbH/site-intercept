@@ -1,15 +1,18 @@
+# This container is for LIVE hosting only!
+# To run the worker locally, just execute them directly
+# ./bin/console app:git-core-split-worker
 version: '2.3'
 services:
   git-core-split-worker:
     restart: always
     image: typo3gmbh/php72:latest
-    user: "${RABBITMQ_WORKER_USER}:${RABBITMQ_WORKER_GROUP}"
+    user: "1025:1027"
     hostname: intercept-split-worker
     volumes:
-    - ./../:/app
+    - /srv/vhosts/intercept.typo3.com:/srv/vhosts/intercept.typo3.com
     - /etc/passwd:/etc/passwd:ro
     - /etc/group:/etc/group:ro
-    working_dir: /app/intercept
+    working_dir: /srv/vhosts/intercept.typo3.com/intercept
     command: >
       /bin/sh -c "
         # sleep a second to avoid funny stream issues when starting
