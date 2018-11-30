@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\DoNotCareException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Extract information from a github push event hook
@@ -33,12 +34,12 @@ class GithubPushEventForSplit
     /**
      * Extract information.
      *
-     * @param string $payload
+     * @param Request $request
      * @throws DoNotCareException
      */
-    public function __construct(string $payload)
+    public function __construct(Request $request)
     {
-        $fullPullRequestInformation = json_decode($payload, true);
+        $fullPullRequestInformation = json_decode($request->getContent(), true);
         $ref = $fullPullRequestInformation['ref'] ?? '';
         $this->sourceBranch = $this->getSourceBranch($ref);
         $this->targetBranch = $this->getTargetBranch($this->sourceBranch);

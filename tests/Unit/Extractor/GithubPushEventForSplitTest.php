@@ -5,6 +5,7 @@ namespace App\Tests\Unit\Extractor;
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubPushEventForSplit;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 class GithubPushEventForSplitTest extends TestCase
 {
@@ -13,8 +14,16 @@ class GithubPushEventForSplitTest extends TestCase
      */
     public function constructorHandlesMasterBranch()
     {
-        $payload = [ 'ref' => 'refs/heads/master' ];
-        $subject = new GithubPushEventForSplit(json_encode($payload));
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            json_encode(['ref' => 'refs/heads/master'])
+        );
+        $subject = new GithubPushEventForSplit($request);
         $this->assertSame('master', $subject->sourceBranch);
         $this->assertSame('master', $subject->targetBranch);
     }
@@ -24,8 +33,16 @@ class GithubPushEventForSplitTest extends TestCase
      */
     public function constructorHandlesNineBranch()
     {
-        $payload = [ 'ref' => 'refs/heads/9.2' ];
-        $subject = new GithubPushEventForSplit(json_encode($payload));
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            json_encode(['ref' => 'refs/heads/9.2'])
+        );
+        $subject = new GithubPushEventForSplit($request);
         $this->assertSame('9.2', $subject->sourceBranch);
         $this->assertSame('9.2', $subject->targetBranch);
     }
@@ -35,8 +52,16 @@ class GithubPushEventForSplitTest extends TestCase
      */
     public function constructorHandlesEightBranch()
     {
-        $payload = [ 'ref' => 'refs/heads/TYPO3_8-7' ];
-        $subject = new GithubPushEventForSplit(json_encode($payload));
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            json_encode(['ref' => 'refs/heads/TYPO3_8-7'])
+        );
+        $subject = new GithubPushEventForSplit($request);
         $this->assertSame('TYPO3_8-7', $subject->sourceBranch);
         $this->assertSame('8.7', $subject->targetBranch);
     }
@@ -47,8 +72,16 @@ class GithubPushEventForSplitTest extends TestCase
     public function constructorThrowsWithSevenBranch()
     {
         $this->expectException(DoNotCareException::class);
-        $payload = [ 'ref' => 'refs/heads/TYPO3_7-6' ];
-        new GithubPushEventForSplit(json_encode($payload));
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            json_encode(['ref' => 'refs/heads/TYPO3_7-6'])
+        );
+        new GithubPushEventForSplit($request);
     }
 
     /**
@@ -57,7 +90,15 @@ class GithubPushEventForSplitTest extends TestCase
     public function constructorThrowsWithInvalidRef()
     {
         $this->expectException(DoNotCareException::class);
-        $payload = [ 'ref' => 'refs/heads/' ];
-        new GithubPushEventForSplit(json_encode($payload));
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            json_encode(['ref' => 'refs/heads/'])
+        );
+        new GithubPushEventForSplit($request);
     }
 }
