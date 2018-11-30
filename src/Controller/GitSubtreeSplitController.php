@@ -10,8 +10,10 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Creator\RabbitMqCoreSplitMessage;
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubPushEventForSplit;
+use App\Service\RabbitSplitService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,42 +49,14 @@ class GitSubtreeSplitController extends AbstractController
      * @throws \RuntimeException If locking goes wrong
      * @return Response
      */
-    public function index(Request $request, LoggerInterface $logger): Response
+    public function index(Request $request, LoggerInterface $logger, RabbitSplitService $rabbitService): Response
     {
         try {
-            $payload = $request->getContent();
             // This throws exceptions if this push event should not trigger splitting,
             // eg. if branches do not match.
-            $pushEventInformation = new GithubPushEventForSplit($payload);
-            $this->lockFilePointer = fopen('/tmp/core-git-subtree-split.lock', 'w');
-            $this->isLockAcquired = flock($this->lockFilePointer, LOCK_EX);
-            if ($this->isLockAcquired) {
-                $sourceBranch = $pushEventInformation->sourceBranch;
-                $targetBranch = $pushEventInformation->targetBranch;
-
-                $execOutput = [];
-                $execReturn = 0;
-                exec(
-                    __DIR__ . '/../../bin/split.sh ' . escapeshellarg($sourceBranch) . ' ' . escapeshellarg($targetBranch) . ' 2>&1',
-                    $execOutput,
-                    $execReturn
-                );
-
-                $logger->info(
-                    'github git split'
-                    . ' from ' . $sourceBranch
-                    . ' to ' . $targetBranch
-                    . ' script return ' . $execReturn
-                    . ' with script payload:'
-                );
-                $logger->info(print_r($execOutput, true));
-
-                flock($this->lockFilePointer, LOCK_UN);
-                fclose($this->lockFilePointer);
-                $this->isLockAcquired = false;
-            } else {
-                throw new \RuntimeException('Unable to lock.');
-            }
+            $pushEventInformation = new GithubPushEventForSplit($request);
+            $queueMessage = new RabbitMqCoreSplitMessage($pushEventInformation->sourceBranch, $pushEventInformation->targetBranch);
+            $rabbitService->pushNewCoreSplitJob($queueMessage);
         } catch (DoNotCareException $e) {
             // Hook payload could not be identified as hook that
             // should trigger git split
