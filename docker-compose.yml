@@ -6,10 +6,10 @@ services:
     user: "${RABBITMQ_WORKER_USER}:${RABBITMQ_WORKER_GROUP}"
     hostname: intercept-split-worker
     volumes:
-    - ./:/app
+    - ./../:/app
     - /etc/passwd:/etc/passwd:ro
     - /etc/group:/etc/group:ro
-    working_dir: /app
+    working_dir: /app/intercept
     command: >
       /bin/sh -c "
         # sleep a second to avoid funny stream issues when starting
