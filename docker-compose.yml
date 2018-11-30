@@ -8,7 +8,6 @@ services:
     - ./:/app
     - /etc/passwd:/etc/passwd:ro
     - /etc/group:/etc/group:ro
-    - /home/lolli:/home/lolli
     working_dir: /app
     command: >
       /bin/sh -c "
