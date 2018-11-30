@@ -1,0 +1,18 @@
+version: '2.3'
+services:
+  git-core-split-worker:
+    restart: always
+    image: typo3gmbh/php72:latest
+    user: ${RABBITMQ_WORKER_USER}:${RABBITMQ_WORKER_GROUP}
+    volumes:
+    - ./:/app
+    - /etc/passwd:/etc/passwd:ro
+    - /etc/group:/etc/group:ro
+    - /home/lolli:/home/lolli
+    working_dir: /app
+    command: >
+      /bin/sh -c "
+        # sleep a second to avoid funny stream issues when starting
+        sleep 1
+        php -n -c /etc/php/cli-no-xdebug/php.ini bin/console app:git-core-split-worker
+      "
