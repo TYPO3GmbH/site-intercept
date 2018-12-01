@@ -14,7 +14,6 @@ use App\Creator\RabbitMqCoreSplitMessage;
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubPushEventForSplit;
 use App\Service\RabbitSplitService;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
