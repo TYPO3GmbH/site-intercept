@@ -45,11 +45,10 @@ class GitSubtreeSplitController extends AbstractController
      *
      * @Route("/split", name="core_git_split")
      * @param Request $request
-     * @param LoggerInterface $logger
      * @throws \RuntimeException If locking goes wrong
      * @return Response
      */
-    public function index(Request $request, LoggerInterface $logger, RabbitSplitService $rabbitService): Response
+    public function index(Request $request, RabbitSplitService $rabbitService): Response
     {
         try {
             // This throws exceptions if this push event should not trigger splitting,
@@ -63,17 +62,5 @@ class GitSubtreeSplitController extends AbstractController
         }
 
         return Response::create();
-    }
-
-    /**
-     * Release lock on shutdown
-     */
-    public function __destruct()
-    {
-        if ($this->isLockAcquired) {
-            flock($this->lockFilePointer, LOCK_UN);
-            fclose($this->lockFilePointer);
-            $this->isLockAcquired = false;
-        }
     }
 }
