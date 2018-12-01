@@ -33,6 +33,8 @@ class GitOutputListener implements GitOutputListenerInterface
      */
     public function handleOutput(GitOutputEvent $event): void
     {
-        $this->output .= $event->getBuffer();
+        if ($event->getType() === 'err') {
+            $this->output .= $event->getBuffer();
+        }
     }
 }
