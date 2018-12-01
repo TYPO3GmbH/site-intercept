@@ -10,7 +10,6 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-
 use App\Creator\RabbitMqCoreSplitMessage;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -35,16 +34,27 @@ class RabbitSplitService
     private $logger;
 
     /**
+     * @var CoreSplitService Service executing the split job
+     */
+    private $coreSplitService;
+
+    /**
      * RabbitSplitService constructor.
      *
      * @param LoggerInterface $logger
      * @param AMQPStreamConnection $rabbitConnection
+     * @param CoreSplitService $coreSplitService
      * @param string $rabbitSplitQueue
      */
-    public function __construct(LoggerInterface $logger, AMQPStreamConnection $rabbitConnection, string $rabbitSplitQueue)
+    public function __construct(
+        LoggerInterface $logger,
+        AMQPStreamConnection $rabbitConnection,
+        CoreSplitService $coreSplitService,
+        string $rabbitSplitQueue)
     {
         $this->logger = $logger;
         $this->queueName = $rabbitSplitQueue;
+        $this->coreSplitService = $coreSplitService;
         $this->rabbitChannel = $rabbitConnection->channel();
         $this->rabbitChannel->queue_declare($this->queueName, false, true, false, false);
     }
@@ -83,35 +93,8 @@ class RabbitSplitService
         $this->logger->info('handling a git split worker job');
         $jobData = json_decode($message->getBody(), true);
         $rabbitMessage = new RabbitMqCoreSplitMessage($jobData['sourceBranch'], $jobData['targetBranch']);
-        $this->coreSplit($rabbitMessage);
+        $this->coreSplitService->split($rabbitMessage);
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
         $this->logger->info('finished a git split worker job');
-    }
-
-    /**
-     * Execute core splitting
-     *
-     * @param RabbitMqCoreSplitMessage $rabbitMessage
-     */
-    private function coreSplit(RabbitMqCoreSplitMessage $rabbitMessage): void
-    {
-        $sourceBranch = $rabbitMessage->sourceBranch;
-        $targetBranch = $rabbitMessage->targetBranch;
-        $execOutput = [];
-        $execReturn = 0;
-        exec(
-            __DIR__ . '/../../bin/split.sh ' . escapeshellarg($sourceBranch) . ' ' . escapeshellarg($targetBranch) . ' 2>&1',
-            $execOutput,
-            $execReturn
-        );
-
-        $this->logger->info(
-        'github git split'
-        . ' from ' . $sourceBranch
-        . ' to ' . $targetBranch
-        . ' script return ' . $execReturn
-        . ' with script payload:'
-        );
-        $this->logger->info(print_r($execOutput, true));
     }
 }
