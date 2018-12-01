@@ -10,6 +10,8 @@ declare(strict_types = 1);
 
 namespace App\Creator;
 
+use Ramsey\Uuid\Uuid;
+
 /**
  * A message send to and taken from rabbit mq containing
  * details for a core git split job.
@@ -27,18 +29,29 @@ class RabbitMqCoreSplitMessage implements \JsonSerializable
     public $targetBranch;
 
     /**
+     * @var string Used especially in logging as context.
+     */
+    public $jobUuid;
+
+    /**
      * Create a rabbit mq core split message.
      *
      * @param string $sourceBranch
      * @param string $targetBranch
+     * @param string $jobUuid A uuid to identify publisher and consumer handling *this* job
+     * @throws \Exception
      */
-    public function __construct(string $sourceBranch, string $targetBranch)
+    public function __construct(string $sourceBranch, string $targetBranch, string $jobUuid = '')
     {
         if (empty($sourceBranch) || empty($targetBranch)) {
             throw new \RuntimeException('Empty source or target branch');
         }
         $this->sourceBranch = $sourceBranch;
         $this->targetBranch = $targetBranch;
+        if (empty($jobUuid)) {
+            $jobUuid = Uuid::uuid4()->toString();
+        }
+        $this->jobUuid = $jobUuid;
     }
 
     /**
@@ -51,6 +64,7 @@ class RabbitMqCoreSplitMessage implements \JsonSerializable
         return [
             'sourceBranch' => $this->sourceBranch,
             'targetBranch' => $this->targetBranch,
+            'jobUuid' => $this->jobUuid,
         ];
     }
 }

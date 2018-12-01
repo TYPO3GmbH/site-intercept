@@ -15,6 +15,7 @@ class RabbitMqCoreSplitMessageTest extends TestCase
         $message = new RabbitMqCoreSplitMessage('mySource', 'myTarget');
         $this->assertSame('mySource', $message->sourceBranch);
         $this->assertSame('myTarget', $message->targetBranch);
+        $this->assertNotEmpty($message->jobUuid);
     }
 
     /**
@@ -22,10 +23,11 @@ class RabbitMqCoreSplitMessageTest extends TestCase
      */
     public function serializedMessageContainsRelevantInformation()
     {
-        $message = new RabbitMqCoreSplitMessage('mySource', 'myTarget');
+        $message = new RabbitMqCoreSplitMessage('mySource', 'myTarget', 'myUuid');
         $jsonMessage = json_encode($message);
         $this->assertRegExp('/mySource/', $jsonMessage);
         $this->assertRegExp('/myTarget/', $jsonMessage);
+        $this->assertRegExp('/myUuid/', $jsonMessage);
     }
 
     /**

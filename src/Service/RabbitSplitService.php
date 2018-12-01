@@ -74,6 +74,7 @@ class RabbitSplitService
 
     /**
      * Entry point with endless loop for git split worker, used by worker command
+     * @throws \ErrorException
      */
     public function workerLoop(): void
     {
@@ -87,12 +88,16 @@ class RabbitSplitService
      * Handle a single split job
      *
      * @param AMQPMessage $message
+     * @throws \Exception
      */
     public function handleWorkerJob(AMQPMessage $message): void
     {
-        $this->logger->info('handling a git split worker job');
         $jobData = json_decode($message->getBody(), true);
-        $rabbitMessage = new RabbitMqCoreSplitMessage($jobData['sourceBranch'], $jobData['targetBranch']);
+        if (empty($jobData['jobUuid'])) {
+            throw new \RuntimeException('Required job uuid missing');
+        }
+        $this->logger->info('handling a git split worker job', ['job_uuid' => $jobData['jobUuid']]);
+        $rabbitMessage = new RabbitMqCoreSplitMessage($jobData['sourceBranch'], $jobData['targetBranch'], $jobData['jobUuid']);
         $this->coreSplitService->split($rabbitMessage);
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
         $this->logger->info('finished a git split worker job');

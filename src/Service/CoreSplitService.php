@@ -12,7 +12,6 @@ namespace App\Service;
 
 use App\Creator\RabbitMqCoreSplitMessage;
 use App\GitWrapper\Event\GitOutputListener;
-use GitWrapper\Event\GitLoggerEventSubscriber;
 use GitWrapper\GitException;
 use GitWrapper\GitWorkingCopy;
 use GitWrapper\GitWrapper;
@@ -58,6 +57,16 @@ class CoreSplitService
     private $overrideExtensionList = [];
 
     /**
+     * @var GitWorkingCopy
+     */
+    private $workingCopy;
+
+    /**
+     * @var RabbitMqCoreSplitMessage Runtime rabbit message
+     */
+    private $rabbitMessage;
+
+    /**
      * @param LoggerInterface $logger
      * @param string $splitCorePath
      * @param string $splitMonoRepo
@@ -76,6 +85,13 @@ class CoreSplitService
         $this->splitMonoRepo = $splitMonoRepo;
         $this->splitSingleRepoBase = $splitSingleRepoBase;
         $this->gitOutputListener = $gitOutputListener;
+
+        $gitWrapper = new GitWrapper();
+        $gitWrapper->setEnvVar('HOME', getenv('GIT_HOME'));
+        $gitWrapper->setPrivateKey(getenv('GIT_SSH_PRIVATE_KEY'));
+        // Increase timeout to have a chance initial clone runs through
+        $gitWrapper->setTimeout(300);
+        $this->workingCopy = $gitWrapper->workingCopy($splitCorePath);
     }
 
     /**
@@ -85,39 +101,33 @@ class CoreSplitService
      */
     public function split(RabbitMqCoreSplitMessage $rabbitMessage): void
     {
-        $gitWrapper = new GitWrapper();
-        $gitWrapper->setEnvVar('HOME', getenv('GIT_HOME'));
-        $gitWrapper->setPrivateKey(getenv('GIT_SSH_PRIVATE_KEY'));
-        // Increase timeout to have a chance initial clone runs through
-        $gitWrapper->setTimeout(300);
-
-        $workingCopy = $gitWrapper->workingCopy($this->splitCorePath);
-        if (!$workingCopy->isCloned()) {
-            $this->logger->info('Initial clone of ' . $this->splitMonoRepo . ' to ' . $this->splitCorePath);
-            $this->initialClone($workingCopy);
-            $this->gitCommand($workingCopy, 'checkout', $rabbitMessage->sourceBranch);
+        $this->rabbitMessage = $rabbitMessage;
+        if (!$this->workingCopy->isCloned()) {
+            $this->logInfo('Initial clone of mono repo ' . $this->splitMonoRepo . ' to ' . $this->splitCorePath);
+            $this->initialClone();
+            $this->gitCommand('checkout', $rabbitMessage->sourceBranch);
         } else {
-            $this->logger->info('Updating clone and checkout out ' . $rabbitMessage->sourceBranch);
+            $this->logInfo('Updating clone and checkout of ' . $rabbitMessage->sourceBranch);
             // First fetch to make sure new branches are there
-            $this->gitCommand($workingCopy, 'fetch');
-            $this->gitCommand($workingCopy, 'checkout', $rabbitMessage->sourceBranch);
+            $this->gitCommand('fetch');
+            $this->gitCommand('checkout', $rabbitMessage->sourceBranch);
             // Pull in upstream changes
-            $this->gitCommand($workingCopy, 'pull');
+            $this->gitCommand('pull');
         }
 
         $splitBinary = $this->getSplitBinary();
         $extensions = $this->getExtensions();
-        $this->logger->info('Extensions to split: ' . implode(' ', $extensions));
+        $this->logInfo('Extensions to split: ' . implode(' ', $extensions));
 
         // Fetch extensions and add remotes if not done, yet
-        $existingRemotes = explode("\n", $this->gitCommand($workingCopy, 'remote'));
+        $existingRemotes = explode("\n", $this->gitCommand('remote'));
         foreach ($extensions as $extension) {
             $fullRemotePath = $this->splitSingleRepoBase . $extension . '.git';
-            $this->logger->info('Fetching extension ' . $extension . ' from ' . $fullRemotePath);
+            $this->logInfo('Fetching extension ' . $extension . ' from ' . $fullRemotePath);
             if (!in_array($extension, $existingRemotes)) {
-                $this->gitCommand($workingCopy, 'remote', 'add', $extension, $this->splitSingleRepoBase . $extension . '.git');
+                $this->gitCommand('remote', 'add', $extension, $this->splitSingleRepoBase . $extension . '.git');
             }
-            $this->gitCommand($workingCopy, 'fetch', $extension);
+            $this->gitCommand('fetch', $extension);
         }
 
         // Split and push
@@ -129,15 +139,15 @@ class CoreSplitService
                 . ' --prefix=' . escapeshellarg('typo3/sysext/' . $extension)
                 . ' --origin=' . escapeshellarg('origin/' . $rabbitMessage->sourceBranch)
                 . ' 2>&1';
-            $this->logger->info('Splitting extension with command ' . $command);
+            $this->logInfo('Splitting extension with command ' . $command);
             $splitSha = exec($command, $execOutput, $execExitCode);
-            $this->logger->info('Split operation extension ' . $extension . ' result "' . $execExitCode . '" with sha "' . $splitSha . '" Full output: "' . implode($execOutput) . '"');
+            $this->logInfo('Split operation extension ' . $extension . ' result "' . $execExitCode . '" with sha "' . $splitSha . '" Full output: "' . implode($execOutput) . '"');
             if ($execExitCode !== 0) {
                 throw new \RuntimeException('Splitting went wrong. Aborting.');
             }
             $remoteRef = $splitSha . ':refs/heads/' . $rabbitMessage->targetBranch;
-            $this->logger->info('Pushing extension ' . $extension . ' to remote ' . $remoteRef);
-            $this->gitCommand($workingCopy, 'push', $extension, $remoteRef);
+            $this->logInfo('Pushing extension ' . $extension . ' to remote ' . $remoteRef);
+            $this->gitCommand('push', $extension, $remoteRef);
         }
     }
 
@@ -155,32 +165,31 @@ class CoreSplitService
     /**
      * Run a single git command, handle logging and output and break on error.
      *
-     * @param GitWorkingCopy $workingCopy
      * @param $command
      * @param mixed ...$arguments
      * @return string
      */
-    private function gitCommand(GitWorkingCopy $workingCopy, $command, ...$arguments)
+    private function gitCommand($command, ...$arguments)
     {
-        $gitWrapper = $workingCopy->getWrapper();
+        $gitWrapper = $this->workingCopy->getWrapper();
         $gitWrapper->addOutputListener($this->gitOutputListener);
         try {
-            $standardOutput = $workingCopy->run($command, $arguments);
+            $standardOutput = $this->workingCopy->run($command, $arguments);
         } catch (GitException $e) {
             // Log and throw up if command was not successful
             $errorOutput = $this->gitOutputListener->output;
             if (!empty($errorOutput)) {
-                $this->logger->info('Git command error output: ' . $errorOutput);
+                $this->logInfo('Git command error output: ' . $errorOutput);
             }
             throw $e;
         }
         $gitWrapper->removeOutputListener($this->gitOutputListener);
         $errorOutput = $this->gitOutputListener->output;
         if (!empty($standardOutput)) {
-            $this->logger->info('Git command standard output: ' . $standardOutput);
+            $this->logInfo('Git command standard output: ' . $standardOutput);
         }
         if (!empty($errorOutput)) {
-            $this->logger->info('Git command error output: ' . $errorOutput);
+            $this->logInfo('Git command error output: ' . $errorOutput);
         }
         $this->gitOutputListener->output = '';
         return $standardOutput;
@@ -189,31 +198,30 @@ class CoreSplitService
     /**
      * Initial clone of main repository.
      *
-     * @param GitWorkingCopy $workingCopy
      * @return string
      */
-    private function initialClone(GitWorkingCopy $workingCopy): string
+    private function initialClone(): string
     {
-        $gitWrapper = $workingCopy->getWrapper();
+        $gitWrapper = $this->workingCopy->getWrapper();
         $gitWrapper->addOutputListener($this->gitOutputListener);
         try {
-            $standardOutput = $workingCopy->cloneRepository($this->splitMonoRepo);
+            $standardOutput = $this->workingCopy->cloneRepository($this->splitMonoRepo);
         } catch (GitException $e) {
             // Log and throw up if command was not successful
             $errorOutput = $this->gitOutputListener->output;
             if (!empty($errorOutput)) {
-                $this->logger->info('Git command error output: ' . $errorOutput);
+                $this->logInfo('Git command error output: ' . $errorOutput);
             }
             throw $e;
         }
-        $workingCopy->setCloned(true);
+        $this->workingCopy->setCloned(true);
         $gitWrapper->removeOutputListener($this->gitOutputListener);
         $errorOutput = $this->gitOutputListener->output;
         if (!empty($standardOutput)) {
-            $this->logger->info('Git command standard output: ' . $standardOutput);
+            $this->logInfo('Git command standard output: ' . $standardOutput);
         }
         if (!empty($errorOutput)) {
-            $this->logger->info('Git command error output: ' . $errorOutput);
+            $this->logInfo('Git command error output: ' . $errorOutput);
         }
         $this->gitOutputListener->output = '';
         return $standardOutput;
@@ -258,5 +266,20 @@ class CoreSplitService
             throw new \RuntimeException('Split binary does not support this ' . PHP_OS . ' platform');
         }
         return $splitBinary;
+    }
+
+    /**
+     * Helper to log stuff with job context.
+     * Depends on rabbit message to be set.
+     *
+     * @param string $message
+     */
+    private function logInfo(string $message): void
+    {
+        if (empty($this->rabbitMessage)) {
+            throw new \RuntimeException('Logger helper can only be called if a rabbit message has been set.');
+        }
+        $defaultLogContext = ['job_uuid' => $this->rabbitMessage->jobUuid];
+        $this->logger->info($message, $defaultLogContext);
     }
 }
