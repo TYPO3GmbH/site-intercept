@@ -58,8 +58,6 @@ class CoreSplitService
     private $overrideExtensionList = [];
 
     /**
-     * RabbitSplitService constructor.
-     *
      * @param LoggerInterface $logger
      * @param string $splitCorePath
      * @param string $splitMonoRepo
@@ -90,15 +88,16 @@ class CoreSplitService
         $gitWrapper = new GitWrapper();
         $gitWrapper->setEnvVar('HOME', getenv('GIT_HOME'));
         $gitWrapper->setPrivateKey(getenv('GIT_SSH_PRIVATE_KEY'));
-        $gitWrapper->addLoggerEventSubscriber(new GitLoggerEventSubscriber($this->logger));
         // Increase timeout to have a chance initial clone runs through
         $gitWrapper->setTimeout(300);
 
         $workingCopy = $gitWrapper->workingCopy($this->splitCorePath);
         if (!$workingCopy->isCloned()) {
+            $this->logger->info('Initial clone of ' . $this->splitMonoRepo . ' to ' . $this->splitCorePath);
             $this->initialClone($workingCopy);
             $this->gitCommand($workingCopy, 'checkout', $rabbitMessage->sourceBranch);
         } else {
+            $this->logger->info('Updating clone and checkout out ' . $rabbitMessage->sourceBranch);
             // First fetch to make sure new branches are there
             $this->gitCommand($workingCopy, 'fetch');
             $this->gitCommand($workingCopy, 'checkout', $rabbitMessage->sourceBranch);
@@ -106,15 +105,9 @@ class CoreSplitService
             $this->gitCommand($workingCopy, 'pull');
         }
 
-        if (PHP_OS === 'Darwin') {
-            $splitBinary = 'splitsh-lite-darwin';
-        } elseif (PHP_OS === 'Linux') {
-            $splitBinary = 'splitsh-lite-linux';
-        } else {
-            throw new \RuntimeException('Split binary does not support this ' . PHP_OS . ' platform');
-        }
-
+        $splitBinary = $this->getSplitBinary();
         $extensions = $this->getExtensions();
+        $this->logger->info('Extensions to split: ' . implode(' ', $extensions));
 
         // Fetch extensions and add remotes if not done, yet
         $existingRemotes = explode("\n", $this->gitCommand($workingCopy, 'remote'));
@@ -132,13 +125,13 @@ class CoreSplitService
             $execOutput = [];
             $execExitCode = 0;
             $command = 'cd ' . escapeshellarg($this->splitCorePath) . ' && '
-                . '../../bin/' . escapeshellarg($splitBinary)
-                . ' --prefix=typo3/sysext/' . escapeshellarg($extension)
-                . ' --origin=origin/' . escapeshellarg($rabbitMessage->sourceBranch)
+                . escapeshellcmd('../../bin/' . $splitBinary)
+                . ' --prefix=' . escapeshellarg('typo3/sysext/' . $extension)
+                . ' --origin=' . escapeshellarg('origin/' . $rabbitMessage->sourceBranch)
                 . ' 2>&1';
             $this->logger->info('Splitting extension with command ' . $command);
             $splitSha = exec($command, $execOutput, $execExitCode);
-            $this->logger->info('Split operation result "' . $execExitCode . '" with sha "' . $splitSha . '" Full output: "' . implode($execOutput) . '"');
+            $this->logger->info('Split operation extension ' . $extension . ' result "' . $execExitCode . '" with sha "' . $splitSha . '" Full output: "' . implode($execOutput) . '"');
             if ($execExitCode !== 0) {
                 throw new \RuntimeException('Splitting went wrong. Aborting.');
             }
@@ -148,6 +141,25 @@ class CoreSplitService
         }
     }
 
+    /**
+     * Used by integration test to restrict testing to a given set of extensions.
+     *
+     * @param array $extensions
+     * @internal
+     */
+    public function setExtensions(array $extensions): void
+    {
+        $this->overrideExtensionList = $extensions;
+    }
+
+    /**
+     * Run a single git command, handle logging and output and break on error.
+     *
+     * @param GitWorkingCopy $workingCopy
+     * @param $command
+     * @param mixed ...$arguments
+     * @return string
+     */
     private function gitCommand(GitWorkingCopy $workingCopy, $command, ...$arguments)
     {
         $gitWrapper = $workingCopy->getWrapper();
@@ -174,7 +186,13 @@ class CoreSplitService
         return $standardOutput;
     }
 
-    private function initialClone(GitWorkingCopy $workingCopy)
+    /**
+     * Initial clone of main repository.
+     *
+     * @param GitWorkingCopy $workingCopy
+     * @return string
+     */
+    private function initialClone(GitWorkingCopy $workingCopy): string
     {
         $gitWrapper = $workingCopy->getWrapper();
         $gitWrapper->addOutputListener($this->gitOutputListener);
@@ -198,8 +216,14 @@ class CoreSplitService
             $this->logger->info('Git command error output: ' . $errorOutput);
         }
         $this->gitOutputListener->output = '';
+        return $standardOutput;
     }
 
+    /**
+     * Determine list of extensions to split by looking at typo3/sysext/ after checkout of branch.
+     *
+     * @return array
+     */
     private function getExtensions(): array
     {
         if (!empty($this->overrideExtensionList)) {
@@ -220,13 +244,19 @@ class CoreSplitService
     }
 
     /**
-     * Used by integration test to restrict testing to a given set of extensions.
+     * Determine split binary depending on OS
      *
-     * @param array $extensions
-     * @internal
+     * @return string
      */
-    public function setExtensions(array $extensions): void
+    private function getSplitBinary(): string
     {
-        $this->overrideExtensionList = $extensions;
+        if (PHP_OS === 'Darwin') {
+            $splitBinary = 'splitsh-lite-darwin';
+        } elseif (PHP_OS === 'Linux') {
+            $splitBinary = 'splitsh-lite-linux';
+        } else {
+            throw new \RuntimeException('Split binary does not support this ' . PHP_OS . ' platform');
+        }
+        return $splitBinary;
     }
 }
