@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     app.forgeClient.forgeEndpoint: 'https://forge.typo3.org'
+    app.coreGitSplit.monoRepo: 'git@github.com:TYPO3/TYPO3.CMS.git'
+    app.coreGitSplit.singleRepoBase: 'git@github.com:TYPO3-CMS/'
 
 services:
     # default configuration for services in *this* file
@@ -40,12 +42,23 @@ services:
     App\Client\ForgeClient:
         class: App\Client\ForgeClient
         arguments: [ '%app.forgeClient.forgeEndpoint%', '%env(FORGE_ACCESS_TOKEN)%' ]
+
     App\Service\LocalCoreGitService:
         class: App\Service\LocalCoreGitService
         arguments:
             $logger: '@monolog.logger.request'
             $listener: '@App\GitWrapper\Event\GitOutputListener'
             $pullRequestCorePath: '%kernel.project_dir%/var/git-core-pr/'
+
+    App\Service\CoreSplitService:
+        class: App\Service\CoreSplitService
+        public: true
+        arguments:
+            $logger: '@monolog.logger.request'
+            $splitCorePath: '%kernel.project_dir%/var/git-core-split/'
+            $splitMonoRepo: '%app.coreGitSplit.monoRepo%'
+            $splitSingleRepoBase: '%app.coreGitSplit.singleRepoBase%'
+            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
 
     PhpAmqpLib\Connection\AMQPStreamConnection:
         class: PhpAmqpLib\Connection\AMQPStreamConnection
@@ -67,9 +80,3 @@ services:
     gelf.transport:
         class: Gelf\Transport\UdpTransport
         arguments: ['%env(GRAYLOG_HOST)%', '%env(int:GRAYLOG_PORT)%']
-    monolog.processor.add_field_processor:
-        class: App\Monolog\Processor\AddFieldProcessor
-        arguments:
-            - { application: 'intercept', env: '%env(APP_ENV)%' }
-        tags:
-            - { name: monolog.processor, handler: 'graylog' }
