@@ -45,6 +45,7 @@ class GitSubtreeSplitController extends AbstractController
      * @Route("/split", name="core_git_split")
      * @param Request $request
      * @throws \RuntimeException If locking goes wrong
+     * @throws \Exception
      * @return Response
      */
     public function index(Request $request, RabbitSplitService $rabbitService): Response

@@ -69,11 +69,12 @@ class RabbitSplitService
         $jsonMessage = json_encode($rabbitMessage);
         $message = new AMQPMessage($jsonMessage, ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]);
         $this->rabbitChannel->basic_publish($message, '', $this->queueName);
-        $this->logger->info('Queued a core split job to queue ' . $this->queueName . ' with message ' . $jsonMessage);
+        $this->logger->info('Queued a core split job to queue ' . $this->queueName . ' with message ' . $jsonMessage, ['job_uuid' => $rabbitMessage->jobUuid]);
     }
 
     /**
-     * Entry point with endless loop for git split worker, used by worker command
+     * Entry point with endless loop for git split worker, used by worker command.
+     *
      * @throws \ErrorException
      */
     public function workerLoop(): void
