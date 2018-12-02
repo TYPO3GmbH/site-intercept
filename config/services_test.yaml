@@ -13,4 +13,3 @@ services:
         public: true
     App\Service\LocalCoreGitService:
         public: true
-

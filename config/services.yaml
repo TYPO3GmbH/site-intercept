@@ -7,6 +7,7 @@ parameters:
     app.forgeClient.forgeEndpoint: 'https://forge.typo3.org'
     app.coreGitSplit.monoRepo: 'git@github.com:TYPO3/TYPO3.CMS.git'
     app.coreGitSplit.singleRepoBase: 'git@github.com:TYPO3-CMS/'
+    app.coreGitSplit.rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
 
 services:
     # default configuration for services in *this* file
@@ -20,7 +21,6 @@ services:
         bind:
             # Absolute path to local directory where github core pull request files are put
             $pullRequestPatchPath: '%kernel.project_dir%/var/patches/'
-            $rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -59,6 +59,15 @@ services:
             $splitMonoRepo: '%app.coreGitSplit.monoRepo%'
             $splitSingleRepoBase: '%app.coreGitSplit.singleRepoBase%'
             $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
+
+    App\Service\RabbitSplitService:
+        class: App\Service\RabbitSplitService
+        public: true
+        arguments:
+            $logger: '@monolog.logger.request'
+            $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
+            $coreSplitService: '@App\Service\CoreSplitService'
+            $rabbitSplitQueue: '%app.coreGitSplit.rabbitSplitQueue%'
 
     PhpAmqpLib\Connection\AMQPStreamConnection:
         class: PhpAmqpLib\Connection\AMQPStreamConnection
