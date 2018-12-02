@@ -23,21 +23,9 @@ use Symfony\Component\Routing\Annotation\Route;
  * Git sub tree split core to single repositories at
  * https://github.com/typo3-cms. Triggered by github hook on
  * https://github.com/TYPO3/TYPO3.CMS.
- *
- * @codeCoverageIgnore
  */
 class GitSubtreeSplitController extends AbstractController
 {
-    /**
-     * @var bool TRUE if lock is acquired
-     */
-    protected $isLockAcquired;
-
-    /**
-     * @var resource Lock file resource
-     */
-    protected $lockFilePointer;
-
     /**
      * Called by github post merge, this calls a script to update
      * the git sub tree repositories

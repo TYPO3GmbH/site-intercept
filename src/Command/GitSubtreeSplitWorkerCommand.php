@@ -16,6 +16,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * A cli worker listening for rabbit mq messages and executes
+ * core git split and tag jobs
+ *
+ * @codeCoverageIgnore
+ */
 class GitSubtreeSplitWorkerCommand extends Command
 {
     /**
@@ -62,6 +68,7 @@ class GitSubtreeSplitWorkerCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int|null|void
+     * @throws \ErrorException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

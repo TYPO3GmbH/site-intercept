@@ -1,0 +1,58 @@
+<?php
+declare(strict_types = 1);
+namespace App\Tests\Functional;
+
+use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+
+class GitSubtreeSplitControllerTest extends TestCase
+{
+    /**
+     * @test
+     */
+    public function splitIsQueued()
+    {
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
+        $container->set(AMQPStreamConnection::class, $rabbitConnection->reveal());
+
+        $rabbitChannel = $this->prophesize(AMQPChannel::class);
+        $rabbitConnection->channel()->shouldBeCalled()->willReturn($rabbitChannel->reveal());
+
+        $rabbitChannel->queue_declare('intercept-core-split-testing', false, true, false, false)->shouldBeCalled();
+        $rabbitChannel->basic_publish(Argument::type(AMQPMessage::class), '', 'intercept-core-split-testing')->shouldBeCalled();
+
+        $request = require __DIR__ . '/Fixtures/GitSubtreeSplitSplitRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * @test
+     */
+    public function nothingDoneWithBadRequest()
+    {
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
+        $container->set(AMQPStreamConnection::class, $rabbitConnection->reveal());
+
+        $rabbitChannel = $this->prophesize(AMQPChannel::class);
+        $rabbitConnection->channel()->shouldBeCalled()->willReturn($rabbitChannel->reveal());
+
+        $rabbitChannel->queue_declare('intercept-core-split-testing', false, true, false, false)->shouldBeCalled();
+        $rabbitChannel->basic_publish(Argument::cetera())->shouldNotBeCalled();
+
+        $request = require __DIR__ . '/Fixtures/GitSubtreeSplitBadRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+    }
+}

@@ -76,6 +76,7 @@ class RabbitSplitService
      * Entry point with endless loop for git split worker, used by worker command.
      *
      * @throws \ErrorException
+     * @codeCoverageIgnore Not easy to test this endless loop in a good way
      */
     public function workerLoop(): void
     {
@@ -101,6 +102,6 @@ class RabbitSplitService
         $rabbitMessage = new RabbitMqCoreSplitMessage($jobData['sourceBranch'], $jobData['targetBranch'], $jobData['jobUuid']);
         $this->coreSplitService->split($rabbitMessage);
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
-        $this->logger->info('finished a git split worker job');
+        $this->logger->info('finished a git split worker job', ['job_uuid' => $jobData['jobUuid']]);
     }
 }

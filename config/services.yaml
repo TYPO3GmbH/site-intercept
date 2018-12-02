@@ -62,6 +62,7 @@ services:
 
     PhpAmqpLib\Connection\AMQPStreamConnection:
         class: PhpAmqpLib\Connection\AMQPStreamConnection
+        public: true
         arguments:
             $host: '%env(RABBITMQ_HOST)%'
             $port: '%env(RABBITMQ_PORT)%'

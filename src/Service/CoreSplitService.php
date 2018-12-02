@@ -22,7 +22,7 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * Split mono repo TYPO3.CMS to single repos per extension
  *
- * @codeCoverageIgnore Covered by integration test
+ * @codeCoverageIgnore Covered by integration tests
  */
 class CoreSplitService
 {
