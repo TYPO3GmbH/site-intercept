@@ -67,6 +67,7 @@ class RabbitConsumerServiceTest extends TestCase
             'sourceBranch' => 'source-branch',
             'targetBranch' => 'target-branch',
             'jobUuid' => 'job-uuid',
+            'type' => 'patch',
         ]);
         $message->getBody()->shouldBeCalled()->willReturn($messageBody);
 

@@ -92,9 +92,11 @@ class RabbitConsumerService
         if (empty($event->jobUuid)) {
             throw new \RuntimeException('Required job uuid missing');
         }
-        $this->logger->info('handling a git split worker job', ['job_uuid' => $event->jobUuid]);
-        $this->coreSplitService->split($event);
+        $this->logger->info('handling a git split worker job', ['job_uuid' => $event->jobUuid, 'type' => $event->type]);
+        if ($event->type === 'patch') {
+            $this->coreSplitService->split($event);
+        }
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
-        $this->logger->info('finished a git split worker job', ['job_uuid' => $event->jobUuid]);
+        $this->logger->info('finished a git split worker job', ['job_uuid' => $event->jobUuid, 'type' => $event->type]);
     }
 }
