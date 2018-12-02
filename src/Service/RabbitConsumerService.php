@@ -10,13 +10,17 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use App\Creator\RabbitMqCoreSplitMessage;
+use App\Extractor\GithubPushEventForCore;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
-class RabbitSplitService
+class RabbitConsumerService
 {
     /**
      * @var AMQPChannel The rabbit channel to messages to and fetch from
@@ -39,11 +43,12 @@ class RabbitSplitService
     private $coreSplitService;
 
     /**
-     * RabbitSplitService constructor.
+     * RabbitPublisherService constructor.
      *
      * @param LoggerInterface $logger
      * @param AMQPStreamConnection $rabbitConnection
      * @param CoreSplitService $coreSplitService
+     * @param SerializerInterface $serializer
      * @param string $rabbitSplitQueue
      */
     public function __construct(
@@ -57,19 +62,6 @@ class RabbitSplitService
         $this->coreSplitService = $coreSplitService;
         $this->rabbitChannel = $rabbitConnection->channel();
         $this->rabbitChannel->queue_declare($this->queueName, false, true, false, false);
-    }
-
-    /**
-     * Push a core split job message to rabbit queue
-     *
-     * @param RabbitMqCoreSplitMessage $rabbitMessage
-     */
-    public function pushNewCoreSplitJob(RabbitMqCoreSplitMessage $rabbitMessage): void
-    {
-        $jsonMessage = json_encode($rabbitMessage);
-        $message = new AMQPMessage($jsonMessage, ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]);
-        $this->rabbitChannel->basic_publish($message, '', $this->queueName);
-        $this->logger->info('Queued a core split job to queue ' . $this->queueName . ' with message ' . $jsonMessage, ['job_uuid' => $rabbitMessage->jobUuid]);
     }
 
     /**
@@ -94,14 +86,15 @@ class RabbitSplitService
      */
     public function handleWorkerJob(AMQPMessage $message): void
     {
-        $jobData = json_decode($message->getBody(), true);
-        if (empty($jobData['jobUuid'])) {
+        $serializer = new Serializer([new PropertyNormalizer()], [new JsonEncoder()]);
+        /** @var GithubPushEventForCore $event */
+        $event = $serializer->deserialize($message->getBody(), GithubPushEventForCore::class, 'json');
+        if (empty($event->jobUuid)) {
             throw new \RuntimeException('Required job uuid missing');
         }
-        $this->logger->info('handling a git split worker job', ['job_uuid' => $jobData['jobUuid']]);
-        $rabbitMessage = new RabbitMqCoreSplitMessage($jobData['sourceBranch'], $jobData['targetBranch'], $jobData['jobUuid']);
-        $this->coreSplitService->split($rabbitMessage);
+        $this->logger->info('handling a git split worker job', ['job_uuid' => $event->jobUuid]);
+        $this->coreSplitService->split($event);
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
-        $this->logger->info('finished a git split worker job', ['job_uuid' => $jobData['jobUuid']]);
+        $this->logger->info('finished a git split worker job', ['job_uuid' => $event->jobUuid]);
     }
 }

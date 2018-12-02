@@ -3,6 +3,7 @@ declare(strict_types = 1);
 namespace App\Tests\Integration;
 
 use App\Creator\RabbitMqCoreSplitMessage;
+use App\Extractor\GithubPushEventForCore;
 use App\Service\CoreSplitService;
 use PHPUnit\Framework\TestCase;
 
@@ -19,7 +20,10 @@ class BambooPostBuildControllerTest extends TestCase
         /** @var CoreSplitService $subject */
         $subject = $container->get(CoreSplitService::class);
         $subject->setExtensions(['about', 'backend']);
-        $message = new RabbitMqCoreSplitMessage('lolli-1', 'lolli-1', 'my-uuid');
+        $message = new GithubPushEventForCore();
+        $message->sourceBranch = 'lolli-1';
+        $message->targetBranch = 'lolli-1';
+        $message->jobUuid = 'my-uuid';
         $subject->split($message);
         $kernel->shutdown();
         $this->assertTrue(true);

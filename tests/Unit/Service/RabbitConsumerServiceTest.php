@@ -2,9 +2,9 @@
 declare(strict_types = 1);
 namespace App\Tests\Unit\Extractor;
 
-use App\Creator\RabbitMqCoreSplitMessage;
+use App\Extractor\GithubPushEventForCore;
 use App\Service\CoreSplitService;
-use App\Service\RabbitSplitService;
+use App\Service\RabbitConsumerService;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 
-class RabbitSplitServiceTest extends TestCase
+class RabbitConsumerServiceTest extends TestCase
 {
     /**
      * @test
@@ -25,7 +25,7 @@ class RabbitSplitServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
 
-        $subject = new RabbitSplitService(
+        $subject = new RabbitConsumerService(
             $loggerProphecy->reveal(),
             $rabbitConnection->reveal(),
             $coreSplitService->reveal(),
@@ -51,7 +51,7 @@ class RabbitSplitServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
 
-        $subject = new RabbitSplitService(
+        $subject = new RabbitConsumerService(
             $loggerProphecy->reveal(),
             $rabbitConnection->reveal(),
             $coreSplitService->reveal(),
@@ -70,7 +70,7 @@ class RabbitSplitServiceTest extends TestCase
         ]);
         $message->getBody()->shouldBeCalled()->willReturn($messageBody);
 
-        $coreSplitService->split(Argument::type(RabbitMqCoreSplitMessage::class))->shouldBeCalled();
+        $coreSplitService->split(Argument::type(GithubPushEventForCore::class))->shouldBeCalled();
 
         $subject->handleWorkerJob($message->reveal());
     }

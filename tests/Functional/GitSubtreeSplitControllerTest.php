@@ -3,7 +3,7 @@ declare(strict_types = 1);
 namespace App\Tests\Functional;
 
 use App\Service\CoreSplitService;
-use App\Service\RabbitSplitService;
+use App\Service\RabbitPublisherService;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -21,7 +21,7 @@ class GitSubtreeSplitControllerTest extends TestCase
         $kernel->boot();
         $container = $kernel->getContainer();
 
-        // Mock core split service that is a DI dependency of RabbitSplitService
+        // Mock core split service that is a DI dependency of RabbitPublisherService
         $coreSplitService = $this->prophesize(CoreSplitService::class);
         $container->set(CoreSplitService::class, $coreSplitService->reveal());
 
@@ -48,7 +48,7 @@ class GitSubtreeSplitControllerTest extends TestCase
         $kernel->boot();
         $container = $kernel->getContainer();
 
-        // Mock core split service that is a DI dependency of RabbitSplitService
+        // Mock core split service that is a DI dependency of RabbitPublisherService
         $coreSplitService = $this->prophesize(CoreSplitService::class);
         $container->set(CoreSplitService::class, $coreSplitService->reveal());
 

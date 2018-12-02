@@ -3,11 +3,11 @@ declare(strict_types = 1);
 namespace App\Tests\Unit\Extractor;
 
 use App\Exception\DoNotCareException;
-use App\Extractor\GithubPushEventForSplit;
+use App\Extractor\GithubPushEventForCore;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class GithubPushEventForSplitTest extends TestCase
+class GithubPushEventForCoreTest extends TestCase
 {
     /**
      * @test
@@ -23,7 +23,7 @@ class GithubPushEventForSplitTest extends TestCase
             [],
             json_encode(['ref' => 'refs/heads/master'])
         );
-        $subject = new GithubPushEventForSplit($request);
+        $subject = new GithubPushEventForCore($request);
         $this->assertSame('master', $subject->sourceBranch);
         $this->assertSame('master', $subject->targetBranch);
     }
@@ -42,7 +42,7 @@ class GithubPushEventForSplitTest extends TestCase
             [],
             json_encode(['ref' => 'refs/heads/9.2'])
         );
-        $subject = new GithubPushEventForSplit($request);
+        $subject = new GithubPushEventForCore($request);
         $this->assertSame('9.2', $subject->sourceBranch);
         $this->assertSame('9.2', $subject->targetBranch);
     }
@@ -61,7 +61,7 @@ class GithubPushEventForSplitTest extends TestCase
             [],
             json_encode(['ref' => 'refs/heads/TYPO3_8-7'])
         );
-        $subject = new GithubPushEventForSplit($request);
+        $subject = new GithubPushEventForCore($request);
         $this->assertSame('TYPO3_8-7', $subject->sourceBranch);
         $this->assertSame('8.7', $subject->targetBranch);
     }
@@ -81,7 +81,7 @@ class GithubPushEventForSplitTest extends TestCase
             [],
             json_encode(['ref' => 'refs/heads/TYPO3_7-6'])
         );
-        new GithubPushEventForSplit($request);
+        new GithubPushEventForCore($request);
     }
 
     /**
@@ -99,6 +99,6 @@ class GithubPushEventForSplitTest extends TestCase
             [],
             json_encode(['ref' => 'refs/heads/'])
         );
-        new GithubPushEventForSplit($request);
+        new GithubPushEventForCore($request);
     }
 }

@@ -10,10 +10,9 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
-use App\Creator\RabbitMqCoreSplitMessage;
 use App\Exception\DoNotCareException;
-use App\Extractor\GithubPushEventForSplit;
-use App\Service\RabbitSplitService;
+use App\Extractor\GithubPushEventForCore;
+use App\Service\RabbitPublisherService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,21 +31,19 @@ class GitSubtreeSplitController extends AbstractController
      *
      * @Route("/split", name="core_git_split")
      * @param Request $request
+     * @param RabbitPublisherService $rabbitService
      * @throws \RuntimeException If locking goes wrong
      * @throws \Exception
      * @return Response
      */
-    public function index(Request $request, RabbitSplitService $rabbitService): Response
+    public function index(Request $request, RabbitPublisherService $rabbitService): Response
     {
         try {
-            // This throws exceptions if this push event should not trigger splitting,
-            // eg. if branches do not match.
-            $pushEventInformation = new GithubPushEventForSplit($request);
-            $queueMessage = new RabbitMqCoreSplitMessage($pushEventInformation->sourceBranch, $pushEventInformation->targetBranch);
-            $rabbitService->pushNewCoreSplitJob($queueMessage);
+            // This throws exceptions if this push event should not trigger splitting, eg. if branches do not match.
+            $pushEventInformation = new GithubPushEventForCore($request);
+            $rabbitService->pushNewCoreSplitJob($pushEventInformation);
         } catch (DoNotCareException $e) {
-            // Hook payload could not be identified as hook that
-            // should trigger git split
+            // Hook payload could not be identified as hook that should trigger git split
         }
 
         return Response::create();

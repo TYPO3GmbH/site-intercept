@@ -10,7 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use App\Creator\RabbitMqCoreSplitMessage;
+use App\Extractor\GithubPushEventForCore;
 use App\GitWrapper\Event\GitOutputListener;
 use GitWrapper\GitException;
 use GitWrapper\GitWorkingCopy;
@@ -62,9 +62,9 @@ class CoreSplitService
     private $workingCopy;
 
     /**
-     * @var RabbitMqCoreSplitMessage Runtime rabbit message
+     * @var GithubPushEventForCore Runtime rabbit message
      */
-    private $rabbitMessage;
+    private $event;
 
     /**
      * @param LoggerInterface $logger
@@ -97,20 +97,20 @@ class CoreSplitService
     /**
      * Execute core splitting
      *
-     * @param RabbitMqCoreSplitMessage $rabbitMessage
+     * @param GithubPushEventForCore $event
      */
-    public function split(RabbitMqCoreSplitMessage $rabbitMessage): void
+    public function split(GithubPushEventForCore $event): void
     {
-        $this->rabbitMessage = $rabbitMessage;
+        $this->event = $event;
         if (!$this->workingCopy->isCloned()) {
             $this->logInfo('Initial clone of mono repo ' . $this->splitMonoRepo . ' to ' . $this->splitCorePath);
             $this->initialClone();
-            $this->gitCommand('checkout', $rabbitMessage->sourceBranch);
+            $this->gitCommand('checkout', $event->sourceBranch);
         } else {
-            $this->logInfo('Updating clone and checkout of ' . $rabbitMessage->sourceBranch);
+            $this->logInfo('Updating clone and checkout of ' . $event->sourceBranch);
             // First fetch to make sure new branches are there
             $this->gitCommand('fetch');
-            $this->gitCommand('checkout', $rabbitMessage->sourceBranch);
+            $this->gitCommand('checkout', $event->sourceBranch);
             // Pull in upstream changes
             $this->gitCommand('pull');
         }
@@ -137,7 +137,7 @@ class CoreSplitService
             $command = 'cd ' . escapeshellarg($this->splitCorePath) . ' && '
                 . escapeshellcmd('../../bin/' . $splitBinary)
                 . ' --prefix=' . escapeshellarg('typo3/sysext/' . $extension)
-                . ' --origin=' . escapeshellarg('origin/' . $rabbitMessage->sourceBranch)
+                . ' --origin=' . escapeshellarg('origin/' . $event->sourceBranch)
                 . ' 2>&1';
             $this->logInfo('Splitting extension with command ' . $command);
             $splitSha = exec($command, $execOutput, $execExitCode);
@@ -145,7 +145,7 @@ class CoreSplitService
             if ($execExitCode !== 0) {
                 throw new \RuntimeException('Splitting went wrong. Aborting.');
             }
-            $remoteRef = $splitSha . ':refs/heads/' . $rabbitMessage->targetBranch;
+            $remoteRef = $splitSha . ':refs/heads/' . $event->targetBranch;
             $this->logInfo('Pushing extension ' . $extension . ' to remote ' . $remoteRef);
             $this->gitCommand('push', $extension, $remoteRef);
         }
@@ -276,10 +276,10 @@ class CoreSplitService
      */
     private function logInfo(string $message): void
     {
-        if (empty($this->rabbitMessage)) {
+        if (empty($this->event)) {
             throw new \RuntimeException('Logger helper can only be called if a rabbit message has been set.');
         }
-        $defaultLogContext = ['job_uuid' => $this->rabbitMessage->jobUuid];
+        $defaultLogContext = ['job_uuid' => $this->event->jobUuid];
         $this->logger->info($message, $defaultLogContext);
     }
 }

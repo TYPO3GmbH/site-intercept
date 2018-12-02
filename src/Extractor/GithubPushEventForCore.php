@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\DoNotCareException;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * Throws exceptions if not responsible.
  */
-class GithubPushEventForSplit
+class GithubPushEventForCore
 {
     /**
      * @var string The source branch to split FROM, eg. 'TYPO3_8-7', '9.2', 'master'
@@ -32,17 +33,29 @@ class GithubPushEventForSplit
     public $targetBranch;
 
     /**
+     * @var string Used especially in logging as context.
+     */
+    public $jobUuid;
+
+    /**
      * Extract information.
      *
      * @param Request $request
      * @throws DoNotCareException
+     * @throws \Exception
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request = null)
     {
-        $fullPullRequestInformation = json_decode($request->getContent(), true);
-        $ref = $fullPullRequestInformation['ref'] ?? '';
-        $this->sourceBranch = $this->getSourceBranch($ref);
-        $this->targetBranch = $this->getTargetBranch($this->sourceBranch);
+        if ($request) {
+            $fullPullRequestInformation = json_decode($request->getContent(), true);
+            $ref = $fullPullRequestInformation['ref'] ?? '';
+            $this->sourceBranch = $this->getSourceBranch($ref);
+            $this->targetBranch = $this->getTargetBranch($this->sourceBranch);
+            if (empty($jobUuid)) {
+                $jobUuid = Uuid::uuid4()->toString();
+            }
+            $this->jobUuid = $jobUuid;
+        }
     }
 
     /**

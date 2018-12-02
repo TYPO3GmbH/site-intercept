@@ -60,8 +60,16 @@ services:
             $splitSingleRepoBase: '%app.coreGitSplit.singleRepoBase%'
             $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
 
-    App\Service\RabbitSplitService:
-        class: App\Service\RabbitSplitService
+    App\Service\RabbitPublisherService:
+        class: App\Service\RabbitPublisherService
+        public: true
+        arguments:
+            $logger: '@monolog.logger.request'
+            $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
+            $rabbitSplitQueue: '%app.coreGitSplit.rabbitSplitQueue%'
+
+    App\Service\RabbitConsumerService:
+        class: App\Service\RabbitConsumerService
         public: true
         arguments:
             $logger: '@monolog.logger.request'
