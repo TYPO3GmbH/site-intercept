@@ -11,7 +11,6 @@ declare(strict_types = 1);
 namespace App\Controller;
 
 use App\Creator\GerritBuildStatusMessage;
-use App\Extractor\BambooBuildStatus;
 use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
 use App\Service\GerritService;

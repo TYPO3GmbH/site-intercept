@@ -75,4 +75,41 @@ class RabbitConsumerServiceTest extends TestCase
 
         $subject->handleWorkerJob($message->reveal());
     }
+
+    /**
+     * @test
+     */
+    public function handleWorkerJobCallsTagService()
+    {
+        $loggerProphecy = $this->prophesize(LoggerInterface::class);
+        $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
+        $rabbitChannel = $this->prophesize(AMQPChannel::class);
+        $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
+        $coreSplitService = $this->prophesize(CoreSplitService::class);
+
+        $subject = new RabbitConsumerService(
+            $loggerProphecy->reveal(),
+            $rabbitConnection->reveal(),
+            $coreSplitService->reveal(),
+            'intercept-core-split-testing'
+        );
+
+        $message = $this->prophesize(AMQPMessage::class);
+        $message->delivery_info = [
+            'channel' => $rabbitChannel->reveal(),
+            'delivery_tag' => 'delivery-tag',
+        ];
+        $messageBody = json_encode([
+            'sourceBranch' => 'source-branch',
+            'targetBranch' => 'target-branch',
+            'jobUuid' => 'job-uuid',
+            'type' => 'tag',
+            'tag' => 'v9.5.1',
+        ]);
+        $message->getBody()->shouldBeCalled()->willReturn($messageBody);
+
+        $coreSplitService->tag(Argument::type(GithubPushEventForCore::class))->shouldBeCalled();
+
+        $subject->handleWorkerJob($message->reveal());
+    }
 }

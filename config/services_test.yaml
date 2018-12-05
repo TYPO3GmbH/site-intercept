@@ -1,15 +1,7 @@
-parameters:
-    app.coreGitSplit.monoRepo: 'git@github.com:lolli42/TYPO3.CMS.git'
-    app.coreGitSplit.singleRepoBase: 'git@github.com:lolli42/'
-
 services:
     App\Client\BambooClient:
         public: true
     App\Client\GerritClient:
         public: true
     App\Client\GeneralClient:
-        public: true
-    App\Client\ForgeClient:
-        public: true
-    App\Service\LocalCoreGitService:
         public: true

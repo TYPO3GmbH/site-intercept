@@ -1,11 +1,7 @@
-parameters:
-    app.coreGitSplit.monoRepo: 'git@github.com:lolli42/TYPO3.CMS.git'
-    app.coreGitSplit.singleRepoBase: 'git@github.com:lolli42/'
-
 services:
     monolog.processor.add_field_processor:
         class: App\Monolog\Processor\AddFieldProcessor
         arguments:
-        - { application: 'intercept', env: '%env(APP_ENV)%' }
+            - { application: 'intercept', env: '%env(APP_ENV)%' }
         tags:
-        - { name: monolog.processor, handler: 'graylog' }
+            - { name: monolog.processor, handler: 'graylog' }

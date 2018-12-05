@@ -77,5 +77,4 @@ class GitSubtreeSplitWorkerCommand extends Command
         // Worker usually never stop, but if they do, they log ... hopefully
         $this->logger->warning('Git core split worker stopped');
     }
-
 }

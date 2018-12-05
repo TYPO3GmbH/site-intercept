@@ -55,8 +55,8 @@ class RabbitConsumerService
         LoggerInterface $logger,
         AMQPStreamConnection $rabbitConnection,
         CoreSplitService $coreSplitService,
-        string $rabbitSplitQueue)
-    {
+        string $rabbitSplitQueue
+    ) {
         $this->logger = $logger;
         $this->queueName = $rabbitSplitQueue;
         $this->coreSplitService = $coreSplitService;
@@ -95,6 +95,8 @@ class RabbitConsumerService
         $this->logger->info('handling a git split worker job', ['job_uuid' => $event->jobUuid, 'type' => $event->type]);
         if ($event->type === 'patch') {
             $this->coreSplitService->split($event);
+        } elseif ($event->type === 'tag') {
+            $this->coreSplitService->tag($event);
         }
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
         $this->logger->info('finished a git split worker job', ['job_uuid' => $event->jobUuid, 'type' => $event->type]);
