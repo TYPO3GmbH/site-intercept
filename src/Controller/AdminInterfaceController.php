@@ -13,6 +13,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Handle the web admin interface
@@ -26,6 +27,6 @@ class AdminInterfaceController extends AbstractController
      */
     public function index(Request $request): Response
     {
-        return Response::create();
+        return $this->render('base.html.twig');
     }
 }
