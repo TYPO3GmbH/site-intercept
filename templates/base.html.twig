@@ -29,6 +29,18 @@
             </div>
             <div id="page-content-wrapper">
                 <div class="container-fluid">
+                    {% block headline %}
+                        Default headline
+                    {% endblock %}
+
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
                     {% block content %}
                         Default content
                     {% endblock %}

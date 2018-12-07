@@ -11,7 +11,7 @@ declare(strict_types = 1);
 namespace App\Controller;
 
 use App\Exception\DoNotCareException;
-use App\Extractor\GerritCorePreMergePushEvent;
+use App\Extractor\GerritToBambooCore;
 use App\Service\BambooService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,8 +35,12 @@ class GerritToBambooController extends AbstractController
     public function index(Request $request, BambooService $bambooService): Response
     {
         try {
-            $pushInformation = new GerritCorePreMergePushEvent($request);
-            $bambooService->triggerNewCoreBuild($pushInformation);
+            $bambooData = new GerritToBambooCore(
+                $request->get('changeUrl'),
+                (int)$request->get('patchset'),
+                $request->get('branch')
+            );
+            $bambooService->triggerNewCoreBuild($bambooData);
         } catch (DoNotCareException $e) {
             // Do not care if pushed to some other branch than the
             // ones we do want to handle.

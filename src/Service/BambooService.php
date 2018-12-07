@@ -13,7 +13,7 @@ namespace App\Service;
 use App\Client\BambooClient;
 use App\Extractor\BambooBuildStatus;
 use App\Extractor\BambooSlackMessage;
-use App\Extractor\GerritCorePreMergePushEvent;
+use App\Extractor\GerritToBambooCore;
 use App\Extractor\GithubPushEventForDocs;
 use Psr\Http\Message\ResponseInterface;
 
@@ -66,20 +66,21 @@ class BambooService
     /**
      * Triggers a new build in one of the bamboo core pre-merge branch projects
      *
-     * @param GerritCorePreMergePushEvent $pushEvent
+     * @param GerritToBambooCore $pushEvent
      * @return ResponseInterface
      */
-    public function triggerNewCoreBuild(GerritCorePreMergePushEvent $pushEvent): ResponseInterface
+    public function triggerNewCoreBuild(GerritToBambooCore $pushEvent): ResponseInterface
     {
-        $apiPath = 'latest/queue/' . $pushEvent->bambooProject;
-        $apiPathParams = '?stage='
-            . '&os_authType=basic'
-            . '&executeAllStages=&'
-            . 'bamboo.variable.changeUrl=' . urlencode($pushEvent->changeUrl)
-            . '&bamboo.variable.patchset=' . (string)$pushEvent->patchSet;
-        $uri = $apiPath . $apiPathParams;
-
-        return $this->sendBambooPost($uri);
+        $apiPath = 'latest/queue/'
+            . $pushEvent->bambooProject . '?'
+            . implode('&', [
+                'stage=',
+                'os_authType=basic',
+                'executeAllStages=',
+                'bamboo.variable.changeUrl=' . (string)$pushEvent->changeId,
+                'bamboo.variable.patchset=' . (string)$pushEvent->patchSet
+            ]);
+        return $this->sendBambooPost($apiPath);
     }
 
     /**

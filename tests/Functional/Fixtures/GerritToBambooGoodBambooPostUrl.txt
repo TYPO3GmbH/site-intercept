@@ -1,1 +1,1 @@
-latest/queue/CORE-GTC?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=https%3A%2F%2Freview.typo3.org%2F58920%2F&bamboo.variable.patchset=1
+latest/queue/CORE-GTC?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=58920&bamboo.variable.patchset=1

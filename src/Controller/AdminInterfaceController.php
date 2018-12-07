@@ -10,6 +10,10 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Exception\DoNotCareException;
+use App\Extractor\GerritToBambooCore;
+use App\Form\BambooTriggerFormType;
+use App\Service\BambooService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,10 +37,34 @@ class AdminInterfaceController extends AbstractController
     /**
      * @Route("/admin/bamboo", name="admin_bamboo")
      * @param Request $request
+     * @param BambooService $bambooService
      * @return Response
      */
-    public function bamboo(Request $request): Response
+    public function bamboo(Request $request, BambooService $bambooService): Response
     {
-        return $this->render('bamboo.html.twig');
+        $form = $this->createForm(BambooTriggerFormType::class);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $formData = $form->getData();
+            try {
+                $bambooData = new GerritToBambooCore(
+                    (string)$formData['change'],
+                    $formData['set'],
+                    $form->getClickedButton()->getName()
+                );
+                $bambooService->triggerNewCoreBuild($bambooData);
+                $this->addFlash('success', 'bar');
+            } catch (DoNotCareException $e) {
+                $this->addFlash('danger', $e->getMessage());
+            }
+        }
+
+        return $this->render(
+            'bamboo.html.twig',
+            [
+                'bambooForm' => $form->createView()
+            ]
+        );
     }
 }
