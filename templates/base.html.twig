@@ -2,15 +2,40 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="shortcut icon" href="{{ asset('build/images/favicon.ico') }}">
+        {{ encore_entry_link_tags('app') }}
     </head>
     <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
+
+        <div id="top-wrapper">
+            <nav class="navbar navbar-expand navbar-dark">
+                <a href="#menu-toggle" id="menu-toggle" class="navbar-brand">
+                    <span class="navbar-toggler-icon"></span>
+                </a>
+            </nav>
+        </div>
+
+        <div id="main-wrapper" class="toggled">
+            <div id="sidebar-wrapper">
+                <ul id="sidebar-nav">
+                    <li>
+                        <a href="{{ path('admin_index') }}" {% if active == 'home' %}class="active"{% endif %}>Home</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('admin_bamboo') }}" {% if active == 'bamboo' %}class="active"{% endif %}>Bamboo</a>
+                    </li>
+                </ul>
+            </div>
+            <div id="page-content-wrapper">
+                <div class="container-fluid">
+                    {% block content %}
+                        Default content
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+
+        {{ encore_entry_script_tags('app') }}
     </body>
 </html>

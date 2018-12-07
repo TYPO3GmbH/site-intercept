@@ -1,16 +1,21 @@
-/*
- * Welcome to your app's main JavaScript file!
- *
- * We recommend including the built version of this JavaScript file
- * (and its CSS file) in your base layout (base.html.twig).
- */
+import '../css/app.scss';
 
-// any CSS you require will output into a single css file (app.css in this case)
-require('../css/app.scss');
+// Don't load bootstrap js for now, let's see if we need it later
+//require('bootstrap');
 
-// Need jQuery? Install it with "yarn add jquery", then uncomment to require it.
-var $ = require('jquery');
+import $ from 'jquery';
 
-require('bootstrap');
-
-console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
+$(document).ready(function() {
+  // hamburger menu toggle foo
+  $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#main-wrapper").toggleClass("toggled");
+  });
+  $(window).resize(function() {
+    if($(window).width()<=768){
+      $("#main-wrapper").removeClass("toggled");
+    }else{
+      $("#main-wrapper").addClass("toggled");
+    }
+  });
+});

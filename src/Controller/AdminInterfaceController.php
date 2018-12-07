@@ -27,6 +27,16 @@ class AdminInterfaceController extends AbstractController
      */
     public function index(Request $request): Response
     {
-        return $this->render('base.html.twig');
+        return $this->render('home.html.twig');
+    }
+
+    /**
+     * @Route("/admin/bamboo", name="admin_bamboo")
+     * @param Request $request
+     * @return Response
+     */
+    public function bamboo(Request $request): Response
+    {
+        return $this->render('bamboo.html.twig');
     }
 }

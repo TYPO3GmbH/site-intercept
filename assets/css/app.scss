@@ -1,5 +1,83 @@
-body {
-    background-color: lightgray;
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/root";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/navbar";
+
+// Default collapse transition
+@mixin transition() {
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 
-@import "~bootstrap/scss/bootstrap";
+$navbar-width: 250px;
+
+body {
+  overflow-x: hidden;
+}
+
+#top-wrapper {
+  background-color: black;
+}
+
+#main-wrapper {
+  @include transition();
+
+  &.toggled {
+    padding-left: $navbar-width;
+    #sidebar-wrapper {
+      width: $navbar-width;
+    }
+  }
+
+  #sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: $navbar-width;
+    width: 0;
+    height: 100%;
+    margin-left: -$navbar-width;
+    overflow-y: auto;
+    background: black;
+    @include transition();
+
+    #sidebar-nav {
+      position: absolute;
+      width: $navbar-width;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      li {
+        text-indent: 20px;
+        line-height: 40px;
+        a {
+          display: block;
+          text-decoration: none;
+          color: grey;
+          &.active, &:hover {
+            color: white;
+            background: rgba(white, 0.2);
+          }
+        }
+      }
+    }
+  }
+
+  #page-content-wrapper {
+    width: 100%;
+    position: absolute;
+    padding: 15px;
+  }
+}
+
+@media(min-width:768px) {
+  #main-wrapper #page-content-wrapper {
+    position: relative;
+  }
+  #main-wrapper.toggled #page-content-wrapper {
+    margin-right: 0;
+  }
+}
