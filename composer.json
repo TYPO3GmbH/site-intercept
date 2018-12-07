@@ -36,6 +36,7 @@
     "friendsofphp/php-cs-fixer": "^2.12",
     "phpunit/phpunit": "^7.4",
     "roave/security-advisories": "dev-master",
+    "symfony/profiler-pack": "^1.0",
     "symfony/var-dumper": "^4.1"
   },
   "config": {
