@@ -15,6 +15,17 @@ class GerritToBambooCoreTest extends TestCase
      */
     public function constructorExtractsValues()
     {
+        $subject = new GerritToBambooCore('https://review.typo3.org/48574', 42, 'master');
+        $this->assertSame(48574, $subject->changeId);
+        $this->assertSame(42, $subject->patchSet);
+        $this->assertSame('CORE-GTC', $subject->bambooProject);
+    }
+
+    /**
+     * @test
+     */
+    public function constructorExtractsValuesWithChangeUrlTrailingSlach()
+    {
         $subject = new GerritToBambooCore('https://review.typo3.org/48574/', 42, 'master');
         $this->assertSame(48574, $subject->changeId);
         $this->assertSame(42, $subject->patchSet);
@@ -38,6 +49,17 @@ class GerritToBambooCoreTest extends TestCase
     public function constructorExtractsChangeWithFullChangeUrlIncludingPatchSet()
     {
         $subject = new GerritToBambooCore('https://review.typo3.org/#/c/58611/11', 42, 'master');
+        $this->assertSame(58611, $subject->changeId);
+        $this->assertSame(42, $subject->patchSet);
+        $this->assertSame('CORE-GTC', $subject->bambooProject);
+    }
+
+    /**
+     * @test
+     */
+    public function constructorExtractsChangeWithFullChangeUrlIncludingPatchSetSlash()
+    {
+        $subject = new GerritToBambooCore('https://review.typo3.org/#/c/58611/11/', 42, 'master');
         $this->assertSame(58611, $subject->changeId);
         $this->assertSame(42, $subject->patchSet);
         $this->assertSame('CORE-GTC', $subject->bambooProject);
