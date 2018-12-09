@@ -8,6 +8,17 @@
     <h1>Trigger bamboo builds</h1>
 {% endblock %}
 
+{# flash messages an this page are NOT escaped !#}
+{% block flashMessages %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message | raw}}
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}
+
 {% block content %}
     <h2>
         Bamboo core tests with specific patch

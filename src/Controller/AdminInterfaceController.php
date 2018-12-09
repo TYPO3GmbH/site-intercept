@@ -53,8 +53,24 @@ class AdminInterfaceController extends AbstractController
                     $formData['set'],
                     $form->getClickedButton()->getName()
                 );
-                $bambooService->triggerNewCoreBuild($bambooData);
-                $this->addFlash('success', 'bar');
+                $bambooTriggered = $bambooService->triggerNewCoreBuild($bambooData);
+                if (!empty($bambooTriggered->buildResultKey)) {
+                    $this->addFlash(
+                        'success',
+                        'Triggered bamboo build'
+                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
+                        . ' of change "' . $bambooData->changeId . '"'
+                        . ' with patch set "' . $bambooData->patchSet . '"'
+                        . ' to plan key "' . $bambooData->bambooProject . '".'
+                    );
+                } else {
+                    $this->addFlash(
+                        'danger',
+                        'Bamboo trigger not successful with change "' . $bambooData->changeId . '"'
+                        . ' and patch set "' . $bambooData->patchSet . '"'
+                        . ' to plan key "' . $bambooData->bambooProject . '".'
+                    );
+                }
             } catch (DoNotCareException $e) {
                 $this->addFlash('danger', $e->getMessage());
             }

@@ -12,6 +12,7 @@ namespace App\Service;
 
 use App\Client\BambooClient;
 use App\Extractor\BambooBuildStatus;
+use App\Extractor\BambooBuildTriggered;
 use App\Extractor\BambooSlackMessage;
 use App\Extractor\GerritToBambooCore;
 use App\Extractor\GithubPushEventForDocs;
@@ -67,11 +68,11 @@ class BambooService
      * Triggers a new build in one of the bamboo core pre-merge branch projects
      *
      * @param GerritToBambooCore $pushEvent
-     * @return ResponseInterface
+     * @return BambooBuildTriggered
      */
-    public function triggerNewCoreBuild(GerritToBambooCore $pushEvent): ResponseInterface
+    public function triggerNewCoreBuild(GerritToBambooCore $pushEvent): BambooBuildTriggered
     {
-        $apiPath = 'latest/queue/'
+        $url = 'latest/queue/'
             . $pushEvent->bambooProject . '?'
             . implode('&', [
                 'stage=',
@@ -80,7 +81,19 @@ class BambooService
                 'bamboo.variable.changeUrl=' . (string)$pushEvent->changeId,
                 'bamboo.variable.patchset=' . (string)$pushEvent->patchSet
             ]);
-        return $this->sendBambooPost($apiPath);
+        $response = $this->client->post(
+            $url,
+            [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'authorization' => getenv('BAMBOO_AUTHORIZATION'),
+                    'cache-control' => 'no-cache',
+                    'content-type' => 'application/json',
+                    'x-atlassian-token' => 'nocheck'
+                ],
+            ]
+        );
+        return new BambooBuildTriggered((string)$response->getBody());
     }
 
     /**

@@ -79,6 +79,15 @@ class GerritToBambooCoreTest extends TestCase
     /**
      * @test
      */
+    public function constructorThrowsIfUrlIsBorked()
+    {
+        $this->expectException(DoNotCareException::class);
+        new GerritToBambooCore('https://review.typo3.org/foo/', 42, 'some-other-branch');
+    }
+
+    /**
+     * @test
+     */
     public function constructorThrowsWithWrongBranch()
     {
         $this->expectException(DoNotCareException::class);
