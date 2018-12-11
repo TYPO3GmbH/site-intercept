@@ -11,7 +11,6 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\DoNotCareException;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Extract information from a gerrit push event hook
@@ -52,7 +51,7 @@ class GerritToBambooCore
      * Extract information needed from a gerrit push event hook
      *
      * @param string $change Something like '48574' or 'https://review.typo3.org/48574/' or 'https://review.typo3.org/#/c/48574/11'
-     * @param integer $set Patch set, eg 5
+     * @param int $set Patch set, eg 5
      * @param string $branch 'master' or 'TYPO3_8-7' or ''TYPO3_87' or 'nightly87', see $branchToProjectKey
      * @throws DoNotCareException
      * @throws \RuntimeException
