@@ -1,6 +1,7 @@
 services:
     App\Client\BambooClient:
-        public: true
+        tags:
+            - testDouble
     App\Client\GerritClient:
         public: true
     App\Client\GeneralClient:
