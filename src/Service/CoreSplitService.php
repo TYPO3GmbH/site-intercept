@@ -202,6 +202,20 @@ class CoreSplitService
                     continue;
                 }
                 $treeHash = $this->gitCommand($coreWorkingCopy, true, 'ls-tree', $rev, 'typo3/sysext/' . $extension);
+                if (empty($treeHash)) {
+                    // This one may look weird but is ok: There ARE commits (rev-list) for single directories, that
+                    // do NOT have a tree attached (ls-tree) to that commit in the very same directory.
+                    // This happens if a commit removes all files from an extension directory
+                    // ("git mv typo3/sysext/install typo3/sysext/install_old"). The according tree
+                    // object then simply does not have files attached. If then later that commit is reverted
+                    // or the extension re-introduced and used here for tagging, the ls-tree for these commit has
+                    // no tree objects and ls-tree is empty. It is safe to ignore these cases and continue.
+                    // Examples commit hashes for those cases:
+                    // a658209aad3f6904017e08f57cc32ce6a97c065f  -  typo3/sysext/filelist gone, later re-introduced
+                    // b4e6274841f9f0f33779bfb14afe2fa1237bb27a  -  typo3/sysext/install gone, later re-introduced
+                    // 09e85a95861ae41e83749f1aed6693748060a920  -  typo3/sysext/workspaces gone, later re-introduced
+                    continue;
+                }
                 preg_match('([0-9a-f]{40})', $treeHash, $matches);
                 if (empty($matches[0])) {
                     throw new \RuntimeException('Something went wrong calculating tree hashes');
