@@ -38,6 +38,19 @@ function runPhpCsFixer() {
         bin/bash -c "cd ${PWD}; ./bin/php-cs-fixer $*"
 }
 
+function runYarn() {
+    docker run \
+        -u ${HOST_UID} \
+        -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/passwd:/etc/passwd \
+        -v ${BAMBOO_COMPOSE_PROJECT_NAME}_bamboo-data:/srv/bamboo/xml-data/build-dir/ \
+        -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} \
+        -e HOME=${HOME} \
+        --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \
+        --rm \
+        typo3gmbh/php72:latest \
+        bin/bash -c "cd ${PWD}; yarn $*"
+}
+
 function runPhpunit() {
     docker run \
         -u ${HOST_UID} \

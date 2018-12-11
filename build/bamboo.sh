@@ -25,5 +25,9 @@ runComposer install --no-interaction --no-progress
 # CGL Checks
 runPhpCsFixer fix --config build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml
 
+# yarn install and encore
+runYarn install
+runYarn encore dev
+
 # Unit tests
 runPhpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml  --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/
