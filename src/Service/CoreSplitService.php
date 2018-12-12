@@ -155,6 +155,15 @@ class CoreSplitService
     {
         $this->event = $event;
 
+        // If given tag does not start with "v" ... ignore this job
+        if (strpos($event->tag, 'v') !== 0) {
+            $this->log(
+                'Job ignored: The tagger only handles tags starting with "v", "' . $event->tag . '" given.',
+                'WARNING'
+            );
+            return;
+        }
+
         $coreGitWrapper = new GitWrapper();
         $coreGitWrapper->setEnvVar('HOME', getenv('GIT_HOME'));
         $coreGitWrapper->setPrivateKey(getenv('GIT_SSH_PRIVATE_KEY'));
@@ -162,27 +171,35 @@ class CoreSplitService
         $coreGitWrapper->setTimeout(300);
         $coreWorkingCopy = $coreGitWrapper->workingCopy($this->splitCorePath);
 
-        $this->initialCloneAndCheckout($coreWorkingCopy, $event->sourceBranch);
+        $this->initialCloneAndCheckout($coreWorkingCopy, 'master');
 
-        // Verify the tag actually exists in the source branch of core
-        // Otherwise something went wrong, this job should not be there, then.
-        // The command will already error out if the tag does not exist at all
-        $branchesContainTag = $this->gitCommand($coreWorkingCopy, false, 'branch', '-r', '--contains', $event->tag);
+        // Verify given tag is in one of the branches we DO consider: TYPO3_8_7, 9.x, 10.x, ..., master)
+        try {
+            $branchesContainTag = $this->gitCommand($coreWorkingCopy, false, 'branch', '-r', '--contains', $event->tag);
+        } catch (GitException $e) {
+            $this->log('Job igonred: No branch contains given tag "' . $event->tag . '"', 'WARNING');
+            return;
+        }
         $branchesContainTag = explode("\n", $branchesContainTag);
-        $branchToLookFor = 'origin/' . $event->sourceBranch;
-        $found = false;
+        $responsibleForBranch = false;
         foreach ($branchesContainTag as $branch) {
-            if (trim($branch) === $branchToLookFor) {
-                $found = true;
+            $branch = trim($branch);
+            if (empty($branch) || strpos($branch, 'origin/') !== 0 || strpos($branch, 'origin/HEAD') === 0) {
+                continue;
+            }
+            $sourceBranch = str_replace('origin/', '', $branch);
+            if ($sourceBranch === 'master' || $sourceBranch === 'TYPO3_8-7' || (int)trim(substr($sourceBranch, 0, 2), '.') >= 9) {
+                $responsibleForBranch = true;
                 break;
             }
         }
-        if ($found === false) {
-            $this->log('Tag ' . $event->tag . ' could not be found in core branch ' . $event->sourceBranch, 'WARNING');
-            // Kill job - this needs investigation
-            throw new \RuntimeException(
-                'Tag ' . $event->tag . ' could not be found in core branch ' . $event->sourceBranch . '. Aborting.'
+        if (!$responsibleForBranch) {
+            $this->log(
+                'Job ignored: Skipped tagging sub tree repositories:'
+                . ' The given tag "' . $event->tag . '" is not in one of the branches we do care of - "TYPO3_8-7", ">=9.x.y" or "master"',
+                'WARNING'
             );
+            return;
         }
 
         // Make sure base extension path exists
@@ -238,7 +255,6 @@ class CoreSplitService
             // Find closest commit-hash having both the same tree-hash in the main and package repository
             $foundCommitHash = '';
             foreach ($mainRepoTreeHashes as $mainRepoTreeHash) {
-                //var_dump('mainRepoTreeHash: ' . $mainRepoTreeHash);
                 foreach ($extensionCommitsAndTreeHashes as $extensionCommitHash => $extensionTreeHash) {
                     if ($mainRepoTreeHash === $extensionTreeHash) {
                         $foundCommitHash = $extensionCommitHash;

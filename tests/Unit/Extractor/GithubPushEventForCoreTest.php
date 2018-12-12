@@ -61,11 +61,8 @@ class GithubPushEventForCoreTest extends TestCase
         $subject = new GithubPushEventForCore([
             'ref' => 'refs/tags/v9.5.1',
             'created' => true,
-            'base_ref' => 'refs/heads/9.5',
         ]);
         $this->assertSame('v9.5.1', $subject->tag);
-        $this->assertSame('9.5', $subject->sourceBranch);
-        $this->assertSame('9.5', $subject->targetBranch);
         $this->assertSame('tag', $subject->type);
     }
 
@@ -77,11 +74,8 @@ class GithubPushEventForCoreTest extends TestCase
         $subject = new GithubPushEventForCore([
             'ref' => 'refs/tags/v8.7.42',
             'created' => true,
-            'base_ref' => 'refs/heads/TYPO3_8-7',
         ]);
         $this->assertSame('v8.7.42', $subject->tag);
-        $this->assertSame('TYPO3_8-7', $subject->sourceBranch);
-        $this->assertSame('8.7', $subject->targetBranch);
         $this->assertSame('tag', $subject->type);
     }
 
@@ -121,7 +115,6 @@ class GithubPushEventForCoreTest extends TestCase
         new GithubPushEventForCore([
             'ref' => 'refs/tags/',
             'created' => true,
-            'base_ref' => 'refs/heads/9.5',
         ]);
     }
 

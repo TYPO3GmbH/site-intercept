@@ -70,8 +70,6 @@ class GithubPushEventForCore
             } elseif ($this->isPushedTag($fullPullRequestInformation)) {
                 $this->type = self::TYPE_TAG;
                 $this->tag = $this->getTag($fullPullRequestInformation['ref']);
-                $this->sourceBranch = $this->getSourceBranch($fullPullRequestInformation['base_ref']);
-                $this->targetBranch = $this->getTargetBranch($this->sourceBranch);
             } else {
                 throw new DoNotCareException();
             }
@@ -101,8 +99,7 @@ class GithubPushEventForCore
     private function isPushedTag(array $requestInformation): bool
     {
         return strpos($requestInformation['ref'], 'refs/tags/') === 0
-            && $requestInformation['created'] === true
-            && !empty($requestInformation['base_ref']);
+            && $requestInformation['created'] === true;
     }
 
     /**
