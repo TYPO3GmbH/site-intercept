@@ -94,4 +94,46 @@ class AdminInterfaceSplitCoreControllerTest extends WebTestCase
             $client->getResponse()->getContent()
         );
     }
+
+    /**
+     * @test
+     */
+    public function tagCoreCanBeTriggered()
+    {
+        $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
+        TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
+        $rabbitClientProphecy->get(Argument::cetera())->willReturn(
+            new Response(200, [], json_encode(['consumers' => 1, 'messages' => 2]))
+        );
+        $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
+        TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
+        $rabbitClientProphecy->get(Argument::cetera())->willReturn(
+            new Response(200, [], json_encode(['consumers' => 1, 'messages' => 3]))
+        );
+
+        TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
+
+        // rabbit stream client double for the second request
+        $rabbitStreamProphecy = $this->prophesize(AMQPStreamConnection::class);
+        TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $rabbitStreamProphecy);
+        $rabbitChannelProphecy = $this->prophesize(AMQPChannel::class);
+        $rabbitStreamProphecy->channel()->shouldBeCalled()->willReturn($rabbitChannelProphecy->reveal());
+        $rabbitChannelProphecy->queue_declare(Argument::cetera())->shouldBeCalled();
+        $rabbitChannelProphecy->basic_publish(Argument::cetera())->shouldBeCalled();
+
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/admin/split/core');
+
+        // Get the rendered form, feed it with some data and submit it
+        $form = $crawler->selectButton('Trigger sub repo tagging')->form();
+        $form['split_core_tag_form[tag]'] = 'v9.5.1';
+        $client->submit($form);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        // The branch is shown
+        $this->assertRegExp(
+            '/Triggered tag job with tag &quot;v9.5.1&quot;/',
+            $client->getResponse()->getContent()
+        );
+    }
 }

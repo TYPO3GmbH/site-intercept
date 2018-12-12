@@ -29,26 +29,28 @@
         branch. Do not abuse this interface - triggering many builds can <strong>easily</strong> occupy bamboo
         for hours.
     </p>
-    {{ form_start(bambooForm) }}
-        {{ form_errors(bambooForm) }}
-        <div class="form-group row">
-            <div class="col-2">
-                {{ form_label(bambooForm.change) }}
-                {{ form_errors(bambooForm.change) }}
-                {{ form_widget(bambooForm.change) }}
-                {{ form_help(bambooForm.change) }}
+    <p>
+        {{ form_start(bambooForm) }}
+            {{ form_errors(bambooForm) }}
+            <div class="form-group row">
+                <div class="col-2">
+                    {{ form_label(bambooForm.change) }}
+                    {{ form_errors(bambooForm.change) }}
+                    {{ form_widget(bambooForm.change) }}
+                    {{ form_help(bambooForm.change) }}
+                </div>
+                <div class="col-2">
+                    {{ form_label(bambooForm.set) }}
+                    {{ form_errors(bambooForm.set) }}
+                    {{ form_widget(bambooForm.set) }}
+                    {{ form_help(bambooForm.set) }}
+                </div>
             </div>
-            <div class="col-2">
-                {{ form_label(bambooForm.set) }}
-                {{ form_errors(bambooForm.set) }}
-                {{ form_widget(bambooForm.set) }}
-                {{ form_help(bambooForm.set) }}
-            </div>
-        </div>
-        {{ form_widget(bambooForm.master) }}
-        {{ form_widget(bambooForm.TYPO3_8_7) }}
-        {{ form_widget(bambooForm.TYPO3_7_6) }}
-        {{ form_widget(bambooForm.nightlyMaster) }}
-        {{ form_widget(bambooForm.nightly8_7) }}
-    {{ form_end(bambooForm, {'render_rest': false}) }}
+            {{ form_widget(bambooForm.master) }}
+            {{ form_widget(bambooForm.TYPO3_8_7) }}
+            {{ form_widget(bambooForm.TYPO3_7_6) }}
+            {{ form_widget(bambooForm.nightlyMaster) }}
+            {{ form_widget(bambooForm.nightly8_7) }}
+        {{ form_end(bambooForm, {'render_rest': false}) }}
+    </p>
 {% endblock %}

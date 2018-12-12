@@ -12,6 +12,7 @@ namespace App\Controller;
 
 use App\Extractor\GithubPushEventForCore;
 use App\Form\SplitCoreSplitFormType;
+use App\Form\SplitCoreTagFormType;
 use App\Service\RabbitPublisherService;
 use App\Service\RabbitStatusService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,11 +35,12 @@ class AdminInterfaceSplitCoreController extends AbstractController
      */
     public function index(Request $request, RabbitStatusService $rabbitStatus, RabbitPublisherService $rabbitService): Response
     {
-        $form = $this->createForm(SplitCoreSplitFormType::class);
+        $splitForm = $this->createForm(SplitCoreSplitFormType::class);
+        $tagForm = $this->createForm(SplitCoreTagFormType::class);
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $branch = $form->getClickedButton()->getName();
+        $splitForm->handleRequest($request);
+        if ($splitForm->isSubmitted() && $splitForm->isValid()) {
+            $branch = $splitForm->getClickedButton()->getName();
             $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/heads/' . $branch]);
             $rabbitService->pushNewCoreSplitJob($pushEventInformation);
             $this->addFlash(
@@ -47,10 +49,22 @@ class AdminInterfaceSplitCoreController extends AbstractController
             );
         }
 
+        $tagForm->handleRequest($request);
+        if ($tagForm->isSubmitted() && $tagForm->isValid()) {
+            $tag = $tagForm->getData()['tag'];
+            $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/tags/' . $tag, 'created' => true]);
+            $rabbitService->pushNewCoreSplitJob($pushEventInformation);
+            $this->addFlash(
+                'success',
+                'Triggered tag job with tag "' . $pushEventInformation->tag . '"'
+            );
+        }
+
         return $this->render(
             'splitCore.html.twig',
             [
-                'splitCoreSplit' => $form->createView(),
+                'splitCoreSplit' => $splitForm->createView(),
+                'splitCoreTag' => $tagForm->createView(),
                 'rabbitStatus' => $rabbitStatus->getStatus(),
             ]
         );
