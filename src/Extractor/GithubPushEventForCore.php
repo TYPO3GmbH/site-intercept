@@ -53,14 +53,13 @@ class GithubPushEventForCore
     /**
      * Extract information.
      *
-     * @param Request $request
+     * @param array $fullPullRequestInformation Optional, this object is used in consumer, via json serializer, too.
      * @throws DoNotCareException
      * @throws \Exception
      */
-    public function __construct(Request $request = null)
+    public function __construct(array $fullPullRequestInformation = [])
     {
-        if ($request) {
-            $fullPullRequestInformation = json_decode($request->getContent(), true);
+        if (!empty($fullPullRequestInformation)) {
             if (!is_array($fullPullRequestInformation) || empty($fullPullRequestInformation['ref'])) {
                 throw new DoNotCareException();
             }

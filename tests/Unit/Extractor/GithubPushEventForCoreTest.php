@@ -14,16 +14,7 @@ class GithubPushEventForCoreTest extends TestCase
      */
     public function constructorHandlesPatchMasterBranch()
     {
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode(['ref' => 'refs/heads/master'])
-        );
-        $subject = new GithubPushEventForCore($request);
+        $subject = new GithubPushEventForCore(['ref' => 'refs/heads/master']);
         $this->assertSame('master', $subject->sourceBranch);
         $this->assertSame('master', $subject->targetBranch);
         $this->assertSame('patch', $subject->type);
@@ -34,16 +25,7 @@ class GithubPushEventForCoreTest extends TestCase
      */
     public function constructorHandlesPatchNineBranch()
     {
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode(['ref' => 'refs/heads/9.2'])
-        );
-        $subject = new GithubPushEventForCore($request);
+        $subject = new GithubPushEventForCore(['ref' => 'refs/heads/9.2']);
         $this->assertSame('9.2', $subject->sourceBranch);
         $this->assertSame('9.2', $subject->targetBranch);
         $this->assertSame('patch', $subject->type);
@@ -54,16 +36,7 @@ class GithubPushEventForCoreTest extends TestCase
      */
     public function constructorHandlesPatchEightBranch()
     {
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode(['ref' => 'refs/heads/TYPO3_8-7'])
-        );
-        $subject = new GithubPushEventForCore($request);
+        $subject = new GithubPushEventForCore(['ref' => 'refs/heads/TYPO3_8-7']);
         $this->assertSame('TYPO3_8-7', $subject->sourceBranch);
         $this->assertSame('8.7', $subject->targetBranch);
         $this->assertSame('patch', $subject->type);
@@ -74,20 +47,11 @@ class GithubPushEventForCoreTest extends TestCase
      */
     public function constructorHandlesTagNineBranch()
     {
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode([
-                'ref' => 'refs/tags/v9.5.1',
-                'created' => true,
-                'base_ref' => 'refs/heads/9.5',
-            ])
-        );
-        $subject = new GithubPushEventForCore($request);
+        $subject = new GithubPushEventForCore([
+            'ref' => 'refs/tags/v9.5.1',
+            'created' => true,
+            'base_ref' => 'refs/heads/9.5',
+        ]);
         $this->assertSame('v9.5.1', $subject->tag);
         $this->assertSame('9.5', $subject->sourceBranch);
         $this->assertSame('9.5', $subject->targetBranch);
@@ -99,20 +63,11 @@ class GithubPushEventForCoreTest extends TestCase
      */
     public function constructorHandlesTagEightBranch()
     {
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode([
-                'ref' => 'refs/tags/v8.7.42',
-                'created' => true,
-                'base_ref' => 'refs/heads/TYPO3_8-7',
-            ])
-        );
-        $subject = new GithubPushEventForCore($request);
+        $subject = new GithubPushEventForCore([
+            'ref' => 'refs/tags/v8.7.42',
+            'created' => true,
+            'base_ref' => 'refs/heads/TYPO3_8-7',
+        ]);
         $this->assertSame('v8.7.42', $subject->tag);
         $this->assertSame('TYPO3_8-7', $subject->sourceBranch);
         $this->assertSame('8.7', $subject->targetBranch);
@@ -125,16 +80,7 @@ class GithubPushEventForCoreTest extends TestCase
     public function constructorThrowsWithSevenBranch()
     {
         $this->expectException(DoNotCareException::class);
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode(['ref' => 'refs/heads/TYPO3_7-6'])
-        );
-        new GithubPushEventForCore($request);
+        new GithubPushEventForCore(['ref' => 'refs/heads/TYPO3_7-6']);
     }
 
     /**
@@ -143,16 +89,7 @@ class GithubPushEventForCoreTest extends TestCase
     public function constructorThrowsWithEmptyRef()
     {
         $this->expectException(DoNotCareException::class);
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode(['ref' => ''])
-        );
-        new GithubPushEventForCore($request);
+        new GithubPushEventForCore(['ref' => '']);
     }
 
     /**
@@ -161,16 +98,7 @@ class GithubPushEventForCoreTest extends TestCase
     public function constructorThrowsWithInvalidRef()
     {
         $this->expectException(DoNotCareException::class);
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode(['ref' => 'refs/heads/'])
-        );
-        new GithubPushEventForCore($request);
+        new GithubPushEventForCore(['ref' => 'refs/heads/']);
     }
 
     /**
@@ -179,20 +107,11 @@ class GithubPushEventForCoreTest extends TestCase
     public function constructorThrowsWithInvalidTagRef()
     {
         $this->expectException(DoNotCareException::class);
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode([
-                'ref' => 'refs/tags/',
-                'created' => true,
-                'base_ref' => 'refs/heads/9.5',
-            ])
-        );
-        new GithubPushEventForCore($request);
+        new GithubPushEventForCore([
+            'ref' => 'refs/tags/',
+            'created' => true,
+            'base_ref' => 'refs/heads/9.5',
+        ]);
     }
 
     /**
@@ -201,15 +120,6 @@ class GithubPushEventForCoreTest extends TestCase
     public function constructorThrowsWithBrokenRef()
     {
         $this->expectException(DoNotCareException::class);
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            json_encode(['ref' => 'refs/foo/'])
-        );
-        new GithubPushEventForCore($request);
+        new GithubPushEventForCore(['ref' => 'refs/foo/']);
     }
 }

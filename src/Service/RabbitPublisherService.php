@@ -11,7 +11,6 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Extractor\GithubPushEventForCore;
-use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -22,9 +21,9 @@ use Symfony\Component\Serializer\Serializer;
 class RabbitPublisherService
 {
     /**
-     * @var AMQPChannel The rabbit channel to messages to and fetch from
+     * @var AMQPStreamConnection The rabbit connection
      */
-    private $rabbitChannel;
+    private $rabbitConnection;
 
     /**
      * @var string Name of the queue to push to and fetch from
@@ -47,8 +46,7 @@ class RabbitPublisherService
     {
         $this->logger = $logger;
         $this->queueName = $rabbitSplitQueue;
-        $this->rabbitChannel = $rabbitConnection->channel();
-        $this->rabbitChannel->queue_declare($this->queueName, false, true, false, false);
+        $this->rabbitConnection = $rabbitConnection;
     }
 
     /**
@@ -61,7 +59,9 @@ class RabbitPublisherService
         $serializer = new Serializer([new PropertyNormalizer()], [new JsonEncoder()]);
         $jsonMessage = $serializer->serialize($message, 'json');
         $rabbitMessage = new AMQPMessage($jsonMessage, ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]);
-        $this->rabbitChannel->basic_publish($rabbitMessage, '', $this->queueName);
+        $rabbitChannel = $this->rabbitConnection->channel();
+        $rabbitChannel->queue_declare($this->queueName, false, true, false, false);
+        $rabbitChannel->basic_publish($rabbitMessage, '', $this->queueName);
         $this->logger->info('Queued a core split job to queue ' . $this->queueName . ' with message ' . $jsonMessage, ['job_uuid' => $message->jobUuid]);
     }
 }

@@ -7,6 +7,8 @@ use App\Client\RabbitManagementClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Prophecy\Argument;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -17,8 +19,10 @@ class AdminInterfaceSplitCoreControllerTest extends WebTestCase
      */
     public function rabbitDataIsRendered()
     {
+        TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
+
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
-        TestDoubleBundle::addProphecy('App\Client\RabbitManagementClient', $rabbitClientProphecy);
+        TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
         $rabbitClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
             new Response(200, [], json_encode(['consumers' => 1, 'messages' => 2]))
         );
@@ -36,8 +40,10 @@ class AdminInterfaceSplitCoreControllerTest extends WebTestCase
      */
     public function rabbitDownIsRendered()
     {
+        TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
+
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
-        TestDoubleBundle::addProphecy('App\Client\RabbitManagementClient', $rabbitClientProphecy);
+        TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
         $rabbitClientProphecy->get(Argument::cetera())->shouldBeCalled()->willThrow(
             new ClientException('testing', new Request('GET', ''))
         );
@@ -46,5 +52,46 @@ class AdminInterfaceSplitCoreControllerTest extends WebTestCase
         $client->request('GET', '/admin/split/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Rabbit: offline/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function splitCoreCanBeTriggered()
+    {
+        $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
+        TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
+        $rabbitClientProphecy->get(Argument::cetera())->willReturn(
+            new Response(200, [], json_encode(['consumers' => 1, 'messages' => 2]))
+        );
+        $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
+        TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
+        $rabbitClientProphecy->get(Argument::cetera())->willReturn(
+            new Response(200, [], json_encode(['consumers' => 1, 'messages' => 3]))
+        );
+
+        TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
+
+        // rabbit stream client double for the second request
+        $rabbitStreamProphecy = $this->prophesize(AMQPStreamConnection::class);
+        TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $rabbitStreamProphecy);
+        $rabbitChannelProphecy = $this->prophesize(AMQPChannel::class);
+        $rabbitStreamProphecy->channel()->shouldBeCalled()->willReturn($rabbitChannelProphecy->reveal());
+        $rabbitChannelProphecy->queue_declare(Argument::cetera())->shouldBeCalled();
+        $rabbitChannelProphecy->basic_publish(Argument::cetera())->shouldBeCalled();
+
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/admin/split/core');
+
+        // Get the rendered form, feed it with some data and submit it
+        $form = $crawler->selectButton('Trigger master')->form();
+        $client->submit($form);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        // The branch is shown
+        $this->assertRegExp(
+            '/Triggered split job for core branch &quot;master&quot;/',
+            $client->getResponse()->getContent()
+        );
     }
 }

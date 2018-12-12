@@ -74,11 +74,7 @@ class GitSubtreeSplitControllerTest extends TestCase
         $rabbitConnectionProphecy = $this->prophesize(AMQPStreamConnection::class);
         TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $rabbitConnectionProphecy);
 
-        $rabbitChannel = $this->prophesize(AMQPChannel::class);
-        $rabbitConnectionProphecy->channel()->shouldBeCalled()->willReturn($rabbitChannel->reveal());
-
-        $rabbitChannel->queue_declare('intercept-core-split-testing', false, true, false, false)->shouldBeCalled();
-        $rabbitChannel->basic_publish(Argument::cetera())->shouldNotBeCalled();
+        $rabbitConnectionProphecy->channel()->shouldNotBeCalled();
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();

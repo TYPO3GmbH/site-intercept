@@ -9,7 +9,5 @@ return Request::create(
     [],
     [],
     [],
-    '{
-      "ref": "refs/heads/bad-branch",
-    }'
+    json_encode(['ref' => 'refs/heads/bad-branch'])
 );

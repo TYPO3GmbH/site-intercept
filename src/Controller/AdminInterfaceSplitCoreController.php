@@ -10,7 +10,9 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Extractor\GithubPushEventForCore;
 use App\Form\SplitCoreSplitFormType;
+use App\Service\RabbitPublisherService;
 use App\Service\RabbitStatusService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,16 +28,29 @@ class AdminInterfaceSplitCoreController extends AbstractController
      * @Route("/admin/split/core", name="admin_split_core");
      * @param Request $request
      * @param RabbitStatusService $rabbitStatus
+     * @param RabbitPublisherService $rabbitService
      * @return Response
+     * @throws \Exception
      */
-    public function index(Request $request, RabbitStatusService $rabbitStatus): Response
+    public function index(Request $request, RabbitStatusService $rabbitStatus, RabbitPublisherService $rabbitService): Response
     {
-        //$form = $this->createForm(SplitCoreSplitFormType::class);
+        $form = $this->createForm(SplitCoreSplitFormType::class);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $branch = $form->getClickedButton()->getName();
+            $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/heads/' . $branch]);
+            $rabbitService->pushNewCoreSplitJob($pushEventInformation);
+            $this->addFlash(
+                'success',
+                'Triggered split job for core branch "' . $pushEventInformation->targetBranch . '"'
+            );
+        }
 
         return $this->render(
             'splitCore.html.twig',
             [
-                //'splitCoreSplit' => $form->createView(),
+                'splitCoreSplit' => $form->createView(),
                 'rabbitStatus' => $rabbitStatus->getStatus(),
             ]
         );
