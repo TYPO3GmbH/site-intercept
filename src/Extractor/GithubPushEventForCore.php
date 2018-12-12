@@ -134,6 +134,10 @@ class GithubPushEventForCore
         if (empty($sourceBranch)) {
             throw new DoNotCareException();
         }
+        // Rewrite TYPO3_8_7 to TYPO3_8-7
+        if ($sourceBranch === 'TYPO3_8_7') {
+            $sourceBranch = 'TYPO3_8-7';
+        }
         return $sourceBranch;
     }
 

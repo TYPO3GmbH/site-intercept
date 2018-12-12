@@ -45,6 +45,17 @@ class GithubPushEventForCoreTest extends TestCase
     /**
      * @test
      */
+    public function constructorHandlesPatchEightBranchWithUnderScore()
+    {
+        $subject = new GithubPushEventForCore(['ref' => 'refs/heads/TYPO3_8_7']);
+        $this->assertSame('TYPO3_8-7', $subject->sourceBranch);
+        $this->assertSame('8.7', $subject->targetBranch);
+        $this->assertSame('patch', $subject->type);
+    }
+
+    /**
+     * @test
+     */
     public function constructorHandlesTagNineBranch()
     {
         $subject = new GithubPushEventForCore([
