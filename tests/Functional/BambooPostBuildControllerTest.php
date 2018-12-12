@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 namespace App\Tests\Functional;
 
+use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
 use App\Client\GerritClient;
 use GuzzleHttp\Psr7\Response;
@@ -14,29 +15,27 @@ class BambooPostBuildControllerTest extends TestCase
      */
     public function gerritVoteIsCalled()
     {
-        $kernel = new \App\Kernel('test', true);
-        $kernel->boot();
-        $container = $kernel->getContainer();
-
-        $bambooClient = $this->prophesize(BambooClient::class);
-        $bambooClient
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy
             ->get(
                 file_get_contents(__DIR__ . '/Fixtures/BambooPostBuildGoodBambooDetailsUrl.txt'),
                 require __DIR__ . '/Fixtures/BambooPostBuildGoodBambooDetailsHeader.php'
             )->shouldBeCalled()
             ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildGoodBambooDetailsResponse.php');
-        $container->set('App\Client\BambooClient', $bambooClient->reveal());
+        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
 
-        $gerritClient = $this->prophesize(GerritClient::class);
-        $gerritClient
+        $gerritClientProphecy = $this->prophesize(GerritClient::class);
+        $gerritClientProphecy
             ->post(
                 file_get_contents(__DIR__ . '/Fixtures/BambooPostBuildGoodGerritPostUrl.txt'),
                 require __DIR__ . '/Fixtures/BambooPostBuildGoodGerritPostData.php'
             )
             ->shouldBeCalled()
             ->willReturn(new Response());
-        $container->set('App\Client\GerritClient', $gerritClient->reveal());
+        TestDoubleBundle::addProphecy('App\Client\GerritClient', $gerritClientProphecy);
 
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
         $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);

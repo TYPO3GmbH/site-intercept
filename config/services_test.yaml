@@ -3,6 +3,9 @@ services:
         tags:
             - testDouble
     App\Client\GerritClient:
-        public: true
+        tags:
+            - testDouble
     App\Client\GeneralClient:
-        public: true
+        tags:
+            - testDouble
+

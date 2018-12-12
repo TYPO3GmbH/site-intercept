@@ -25,12 +25,15 @@ services:
     App\Client\BambooClient: '@eight_points_guzzle.client.bamboo'
     App\Client\GerritClient: '@eight_points_guzzle.client.gerrit'
     App\Client\GeneralClient: '@eight_points_guzzle.client.general'
+
     App\Client\ForgeClient:
         class: App\Client\ForgeClient
         public: true
         arguments:
             $url: '%env(FORGE_ENDPOINT)%'
             $apikeyOrUsername: '%env(FORGE_ACCESS_TOKEN)%'
+        tags:
+            - testDouble
 
     App\Service\LocalCoreGitService:
         class: App\Service\LocalCoreGitService
@@ -39,6 +42,8 @@ services:
             $logger: '@monolog.logger.request'
             $listener: '@App\GitWrapper\Event\GitOutputListener'
             $pullRequestCorePath: '%kernel.project_dir%/var/git-core-pr/'
+        tags:
+            - testDouble
 
     App\Service\CoreSplitService:
         class: App\Service\CoreSplitService
@@ -50,6 +55,8 @@ services:
             $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE)%'
             $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions/'
             $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
+        tags:
+            - testDouble
 
     App\Service\GithubService:
         class: App\Service\GithubService
@@ -60,7 +67,6 @@ services:
 
     App\Service\RabbitPublisherService:
         class: App\Service\RabbitPublisherService
-        public: true
         arguments:
             $logger: '@monolog.logger.request'
             $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
@@ -68,7 +74,6 @@ services:
 
     App\Service\RabbitConsumerService:
         class: App\Service\RabbitConsumerService
-        public: true
         arguments:
             $logger: '@monolog.logger.request'
             $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
@@ -83,6 +88,8 @@ services:
             $port: '%env(RABBITMQ_PORT)%'
             $user: '%env(RABBITMQ_USER)%'
             $password: '%env(RABBITMQ_PASSWORD)%'
+        tags:
+            - testDouble
 
     # graylog log setup and enrichment of log rows with static
     # data for easy search on elk.typo3.com. Works on dev / local too since

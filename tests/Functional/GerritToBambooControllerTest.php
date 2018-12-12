@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 namespace App\Tests\Functional;
 
+use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
@@ -14,17 +15,17 @@ class GerritToBambooControllerTest extends TestCase
      */
     public function bambooBuildIsTriggered()
     {
-        $kernel = new \App\Kernel('test', true);
-        $kernel->boot();
-        $container = $kernel->getContainer();
-        $bambooClient = $this->prophesize(BambooClient::class);
-        $bambooClient
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy
             ->post(
                 file_get_contents(__DIR__ . '/Fixtures/GerritToBambooGoodBambooPostUrl.txt'),
                 require __DIR__ . '/Fixtures/GerritToBambooGoodBambooPostData.php'
             )->shouldBeCalled()
             ->willReturn(new Response());
-        $container->set('App\Client\BambooClient', $bambooClient->reveal());
+        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GerritToBambooGoodRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
@@ -35,12 +36,12 @@ class GerritToBambooControllerTest extends TestCase
      */
     public function bambooBuildIsNotTriggeredWithWrongBranch()
     {
-        $kernel = new \App\Kernel('test', true);
-        $kernel->boot();
-        $container = $kernel->getContainer();
         $bambooClient = $this->prophesize(BambooClient::class);
         $bambooClient->post(Argument::cetera())->shouldNotBeCalled();
-        $container->set('App\Client\BambooClient', $bambooClient->reveal());
+        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClient);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GerritToBambooBadRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);

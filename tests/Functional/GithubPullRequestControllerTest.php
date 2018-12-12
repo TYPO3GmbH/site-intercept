@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 namespace App\Tests\Functional;
 
+use App\Bundle\TestDoubleBundle;
 use App\Client\ForgeClient;
 use App\Client\GeneralClient;
 use App\Extractor\GitPushOutput;
@@ -17,29 +18,25 @@ class GithubPullRequestControllerTest extends TestCase
      */
     public function pullRequestIsTransformed()
     {
-        $kernel = new \App\Kernel('test', true);
-        $kernel->boot();
-        $container = $kernel->getContainer();
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        TestDoubleBundle::addProphecy('App\Client\GeneralClient', $generalClientProphecy);
+        $forgeClientProphecy = $this->prophesize(ForgeClient::class);
+        TestDoubleBundle::addProphecy('App\Client\ForgeClient', $forgeClientProphecy);
+        $gitServiceProphecy = $this->prophesize(LocalCoreGitService::class);
+        TestDoubleBundle::addProphecy('App\Service\LocalCoreGitService', $gitServiceProphecy);
 
-        $generalClient = $this->prophesize(GeneralClient::class);
-        $container->set('App\Client\GeneralClient', $generalClient->reveal());
-        $forgeClient = $this->prophesize(ForgeClient::class);
-        $container->set('App\Client\ForgeClient', $forgeClient->reveal());
-        $gitService = $this->prophesize(LocalCoreGitService::class);
-        $container->set('App\Service\LocalCoreGitService', $gitService->reveal());
-
-        $generalClient
+        $generalClientProphecy
             ->get('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1')
             ->shouldBeCalled()
             ->willReturn(require __DIR__ . '/Fixtures/GithubPullRequestIssueDetailsResponse.php');
 
-        $generalClient
+        $generalClientProphecy
             ->get('https://api.github.com/users/psychomieze')
             ->shouldBeCalled()
             ->willReturn(require __DIR__ . '/Fixtures/GithubPullRequestUserDetailsResponse.php');
 
         $forgeIssueProphecy = $this->prophesize(Issue::class);
-        $forgeClient->issue = $forgeIssueProphecy->reveal();
+        $forgeClientProphecy->issue = $forgeIssueProphecy->reveal();
         $forgeIssueProphecy
             ->create([
                 'project_id' => 27,
@@ -57,18 +54,18 @@ class GithubPullRequestControllerTest extends TestCase
             ->shouldBeCalled()
             ->willReturn(new \SimpleXMLElement('<?xml version="1.0"?><root><id>42</id></root>'));
 
-        $generalClient
+        $generalClientProphecy
             ->get('https://github.com/psychomieze/TYPO3.CMS/pull/1.diff')
             ->shouldBeCalled()
             ->willReturn(require __DIR__ . '/Fixtures/GithubPullRequestPatchResponse.php');
 
         // Unmockable git foo
-        $gitService->commitPatchAsUser(Argument::cetera())->shouldBeCalled();
+        $gitServiceProphecy->commitPatchAsUser(Argument::cetera())->shouldBeCalled();
         $pushOutput = $this->prophesize(GitPushOutput::class);
         $pushOutput->reviewUrl = 'https://review.typo3.org/12345';
-        $gitService->pushToGerrit(Argument::cetera())->shouldBeCalled()->willReturn($pushOutput->reveal());
+        $gitServiceProphecy->pushToGerrit(Argument::cetera())->shouldBeCalled()->willReturn($pushOutput->reveal());
 
-        $generalClient
+        $generalClientProphecy
             ->patch(
                 'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1?access_token=4711',
                 [
@@ -79,7 +76,7 @@ class GithubPullRequestControllerTest extends TestCase
             )
             ->shouldBeCalled();
 
-        $generalClient
+        $generalClientProphecy
             ->post(
                 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments?access_token=4711',
                 [
@@ -90,12 +87,14 @@ class GithubPullRequestControllerTest extends TestCase
             )
             ->shouldBeCalled();
 
-        $generalClient
+        $generalClientProphecy
             ->put(
                 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/lock?access_token=4711'
             )
             ->shouldBeCalled();
 
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GithubPullRequestGoodRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
@@ -106,19 +105,17 @@ class GithubPullRequestControllerTest extends TestCase
      */
     public function pullRequestIsNotTransformed()
     {
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        TestDoubleBundle::addProphecy('App\Client\GeneralClient', $generalClientProphecy);
+        $forgeClientProphecy = $this->prophesize(ForgeClient::class);
+        TestDoubleBundle::addProphecy('App\Client\ForgeClient', $forgeClientProphecy);
+        $gitServiceProphecy = $this->prophesize(LocalCoreGitService::class);
+        TestDoubleBundle::addProphecy('App\Service\LocalCoreGitService', $gitServiceProphecy);
+
+        $generalClientProphecy->get(Argument::cetera())->shouldNotBeCalled();
+
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
-        $container = $kernel->getContainer();
-
-        $generalClient = $this->prophesize(GeneralClient::class);
-        $container->set('App\Client\GeneralClient', $generalClient->reveal());
-        $forgeClient = $this->prophesize(ForgeClient::class);
-        $container->set('App\Client\ForgeClient', $forgeClient->reveal());
-        $gitService = $this->prophesize(LocalCoreGitService::class);
-        $container->set('App\Service\LocalCoreGitService', $gitService->reveal());
-
-        $generalClient->get(Argument::cetera())->shouldNotBeCalled();
-
         $request = require __DIR__ . '/Fixtures/GithubPullRequestBadRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
