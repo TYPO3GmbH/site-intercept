@@ -203,12 +203,11 @@ class CoreSplitService
         }
 
         // Check out this tag to get a list of extensions
-        $this->initialCloneAndCheckout($coreWorkingCopy, $event->tag);
+        $this->checkoutDetachedHead($coreWorkingCopy, $event->tag);
+        $extensions = $this->getExtensions();
 
         // Make sure base extension path exists
         @mkdir($this->splitSingleRepoPath);
-
-        $extensions = $this->getExtensions();
 
         foreach ($extensions as $extension) {
             $extensionWorkingCopy = $this->initialExtensionWorkingCopyOrUpdate($extension);
@@ -372,6 +371,17 @@ class CoreSplitService
         }
 
         return $standardOutput;
+    }
+
+    /**
+     * Git fetch and checkout a detached head (a tag in our case)
+     *
+     * @param GitWorkingCopy $coreWorkingCopy
+     * @param string $tag
+     */
+    private function checkoutDetachedHead(GitWorkingCopy $coreWorkingCopy, string $tag): void
+    {
+        $this->gitCommand($coreWorkingCopy, false, 'checkout', $tag);
     }
 
     /**
