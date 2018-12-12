@@ -202,6 +202,9 @@ class CoreSplitService
             return;
         }
 
+        // Check out this tag to get a list of extensions
+        $this->initialCloneAndCheckout($coreWorkingCopy, $event->tag);
+
         // Make sure base extension path exists
         @mkdir($this->splitSingleRepoPath);
 
