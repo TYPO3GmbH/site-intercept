@@ -18,4 +18,5 @@ services:
       /bin/sh -c "
         sleep 1
         php -n -c /etc/php/cli-no-xdebug/php.ini bin/console app:git-core-split-worker
+        sleep 60
       "
