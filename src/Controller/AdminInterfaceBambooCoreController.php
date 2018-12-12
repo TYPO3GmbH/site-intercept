@@ -12,7 +12,7 @@ namespace App\Controller;
 
 use App\Exception\DoNotCareException;
 use App\Extractor\GerritToBambooCore;
-use App\Form\BambooTriggerFormType;
+use App\Form\BambooCoreTriggerFormType;
 use App\Service\BambooService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,27 +22,17 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Handle the web admin interface
  */
-class AdminInterfaceController extends AbstractController
+class AdminInterfaceBambooCoreController extends AbstractController
 {
     /**
-     * @Route("/admin", name="admin_index")
-     * @param Request $request
-     * @return Response
-     */
-    public function index(Request $request): Response
-    {
-        return $this->render('home.html.twig');
-    }
-
-    /**
-     * @Route("/admin/bamboo", name="admin_bamboo")
+     * @Route("/admin/bamboo/core", name="admin_bamboo_core")
      * @param Request $request
      * @param BambooService $bambooService
      * @return Response
      */
-    public function bamboo(Request $request, BambooService $bambooService): Response
+    public function index(Request $request, BambooService $bambooService): Response
     {
-        $form = $this->createForm(BambooTriggerFormType::class);
+        $form = $this->createForm(BambooCoreTriggerFormType::class);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -77,7 +67,7 @@ class AdminInterfaceController extends AbstractController
         }
 
         return $this->render(
-            'bamboo.html.twig',
+            'bambooCore.html.twig',
             [
                 'bambooForm' => $form->createView()
             ]

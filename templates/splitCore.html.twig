@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% set active = 'splitCore' %}
+
+{% block title %}Split Core{% endblock %}
+
+{% block headline %}
+    <h1>Split Core</h1>
+{% endblock %}
+
+{% block content %}
+    <h2>
+        {% if rabbitStatus.isRabbitOnline == true %}
+            <span class="badge badge-success">Rabbit: online</span>
+        {% else %}
+            <span class="badge badge-danger">Rabbit: offline</span>
+        {% endif %}
+
+        {% if rabbitStatus.isWorkerOnline == true and rabbitStatus.isRabbitOnline == true %}
+            <span class="badge badge-success">Worker: online</span>
+        {% elseif rabbitStatus.isRabbitOnline == true %}
+            <span class="badge badge-danger">Worker: offline</span>
+        {% endif %}
+
+        {% if rabbitStatus.numberOfJobs == 0 and rabbitStatus.isRabbitOnline == true %}
+            <span class="badge badge-success">Jobs: {{ rabbitStatus.numberOfJobs }}</span>
+        {% elseif rabbitStatus.isRabbitOnline == true %}
+            <span class="badge badge-warning">Jobs: {{ rabbitStatus.numberOfJobs }}</span>
+        {% endif %}
+    </h2>
+    <h2>
+        Core mono repo splitting and tagging to sub repos
+    </h2>
+    <p>
+        All core extensions are handled in monolithic repository at
+        <a href="https://git.typo3.org/Packages/TYPO3.CMS.git">git.typo3.org</a>, which is mirrored
+        to <a href="https://github.com/TYPO3/TYPO3.CMS">github</a>.
+        To base a project on only a sub set of core extensions, this mono repo is split to single
+        repositories per extension, which are then packaged for use via composer on
+        <a href="https://packagist.org/?query=typo3%2Fcms-">packagist.org</a>.
+    </p>
+    <p>
+        The split and tag actions themselves are performed through a rabbit queue
+        with one worker to have them decoupled from web requests.
+    </p>
+    <p>
+        This split operation can be triggered manually, and pushing tags from
+        the mono repo to the single repos can be triggered, too. Note these
+        steps are usually triggered via hooks on github and don't need to be triggered
+        manually here.
+    </p>
+    <h2>
+        Trigger core split
+    </h2>
+    {#
+    {{ form_start(splitCoreSplit) }}
+        {{ form_errors(splitCoreSplit) }}
+        {{ form_widget(splitCoreSplit.master) }}
+        {{ form_widget(splitCoreSplit.TYPO3_8_7) }}
+    {{ form_end(splitCoreSplit, {'render_rest': false}) }}
+    #}
+{% endblock %}

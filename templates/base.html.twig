@@ -23,7 +23,10 @@
                         <a href="{{ path('admin_index') }}" {% if active == 'home' %}class="active"{% endif %}>Home</a>
                     </li>
                     <li>
-                        <a href="{{ path('admin_bamboo') }}" {% if active == 'bamboo' %}class="active"{% endif %}>Bamboo</a>
+                        <a href="{{ path('admin_bamboo_core') }}" {% if active == 'bambooCore' %}class="active"{% endif %}>Bamboo Core</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('admin_split_core') }}" {% if active == 'splitCore' %}class="active"{% endif %}>Split Core</a>
                     </li>
                 </ul>
             </div>

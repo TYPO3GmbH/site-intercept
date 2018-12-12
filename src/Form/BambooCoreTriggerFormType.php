@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  * Form class represents a form to trigger core bamboo builds
  * with specific patch sets.
  */
-class BambooTriggerFormType extends AbstractType
+class BambooCoreTriggerFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

@@ -1,14 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% set active = 'bamboo' %}
+{% set active = 'bambooCore' %}
 
-{% block title %}Bamboo{% endblock %}
+{% block title %}Bamboo Core{% endblock %}
 
 {% block headline %}
     <h1>Trigger bamboo builds</h1>
 {% endblock %}
 
-{# flash messages an this page are NOT escaped !#}
+{# flash messages on this page are NOT escaped !#}
 {% block flashMessages %}
     {% for label, messages in app.flashes %}
         {% for message in messages %}

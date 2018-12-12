@@ -7,7 +7,6 @@ eight_points_guzzle:
 
     clients:
         bamboo:
-            # Write here the host where to do requests
             base_url: "https://bamboo.typo3.com/rest/api/"
             class: App\Client\BambooClient
         gerrit:
@@ -15,3 +14,6 @@ eight_points_guzzle:
             class: App\Client\GerritClient
         general:
             class: App\Client\GeneralClient
+        rabbitManagement:
+            base_url: '%env(RABBITMQ_MANAGEMENT)%'
+            class: App\Client\RabbitManagementClient

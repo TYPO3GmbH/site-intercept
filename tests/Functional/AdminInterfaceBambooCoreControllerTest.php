@@ -8,26 +8,15 @@ use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class AdminInterfaceControllerTest extends WebTestCase
+class AdminInterfaceBambooCoreControllerTest extends WebTestCase
 {
-    /**
-     * @test
-     */
-    public function indexPageIsRendered()
-    {
-        $client = static::createClient();
-        $client->request('GET', '/admin');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Intercept web admin interface/', $client->getResponse()->getContent());
-    }
-
     /**
      * @test
      */
     public function bambooCoreFormIsRendered()
     {
         $client = static::createClient();
-        $client->request('GET', '/admin/bamboo');
+        $client->request('GET', '/admin/bamboo/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Trigger bamboo builds/', $client->getResponse()->getContent());
     }
@@ -40,7 +29,7 @@ class AdminInterfaceControllerTest extends WebTestCase
         // Bamboo client double for the first request
         TestDoubleBundle::addProphecy('App\Client\BambooClient', $this->prophesize(BambooClient::class));
         $client = static::createClient();
-        $crawler = $client->request('GET', '/admin/bamboo');
+        $crawler = $client->request('GET', '/admin/bamboo/core');
 
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -51,8 +40,8 @@ class AdminInterfaceControllerTest extends WebTestCase
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger master')->form();
-        $form['bamboo_trigger_form[change]'] = '58920';
-        $form['bamboo_trigger_form[set]'] = 3;
+        $form['bamboo_core_trigger_form[change]'] = '58920';
+        $form['bamboo_core_trigger_form[set]'] = 3;
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
@@ -67,7 +56,7 @@ class AdminInterfaceControllerTest extends WebTestCase
         // Bamboo client double for the first request
         TestDoubleBundle::addProphecy('App\Client\BambooClient', $this->prophesize(BambooClient::class));
         $client = static::createClient();
-        $crawler = $client->request('GET', '/admin/bamboo');
+        $crawler = $client->request('GET', '/admin/bamboo/core');
 
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -79,8 +68,8 @@ class AdminInterfaceControllerTest extends WebTestCase
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger master')->form();
-        $form['bamboo_trigger_form[change]'] = '58920';
-        $form['bamboo_trigger_form[set]'] = 3;
+        $form['bamboo_core_trigger_form[change]'] = '58920';
+        $form['bamboo_core_trigger_form[set]'] = 3;
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
@@ -94,7 +83,7 @@ class AdminInterfaceControllerTest extends WebTestCase
         // Bamboo client double for the first request
         TestDoubleBundle::addProphecy('App\Client\BambooClient', $this->prophesize(BambooClient::class));
         $client = static::createClient();
-        $crawler = $client->request('GET', '/admin/bamboo');
+        $crawler = $client->request('GET', '/admin/bamboo/core');
 
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -105,8 +94,8 @@ class AdminInterfaceControllerTest extends WebTestCase
 
         $form = $crawler->selectButton('Trigger master')->form();
         // Empty change is not allowed
-        $form['bamboo_trigger_form[change]'] = '';
-        $form['bamboo_trigger_form[set]'] = 3;
+        $form['bamboo_core_trigger_form[change]'] = '';
+        $form['bamboo_core_trigger_form[set]'] = 3;
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Could not determine a changeId/', $client->getResponse()->getContent());

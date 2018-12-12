@@ -25,6 +25,7 @@ services:
     App\Client\BambooClient: '@eight_points_guzzle.client.bamboo'
     App\Client\GerritClient: '@eight_points_guzzle.client.gerrit'
     App\Client\GeneralClient: '@eight_points_guzzle.client.general'
+    App\Client\RabbitManagementClient: '@eight_points_guzzle.client.rabbitManagement'
 
     App\Client\ForgeClient:
         class: App\Client\ForgeClient
@@ -79,6 +80,11 @@ services:
             $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
             $coreSplitService: '@App\Service\CoreSplitService'
             $rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
+
+    App\Service\RabbitStatusService:
+        class: App\Service\RabbitStatusService
+        arguments:
+            $client: '@App\Client\RabbitManagementClient'
 
     PhpAmqpLib\Connection\AMQPStreamConnection:
         class: PhpAmqpLib\Connection\AMQPStreamConnection
