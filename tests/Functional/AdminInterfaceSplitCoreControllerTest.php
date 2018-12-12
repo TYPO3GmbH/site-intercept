@@ -130,7 +130,7 @@ class AdminInterfaceSplitCoreControllerTest extends WebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
-        // The branch is shown
+        // The tag is shown
         $this->assertRegExp(
             '/Triggered tag job with tag &quot;v9.5.1&quot;/',
             $client->getResponse()->getContent()
