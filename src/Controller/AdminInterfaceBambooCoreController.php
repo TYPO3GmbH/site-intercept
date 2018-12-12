@@ -15,6 +15,7 @@ use App\Extractor\GerritToBambooCore;
 use App\Form\BambooCoreTriggerFormType;
 use App\Service\BambooService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,9 +33,26 @@ class AdminInterfaceBambooCoreController extends AbstractController
      */
     public function index(Request $request, BambooService $bambooService): Response
     {
-        $form = $this->createForm(BambooCoreTriggerFormType::class);
+        $patchForm = $this->createForm(BambooCoreTriggerFormType::class);
+        $patchForm->handleRequest($request);
+        $this->handlePatchForm($patchForm, $bambooService);
 
-        $form->handleRequest($request);
+        return $this->render(
+            'bambooCore.html.twig',
+            [
+                'bambooForm' => $patchForm->createView()
+            ]
+        );
+    }
+
+    /**
+     * Handle form submit for change and patch number
+     *
+     * @param FormInterface $form
+     * @param BambooService $bambooService
+     */
+    private function handlePatchForm(FormInterface $form, BambooService $bambooService): void
+    {
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
             try {
@@ -65,12 +83,5 @@ class AdminInterfaceBambooCoreController extends AbstractController
                 $this->addFlash('danger', $e->getMessage());
             }
         }
-
-        return $this->render(
-            'bambooCore.html.twig',
-            [
-                'bambooForm' => $form->createView()
-            ]
-        );
     }
 }
