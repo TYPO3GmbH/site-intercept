@@ -10,7 +10,7 @@ eight_points_guzzle:
             base_url: "https://bamboo.typo3.com/rest/api/"
             class: App\Client\BambooClient
         gerrit:
-            base_url: "https://review.typo3.org/a/"
+            base_url: "https://review.typo3.org/"
             class: App\Client\GerritClient
         general:
             class: App\Client\GeneralClient

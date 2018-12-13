@@ -12,7 +12,10 @@ namespace App\Service;
 
 use App\Client\GerritClient;
 use App\Creator\GerritBuildStatusMessage;
+use App\Exception\DoNotCareException;
 use App\Extractor\BambooBuildStatus;
+use App\Extractor\GerritToBambooCore;
+use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -45,7 +48,7 @@ class GerritService
      */
     public function voteOnGerrit(BambooBuildStatus $buildInformation, GerritBuildStatusMessage $message): ResponseInterface
     {
-        $apiPath = 'changes/' . $buildInformation->change
+        $apiPath = 'a/changes/' . $buildInformation->change
             . '/revisions/' . $buildInformation->patchSet
             . '/review';
 
@@ -58,6 +61,53 @@ class GerritService
             ]
         ];
         return $this->sendGerritPost($apiPath, $postFields);
+    }
+
+    /**
+     * Get details of a change from gerrit to determine branch and patch set.
+     *
+     * @param int $changeId
+     * @param int|null $patchSet
+     * @return GerritToBambooCore
+     * @throws DoNotCareException
+     */
+    public function getChangeDetails(int $changeId, ?int $patchSet): GerritToBambooCore
+    {
+        if (empty($patchSet)) {
+            // Fetch latest revision only
+            $apiPath = 'changes/' . $changeId . '?o=CURRENT_REVISION';
+        } else {
+            // Get all revisions to verify the given patch set actually exists
+            $apiPath = 'changes/' . $changeId . '?o=ALL_REVISIONS';
+        }
+        try {
+            $response = $this->client->get($apiPath);
+        } catch (ClientException $e) {
+            // Usually: 404, No such change ...
+            throw new DoNotCareException();
+        }
+        // gerrit responses prefix their json with ")]}'\n" which has to be removed first
+        $json = json_decode(str_replace(")]}'\n", '', (string)$response->getBody()), true);
+        if ($json['project'] !== 'Packages/TYPO3.CMS') {
+            throw new DoNotCareException();
+        }
+        $branch = $json['branch'];
+        if (empty($patchSet)) {
+            // Latest patch set number
+            $patchSet = (int)$json['revisions'][$json['current_revision']]['_number'];
+        } else {
+            $found = false;
+            foreach ($json['revisions'] as $revision) {
+                if ((int)$revision['_number'] === $patchSet) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                throw new DoNotCareException();
+            }
+        }
+        return new GerritToBambooCore((string)$changeId, $patchSet, $branch);
     }
 
     /**
