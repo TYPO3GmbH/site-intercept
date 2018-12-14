@@ -51,9 +51,10 @@
                 </div>
             </div>
             {{ form_widget(patchForm.master) }}
+            {{ form_widget(patchForm.TYPO3_9_5) }}
             {{ form_widget(patchForm.TYPO3_8_7) }}
-            {{ form_widget(patchForm.TYPO3_7_6) }}
             {{ form_widget(patchForm.nightlyMaster) }}
+            {{ form_widget(patchForm.nightly9_5) }}
             {{ form_widget(patchForm.nightly8_7) }}
         {{ form_end(patchForm, {'render_rest': false}) }}
     </p>
