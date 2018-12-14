@@ -135,6 +135,10 @@ class GithubPushEventForCore
         if ($sourceBranch === 'TYPO3_8_7') {
             $sourceBranch = 'TYPO3_8-7';
         }
+        // @todo: Improve this to handle 10_1, 11_42 and similar
+        if ($sourceBranch === 'TYPO3_9_5') {
+            $sourceBranch = '9.5';
+        }
         return $sourceBranch;
     }
 

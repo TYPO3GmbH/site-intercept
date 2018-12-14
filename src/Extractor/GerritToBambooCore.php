@@ -24,7 +24,7 @@ class GerritToBambooCore
      */
     private $branchToProjectKey = [
         'master' => 'CORE-GTC',
-        'TYPO3_9-5' => 'CORE-GTC95',
+        '9.5' => 'CORE-GTC95',
         'TYPO3_9_5' => 'CORE-GTC95',
         'TYPO3_8-7' => 'CORE-GTC87',
         'TYPO3_8_7' => 'CORE-GTC87',
