@@ -6,7 +6,7 @@ use App\Extractor\GithubPushEventForCore;
 use App\Service\CoreSplitService;
 use PHPUnit\Framework\TestCase;
 
-class BambooPostBuildControllerTest extends TestCase
+class CoreSplitServiceTest extends TestCase
 {
     /**
      * How to test:
