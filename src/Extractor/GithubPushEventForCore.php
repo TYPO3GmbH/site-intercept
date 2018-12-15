@@ -11,8 +11,8 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\DoNotCareException;
+use App\Utility\BranchUtility;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Extract information from a github push event hook
@@ -66,7 +66,7 @@ class GithubPushEventForCore
             if ($this->isPushedPatch($fullPullRequestInformation)) {
                 $this->type = self::TYPE_PATCH;
                 $this->sourceBranch = $this->getSourceBranch($fullPullRequestInformation['ref']);
-                $this->targetBranch = $this->getTargetBranch($this->sourceBranch);
+                $this->targetBranch = BranchUtility::resolveCoreSplitBranch($this->sourceBranch);
             } elseif ($this->isPushedTag($fullPullRequestInformation)) {
                 $this->type = self::TYPE_TAG;
                 $this->tag = $this->getTag($fullPullRequestInformation['ref']);
@@ -131,34 +131,6 @@ class GithubPushEventForCore
         if (empty($sourceBranch)) {
             throw new DoNotCareException();
         }
-        // Rewrite TYPO3_8_7 to TYPO3_8-7
-        if ($sourceBranch === 'TYPO3_8_7') {
-            $sourceBranch = 'TYPO3_8-7';
-        }
-        // @todo: Improve this to handle 10_1, 11_42 and similar
-        if ($sourceBranch === 'TYPO3_9_5') {
-            $sourceBranch = '9.5';
-        }
-        return $sourceBranch;
-    }
-
-    /**
-     * Translate source branch of main git TYPO3.CMS repo to target branch name on split repos.
-     *
-     * @param string Source branch name
-     * @return string Target branch name
-     * @throws DoNotCareException
-     */
-    private function getTargetBranch(string $sourceBranch): string
-    {
-        if ($sourceBranch === 'master') {
-            return $sourceBranch;
-        } elseif ($sourceBranch === 'TYPO3_8-7') {
-            return '8.7';
-        } elseif (preg_match('/[0-9]+\.[0-9]+/', $sourceBranch)) {
-            return $sourceBranch;
-        } else {
-            throw new DoNotCareException();
-        }
+        return BranchUtility::resolveCoreMonoRepoBranch($sourceBranch);
     }
 }

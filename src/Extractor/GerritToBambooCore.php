@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\DoNotCareException;
+use App\Utility\BranchUtility;
 
 /**
  * Extract information from a gerrit push event hook
@@ -19,22 +20,6 @@ use App\Exception\DoNotCareException;
  */
 class GerritToBambooCore
 {
-    /**
-     * @var array Map gerrit branches to bamboo plan keys
-     */
-    private $branchToProjectKey = [
-        'master' => 'CORE-GTC',
-        '9.5' => 'CORE-GTC95',
-        'TYPO3_9_5' => 'CORE-GTC95',
-        'TYPO3_8-7' => 'CORE-GTC87',
-        'TYPO3_8_7' => 'CORE-GTC87',
-        'TYPO3_7-6' => 'CORE-GTC76',
-        'TYPO3_7_6' => 'CORE-GTC76',
-        'nightlyMaster' => 'CORE-GTN',
-        'nightly9_5' => 'CORE-GTN95',
-        'nightly8_7' => 'CORE-GTN87',
-    ];
-
     /**
      * @var int Resolved change number, eg. 48574
      */
@@ -55,9 +40,8 @@ class GerritToBambooCore
      *
      * @param string $change Something like '48574' or 'https://review.typo3.org/48574/' or 'https://review.typo3.org/#/c/48574/11'
      * @param int $set Patch set, eg 5
-     * @param string $branch 'master' or 'TYPO3_8-7' or ''TYPO3_87' or 'nightly87', see $branchToProjectKey
+     * @param string $branch 'master' or 'TYPO3_8-7' or 'branch8_7' or 'nightly9_5', see utility tests
      * @throws DoNotCareException
-     * @throws \RuntimeException
      */
     public function __construct(string $change, int $set, string $branch)
     {
@@ -72,9 +56,6 @@ class GerritToBambooCore
         if (empty($this->patchSet)) {
             throw new DoNotCareException('Could not determine a patch set from "' . $set . '"');
         }
-        if (!array_key_exists($branch, $this->branchToProjectKey)) {
-            throw new DoNotCareException('Did not find bamboo project for branch key "' . $branch . '"');
-        }
-        $this->bambooProject = $this->branchToProjectKey[$branch];
+        $this->bambooProject = BranchUtility::resolveBambooProjectKey($branch);
     }
 }
