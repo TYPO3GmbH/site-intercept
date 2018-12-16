@@ -31,6 +31,11 @@ class GerritToBambooCore
     public $patchSet;
 
     /**
+     * @var string Core branch, eg. 'TYPO3_8-7' or '9.5'
+     */
+    public $branch;
+
+    /**
      * @var string The bamboo project that relates to given core pre-merge branch
      */
     public $bambooProject;
@@ -56,6 +61,7 @@ class GerritToBambooCore
         if (empty($this->patchSet)) {
             throw new DoNotCareException('Could not determine a patch set from "' . $set . '"');
         }
+        $this->branch = BranchUtility::resolveCoreMonoRepoBranch($branch);
         $this->bambooProject = BranchUtility::resolveBambooProjectKey($branch);
     }
 }

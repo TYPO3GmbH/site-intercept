@@ -18,6 +18,7 @@ use App\Form\BambooCoreTriggerFormType;
 use App\Service\BambooService;
 use App\Service\GerritService;
 use App\Service\GraylogService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,15 +31,29 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminInterfaceBambooCoreController extends AbstractController
 {
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @Route("/admin/bamboo/core", name="admin_bamboo_core")
      * @param Request $request
+     * @param LoggerInterface $logger
      * @param BambooService $bambooService
      * @param GerritService $gerritService
      * @param GraylogService $graylogService
      * @return Response
      */
-    public function index(Request $request, BambooService $bambooService, GerritService $gerritService, GraylogService $graylogService): Response
+    public function index(
+        Request $request,
+        LoggerInterface $logger,
+        BambooService $bambooService,
+        GerritService $gerritService,
+        GraylogService $graylogService
+    ): Response
     {
+        $this->logger = $logger;
+
         $patchForm = $this->createForm(BambooCoreTriggerFormType::class);
         $patchForm->handleRequest($request);
         $this->handlePatchForm($patchForm, $bambooService);
@@ -125,6 +140,20 @@ class AdminInterfaceBambooCoreController extends AbstractController
                         . ' of change "' . $bambooData->changeId . '"'
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'
+                    );
+                    $this->logger->info(
+                        'Triggered bamboo core build "' . $bambooTriggered->buildResultKey . '"'
+                        . ' for change "' . $bambooData->changeId . '"'
+                        . ' with patch set "' . $bambooData->patchSet . '"'
+                        . ' on branch "' . $bambooData->branch . '".',
+                        [
+                            'type' => 'triggerBamboo',
+                            'change' => $bambooData->changeId,
+                            'patch' => $bambooData->patchSet,
+                            'branch' => $bambooData->branch,
+                            'bambooKey' => $bambooTriggered->buildResultKey,
+                            'triggeredBy' => 'interface',
+                        ]
                     );
                 } else {
                     $this->addFlash(

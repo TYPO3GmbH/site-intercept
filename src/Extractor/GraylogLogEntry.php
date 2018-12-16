@@ -78,6 +78,9 @@ class GraylogLogEntry
         if (!isset($entry['ctxt_type']) || !isset($entry['level']) || !isset($entry['env']) || !isset($entry['message'])) {
             throw new \RuntimeException('Need env, level, ctxt_type, message to parse');
         }
+        if (isset($entry['ctxt_triggeredBy']) && ($entry['ctxt_triggeredBy'] !== 'api' && $entry['ctxt_triggeredBy'] !== 'interface')) {
+            throw new \RuntimeException('ctxt_triggeredBy must be either "api" or "interface", ' . $entry['ctxt_triggeredBy'] . ' given.');
+        }
         $this->type = $entry['ctxt_type'];
         $this->env = $entry['env'];
         $this->level = (int)$entry['level'];
