@@ -40,9 +40,6 @@ class BambooPostBuildController extends AbstractController
      */
     public function index(Request $request, BambooService $bambooService, GerritService $gerritService, SlackService $slackService, LoggerInterface $logger): Response
     {
-        // temp hack
-        $logger->info($request->request->get('payload'));
-
         $bambooSlack = new BambooSlackMessage($request);
         $buildDetails = $bambooService->getBuildStatus($bambooSlack);
 

@@ -45,7 +45,7 @@ class GraylogService
     public function getRecentBambooTriggerLogs(): array
     {
         $query = urlencode(
-            'application:intercept AND ctxt_type:triggerBamboo AND level:6 AND env:prod'
+            'application:intercept AND level:6 AND env:prod AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit)'
         );
         try {
             $response = $this->client->get(
