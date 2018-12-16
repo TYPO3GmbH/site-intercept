@@ -17,6 +17,7 @@ use App\Form\BambooCoreByUrlTriggerFormType;
 use App\Form\BambooCoreTriggerFormType;
 use App\Service\BambooService;
 use App\Service\GerritService;
+use App\Service\GraylogService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,9 +34,10 @@ class AdminInterfaceBambooCoreController extends AbstractController
      * @param Request $request
      * @param BambooService $bambooService
      * @param GerritService $gerritService
+     * @param GraylogService $graylogService
      * @return Response
      */
-    public function index(Request $request, BambooService $bambooService, GerritService $gerritService): Response
+    public function index(Request $request, BambooService $bambooService, GerritService $gerritService, GraylogService $graylogService): Response
     {
         $patchForm = $this->createForm(BambooCoreTriggerFormType::class);
         $patchForm->handleRequest($request);
@@ -45,11 +47,14 @@ class AdminInterfaceBambooCoreController extends AbstractController
         $urlForm->handleRequest($request);
         $this->handleUrlForm($urlForm, $bambooService, $gerritService);
 
+        $recentLogsMessages = $graylogService->getRecentBambooTriggerLogs();
+
         return $this->render(
             'bambooCore.html.twig',
             [
                 'patchForm' => $patchForm->createView(),
                 'urlForm' => $urlForm->createView(),
+                'logMessages' => $recentLogsMessages,
             ]
         );
     }

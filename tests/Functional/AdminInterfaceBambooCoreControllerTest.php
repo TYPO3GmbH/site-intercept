@@ -5,7 +5,9 @@ namespace App\Tests\Functional;
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
 use App\Client\GerritClient;
+use App\Client\GraylogClient;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
@@ -13,6 +15,67 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AdminInterfaceBambooCoreControllerTest extends WebTestCase
 {
+    /**
+     * @test
+     */
+    public function recentLogMessagesAreRendered()
+    {
+        $graylogClientProphecy = $this->prophesize(GraylogClient::class);
+        TestDoubleBundle::addProphecy(GraylogClient::class, $graylogClientProphecy);
+        $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
+            new Response(200, [], json_encode([
+                'messages' => [
+                    0 => [
+                        'message' => [
+                            'application' => 'intercept',
+                            'ctxt_type' => 'triggerBamboo',
+                            'env' => 'prod',
+                            'level' => 6,
+                            'message' => 'my message',
+                            'ctxt_branch' => 'master',
+                            'ctxt_change' => 12345,
+                            'ctxt_patch' => 2,
+                        ]
+                    ]
+                ]
+            ]))
+        );
+
+        $client = static::createClient();
+        $client->request('GET', '/admin/bamboo/core');
+        $this->assertRegExp('/my message/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function renderingWorksIfGraylogThrows()
+    {
+        $graylogClientProphecy = $this->prophesize(GraylogClient::class);
+        TestDoubleBundle::addProphecy(GraylogClient::class, $graylogClientProphecy);
+        $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willThrow(
+            new ClientException('testing', new Request('GET', ''))
+        );
+
+        $client = static::createClient();
+        $client->request('GET', '/admin/bamboo/core');
+    }
+
+    /**
+     * @test
+     */
+    public function renderingWorksIfCanNotConnectGraylog()
+    {
+        $graylogClientProphecy = $this->prophesize(GraylogClient::class);
+        TestDoubleBundle::addProphecy(GraylogClient::class, $graylogClientProphecy);
+        $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willThrow(
+            new ConnectException('testing', new Request('GET', ''))
+        );
+
+        $client = static::createClient();
+        $client->request('GET', '/admin/bamboo/core');
+    }
+
     /**
      * @test
      */

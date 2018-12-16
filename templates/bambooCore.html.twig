@@ -82,4 +82,14 @@
             </div>
         {{ form_end(urlForm, {'render_rest': false}) }}
     </p>
+
+    <h2>
+        Recent actions
+    </h2>
+    {% for log in logMessages %}
+        <div class="alert alert-info">
+            {{ log.message }}
+        </div>
+    {% endfor %}
+
 {% endblock %}

@@ -35,6 +35,12 @@ class SlackService
         $this->client = $client;
     }
 
+    /**
+     * Send a nightly build status message to slack
+     *
+     * @param SlackCoreNightlyBuildMessage $message
+     * @return ResponseInterface
+     */
     public function sendNightlyBuildMessage(SlackCoreNightlyBuildMessage $message): ResponseInterface
     {
         $response = $this->client->post(
