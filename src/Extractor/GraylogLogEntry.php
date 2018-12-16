@@ -21,6 +21,11 @@ class GraylogLogEntry
     public $type;
 
     /**
+     * @var \DateTime
+     */
+    public $time;
+
+    /**
      * @var string environment, eg. 'prod'
      */
     public $env;
@@ -75,13 +80,14 @@ class GraylogLogEntry
         if (!isset($entry['application']) || $entry['application'] !== 'intercept') {
             throw new \RuntimeException('Will not parse a non-intercept log entry');
         }
-        if (!isset($entry['ctxt_type']) || !isset($entry['level']) || !isset($entry['env']) || !isset($entry['message'])) {
-            throw new \RuntimeException('Need env, level, ctxt_type, message to parse');
+        if (!isset($entry['ctxt_type']) || !isset($entry['level']) || !isset($entry['env']) || !isset($entry['message']) || !isset($entry['timestamp'])) {
+            throw new \RuntimeException('Need env, level, ctxt_type, message, timestamp to parse');
         }
         if (isset($entry['ctxt_triggeredBy']) && ($entry['ctxt_triggeredBy'] !== 'api' && $entry['ctxt_triggeredBy'] !== 'interface')) {
             throw new \RuntimeException('ctxt_triggeredBy must be either "api" or "interface", ' . $entry['ctxt_triggeredBy'] . ' given.');
         }
         $this->type = $entry['ctxt_type'];
+        $this->time = new \DateTime($entry['timestamp']);
         $this->env = $entry['env'];
         $this->level = (int)$entry['level'];
         $this->message = $entry['message'];

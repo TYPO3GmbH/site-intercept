@@ -16,6 +16,7 @@ class GraylogLogEntryTest extends TestCase
         $entry = new GraylogLogEntry([
             'application' => 'intercept',
             'ctxt_type' => 'triggerBamboo',
+            'timestamp' => '2018-12-16T22:07:04.815Z',
             'env' => 'prod',
             'level' => 6,
             'message' => 'my message',
@@ -36,6 +37,7 @@ class GraylogLogEntryTest extends TestCase
         $this->assertSame('CORE-GTC-1234', $entry->bambooKey);
         $this->assertSame('-1', $entry->vote);
         $this->assertSame('interface', $entry->triggeredBy);
+        $this->assertSame('22', $entry->time->format('H'));
     }
 
     public function constructorThrowsOnMissingDataDataProvider()
@@ -46,12 +48,14 @@ class GraylogLogEntryTest extends TestCase
             ],
             'application missing' => [[
                 'ctxt_type' => 'triggerBamboo',
+                'timestamp' => '2018-12-16T22:07:04.815Z',
                 'env' => 'prod',
                 'level' => 6,
                 'message' => 'my message',
             ]],
             'triggeredBy wrong' => [[
                 'ctxt_type' => 'triggerBamboo',
+                'timestamp' => '2018-12-16T22:07:04.815Z',
                 'ctxt_triggeredBy' => 'wrong trigger',
                 'application' => 'intercept',
                 'env' => 'prod',
@@ -61,6 +65,15 @@ class GraylogLogEntryTest extends TestCase
             'application wrong' => [[
                 'application' => 'not intercept',
                 'ctxt_type' => 'triggerBamboo',
+                'timestamp' => '2018-12-16T22:07:04.815Z',
+                'ctxt_triggeredBy' => 'api',
+                'env' => 'prod',
+                'level' => 6,
+                'message' => 'my message',
+            ]],
+            'timestamp missing' => [[
+                'application' => 'intercept',
+                'ctxt_type' => 'triggerBamboo',
                 'ctxt_triggeredBy' => 'api',
                 'env' => 'prod',
                 'level' => 6,
@@ -68,6 +81,7 @@ class GraylogLogEntryTest extends TestCase
             ]],
             'type missing' => [[
                 'application' => 'intercept',
+                'timestamp' => '2018-12-16T22:07:04.815Z',
                 'ctxt_triggeredBy' => 'api',
                 'env' => 'prod',
                 'level' => 6,
@@ -76,6 +90,7 @@ class GraylogLogEntryTest extends TestCase
             'env missing' => [[
                 'application' => 'intercept',
                 'ctxt_type' => 'triggerBamboo',
+                'timestamp' => '2018-12-16T22:07:04.815Z',
                 'ctxt_triggeredBy' => 'api',
                 'level' => 6,
                 'message' => 'my message',
@@ -83,6 +98,7 @@ class GraylogLogEntryTest extends TestCase
             'level missing' => [[
                 'application' => 'intercept',
                 'ctxt_type' => 'triggerBamboo',
+                'timestamp' => '2018-12-16T22:07:04.815Z',
                 'ctxt_triggeredBy' => 'api',
                 'env' => 'prod',
                 'message' => 'my message',
@@ -90,6 +106,7 @@ class GraylogLogEntryTest extends TestCase
             'message missing' => [[
                 'application' => 'intercept',
                 'ctxt_type' => 'triggerBamboo',
+                'timestamp' => '2018-12-16T22:07:04.815Z',
                 'ctxt_triggeredBy' => 'api',
                 'env' => 'prod',
                 'level' => 6,
