@@ -28,8 +28,6 @@ class GraylogService
     private $client;
 
     /**
-     * SlackService constructor.
-     *
      * @param GraylogClient $client
      */
     public function __construct(GraylogClient $client)
@@ -40,7 +38,7 @@ class GraylogService
     /**
      * Get a list of graylog bamboo trigger calls and gerrit votes
      *
-     * @return array
+     * @return GraylogLogEntry[]
      */
     public function getRecentBambooTriggersAndVotes(): array
     {
