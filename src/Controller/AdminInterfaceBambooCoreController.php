@@ -98,6 +98,20 @@ class AdminInterfaceBambooCoreController extends AbstractController
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'
                     );
+                    $this->logger->info(
+                        'Triggered bamboo core build "' . $bambooTriggered->buildResultKey . '"'
+                        . ' for change "' . $bambooData->changeId . '"'
+                        . ' with patch set "' . $bambooData->patchSet . '"'
+                        . ' on branch "' . $bambooData->branch . '".',
+                        [
+                            'type' => 'triggerBamboo',
+                            'change' => $bambooData->changeId,
+                            'patch' => $bambooData->patchSet,
+                            'branch' => $bambooData->branch,
+                            'bambooKey' => $bambooTriggered->buildResultKey,
+                            'triggeredBy' => 'interface',
+                        ]
+                    );
                 } else {
                     $this->addFlash(
                         'danger',
