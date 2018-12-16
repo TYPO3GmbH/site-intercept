@@ -17,3 +17,5 @@ eight_points_guzzle:
         rabbitManagement:
             base_url: '%env(RABBITMQ_MANAGEMENT)%'
             class: App\Client\RabbitManagementClient
+        slack:
+            class: App\Client\SlackClient

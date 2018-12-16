@@ -14,6 +14,7 @@ use App\Creator\GerritBuildStatusMessage;
 use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
 use App\Service\GerritService;
+use App\Service\SlackService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,14 +32,17 @@ class BambooPostBuildController extends AbstractController
      * @param Request $request
      * @param BambooService $bambooService
      * @param GerritService $gerritService
+     * @param SlackService $slackService
      * @return Response
      */
-    public function index(Request $request, BambooService $bambooService, GerritService $gerritService): Response
+    public function index(Request $request, BambooService $bambooService, GerritService $gerritService, SlackService $slackService): Response
     {
         $slackMessage = new BambooSlackMessage($request);
         $buildDetails = $bambooService->getBuildStatus($slackMessage);
 
-        if (!empty($buildDetails->change) && !empty($buildDetails->patchSet)) {
+        if ($slackMessage->isNightlyBuild) {
+
+        } elseif (!empty($buildDetails->change) && !empty($buildDetails->patchSet)) {
             // Vote on gerrit if this build has been triggered by a gerrit push
             $message = new GerritBuildStatusMessage($buildDetails);
             $gerritService->voteOnGerrit($buildDetails, $message);

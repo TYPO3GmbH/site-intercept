@@ -100,4 +100,20 @@ class BranchUtility
         }
         return $splitBranch;
     }
+
+    /**
+     * True if given bamboo plan key name is a core nightly build
+     *
+     * @param string $incomingPlanKey
+     * @return bool
+     */
+    public static function isBambooNightlyBuild(string $incomingPlanKey): bool
+    {
+        foreach (static::$branchToProjectKeys as $branch => $planKey) {
+            if (strpos($incomingPlanKey, $planKey . '-') === 0 && strpos($branch, 'nightly') === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

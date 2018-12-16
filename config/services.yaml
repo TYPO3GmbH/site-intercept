@@ -26,6 +26,7 @@ services:
     App\Client\GerritClient: '@eight_points_guzzle.client.gerrit'
     App\Client\GeneralClient: '@eight_points_guzzle.client.general'
     App\Client\RabbitManagementClient: '@eight_points_guzzle.client.rabbitManagement'
+    App\Client\SlackClient: '@eight_points_guzzle.client.slack'
 
     App\Client\ForgeClient:
         class: App\Client\ForgeClient

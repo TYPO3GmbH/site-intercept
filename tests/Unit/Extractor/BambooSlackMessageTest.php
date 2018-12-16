@@ -21,6 +21,22 @@ class BambooSlackMessageTest extends TestCase
         );
         $subject = new BambooSlackMessage($payload);
         $this->assertSame('T3G-AP-25', $subject->buildKey);
+        $this->assertFalse($subject->isNightlyBuild);
+    }
+
+    /**
+     * @test
+     */
+    public function constructorSetsNightlyBuildTrue()
+    {
+        $payload = new Request(
+            [],
+            [
+                'payload' => '"attachments":[{"color":"good","text":"<https://bamboo.typo3.com/browse/CORE-GTN-1234|"}'
+            ]
+        );
+        $subject = new BambooSlackMessage($payload);
+        $this->assertTrue($subject->isNightlyBuild);
     }
 
     /**

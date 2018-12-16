@@ -11,3 +11,6 @@ services:
     App\Client\RabbitManagementClient:
         tags:
             - testDouble
+    App\Client\SlackClient:
+        tags:
+            - testDouble

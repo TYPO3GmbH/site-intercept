@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Extractor;
 
+use App\Utility\BranchUtility;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -21,6 +22,11 @@ class BambooSlackMessage
      * @var string Project-Plan-BuildNumber, eg. 'CORE-GTC-30244'
      */
     public $buildKey;
+
+    /**
+     * @var bool True if plan key is a nightly build
+     */
+    public $isNightlyBuild;
 
     /**
      * Extract relevant information from a bamboo created slack message
@@ -36,6 +42,7 @@ class BambooSlackMessage
             preg_match('/<https:\/\/bamboo\.typo3\.com\/browse\/(?<buildKey>.*?)\|/', $payload, $matches)
         ) {
             $this->buildKey = $matches['buildKey'];
+            $this->isNightlyBuild = BranchUtility::isBambooNightlyBuild($matches['buildKey']);
         } else {
             throw new \InvalidArgumentException('Bamboo slack message could not be parsed.');
         }

@@ -187,4 +187,47 @@ class BranchUtilityTest extends TestCase
         $this->expectException(DoNotCareException::class);
         BranchUtility::resolveCoreSplitBranch($input);
     }
+
+    public function isBambooNightlyBuildDataProvider(): array
+    {
+        return [
+            'master nightly' => [
+                'CORE-GTN-1',
+                true
+            ],
+            '9.5 nightly' => [
+                'CORE-GTN95-42',
+                true
+            ],
+            '8.7 nightly' => [
+                'CORE-GTN87-23',
+                true
+            ],
+            'something' => [
+                'something',
+                false
+            ],
+            'master pre-merge' => [
+                'CORE-GTC-4711',
+                false
+            ],
+            '9.5 pre-merge' => [
+                'CORE-GTC95-42',
+                false
+            ],
+            '8.7 pre-merge' => [
+                'CORE-GTC87-23',
+                false
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider isBambooNightlyBuildDataProvider
+     */
+    public function isBambooNightlyBuild(string $key, bool $expected)
+    {
+        $this->assertSame($expected, BranchUtility::isBambooNightlyBuild($key));
+    }
 }
