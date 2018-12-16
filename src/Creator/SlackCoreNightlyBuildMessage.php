@@ -74,7 +74,7 @@ class SlackCoreNightlyBuildMessage implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        $failedOrSuccessful = self::BUILD_FAILED ? ' failed.' : ' successful.';
+        $failedOrSuccessful = $this->status === self::BUILD_FAILED ? ' failed.' : ' successful.';
         return [
             'channel' => getenv('SLACK_CHANNEL'),
             'username' => 'Bamboo Bernd',
