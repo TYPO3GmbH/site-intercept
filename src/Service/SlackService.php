@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Client\SlackClient;
+use App\Creator\SlackCoreNightlyBuildMessage;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 
@@ -34,20 +35,12 @@ class SlackService
         $this->client = $client;
     }
 
-    public function sendNightlyBuildMessage(): ResponseInterface
+    public function sendNightlyBuildMessage(SlackCoreNightlyBuildMessage $message): ResponseInterface
     {
         $response = $this->client->post(
             getenv('SLACK_HOOK'),
             [
-                RequestOptions::JSON => [
-                    'attachments' => [[
-                        'author_name' => 'Bamboo Bernd',
-                        'color' => '#a30000',
-                        'text' => 'Nobody expects it.',
-                        'title' => 'The spanish inquisition',
-                        //'text' => '<https://bamboo.typo3.com/browse/CORE-GTN95|Core › Core 9.5 nightly › #5> failed. 79319 passed. Scheduled',
-                    ]]
-                ]
+                RequestOptions::JSON => $message,
             ]
         );
         return $response;

@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Controller;
 
 use App\Creator\GerritBuildStatusMessage;
+use App\Creator\SlackCoreNightlyBuildMessage;
 use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
 use App\Service\GerritService;
@@ -39,12 +40,24 @@ class BambooPostBuildController extends AbstractController
      */
     public function index(Request $request, BambooService $bambooService, GerritService $gerritService, SlackService $slackService, LoggerInterface $logger): Response
     {
+        // temp hack
         $logger->info($request->request->get('payload'));
-        $slackMessage = new BambooSlackMessage($request);
-        $buildDetails = $bambooService->getBuildStatus($slackMessage);
 
-        if ($slackMessage->isNightlyBuild) {
+        $bambooSlack = new BambooSlackMessage($request);
+        $buildDetails = $bambooService->getBuildStatus($bambooSlack);
 
+        if ($bambooSlack->isNightlyBuild) {
+            // Send message to slack if a nightly build failed
+            if (!$buildDetails->success) {
+                $message = new SlackCoreNightlyBuildMessage(
+                    SlackCoreNightlyBuildMessage::BUILD_FAILED,
+                    $buildDetails->buildKey,
+                    $buildDetails->projectName,
+                    $buildDetails->planName,
+                    $buildDetails->buildNumber
+                );
+                $slackService->sendNightlyBuildMessage($message);
+            }
         } elseif (!empty($buildDetails->change) && !empty($buildDetails->patchSet)) {
             // Vote on gerrit if this build has been triggered by a gerrit push
             $message = new GerritBuildStatusMessage($buildDetails);

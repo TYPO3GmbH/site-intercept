@@ -27,6 +27,11 @@ class BambooBuildStatus
     public $patchSet;
 
     /**
+     * @var string build key, eg. 'CORE-GTC-30244'
+     */
+    public $buildKey;
+
+    /**
      * @var string build url, eg. 'https://bamboo.typo3.com/browse/CORE-GTC-30244
      */
     public $buildUrl;
@@ -52,6 +57,21 @@ class BambooBuildStatus
     public $buildDurationInSeconds;
 
     /**
+     * @var string Plan name, eg. 'Core master nightly'
+     */
+    public $planName;
+
+    /**
+     * @var string Project name, eg. 'Core'
+     */
+    public $projectName;
+
+    /**
+     * @var int Build number, eg. '42'
+     */
+    public $buildNumber;
+
+    /**
      * Extract information from a bamboo build status
      *
      * @param string $payload
@@ -72,10 +92,14 @@ class BambooBuildStatus
                 $this->patchSet = (int)$keyValue[1];
             }
         }
+        $this->buildKey = $response['buildResultKey'] ?? null;
         $this->buildUrl = 'https://bamboo.typo3.com/browse/' . $response['buildResultKey'] ?? '';
         $this->success = (bool)$response['successful'];
         $this->testSummary = $response['buildTestSummary'] ?? '';
         $this->prettyBuildCompletedTime = $response['prettyBuildCompletedTime'];
         $this->buildDurationInSeconds = (int)$response['buildDurationInSeconds'];
+        $this->planName = $response['planName'] ?? null;
+        $this->projectName = $response['projectName'] ?? null;
+        $this->buildNumber = $response['buildNumber'] ?? null;
     }
 }

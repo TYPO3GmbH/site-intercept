@@ -21,6 +21,10 @@ class BambooBuildStatusTest extends TestCase
         $this->assertSame('6 passed', $subject->testSummary);
         $this->assertSame('Sat, 18 Jun, 06:59 PM', $subject->prettyBuildCompletedTime);
         $this->assertSame(21, $subject->buildDurationInSeconds);
+        $this->assertSame('Apparel', $subject->planName);
+        $this->assertSame('T3G', $subject->projectName);
+        $this->assertSame(25, $subject->buildNumber);
+        $this->assertSame('T3G-AP-25', $subject->buildKey);
     }
 
     /**
