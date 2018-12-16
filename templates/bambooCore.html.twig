@@ -130,9 +130,9 @@
                 | <span>Bamboo key: {{ log.bambooKey }}</span>
             {% endif %}
             {% if log.triggeredBy == 'api' %}
-                | <span>Triggered by: API</span>
+                | <span>Trigger: API</span>
             {% elseif log.triggeredBy == 'interface' %}
-                | <span>Triggered by: Web interface</span>
+                | <span>Trigger: Web</span>
             {% endif %}
         </div>
     {% endfor %}
