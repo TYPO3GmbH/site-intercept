@@ -109,7 +109,7 @@
             {% elseif log.type == 'triggerBamboo' and log.bambooKey != '' %}
                 <span>
                     <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a>
-                    by
+                    for
                     <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">gerrit patch</a>
                 </span>
             {% endif %}
