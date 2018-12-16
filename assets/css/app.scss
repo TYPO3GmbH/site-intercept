@@ -26,9 +26,16 @@ body {
 
 #top-wrapper {
   background-color: black;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1020;
 }
 
 #main-wrapper {
+  padding-top: 3.5rem;
+
   @include transition();
 
   &.toggled {
