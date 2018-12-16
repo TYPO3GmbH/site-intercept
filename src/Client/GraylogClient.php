@@ -15,6 +15,6 @@ use GuzzleHttp\Client;
 /**
  * Guzzle client executing graylog API calls for log display in web interface
  */
-class BambooClient extends Client
+class GraylogClient extends Client
 {
 }
