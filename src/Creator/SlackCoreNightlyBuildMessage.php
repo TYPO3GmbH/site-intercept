@@ -79,13 +79,15 @@ class SlackCoreNightlyBuildMessage implements \JsonSerializable
             'channel' => getenv('SLACK_CHANNEL'),
             'username' => 'Bamboo Bernd',
             'attachments' => [
-                'color' => $this->status === self::BUILD_FAILED ? 'danger' : 'good',
-                'text' => '<https://bamboo.typo3.com/browse/' . $this->buildKey
-                    . '|' . $this->projectName
-                    . ' › ' . $this->planName
-                    . ' › #' . $this->buildNumber . '>'
-                    . $failedOrSuccessful,
-                'fallback' => $this->projectName . ' › ' . $this->planName . ' › #' . $this->buildNumber . $failedOrSuccessful,
+                [
+                    'color' => $this->status === self::BUILD_FAILED ? 'danger' : 'good',
+                    'text' => '<https://bamboo.typo3.com/browse/' . $this->buildKey
+                        . '|' . $this->projectName
+                        . ' › ' . $this->planName
+                        . ' › #' . $this->buildNumber . '>'
+                        . $failedOrSuccessful,
+                    'fallback' => $this->projectName . ' › ' . $this->planName . ' › #' . $this->buildNumber . $failedOrSuccessful,
+                ]
             ],
         ];
     }
