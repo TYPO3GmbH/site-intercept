@@ -92,6 +92,8 @@
                 alert graylog-log
                 {% if log.vote == '-1' %}
                     alert-warning
+                {% elseif log.vote == '+1' %}
+                    alert-success
                 {% else %}
                     alert-info
                 {% endif %}
