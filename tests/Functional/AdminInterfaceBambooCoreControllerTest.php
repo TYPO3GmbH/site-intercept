@@ -35,6 +35,10 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
                             'ctxt_branch' => 'master',
                             'ctxt_change' => 12345,
                             'ctxt_patch' => 2,
+                            'timestamp' => '2018-12-16T22:07:04.815Z',
+                            'ctxt_bambooKey' => 'CORE-GTC-1234',
+                            'ctxt_vote' => '-1',
+                            'ctxt_triggeredBy' => 'interface',
                         ]
                     ]
                 ]
