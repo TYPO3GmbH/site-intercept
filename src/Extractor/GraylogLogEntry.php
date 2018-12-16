@@ -58,7 +58,7 @@ class GraylogLogEntry
     /**
      * @var bool Optionally set if this has been a 'vote on gerrit' log entry
      */
-    public $success;
+    public $vote;
 
     /**
      * Extract information from a graylog log entry
@@ -82,6 +82,6 @@ class GraylogLogEntry
         $this->change = (int)($entry['ctxt_change'] ?? 0);
         $this->patch = (int)($entry['ctxt_patch'] ?? 0);
         $this->bambooKey = $entry['ctxt_bambooKey'] ?? '';
-        $this->success = (bool)($entry['ctxt_success'] ?? true);
+        $this->vote = ($entry['ctxt_vote'] ?? '');
     }
 }

@@ -23,17 +23,17 @@ class GraylogLogEntryTest extends TestCase
             'ctxt_change' => 12345,
             'ctxt_patch' => 2,
             'ctxt_bambooKey' => 'CORE-GTC-1234',
-            'ctxt_success' => true,
+            'ctxt_vote' => '-1',
         ]);
-        $this->assertSame($entry->type, 'triggerBamboo');
-        $this->assertSame($entry->env, 'prod');
-        $this->assertSame($entry->level, 6);
-        $this->assertSame($entry->message, 'my message');
-        $this->assertSame($entry->branch, 'master');
-        $this->assertSame($entry->change, 12345);
-        $this->assertSame($entry->patch, 2);
-        $this->assertSame($entry->bambooKey, 'CORE-GTC-1234');
-        $this->assertTrue($entry->success);
+        $this->assertSame('triggerBamboo', $entry->type);
+        $this->assertSame('prod', $entry->env);
+        $this->assertSame(6, $entry->level);
+        $this->assertSame('my message', $entry->message);
+        $this->assertSame('master', $entry->branch);
+        $this->assertSame(12345, $entry->change);
+        $this->assertSame(2, $entry->patch);
+        $this->assertSame('CORE-GTC-1234', $entry->bambooKey);
+        $this->assertSame('-1', $entry->vote);
     }
 
     public function constructorThrowsOnMissingDataDataProvider()

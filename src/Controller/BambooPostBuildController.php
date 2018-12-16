@@ -59,8 +59,9 @@ class BambooPostBuildController extends AbstractController
             // Vote on gerrit if this build has been triggered by a gerrit push
             $message = new GerritBuildStatusMessage($buildDetails);
             $gerritService->voteOnGerrit($buildDetails, $message);
+            $vote = $buildDetails->success === true ? '+1' : '-1';
             $logger->info(
-                'Voted ' . ($buildDetails->success === true ? '+1' : '-1') . ' on gerrit'
+                'Voted ' . $vote . ' on gerrit'
                 . ' due to bamboo build "' . $buildDetails->buildKey . '"'
                 . ' for change "' . $buildDetails->change . '"'
                 . ' with patch set "' . $buildDetails->patchSet . '"',
@@ -69,7 +70,7 @@ class BambooPostBuildController extends AbstractController
                     'change' => $buildDetails->change,
                     'patch' => $buildDetails->patchSet,
                     'bambooKey' => $buildDetails->buildKey,
-                    'success' => $buildDetails->success,
+                    'vote' => $vote,
                 ]
             );
         }

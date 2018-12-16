@@ -90,10 +90,10 @@
         <div
             class="
                 alert
-                {% if log.success == true %}
-                    alert-info
-                {% else %}
+                {% if log.vote == '-1' %}
                     alert-warning
+                {% else %}
+                    alert-info
                 {% endif %}
             "
         >
