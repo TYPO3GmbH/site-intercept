@@ -36,6 +36,11 @@ class GraylogLogEntry
     public $level;
 
     /**
+     * @var string 'interface' if log entry has been triggered by users calling web interface, 'api' otherwise
+     */
+    public $triggeredBy;
+
+    /**
      * @var string Optionally set for specific types
      */
     public $branch;
@@ -83,5 +88,6 @@ class GraylogLogEntry
         $this->patch = (int)($entry['ctxt_patch'] ?? 0);
         $this->bambooKey = $entry['ctxt_bambooKey'] ?? '';
         $this->vote = ($entry['ctxt_vote'] ?? '');
+        $this->triggeredBy = $entry['ctxt_triggeredBy'] ?? '';
     }
 }
