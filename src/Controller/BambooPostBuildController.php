@@ -68,7 +68,8 @@ class BambooPostBuildController extends AbstractController
                     'type' => 'voteGerrit',
                     'change' => $buildDetails->change,
                     'patch' => $buildDetails->patchSet,
-                    'bambooResultKey' => $buildDetails->buildKey
+                    'bambooKey' => $buildDetails->buildKey,
+                    'success' => $buildDetails->success,
                 ]
             );
         }

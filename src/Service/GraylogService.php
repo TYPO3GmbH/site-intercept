@@ -38,11 +38,11 @@ class GraylogService
     }
 
     /**
-     * Get a list of graylog bamboo trigger calls
+     * Get a list of graylog bamboo trigger calls and gerrit votes
      *
      * @return array
      */
-    public function getRecentBambooTriggerLogs(): array
+    public function getRecentBambooTriggersAndVotes(): array
     {
         $query = urlencode(
             'application:intercept AND level:6 AND env:prod AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit)'

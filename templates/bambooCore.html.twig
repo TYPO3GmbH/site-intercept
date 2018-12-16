@@ -87,8 +87,32 @@
         Recent actions
     </h2>
     {% for log in logMessages %}
-        <div class="alert alert-info">
-            {{ log.message }}
+        <div
+            class="
+                alert
+                {% if log.success == true %}
+                    alert-info
+                {% else %}
+                    alert-warning
+                {% endif %}
+            "
+        >
+            {% if log.type == 'voteGerrit' %}
+                <span><a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Vote on gerrit</a></span>
+            {% elseif log.type == 'triggerBamboo' and log.bambooKey != '' %}
+                <span><a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a></span>
+            {% endif %}
+
+            {% if log.branch %}
+                | <span>Branch: {{ log.branch }}</span>
+            {% endif %}
+            {% if log.change %}
+                | <span>Change: {{ log.change }}</span>
+            {% endif %}
+            {% if log.patch %}
+                | <span>Patch: {{ log.patch }}</span>
+            {% endif %}
+            | <span>Message: {{ log.message }}</span>
         </div>
     {% endfor %}
 

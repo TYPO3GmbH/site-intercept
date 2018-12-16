@@ -47,7 +47,7 @@ class AdminInterfaceBambooCoreController extends AbstractController
         $urlForm->handleRequest($request);
         $this->handleUrlForm($urlForm, $bambooService, $gerritService);
 
-        $recentLogsMessages = $graylogService->getRecentBambooTriggerLogs();
+        $recentLogsMessages = $graylogService->getRecentBambooTriggersAndVotes();
 
         return $this->render(
             'bambooCore.html.twig',

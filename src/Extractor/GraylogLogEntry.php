@@ -36,19 +36,29 @@ class GraylogLogEntry
     public $level;
 
     /**
-     * @var string branch Optionally set for specific types
+     * @var string Optionally set for specific types
      */
     public $branch;
 
     /**
-     * @var int change Optionally set for specific types
+     * @var int Optionally set for specific types
      */
     public $change;
 
     /**
-     * @var int patch Optionally set for specific types
+     * @var int Optionally set for specific types
      */
     public $patch;
+
+    /**
+     * @var string Optionally set if this has been a 'triggerBamboo' log entry
+     */
+    public $bambooKey;
+
+    /**
+     * @var bool Optionally set if this has been a 'vote on gerrit' log entry
+     */
+    public $success;
 
     /**
      * Extract information from a graylog log entry
@@ -71,5 +81,7 @@ class GraylogLogEntry
         $this->branch = $entry['ctxt_branch'] ?? '';
         $this->change = (int)($entry['ctxt_change'] ?? 0);
         $this->patch = (int)($entry['ctxt_patch'] ?? 0);
+        $this->bambooKey = $entry['ctxt_bambooKey'] ?? '';
+        $this->success = (bool)($entry['ctxt_success'] ?? true);
     }
 }
