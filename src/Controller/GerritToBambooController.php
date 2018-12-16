@@ -13,6 +13,7 @@ namespace App\Controller;
 use App\Exception\DoNotCareException;
 use App\Extractor\GerritToBambooCore;
 use App\Service\BambooService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,18 +29,33 @@ class GerritToBambooController extends AbstractController
     /**
      * @Route("/gerrit", name="gerrit_to_bamboo")
      * @param Request $request
+     * @param LoggerInterface $logger
      * @param BambooService $bambooService
      * @return Response
      */
-    public function index(Request $request, BambooService $bambooService): Response
+    public function index(Request $request, LoggerInterface $logger, BambooService $bambooService): Response
     {
         try {
+            $branch = $request->get('branch');
             $bambooData = new GerritToBambooCore(
                 $request->get('changeUrl'),
                 (int)$request->get('patchset'),
-                $request->get('branch')
+                $branch
             );
-            $bambooService->triggerNewCoreBuild($bambooData);
+            $bambooBuild = $bambooService->triggerNewCoreBuild($bambooData);
+            $logger->info(
+                'Triggered bamboo core build "' . $bambooBuild->buildResultKey . '"'
+                . ' for change "' . $bambooData->changeId . '"'
+                . ' with patch set "' . $bambooData->patchSet . '"'
+                . ' on branch "' . $branch . '".',
+                [
+                    'type' => 'triggerBamboo',
+                    'change' => $bambooData->changeId,
+                    'patch' => $bambooData->patchSet,
+                    'branch' => $branch,
+                    'bambooResultKey' => $bambooData->bambooProject
+                ]
+            );
         } catch (DoNotCareException $e) {
             // Do not care if pushed to some other branch than the
             // ones we do want to handle.
