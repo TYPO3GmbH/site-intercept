@@ -98,11 +98,22 @@
             "
         >
             {% if log.type == 'voteGerrit' %}
-                <span><a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Vote on gerrit</a></span>
+                <span>
+                    <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Vote on gerrit</a>
+                    by
+                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">bamboo result</a>
+                </span>
             {% elseif log.type == 'triggerBamboo' and log.bambooKey != '' %}
-                <span><a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a></span>
+                <span>
+                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a>
+                    by
+                    <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">gerrit patch</a>
+                </span>
             {% endif %}
 
+            {% if log.vote %}
+                | <span>Vote: {{ log.vote }}</span>
+            {% endif %}
             {% if log.branch %}
                 | <span>Branch: {{ log.branch }}</span>
             {% endif %}
@@ -112,7 +123,9 @@
             {% if log.patch %}
                 | <span>Patch: {{ log.patch }}</span>
             {% endif %}
-            | <span>Message: {{ log.message }}</span>
+            {% if log.bambooKey %}
+                | <span>Bamook key: {{ log.bambooKey }}</span>
+            {% endif %}
         </div>
     {% endfor %}
 
