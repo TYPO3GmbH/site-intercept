@@ -15,6 +15,7 @@ use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
 use App\Service\GerritService;
 use App\Service\SlackService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,10 +34,12 @@ class BambooPostBuildController extends AbstractController
      * @param BambooService $bambooService
      * @param GerritService $gerritService
      * @param SlackService $slackService
+     * @param LoggerInterface $logger
      * @return Response
      */
-    public function index(Request $request, BambooService $bambooService, GerritService $gerritService, SlackService $slackService): Response
+    public function index(Request $request, BambooService $bambooService, GerritService $gerritService, SlackService $slackService, LoggerInterface $logger): Response
     {
+        $logger->info($request->request->get('payload'));
         $slackMessage = new BambooSlackMessage($request);
         $buildDetails = $bambooService->getBuildStatus($slackMessage);
 
