@@ -53,7 +53,7 @@ class GerritToBambooController extends AbstractController
                     'change' => $bambooData->changeId,
                     'patch' => $bambooData->patchSet,
                     'branch' => $branch,
-                    'bambooResultKey' => $bambooData->bambooProject
+                    'bambooKey' => $bambooBuild->buildResultKey
                 ]
             );
         } catch (DoNotCareException $e) {
