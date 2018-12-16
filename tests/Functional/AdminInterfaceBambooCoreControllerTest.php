@@ -43,7 +43,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
 
         $client = static::createClient();
         $client->request('GET', '/admin/bamboo/core');
-        $this->assertRegExp('/my message/', $client->getResponse()->getContent());
+        $this->assertRegExp('/12345/', $client->getResponse()->getContent());
     }
 
     /**
