@@ -176,7 +176,7 @@ class CoreSplitService
         try {
             $branchesContainTag = $this->gitCommand($coreWorkingCopy, false, 'branch', '-r', '--contains', $event->tag);
         } catch (GitException $e) {
-            $this->log('Job igonred: No branch contains given tag "' . $event->tag . '"', 'WARNING');
+            $this->log('Job ignored: No branch contains given tag "' . $event->tag . '"', 'WARNING');
             return;
         }
         $branchesContainTag = explode("\n", $branchesContainTag);
@@ -429,7 +429,7 @@ class CoreSplitService
             }
             $this->gitOutputListener->output = '';
         } else {
-            $this->log('Fetching extension ' . $extension . ' in ' . $extensionCheckoutPath);
+            $this->log('Fetching extension "' . $extension . '"');
             $this->gitCommand($workingCopy, false, 'fetch', '--quiet', '--all');
             $this->gitCommand($workingCopy, false, 'fetch', '--quiet', '--tags');
         }
