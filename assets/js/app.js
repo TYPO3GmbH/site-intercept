@@ -1,7 +1,7 @@
 import '../css/app.scss';
 
-// Don't load bootstrap js for now, let's see if we need it later
-//require('bootstrap');
+// We need bootstrap collapse
+import collapse from 'bootstrap/js/src/collapse';
 
 import $ from 'jquery';
 

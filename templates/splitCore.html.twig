@@ -79,4 +79,50 @@
             </div>
         {{ form_end(splitCoreTag, {'render_rest': false}) }}
     </p>
+
+    <h2>
+        Recent actions
+    </h2>
+    <div id="accordion">
+        {% for log in logs %}
+            <div class="card">
+                <div class="card-header" id="headingOne">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#{{ log.queueLog.uuid }}" aria-expanded="false" aria-controls="{{ log.queueLog.uuid }}">
+                        <span>{{ log.queueLog.time|date("d.m.Y H:i:s") }} UTC - </span>
+                        {% if log.queueLog.type == 'patch' %}
+                            <span>Split sub tree</span>
+                        {% elseif log.queueLog.type == 'tag' %}
+                            <span>Tag sub tree</span>
+                        {% endif %}
+                        {% if log.queueLog.sourceBranch %}
+                            | <span>Source branch: {{ log.queueLog.sourceBranch }}</span>
+                        {% endif %}
+                        {% if log.queueLog.targetBranch %}
+                            | <span>Target branch: {{ log.queueLog.targetBranch }}</span>
+                        {% endif %}
+                        {% if log.queueLog.tag %}
+                            | <span>Tag: {{ log.queueLog.tag }}</span>
+                        {% endif %}
+                        | <span>Job ID: {{ log.queueLog.uuid }}</span>
+                        {% if log.queueLog.triggeredBy == 'api' %}
+                            | <span>Trigger: API</span>
+                        {% elseif log.queueLog.triggeredBy == 'interface' %}
+                            | <span>Trigger: Web</span>
+                        {% endif %}
+                    </button>
+                </div>
+                <div id="{{ log.queueLog.uuid }}" class="collapse" aria-labelledby="{{ log.queueLog.uuid }}" data-parent="#accordion">
+                    <div class="card-body">
+                        {% for detailLog in log.detailLogs %}
+                            <div class="alert graylog-log alert-info">
+                                <span>{{ detailLog.time|date("d.m.Y H:i:s") }} UTC - </span>
+                                <span>Message: {{ detailLog.message }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
 {% endblock %}

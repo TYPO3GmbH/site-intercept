@@ -42,15 +42,60 @@ class GraylogService
      */
     public function getRecentBambooTriggersAndVotes(): array
     {
-        $query = urlencode(
+        return $this->getLogs(
             'application:intercept AND level:6 AND env:prod AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit)'
         );
+    }
+
+    /**
+     * Returns an array of split / tag log entries grouped by job uuid:
+     *
+     * [
+     *  'aUuid' => [
+     *      'queueLog' => GraylogLogEntry, // Initial 'job has been queued log entry'
+     *      'detailLogs' => [  // All other log rows of this job
+     *          GraylogLogEntry
+     *      ]
+     *  ]
+     * ]
+     *
+     * @return array
+     */
+    public function getRecentSplitActions(): array
+    {
+        $queueLogs = $this->getLogs(
+            'application:intercept AND level:6 AND env:prod AND ctxt_status:queued AND (ctxt_type:patch OR ctxt_type:tag)'
+        );
+        $splitActions = [];
+        foreach ($queueLogs as $queueLog) {
+            $splitActions[$queueLog->uuid] = [
+                'queueLog' => $queueLog,
+                'detailLogs' => $this->getLogs(
+                    'application:intercept AND level:6 AND env:prod'
+                    . ' AND !(ctxt_status:queued)'
+                    . ' AND (ctxt_type:patch OR ctxt_type:tag)'
+                    . ' AND ctxt_job_uuid:' . $queueLog->uuid,
+                    500
+                ),
+            ];
+        }
+        return $splitActions;
+    }
+
+    /**
+     * @param string $query
+     * @param int $limit
+     * @return GraylogLogEntry[]
+     */
+    private function getLogs(string $query, int $limit = 40): array
+    {
+        $query = urlencode($query);
         try {
             $response = $this->client->get(
                 'search/universal/relative'
                 . '?query=' . $query
                 . '&range=2592000' // 30 days max
-                . '&limit=40'
+                . '&limit=' . $limit
                 . '&sort=' . urlencode('timestamp:desc')
                 . '&pretty=true',
                 [

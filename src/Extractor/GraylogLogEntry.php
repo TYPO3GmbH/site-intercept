@@ -71,6 +71,31 @@ class GraylogLogEntry
     public $vote;
 
     /**
+     * @var string Optionally set for core split/tag jobs
+     */
+    public $uuid;
+
+    /**
+     * @var string Optionally set for core split/tag jobs
+     */
+    public $status;
+
+    /**
+     * @var string Optionally set for core split/tag jobs
+     */
+    public $sourceBranch;
+
+    /**
+     * @var string Optionally set for core split/tag jobs
+     */
+    public $targetBranch;
+
+    /**
+     * @var string Optionally set for core split/tag jobs
+     */
+    public $tag;
+
+    /**
      * Extract information from a graylog log entry
      *
      * @param array $entry
@@ -98,5 +123,10 @@ class GraylogLogEntry
         $this->bambooKey = $entry['ctxt_bambooKey'] ?? '';
         $this->vote = ($entry['ctxt_vote'] ?? '');
         $this->triggeredBy = $entry['ctxt_triggeredBy'] ?? '';
+        $this->uuid = $entry['ctxt_job_uuid'] ?? '';
+        $this->status = $entry['ctxt_status'] ?? '';
+        $this->sourceBranch = $entry['ctxt_sourceBranch'] ?? '';
+        $this->targetBranch = $entry['ctxt_targetBranch'] ?? '';
+        $this->tag = $entry['ctxt_tag'] ?? '';
     }
 }

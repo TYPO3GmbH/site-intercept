@@ -6,9 +6,11 @@
 @import "~bootstrap/scss/alert";
 @import "~bootstrap/scss/badge";
 @import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/card";
 @import "~bootstrap/scss/forms";
 @import "~bootstrap/scss/grid";
 @import "~bootstrap/scss/navbar";
+@import "~bootstrap/scss/transitions";
 
 // Default collapse transition
 @mixin transition() {

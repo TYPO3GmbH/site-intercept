@@ -13,6 +13,7 @@ namespace App\Controller;
 use App\Extractor\GithubPushEventForCore;
 use App\Form\SplitCoreSplitFormType;
 use App\Form\SplitCoreTagFormType;
+use App\Service\GraylogService;
 use App\Service\RabbitPublisherService;
 use App\Service\RabbitStatusService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,10 +31,16 @@ class AdminInterfaceSplitCoreController extends AbstractController
      * @param Request $request
      * @param RabbitStatusService $rabbitStatus
      * @param RabbitPublisherService $rabbitService
+     * @param GraylogService $graylogService
      * @return Response
      * @throws \Exception
      */
-    public function index(Request $request, RabbitStatusService $rabbitStatus, RabbitPublisherService $rabbitService): Response
+    public function index(
+        Request $request,
+        RabbitStatusService $rabbitStatus,
+        RabbitPublisherService $rabbitService,
+        GraylogService $graylogService
+    ): Response
     {
         $splitForm = $this->createForm(SplitCoreSplitFormType::class);
         $tagForm = $this->createForm(SplitCoreTagFormType::class);
@@ -42,7 +49,7 @@ class AdminInterfaceSplitCoreController extends AbstractController
         if ($splitForm->isSubmitted() && $splitForm->isValid()) {
             $branch = $splitForm->getClickedButton()->getName();
             $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/heads/' . $branch]);
-            $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'api');
+            $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'interface');
             $this->addFlash(
                 'success',
                 'Triggered split job for core branch "' . $pushEventInformation->targetBranch . '"'
@@ -53,12 +60,14 @@ class AdminInterfaceSplitCoreController extends AbstractController
         if ($tagForm->isSubmitted() && $tagForm->isValid()) {
             $tag = $tagForm->getData()['tag'];
             $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/tags/' . $tag, 'created' => true]);
-            $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'api');
+            $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'interface');
             $this->addFlash(
                 'success',
                 'Triggered tag job with tag "' . $pushEventInformation->tag . '"'
             );
         }
+
+        $recentLogs = $graylogService->getRecentSplitActions();
 
         return $this->render(
             'splitCore.html.twig',
@@ -66,6 +75,7 @@ class AdminInterfaceSplitCoreController extends AbstractController
                 'splitCoreSplit' => $splitForm->createView(),
                 'splitCoreTag' => $tagForm->createView(),
                 'rabbitStatus' => $rabbitStatus->getStatus(),
+                'logs' => $recentLogs,
             ]
         );
     }

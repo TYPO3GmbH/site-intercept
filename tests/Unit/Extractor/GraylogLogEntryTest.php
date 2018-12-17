@@ -3,7 +3,6 @@ declare(strict_types = 1);
 namespace App\Tests\Unit\Extractor;
 
 use App\Extractor\GraylogLogEntry;
-use http\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 
 class GraylogLogEntryTest extends TestCase
@@ -26,6 +25,11 @@ class GraylogLogEntryTest extends TestCase
             'ctxt_bambooKey' => 'CORE-GTC-1234',
             'ctxt_vote' => '-1',
             'ctxt_triggeredBy' => 'interface',
+            'ctxt_job_uuid' => 'f42e65f4-7696-4759-94b7-ebc511041657',
+            'ctxt_status' => 'queued',
+            'ctxt_sourceBranch' => '9.5',
+            'ctxt_targetBranch' => 'master',
+            'ctxt_tag' => 'v9.5.2',
         ]);
         $this->assertSame('triggerBamboo', $entry->type);
         $this->assertSame('prod', $entry->env);
@@ -38,6 +42,11 @@ class GraylogLogEntryTest extends TestCase
         $this->assertSame('-1', $entry->vote);
         $this->assertSame('interface', $entry->triggeredBy);
         $this->assertSame('22', $entry->time->format('H'));
+        $this->assertSame('f42e65f4-7696-4759-94b7-ebc511041657', $entry->uuid);
+        $this->assertSame('queued', $entry->status);
+        $this->assertSame('9.5', $entry->sourceBranch);
+        $this->assertSame('master', $entry->targetBranch);
+        $this->assertSame('v9.5.2', $entry->tag);
     }
 
     public function constructorThrowsOnMissingDataDataProvider()

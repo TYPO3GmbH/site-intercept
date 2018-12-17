@@ -115,7 +115,7 @@ class CoreSplitService
         // Add remotes per extension if needed and fetch them. Note this is
         // different in the tagger: The splitter works on additional remotes in
         // main directory, the tagger works on clones of the extensions in own directories
-        $existingRemotes = explode("\n", $this->gitCommand($workingCopy, false, 'remote'));
+        $existingRemotes = explode("\n", $this->gitCommand($workingCopy, true, 'remote'));
         foreach ($extensions as $extension) {
             $fullRemotePath = $this->splitSingleRepoBase . $extension . '.git';
             $this->log('Fetching extension ' . $extension . ' from ' . $fullRemotePath);
@@ -134,14 +134,13 @@ class CoreSplitService
                 . ' --prefix=' . escapeshellarg('typo3/sysext/' . $extension)
                 . ' --origin=' . escapeshellarg('origin/' . $event->sourceBranch)
                 . ' 2>&1';
-            $this->log('Splitting extension with command ' . $command);
             $splitSha = exec($command, $execOutput, $execExitCode);
-            $this->log('Split operation extension ' . $extension . ' result "' . $execExitCode . '" with sha "' . $splitSha . '" Full output: "' . implode($execOutput) . '"');
+            $this->log('Split operation extension "' . $extension . '" result "' . $execExitCode . '" with sha "' . $splitSha . '" Full output: "' . implode($execOutput) . '"');
             if ($execExitCode !== 0) {
                 throw new \RuntimeException('Splitting went wrong. Aborting.');
             }
             $remoteRef = $splitSha . ':refs/heads/' . $event->targetBranch;
-            $this->log('Pushing extension ' . $extension . ' to remote ' . $remoteRef);
+            $this->log('Pushing extension "' . $extension . '" to remote ' . $remoteRef);
             $this->gitCommand($workingCopy, false, 'push', $extension, $remoteRef);
         }
     }
