@@ -491,7 +491,14 @@ class CoreSplitService
         if (empty($this->event)) {
             throw new \RuntimeException('Logger helper can only be called if a rabbit message has been set.');
         }
-        $defaultLogContext = ['job_uuid' => $this->event->jobUuid];
+        $defaultLogContext = [
+            'job_uuid' => $this->event->jobUuid,
+            'type' => $this->event->type,
+            'sourceBranch' => $this->event->sourceBranch,
+            'targetBranch' => $this->event->targetBranch,
+            'tag' => $this->event->tag,
+            'status' => 'work',
+        ];
         $this->logger->log($level, $message, $defaultLogContext);
     }
 }

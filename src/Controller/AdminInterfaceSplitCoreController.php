@@ -42,7 +42,7 @@ class AdminInterfaceSplitCoreController extends AbstractController
         if ($splitForm->isSubmitted() && $splitForm->isValid()) {
             $branch = $splitForm->getClickedButton()->getName();
             $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/heads/' . $branch]);
-            $rabbitService->pushNewCoreSplitJob($pushEventInformation);
+            $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'api');
             $this->addFlash(
                 'success',
                 'Triggered split job for core branch "' . $pushEventInformation->targetBranch . '"'
@@ -53,7 +53,7 @@ class AdminInterfaceSplitCoreController extends AbstractController
         if ($tagForm->isSubmitted() && $tagForm->isValid()) {
             $tag = $tagForm->getData()['tag'];
             $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/tags/' . $tag, 'created' => true]);
-            $rabbitService->pushNewCoreSplitJob($pushEventInformation);
+            $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'api');
             $this->addFlash(
                 'success',
                 'Triggered tag job with tag "' . $pushEventInformation->tag . '"'

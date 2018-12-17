@@ -53,8 +53,9 @@ class RabbitPublisherService
      * Push a core split job message to rabbit queue
      *
      * @param GithubPushEventForCore $message
+     * @param string $trigger 'api' or 'interface'
      */
-    public function pushNewCoreSplitJob(GithubPushEventForCore $message): void
+    public function pushNewCoreSplitJob(GithubPushEventForCore $message, string $trigger): void
     {
         $serializer = new Serializer([new PropertyNormalizer()], [new JsonEncoder()]);
         $jsonMessage = $serializer->serialize($message, 'json');
@@ -62,6 +63,17 @@ class RabbitPublisherService
         $rabbitChannel = $this->rabbitConnection->channel();
         $rabbitChannel->queue_declare($this->queueName, false, true, false, false);
         $rabbitChannel->basic_publish($rabbitMessage, '', $this->queueName);
-        $this->logger->info('Queued a core split job to queue ' . $this->queueName . ' with message ' . $jsonMessage, ['job_uuid' => $message->jobUuid]);
+        $this->logger->info(
+            'Queued a core split job to queue ' . $this->queueName . ' with message ' . $jsonMessage,
+            [
+                'job_uuid' => $message->jobUuid,
+                'type' => $message->type,
+                'triggeredBy' => $trigger,
+                'sourceBranch' => $message->sourceBranch,
+                'targetBranch' => $message->targetBranch,
+                'tag' => $message->tag,
+                'status' => 'queued',
+            ]
+        );
     }
 }
