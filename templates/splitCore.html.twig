@@ -87,7 +87,7 @@
         {% for log in logs %}
             <div class="card">
                 <div class="card-header" id="headingOne">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#{{ log.queueLog.uuid }}" aria-expanded="false" aria-controls="{{ log.queueLog.uuid }}">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#uuid{{ log.queueLog.uuid }}" aria-expanded="false" aria-controls="uuid{{ log.queueLog.uuid }}">
                         <span>{{ log.queueLog.time|date("d.m.Y H:i:s") }} UTC - </span>
                         {% if log.queueLog.type == 'patch' %}
                             <span>Split sub tree</span>
@@ -111,7 +111,7 @@
                         {% endif %}
                     </button>
                 </div>
-                <div id="{{ log.queueLog.uuid }}" class="collapse" aria-labelledby="{{ log.queueLog.uuid }}" data-parent="#accordion">
+                <div id="uuid{{ log.queueLog.uuid }}" class="collapse" aria-labelledby="uuid{{ log.queueLog.uuid }}" data-parent="#accordion">
                     <div class="card-body">
                         {% for detailLog in log.detailLogs %}
                             <div class="alert graylog-log alert-info">
