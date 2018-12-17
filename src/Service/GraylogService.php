@@ -52,7 +52,9 @@ class GraylogService
      *
      * [
      *  'aUuid' => [
-     *      'queueLog' => GraylogLogEntry, // Initial 'job has been queued log entry'
+     *      'queueLog' => GraylogLogEntry // Initial 'job has been queued log entry'
+     *      'finished' => true // True if "done" status log row found
+     *      'timeTaken' => DateInterval // Time diff between job start and finish
      *      'detailLogs' => [  // All other log rows of this job
      *          GraylogLogEntry
      *      ]
@@ -70,14 +72,23 @@ class GraylogService
         foreach ($queueLogs as $queueLog) {
             $splitActions[$queueLog->uuid] = [
                 'queueLog' => $queueLog,
-                'detailLogs' => $this->getLogs(
-                    'application:intercept AND level:6 AND env:prod'
-                    . ' AND !(ctxt_status:queued)'
-                    . ' AND (ctxt_type:patch OR ctxt_type:tag)'
-                    . ' AND ctxt_job_uuid:' . $queueLog->uuid,
-                    500
-                ),
+                'finished' => false,
+                'detailLogs' => [],
             ];
+            $detailLogs = $this->getLogs(
+                'application:intercept AND level:6 AND env:prod'
+                . ' AND !(ctxt_status:queued)'
+                . ' AND (ctxt_type:patch OR ctxt_type:tag)'
+                . ' AND ctxt_job_uuid:' . $queueLog->uuid,
+                500
+            );
+            foreach ($detailLogs as $detailLog) {
+                $splitActions[$queueLog->uuid]['detailLogs'][] = $detailLog;
+                if ($detailLog->status === 'done') {
+                    $splitActions[$queueLog->uuid]['finished'] = true;
+                    $splitActions[$queueLog->uuid]['timeTaken'] = $detailLog->time->diff($queueLog->time);
+                }
+            }
         }
         return $splitActions;
     }

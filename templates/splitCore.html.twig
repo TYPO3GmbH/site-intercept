@@ -94,6 +94,11 @@
                         {% elseif log.queueLog.type == 'tag' %}
                             <span>Tag sub tree</span>
                         {% endif %}
+                        {% if log.finished == true %}
+                            | <span>Finished: {{ log.timeTaken|date("%im %ss") }}</span>
+                        {% else %}
+                            | <span>Finished: No</span>
+                        {% endif %}
                         {% if log.queueLog.sourceBranch %}
                             | <span>Source branch: {{ log.queueLog.sourceBranch }}</span>
                         {% endif %}
