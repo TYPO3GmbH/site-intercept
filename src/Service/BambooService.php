@@ -51,16 +51,7 @@ class BambooService
         $apiPathParams = '?os_authType=basic&expand=labels';
 
         $uri = $apiPath . $apiPathParams;
-        $response = $this->client->get($uri, [
-            'headers' => [
-                'accept' => 'application/json',
-                'authorization' => getenv('BAMBOO_AUTHORIZATION'),
-                'cache-control' => 'no-cache',
-                'content-type' => 'application/json',
-                'x-atlassian-token' => 'nocheck'
-            ],
-        ]);
-
+        $response = $this->sendBamboo('get', $uri);
         return new BambooBuildStatus((string)$response->getBody());
     }
 
@@ -81,18 +72,24 @@ class BambooService
                 'bamboo.variable.changeUrl=' . (string)$pushEvent->changeId,
                 'bamboo.variable.patchset=' . (string)$pushEvent->patchSet
             ]);
-        $response = $this->client->post(
-            $url,
-            [
-                'headers' => [
-                    'accept' => 'application/json',
-                    'authorization' => getenv('BAMBOO_AUTHORIZATION'),
-                    'cache-control' => 'no-cache',
-                    'content-type' => 'application/json',
-                    'x-atlassian-token' => 'nocheck'
-                ],
-            ]
-        );
+        $response = $this->sendBamboo('post', $url);
+        return new BambooBuildTriggered((string)$response->getBody());
+    }
+
+    /**
+     * Re-trigger a failed (?) (core nightly?!) build
+     *
+     * @param string $buildKey, eg. CORE-GTN-4711
+     * @return BambooBuildTriggered
+     */
+    public function reTriggerFailedBuild(string $buildKey): BambooBuildTriggered
+    {
+        $url = 'latest/queue/'
+            . $buildKey . '?'
+            . implode('&', [
+                'os_authType=basic',
+            ]);
+        $response = $this->sendBamboo('put', $url);
         return new BambooBuildTriggered((string)$response->getBody());
     }
 
@@ -104,30 +101,35 @@ class BambooService
      */
     public function triggerDocumentationPlan(GithubPushEventForDocs $pushEventInformation): ResponseInterface
     {
-        $uri = 'latest/queue/CORE-DR?' . implode('&', [
-            'stage=',
-            'executeAllStages=',
-            'os_authType=basic',
-            'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->versionNumber),
-            'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->repositoryUrl),
-        ]);
-        return $this->sendBambooPost($uri);
+        $uri = 'latest/queue/'
+            . 'CORE-DR?'
+            . implode('&', [
+                'stage=',
+                'executeAllStages=',
+                'os_authType=basic',
+                'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->versionNumber),
+                'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->repositoryUrl),
+            ]);
+        return $this->sendBamboo('post', $uri);
     }
 
     /**
      * Execute http request to bamboo
      *
+     * @param string $method
      * @param string $uri
      * @return ResponseInterface
      */
-    private function sendBambooPost(string $uri): ResponseInterface
+    private function sendBamboo(string $method, string $uri): ResponseInterface
     {
-        return $this->client->post(
+        return $this->client->$method(
             $uri,
             [
                 'headers' => [
+                    'accept' => 'application/json',
                     'authorization' => getenv('BAMBOO_AUTHORIZATION'),
                     'cache-control' => 'no-cache',
+                    'content-type' => 'application/json',
                     'x-atlassian-token' => 'nocheck'
                 ],
             ]
