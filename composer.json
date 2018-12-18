@@ -39,6 +39,7 @@
     "roave/security-advisories": "dev-master",
     "symfony/browser-kit": "^4.1",
     "symfony/css-selector": "^4.1",
+    "symfony/maker-bundle": "^1.10",
     "symfony/profiler-pack": "^1.0",
     "symfony/var-dumper": "^4.1"
   },
