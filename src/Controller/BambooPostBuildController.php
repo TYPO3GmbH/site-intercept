@@ -64,6 +64,14 @@ class BambooPostBuildController extends AbstractController
                     $manager = $this->getDoctrine()->getManager();
                     $manager->persist($bambooNightlyBuild);
                     $manager->flush();
+                    $logger->info(
+                        'Re-triggered nightly build "' . $buildDetails->buildKey . '" due to test failures.',
+                        [
+                            'type' => 'rebuildNightly',
+                            'bambooKey' => $buildDetails->buildKey,
+                            'triggeredBy' => 'api',
+                        ]
+                    );
                 } else {
                     // This build has been re-triggered once or more often already
                     // Send message to slack if a nightly build failed
@@ -75,6 +83,14 @@ class BambooPostBuildController extends AbstractController
                         $buildDetails->buildNumber
                     );
                     $slackService->sendNightlyBuildMessage($message);
+                    $logger->info(
+                        'Reported failing build "' . $buildDetails->buildKey . '" to slack.',
+                        [
+                            'type' => 'reportBrokenNightly',
+                            'bambooKey' => $buildDetails->buildKey,
+                            'triggeredBy' => 'api',
+                        ]
+                    );
                 }
             }
         } elseif (!empty($buildDetails->change) && !empty($buildDetails->patchSet)) {
@@ -93,6 +109,7 @@ class BambooPostBuildController extends AbstractController
                     'patch' => $buildDetails->patchSet,
                     'bambooKey' => $buildDetails->buildKey,
                     'vote' => $vote,
+                    'triggeredBy' => 'api',
                 ]
             );
         }

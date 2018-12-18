@@ -41,7 +41,8 @@ class GraylogService
     public function getRecentBambooTriggersAndVotes(): array
     {
         return $this->getLogs(
-            'application:intercept AND level:6 AND env:prod AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit)'
+            'application:intercept AND level:6 AND env:prod'
+            . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
         );
     }
 

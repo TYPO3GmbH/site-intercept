@@ -90,10 +90,12 @@
         <div
             class="
                 alert graylog-log
-                {% if log.vote == '-1' %}
+                {% if log.vote == '-1' or log.type == 'rebuildNightly'%}
                     alert-warning
                 {% elseif log.vote == '+1' %}
                     alert-success
+                {% elseif log.type == 'reportBrokenNightly' %}
+                    alert-danger
                 {% else %}
                     alert-info
                 {% endif %}
@@ -111,6 +113,14 @@
                     <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a>
                     for
                     <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">gerrit patch</a>
+                </span>
+            {% elseif log.type == 'rebuildNightly' and log.bambooKey != '' %}
+                <span>
+                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Re-triggered failed bamboo nightly</a>
+                </span>
+            {% elseif log.type == 'reportBrokenNightly' and log.bambooKey != '' %}
+                <span>
+                    Reported <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">broken nightly</a> to slack
                 </span>
             {% endif %}
 
