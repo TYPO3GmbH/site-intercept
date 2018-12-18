@@ -12,6 +12,7 @@ namespace App\Controller;
 
 use App\Creator\GerritBuildStatusMessage;
 use App\Creator\SlackCoreNightlyBuildMessage;
+use App\Entity\BambooNightlyBuild;
 use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
 use App\Service\GerritService;
@@ -38,22 +39,44 @@ class BambooPostBuildController extends AbstractController
      * @param LoggerInterface $logger
      * @return Response
      */
-    public function index(Request $request, BambooService $bambooService, GerritService $gerritService, SlackService $slackService, LoggerInterface $logger): Response
+    public function index(
+        Request $request,
+        BambooService $bambooService,
+        GerritService $gerritService,
+        SlackService $slackService,
+        LoggerInterface $logger
+    ): Response
     {
         $bambooSlack = new BambooSlackMessage($request);
         $buildDetails = $bambooService->getBuildStatus($bambooSlack);
 
         if ($bambooSlack->isNightlyBuild) {
-            // Send message to slack if a nightly build failed
+            // Handle if a nightly build failed
             if (!$buildDetails->success) {
-                $message = new SlackCoreNightlyBuildMessage(
-                    SlackCoreNightlyBuildMessage::BUILD_FAILED,
-                    $buildDetails->buildKey,
-                    $buildDetails->projectName,
-                    $buildDetails->planName,
-                    $buildDetails->buildNumber
-                );
-                $slackService->sendNightlyBuildMessage($message);
+                // See if we have a row for this build key in db
+                $bambooNightlyBuildRepository = $this->getDoctrine()->getRepository(BambooNightlyBuild::class);
+                $bambooNightlyBuild = $bambooNightlyBuildRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
+                if (!$bambooNightlyBuild) {
+                    // First run of this build - re-trigger and store it has been re-triggered once
+                    $bambooService->reTriggerFailedBuild($buildDetails->buildKey);
+                    $bambooNightlyBuild = new BambooNightlyBuild();
+                    $bambooNightlyBuild->setBuildKey($buildDetails->buildKey);
+                    $bambooNightlyBuild->setFailedRuns(1);
+                    $manager = $this->getDoctrine()->getManager();
+                    $manager->persist($bambooNightlyBuild);
+                    $manager->flush();
+                } else {
+                    // This build has been re-triggered once or more often already
+                    // Send message to slack if a nightly build failed
+                    $message = new SlackCoreNightlyBuildMessage(
+                        SlackCoreNightlyBuildMessage::BUILD_FAILED,
+                        $buildDetails->buildKey,
+                        $buildDetails->projectName,
+                        $buildDetails->planName,
+                        $buildDetails->buildNumber
+                    );
+                    $slackService->sendNightlyBuildMessage($message);
+                }
             }
         } elseif (!empty($buildDetails->change) && !empty($buildDetails->patchSet)) {
             // Vote on gerrit if this build has been triggered by a gerrit push
