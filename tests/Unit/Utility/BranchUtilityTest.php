@@ -111,6 +111,18 @@ class BranchUtilityTest extends TestCase
                 'branch7_6',
                 'TYPO3_7-6'
             ],
+            'web interface nightlyMaster' => [
+                'nightlyMaster',
+                'master'
+            ],
+            'web interface nightly95' => [
+                'nightly9_5',
+                '9.5'
+            ],
+            'web interface nightly87' => [
+                'nightly8_7',
+                'TYPO3_8-7'
+            ],
         ];
     }
 

@@ -61,9 +61,11 @@ class BranchUtility
     public static function resolveCoreMonoRepoBranch(string $identifier): string
     {
         $identifier = str_replace('branch', '', $identifier);
+        $identifier = str_replace('nightly', '', $identifier);
         $identifier = str_replace('TYPO3_', '', $identifier);
         $identifier = str_replace('_', '.', $identifier);
         $identifier = str_replace('-', '.', $identifier);
+        $identifier = mb_strtolower($identifier);
         if ($identifier !== 'master') {
             $sanityCheck = explode('.', $identifier);
             if (count($sanityCheck) !== 2 || (int)$sanityCheck[0] < 7 || (int)$sanityCheck < 0) {
