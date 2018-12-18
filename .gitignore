@@ -5,6 +5,9 @@ bin/php-cs-fixer
 bin/phpunit
 bin/php-parse
 bin/var-dump-server
+bin/doctrine
+bin/doctrine-dbal
+bin/doctrine-migrations
 
 # JIRA plugin
 atlassian-ide-plugin.xml
