@@ -50,8 +50,7 @@ class AdminInterfaceBambooCoreController extends AbstractController
         BambooService $bambooService,
         GerritService $gerritService,
         GraylogService $graylogService
-    ): Response
-    {
+    ): Response {
         $this->logger = $logger;
 
         $patchForm = $this->createForm(BambooCoreTriggerFormType::class);

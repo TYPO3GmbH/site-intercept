@@ -10,9 +10,6 @@ declare(strict_types = 1);
 
 namespace App\Creator;
 
-use App\Extractor\BambooBuildStatus;
-use App\Utility\TimeUtility;
-
 /**
  * A slack message for a core nightly build status message
  */
@@ -55,7 +52,7 @@ class SlackCoreNightlyBuildMessage implements \JsonSerializable
      * @param string $planName
      * @param int $buildNumber
      */
-    public function __construct(int $status, string $buildKey, string $projectName,  string $planName, int $buildNumber)
+    public function __construct(int $status, string $buildKey, string $projectName, string $planName, int $buildNumber)
     {
         if (!in_array($status, [self::BUILD_FAILED, self::BUILD_SUCCESSFUL])) {
             throw new \RuntimeException('Broken status ' . $status);

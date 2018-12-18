@@ -45,8 +45,7 @@ class BambooPostBuildController extends AbstractController
         GerritService $gerritService,
         SlackService $slackService,
         LoggerInterface $logger
-    ): Response
-    {
+    ): Response {
         $bambooSlack = new BambooSlackMessage($request);
         $buildDetails = $bambooService->getBuildStatus($bambooSlack);
 

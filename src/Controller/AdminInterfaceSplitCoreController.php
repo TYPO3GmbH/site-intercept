@@ -40,8 +40,7 @@ class AdminInterfaceSplitCoreController extends AbstractController
         RabbitStatusService $rabbitStatus,
         RabbitPublisherService $rabbitService,
         GraylogService $graylogService
-    ): Response
-    {
+    ): Response {
         $splitForm = $this->createForm(SplitCoreSplitFormType::class);
         $tagForm = $this->createForm(SplitCoreTagFormType::class);
 

@@ -14,8 +14,6 @@ use App\Client\GraylogClient;
 use App\Extractor\GraylogLogEntry;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\RequestOptions;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Get various log messages
