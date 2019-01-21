@@ -1,6 +1,5 @@
 .idea
 
-bin/console
 bin/php-cs-fixer
 bin/phpunit
 bin/php-parse
