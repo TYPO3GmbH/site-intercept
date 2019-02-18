@@ -31,7 +31,7 @@ class GerritUrl
     /**
      * Extract data from url
      *
-     * @param string $url Something like 'https://review.typo3.org/48574/' or 'https://review.typo3.org/#/c/48574/11'
+     * @param string $url Something like 'https://review.typo3.org/48574/' or 'https://review.typo3.org/#/c/Packages/TYPO3.CMS/+/48574/11'
      * @throws DoNotCareException
      */
     public function __construct(string $url)
