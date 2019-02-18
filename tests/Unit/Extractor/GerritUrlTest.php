@@ -41,20 +41,45 @@ class GerritUrlTest extends TestCase
                 48574,
                 42
             ],
-            'url with with hash c with patch set' => [
+            'url with hash c with patch set' => [
                 'https://review.typo3.org/#/c/48574/1',
                 48574,
                 1
             ],
-            'url with with hash c with patch set with slash at end' => [
+            'url with hash c with patch set with slash at end' => [
                 'https://review.typo3.org/#/c/48574/2/',
                 48574,
                 2
             ],
-            'url with with hash c with patch set with file' => [
+            'url with hash c with patch set with file' => [
                 'https://review.typo3.org/#/c/48574/1/typo3/sysext/core/Documentation/Changelog/9.5.x/Index.rst',
                 48574,
                 1
+            ],
+            'new url style' => [
+                'https://review.typo3.org/#/c/Packages/TYPO3.CMS/+/59676',
+                59676,
+                null
+            ],
+            'new url style with slash at end' => [
+                'https://review.typo3.org/#/c/Packages/TYPO3.CMS/+/59676/',
+                59676,
+                null
+            ],
+            'new url style with patch set' => [
+                'https://review.typo3.org/#/c/Packages/TYPO3.CMS/+/59676/1',
+                59676,
+                1
+            ],
+            'new url style with patch set with slash at end' => [
+                'https://review.typo3.org/#/c/Packages/TYPO3.CMS/+/59676/42/',
+                59676,
+                42
+            ],
+            'new url style with patch set with file' => [
+                'https://review.typo3.org/#/c/Packages/TYPO3.CMS/+/59676/42/typo3/sysext/core/Documentation/Changelog/9.5.x/Index.rst',
+                59676,
+                42
             ],
         ];
     }

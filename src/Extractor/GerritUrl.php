@@ -14,6 +14,7 @@ use App\Exception\DoNotCareException;
 
 /**
  * Extract change id and maybe patch id from a gerrit review url.
+ * Used in intercept web interface to trigger bamboo by gerrit review url.
  */
 class GerritUrl
 {
@@ -35,12 +36,12 @@ class GerritUrl
      */
     public function __construct(string $url)
     {
-        preg_match('/https:\/\/review\.typo3\.org\/(#\/c\/)?([0-9]*)(\/{0,1})?([0-9]*)/', $url, $matches);
-        if (!empty($matches[2])) {
-            $this->changeId = (int)$matches[2];
+        preg_match('/https:\/\/review\.typo3\.org\/(#\/c\/)?(Packages\/TYPO3\.CMS\/\+\/)?([0-9]*)(\/{0,1})?([0-9]*)/', $url, $matches);
+        if (!empty($matches[3])) {
+            $this->changeId = (int)$matches[3];
         }
-        if (!empty($matches[4])) {
-            $this->patchSet = (int)$matches[4];
+        if (!empty($matches[5])) {
+            $this->patchSet = (int)$matches[5];
         }
         if (empty($this->changeId)) {
             throw new DoNotCareException();
