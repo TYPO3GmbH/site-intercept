@@ -47,6 +47,20 @@ class GraylogService
     }
 
     /**
+     * Log entries related to documentation tasks. Shown on documentation
+     * site in web interface.
+     *
+     * @return GraylogLogEntry[]
+     */
+    public function getRecentBambooDocsTriggers(): array
+    {
+        return $this->getLogs(
+            'application:intercept AND level:6 AND env:prod'
+            . ' AND (ctxt_type:triggerBambooDocsFluidVh)'
+        );
+    }
+
+    /**
      * Returns an array of split / tag log entries grouped by job uuid:
      *
      * [

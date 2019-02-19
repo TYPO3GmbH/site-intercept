@@ -114,6 +114,24 @@ class BambooService
     }
 
     /**
+     * Trigger new build of project CORE-DRF: Documentation rendering fluid view helper reference
+     *
+     * @return BambooBuildTriggered
+     */
+    public function triggerDocumentationFluidVhPlan(): BambooBuildTriggered
+    {
+        $uri = 'latest/queue/'
+            . 'CORE-DRF?'
+            . implode('&', [
+                'stage=',
+                'executeAllStages=',
+                'os_authType=basic',
+            ]);
+        $response = $this->sendBamboo('post', $uri);
+        return new BambooBuildTriggered((string)$response->getBody());
+    }
+
+    /**
      * Execute http request to bamboo
      *
      * @param string $method
