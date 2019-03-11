@@ -41,7 +41,8 @@ class GraylogService
     public function getRecentBambooTriggersAndVotes(): array
     {
         return $this->getLogs(
-            'application:intercept AND level:6 AND env:prod'
+            'application:intercept AND level:6'
+            . ' AND env:' . getenv('GRAYLOG_ENV')
             . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
         );
     }
@@ -55,7 +56,8 @@ class GraylogService
     public function getRecentBambooDocsTriggers(): array
     {
         return $this->getLogs(
-            'application:intercept AND level:6 AND env:prod'
+            'application:intercept AND level:6'
+            . ' AND env:' . getenv('GRAYLOG_ENV')
             . ' AND (ctxt_type:triggerBambooDocsFluidVh)'
         );
     }
@@ -79,7 +81,9 @@ class GraylogService
     public function getRecentSplitActions(): array
     {
         $queueLogs = $this->getLogs(
-            'application:intercept AND level:6 AND env:prod AND ctxt_status:queued AND (ctxt_type:patch OR ctxt_type:tag)'
+            'application:intercept AND level:6'
+            . ' AND env:' . getenv('GRAYLOG_ENV')
+            . ' AND ctxt_status:queued AND (ctxt_type:patch OR ctxt_type:tag)'
         );
         $splitActions = [];
         foreach ($queueLogs as $queueLog) {
@@ -89,7 +93,8 @@ class GraylogService
                 'detailLogs' => [],
             ];
             $detailLogs = $this->getLogs(
-                'application:intercept AND level:6 AND env:prod'
+                'application:intercept AND level:6'
+                . ' AND env:' . getenv('GRAYLOG_ENV')
                 . ' AND !(ctxt_status:queued)'
                 . ' AND (ctxt_type:patch OR ctxt_type:tag)'
                 . ' AND ctxt_job_uuid:' . $queueLog->uuid,
@@ -107,6 +112,8 @@ class GraylogService
     }
 
     /**
+     * Execute a graylog query and return log entries
+     *
      * @param string $query
      * @param int $limit
      * @return GraylogLogEntry[]
