@@ -3,40 +3,97 @@
 Intercept is a small middleware that communicates between various services
 used in TYPO3 core or core-near world.
 
-Some processes and stats can be found in at
+Processes, setup, architecture and so on are found in this README, some minor
+additional information can be found (for TYPO3 GmbH users) at the
 [TYPO3s Wiki](https://confluence.typo3.com/display/TC/Process+Flow+pre-merge+Tests).
+
+
+## Services
+
+### Bamboo post build
+End point "/bamboo" - Called by bamboo when a core build finished. Triggers votes
+on gerrit for pending (pre-merge) patches, retriggers a failed nightly build once,
+escalates a finally failed nightly core build to slack.
+
+### Docs to bamboo
+Hook end point for domain "docs-hook.typo3.com" (primary) or "intercept.typo3.com/docs"
+(test use only!). Triggers rendering and deployment of a documentation to new docs server.
+
+## Gerrit to bamboo
+End point "/gerrit". A hook fired by gerrit for core patch push events to trigger
+a bamboo pre-merge build.
+
+## Github pull request
+End point "/githubpr" - Hook fired by github TYPO3 core main mirror if a pull request
+has been pushed to github to transfer that PR to a forge issue and a gerrit review.
+
+## Git subtree split
+End point "/split" - Hook fired by github core main mirror https://github.com/typo3/typo3.cms/ for new
+pushes (merged patch / new tag), used to update the git split packages at https://github.com/typo3-cms/.
+Sub tree splitting and tagging takes a while, jobs are queued with a rabbitmq and a single
+symfony command cli worker does the main job.
+
+
+## Web interface
+
+### Bamboo control
+Trigger single bamboo builds manually for core patches.
+
+### Git subtree split control
+Trigger subtree splitting and tagging manually.
+
+### Docs control
+Interface to deal with documentation rendering and management.
+
+
+## List of services interacted with
+
+* forge.typo3.com - Create an issue on forge if a github core pull request is transformed
+  to a gerrit core patch and forge issue.
+* review.typo3.com (gerrit) - Gerrit calls /gerrit if new core patches are pushed, intercept
+  votes on gerrit for completed bamboo builds, intercept pushes patches to gerrit if a
+  github pull request is transformed to a gerrit core patch and forge issue.
+* bamboo.typo3.com - Trigger test builds for core patches, trigger documentation rendering builds
+* github.com - repository hooks trigger: git subtree split, git subtree tagging, pull request
+  handling, documentation rendering. intercept pushes patches and tags to core subtree split
+  repositories.
+* rabbitmq.typo3.com - intercept web controlles push new subtree split & tag jobs to a rabbitmq queue,
+  a intercept cli job connects to rabbit to handle these jobs.
+* elk.typo3.com (graylog) - intercept logs details to graylog, the web intercept interface reads various
+  log entries and renders them.
+* typo3.slack.com - intercept pushs messages to slack for failed nightly builds
 
 
 ## Architecture
 
-* Client/ contain HTTP clients injected into Services to execute remote calls
-* Creator/ contain value objects created by controllers, eg. a specific gerrit review message to be posted
-* Extractor/ contain value objects usually created by services, eg. a class representing a github pull request
-* Service/ contain classes doing the heavy lifting, usually calling Client/ objects and returning Extractor/ objects
+intercept is sort of a spider that hangs in between different services to communicate
+and translate between them. On testing side, only the simple data munging parts are
+unit tested, the main testing logic lies in the functional tests. The coverage is very
+hight to specify in detail what intercept does, and which data is expected from a given
+service.
 
 
-## Bamboo post build
+### Class folders
+* Bundle/ contains a helper class for functional testing
+* Client/ contains HTTP clients injected into Services to execute remote calls
+* Command/ contains a symfony console cli worker that connects to a rabbitmq and
+  does the core subtree splitting and tagging
+* Controller/ contains main controller classes for web and api endpoints
+* Creator/ contains value objects created by controllers, eg. a specific gerrit
+  review message to be posted
+* Entity/ contains doctrine database entity objects
+* Exception/ contains custom exceptions
+* Extractor/ contains value objects usually created by services, eg. a class representing
+  a github pull request
+* Form/ contains classes representing the various web forms
+* GitWrapper/ contains helper classes for details with managing git repositories via PHP.
+  This is used for the github pull request to gerrit service, and by the sub tree split worker.
+* Migrations/ contains doctrine database migration classes.
+* Monolog/ contains helper classes for logging data to graylog
+* Repository/ contains doctrine orm repositories
+* Service/ contains classes doing the heavy lifting, usually calling Client/ objects and
+  returning Extractor/ objects
+* Utility/ contains static helper stuff like date munging or a semver helper
+  
 
-End point "/bamboo" - Called by bamboo when it finished a core pre-merge test. May later be used
-to be called if a nightly build finished, too.
-
-
-## Docs to bamboo
-End point for "docs-hook.typo3.com" and "/docs" for all domains - Used by github push (currently)
-to trigger rendering of a repository that contains documentation.
-
-
-## Gerrit to bamboo
-
-End point "/gerrit" - A hook fired by gerrit for core patch push events to trigger a bamboo pre-merge build.
-
-
-## Github pull request
-
-End point "/githubpr" - Hook fired by github core main mirror if a pull request has been pushed to
-github to transfer that PR to a forge issue and gerrit review.
-
-## Git subtree split
-
-End point "/split" - Hook fired by github core main mirror https://github.com/typo3/typo3.coms/ for new
-pushes (merged patch / new tag), used to update the git split packages at https://github.com/typo3-cms/. 
+ 
