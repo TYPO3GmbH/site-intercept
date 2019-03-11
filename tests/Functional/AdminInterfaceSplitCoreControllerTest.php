@@ -3,6 +3,7 @@ declare(strict_types = 1);
 namespace App\Tests\Functional;
 
 use App\Bundle\TestDoubleBundle;
+use App\Client\GraylogClient;
 use App\Client\RabbitManagementClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
@@ -52,6 +53,85 @@ class AdminInterfaceSplitCoreControllerTest extends WebTestCase
         $client->request('GET', '/admin/split/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Rabbit: offline/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function recentLogMessagesAreRendered()
+    {
+        TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
+        $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
+        TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
+        $rabbitClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
+            new Response(200, [], json_encode(['consumers' => 1, 'messages' => 2]))
+        );
+
+        $graylogClientProphecy = $this->prophesize(GraylogClient::class);
+        TestDoubleBundle::addProphecy(GraylogClient::class, $graylogClientProphecy);
+        // first ->get() call to elastic returns one 'queued' log entry
+        $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
+            new Response(200, [], json_encode([
+                'messages' => [
+                    0 => [
+                        'message' => [
+                            'application' => 'intercept',
+                            'env' => 'prod',
+                            'level' => 6,
+                            'message' => 'Queued a core split job to queue',
+                            'ctxt_job_uuid' => 'a048046f-3204-45f6-9572-cb7af54ad7d5',
+                            'ctxt_type' => 'patch',
+                            'ctxt_status' => 'queued',
+                            'ctxt_sourceBranch' => 'master',
+                            'ctxt_targetBranch' => 'master',
+                            'ctxt_triggeredBy' => 'api',
+                            'timestamp' => '2019-03-11T10:33:16.803Z',
+                        ]
+                    ]
+                ]
+            ]))
+        );
+        // second ->get() call to elastic returns one detail log row and a done message
+        $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
+            new Response(200, [], json_encode([
+                'messages' => [
+                    0 => [
+                        'message' => [
+                            'application' => 'intercept',
+                            'env' => 'prod',
+                            'level' => 6,
+                            'message' => 'Git command error output: Everything up-to-date',
+                            'ctxt_job_uuid' => 'a048046f-3204-45f6-9572-cb7af54ad7d5',
+                            'ctxt_type' => 'patch',
+                            'ctxt_status' => 'work',
+                            'ctxt_sourceBranch' => 'master',
+                            'ctxt_targetBranch' => 'master',
+                            'timestamp' => '2019-03-11T10:34:22.803Z',
+                        ]
+                    ],
+                    1 => [
+                        'message' => [
+                            'application' => 'intercept',
+                            'env' => 'prod',
+                            'level' => 6,
+                            'message' => 'Finished a git split worker job',
+                            'ctxt_job_uuid' => 'a048046f-3204-45f6-9572-cb7af54ad7d5',
+                            'ctxt_type' => 'patch',
+                            'ctxt_status' => 'done',
+                            'ctxt_sourceBranch' => 'master',
+                            'ctxt_targetBranch' => 'master',
+                            'timestamp' => '2019-03-11T10:36:27.256Z',
+                        ]
+                    ]
+                ]
+            ]))
+        );
+
+        $client = static::createClient();
+        $client->request('GET', '/admin/split/core');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertRegExp('/a048046f-3204-45f6-9572-cb7af54ad7d5/', $client->getResponse()->getContent());
+        $this->assertRegExp('/Git command error output: Everything up-to-date/', $client->getResponse()->getContent());
     }
 
     /**
