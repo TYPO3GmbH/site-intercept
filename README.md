@@ -133,7 +133,7 @@ Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` o
 ### URL's
 
 * http://intercept.ddev.local/ - intercept web interface
-* http://intercept.ddev.local:9000/ - graylog interface, user: admin, password: foo
+* http://intercept.ddev.local:9101/ - graylog interface, user: admin, password: foo
 
 ### Upgrading ddev based
 

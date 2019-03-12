@@ -36,12 +36,12 @@ services:
       # This defines the host name the service should be accessible from. This will be sitename.ddev.local
       - VIRTUAL_HOST=$DDEV_HOSTNAME
       # This defines the port the service should be accessible from at sitename.ddev.local
-      - HTTP_EXPOSE=9000
+      - HTTP_EXPOSE=9101:9000
       # pwgen -N1 -s96 ... password encryption and salting
       - GRAYLOG_PASSWORD_SECRET=ULwrllyZMmhispiUyyTHTcicRK76YumjXfsNX3YIClWU4oRjLUPGzPyH83rddOCDxeekUWBfvsPgSjW0txbPO5QTWQpPGycj
       # echo -n foo | shasum -a 256
       - GRAYLOG_ROOT_PASSWORD_SHA2=2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae
-      - GRAYLOG_WEB_ENDPOINT_URI=http://$DDEV_HOSTNAME:9000/api
+      - GRAYLOG_WEB_ENDPOINT_URI=http://$DDEV_HOSTNAME:9101/api
     links:
       - graylogmongo:mongo
       - graylogelastic:elasticsearch
