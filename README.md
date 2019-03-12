@@ -126,6 +126,8 @@ Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` o
 * $ ddev exec bin/console doctrine:migrations:migrate -n
 * $ ddev exec yarn install
 * $ ddev exec yarn encore dev
+* $ docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
+* $ ddev exec -s graylogmongo mongorestore -d graylog /dump
 
 ### URL's
 
@@ -141,6 +143,8 @@ Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` o
 * $ ddev exec bin/console doctrine:migrations:migrate -n
 * $ ddev exec yarn install
 * $ ddev exec yarn encore dev
+* $ docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
+* $ ddev exec -s graylogmongo mongorestore -d graylog /dump
 
 ### Development
 
@@ -152,3 +156,17 @@ An alternative is to start an explicit watcher process to recompile if css files
 
 * $ ddev exec yarn encore dev --watch
 
+### Creating a new mongo dump
+
+The graylog configuration is stored in mongodb. If fiddling with the interface and
+adding stuff, the mongodb should be dumped afterwards and committed for other ddev
+users to fetch this new config. Note: Do not use important passwords on the ddev
+based graylog instance, those would be within that dump!
+
+* $ ddev exec -s graylogmongo rm -rf /dump
+* $ ddev exec -s graylogmongo mongodump --out /dump
+* $ cd .ddev/graylogmongo
+* $ rm -rf dump
+* $ docker cp ddev-intercept-graylogmongo:/dump . 
+* $ ddev exec -s graylogmongo rm -rf /dump
+* commit stuff to git
