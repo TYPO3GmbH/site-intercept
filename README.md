@@ -115,6 +115,11 @@ file and write proper values to a .env.local file!
 * $ ddev exec yarn install
 * $ ddev exec yarn encore dev
 
+### URL's
+
+* http://intercept.ddev.local/ - intercept web interface
+* http://intercept.ddev.local:9000/ - graylog interface, user: admin, password: foo
+
 ### Upgrading ddev based
 
 * $ git pull
