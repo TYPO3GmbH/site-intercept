@@ -127,7 +127,8 @@ Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` o
 * $ ddev exec yarn install
 * $ ddev exec yarn encore dev
 * $ docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
-* $ ddev exec -s graylogmongo mongorestore -d graylog /dump
+* $ ddev exec -s graylogmongo mongorestore -d graylog /dump/graylog
+* $ ddev exec -s graylogmongo rm -rf /dump
 
 ### URL's
 
@@ -144,7 +145,8 @@ Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` o
 * $ ddev exec yarn install
 * $ ddev exec yarn encore dev
 * $ docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
-* $ ddev exec -s graylogmongo mongorestore -d graylog /dump
+* $ ddev exec -s graylogmongo mongorestore -d graylog /dump/graylog
+* $ ddev exec -s graylogmongo rm -rf /dump
 
 ### Development
 
