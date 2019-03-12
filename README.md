@@ -62,6 +62,8 @@ Interface to deal with documentation rendering and management.
 * elk.typo3.com (graylog) - intercept logs details to graylog, the web intercept interface reads various
   log entries and renders them.
 * typo3.slack.com - intercept pushs messages to slack for failed nightly builds
+* sqlite - a local sqlite, stores users, documentation details, information if a single core
+  nightly build has been rebuild already
 
 
 ## Architecture
@@ -96,4 +98,40 @@ service.
 * Utility/ contains static helper stuff like date munging or a semver helper
   
 
- 
+## Installation & upgrading
+
+Notes: the ddev based setup does currently NOT start the rabbitmq server and the core
+split / tag worker. Some further setup is not fully finished, like valid credentials
+for third party services. The documented setup has been created to allow easy
+development of the documentation part - if more is needed, have a look at the .env
+file and write proper values to a .env.local file!
+
+### First install ddev based
+
+* Clone repo
+* $ ddev start
+* $ ddev composer install
+* $ ddev exec bin/console doctrine:migrations:migrate -n
+* $ ddev exec yarn install
+* $ ddev exec yarn encore dev
+
+### Upgrading ddev based
+
+* $ git pull
+* $ ddev start
+* $ ddev composer install
+* $ ddev exec bin/console cache:clear
+* $ ddev exec bin/console doctrine:migrations:migrate -n
+* $ ddev exec yarn install
+* $ ddev exec yarn encore dev
+
+### Development
+
+If changing js / css / web images, files to public dirs need to be recompiled and published:
+
+* $ ddev exec yarn encore dev
+
+An alternative is to start an explicit watcher process to recompile if css files change:
+
+* $ ddev exec yarn encore dev --watch
+
