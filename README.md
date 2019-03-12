@@ -108,6 +108,18 @@ file and write proper values to a .env.local file!
 
 ### First install ddev based
 
+On linux, the elasticsearch container for graylog needs an kernel argument: On the host,
+edit file /etc/sysctl.conf and add:
+
+```
+$ sudo vi /etc/sysctl.conf
+
+# elasticsearch processes / containers
+vm.max_map_count = 262144
+```
+
+Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` once.
+
 * Clone repo
 * $ ddev start
 * $ ddev composer install
