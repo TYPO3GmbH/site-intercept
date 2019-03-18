@@ -45,7 +45,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  *
  * @codeCoverageIgnore Not testing testing related classes.
  */
-class TestDoubleBundle extends Bundle implements CompilerPassInterface {
+class TestDoubleBundle extends Bundle implements CompilerPassInterface
+{
     /**
      * An array of service ids with an array of prepared prophecies
      *
