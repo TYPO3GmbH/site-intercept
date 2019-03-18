@@ -158,6 +158,10 @@ An alternative is to start an explicit watcher process to recompile if css files
 
 * $ ddev exec yarn encore dev --watch
 
+### Test execution
+
+* $ ddev exec bin/phpunit -c build/phpunit.xml
+
 ### Creating a new mongo dump
 
 The graylog configuration is stored in mongodb. If fiddling with the interface and
