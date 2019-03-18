@@ -131,6 +131,7 @@ class GraylogService
                 . '&pretty=true',
                 [
                     'auth' => [getenv('GRAYLOG_TOKEN'), 'token'],
+                    'headers' => ['accept' => 'application/json'],
                 ]
             );
             $content = json_decode((string)$response->getBody(), true);
