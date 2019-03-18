@@ -7,3 +7,5 @@
 *.sh text eol=lf
 *.bat text eol=crlf
 **/bin/** text eol=lf
+bin/splitsh-lite-darwin binary
+bin/splitsh-lite-linux binary
