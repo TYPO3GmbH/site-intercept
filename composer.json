@@ -56,13 +56,13 @@
   },
   "scripts": {
     "t3g:test:php:unit": [
-      "phpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml"
+      "mkdir -p var/phpunit/; phpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml  --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/"
     ],
     "t3g:test": [
       "@t3g:test:php:unit"
     ],
     "t3g:cgl": [
-      "php-cs-fixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xml"
+      "mkdir -p var/php-cs-fixer/; php-cs-fixer fix --config build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml"
     ],
     "auto-scripts": {
       "cache:clear": "symfony-cmd",
