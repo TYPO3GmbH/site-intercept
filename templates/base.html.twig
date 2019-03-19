@@ -32,6 +32,9 @@
                         <a href="{{ path('admin_split_core') }}" {% if active == 'splitCore' %}class="active"{% endif %}>Split Core</a>
                     </li>
                     <li>
+                        <a href="{{ path('redirect_index') }}" {% if active == 'redirects' %}class="active"{% endif %}>Redirects</a>
+                    </li>
+                    <li>
                         <a href="{{ path('admin_docs') }}" {% if active == 'docs' %}class="active"{% endif %}>Documentation</a>
                     </li>
                 </ul>
