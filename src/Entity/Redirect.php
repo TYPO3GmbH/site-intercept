@@ -1,9 +1,17 @@
 <?php
 
+/*
+ * This file is part of the package t3g/intercept.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Exception\InvalidStatusException;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RedirectRepository")
@@ -42,11 +50,19 @@ class Redirect
 
     /**
      * @ORM\Column(type="string", length=2000)
+     * @Assert\Regex(
+     *     pattern="@^/([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)$@m",
+     *     message="The path must start with /p/, /c/, /m/ or /h/ and contains at least the three parts: vendor/package/version/. example: /p/t3g/blog/9.0/Administration/Index.html"
+     * )
      */
     private $source;
 
     /**
      * @ORM\Column(type="string", length=2000)
+     * @Assert\Regex(
+     *     pattern="@^/([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)$@m",
+     *     message="The path must start with /p/, /c/, /m/ or /h/ and contains at least the three parts: vendor/package/version/. example: /p/t3g/blog/9.0/Administration/Index.html"
+     * )
      */
     private $target;
 
@@ -124,7 +140,7 @@ class Redirect
 
     public function setStatusCode(int $statusCode): self
     {
-        if (!in_array($statusCode, $this->allowedStatusCodes, true)) {
+        if (!in_array($statusCode, self::$allowedStatusCodes, true)) {
             throw new InvalidStatusException('The HTTP status code is invalid for a redirect', 1553001673);
         }
         $this->statusCode = $statusCode;

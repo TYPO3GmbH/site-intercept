@@ -22,7 +22,14 @@ Encore
     //.addEntry('page1', './assets/js/page1.js')
     //.addEntry('page2', './assets/js/page2.js')
 
-    .copyFiles({ from: './assets/images', to: 'images/[path][name].[hash:8].[ext]' })
+    .copyFiles({
+      from: './assets/images',
+      to: 'images/[path][name].[hash:8].[ext]'
+    })
+    .copyFiles({
+      from: './config/nginx',
+      to: 'nginx/[path][name].[ext]'
+    })
 
     // will require an extra script tag for runtime.js
     // but, you probably want this, unless you're building a single-page app

@@ -1,3 +1,6 @@
+parameters:
+    locale: 'en'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -13,17 +16,6 @@ services:
     App\:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
-
-    Symfony\Component\Ldap\Ldap:
-        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
-    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
-        arguments:
-            -   host: ldap.typo3.org
-                port: 636
-                encryption: ssl
-                options:
-                    protocol_version: 3
-                    referrals: false
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -122,3 +114,14 @@ services:
     gelf.transport:
         class: Gelf\Transport\UdpTransport
         arguments: ['%env(GRAYLOG_HOST)%', '%env(int:GRAYLOG_PORT)%']
+
+    Symfony\Component\Ldap\Ldap:
+        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+        arguments:
+            -   host: ldap.typo3.org
+                port: 636
+                encryption: ssl
+                options:
+                    protocol_version: 3
+                    referrals: false

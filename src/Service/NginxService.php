@@ -12,9 +12,8 @@ namespace App\Service;
 
 use App\Repository\RedirectRepository;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class NginxService
 {
@@ -24,9 +23,9 @@ class NginxService
     protected $redirectRepository;
 
     /**
-     * @var ParameterBagInterface
+     * @var KernelInterface
      */
-    protected $parameterBag;
+    protected $kernel;
 
     /**
      * @var Filesystem
@@ -38,6 +37,11 @@ class NginxService
      */
     protected $logger;
 
+    /**
+     * @var BambooService
+     */
+    protected $bambooService;
+
     protected $redirectTemplate = '# Rule: %d | Created: %s | Updated: %s
 location = %s {
     return %d https://$host%s;
@@ -46,40 +50,27 @@ location = %s {
     /**
      * NginxService constructor.
      * @param RedirectRepository $redirectRepository
-     * @param ParameterBagInterface $parameterBag
+     * @param KernelInterface $kernel
      * @param Filesystem $filesystem
      * @param LoggerInterface $logger
+     * @param BambooService $bambooService
      */
-    public function __construct(RedirectRepository $redirectRepository, ParameterBagInterface $parameterBag, Filesystem $filesystem, LoggerInterface $logger)
+    public function __construct(RedirectRepository $redirectRepository, KernelInterface $kernel, Filesystem $filesystem, LoggerInterface $logger, BambooService $bambooService)
     {
         $this->redirectRepository = $redirectRepository;
-        $this->parameterBag = $parameterBag;
+        $this->kernel = $kernel;
         $this->filesystem = $filesystem;
         $this->logger = $logger;
+        $this->bambooService = $bambooService;
     }
 
-    protected function createBackupOfRedirectConfigFile(): void
-    {
-        $filename = $this->parameterBag->get('kernel.project_dir') . '/var/cache/nginx/nginx_redirects.conf';
-        if ($this->filesystem->exists($filename)) {
-            $this->filesystem->copy($filename, $filename . '.bak');
-        }
-    }
-
-    protected function restoreBackupOfRedirectConfigFile(): void
-    {
-        $filename = $this->parameterBag->get('kernel.project_dir') . '/var/cache/nginx/nginx_redirects.conf';
-        if ($this->filesystem->exists($filename . '.bak')) {
-            $this->filesystem->copy($filename . '.bak', $filename);
-        }
-    }
-
-    protected function createRedirectConfigFile(): void
+    public function createRedirectConfigFile(): string
     {
         $redirects = $this->redirectRepository->findAll();
         $content = '';
         foreach ($redirects as $redirect) {
-            $content .= chr(10) . sprintf($this->redirectTemplate,
+            $content .= chr(10) . sprintf(
+                $this->redirectTemplate,
                 $redirect->getId(),
                 $redirect->getCreatedAt()->format('d.m.Y H:i'),
                 $redirect->getUpdatedAt()->format('d.m.Y H:i'),
@@ -88,56 +79,24 @@ location = %s {
                 $redirect->getTarget()
             );
         }
-        $filename = $this->parameterBag->get('kernel.project_dir') . '/var/cache/nginx/nginx_redirects.conf';
+
+        $filename = $this->kernel->getCacheDir() . '/nginx/nginx_redirects_%s.conf';
+        $filename = sprintf($filename, (new \DateTime())->format('Ymd-His'));
         $this->filesystem->dumpFile($filename, $content);
+        return $filename;
     }
 
-    protected function checkNginxConfiguration(): bool
+    public function getFileContent(string $filename): string
     {
-        $process = new Process(['nginx', '-t']);
-        $process->run();
-        $errors = $process->getErrorOutput();
-        if ($errors !== '') {
-            $this->logger->error('nginx config check: ' . $errors);
+        $filename = $this->kernel->getCacheDir() . '/nginx/' . $filename;
+        if ($this->filesystem->exists($filename)) {
+            return file_get_contents($filename);
         }
-        return $process->isSuccessful();
+        return '';
     }
 
-    protected function reloadNginx(): bool
+    public function createDeploymentJob(string $filename): void
     {
-        $process = new Process(['service', 'nginx', 'restart']);
-        $process->run();
-        $errors = $process->getErrorOutput();
-        if ($errors !== '') {
-            $this->logger->error('nginx reload: ' . $errors);
-        }
-        return $process->isSuccessful();
-    }
-
-    public function createNewConfigAndReload(): bool
-    {
-        try {
-            $this->createBackupOfRedirectConfigFile();
-            $this->createRedirectConfigFile();
-            $syntaxCheck = $this->checkNginxConfiguration();
-            if (!$syntaxCheck) {
-                $this->logger->error('syntax check failed');
-                $this->restoreBackupOfRedirectConfigFile();
-                return false;
-            }
-            $webServerReload = $this->reloadNginx();
-            if (!$webServerReload) {
-                $this->logger->error('webserver reload failed');
-                $this->restoreBackupOfRedirectConfigFile();
-                $this->reloadNginx();
-                return false;
-            }
-            return true;
-        } catch (\Exception $exception) {
-            $this->logger->error($exception->getMessage(), [$exception]);
-            $this->restoreBackupOfRedirectConfigFile();
-            $this->reloadNginx();
-            return false;
-        }
+        $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
     }
 }

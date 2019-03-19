@@ -1,3 +1,0 @@
-# A static logout route
-logout:
-  path: /logout

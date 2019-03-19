@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the package t3g/intercept.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace App\Command;
 
 use App\Service\NginxService;
@@ -10,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RedirectCreateConfigFileCommand extends Command
 {
-    protected static $defaultName = 'redirect:create-config-and-reload';
+    protected static $defaultName = 'redirect:create-config-and-deploy';
 
     /**
      * @var NginxService
@@ -34,10 +41,10 @@ class RedirectCreateConfigFileCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Creating nginx redirect configuration file');
-        if ($this->nginxService->createNewConfigAndReload()) {
-            $io->success('nginx redirect configuration created.');
-        } else {
-            $io->error('Oops, something went wrong...');
-        }
+        $filename = $this->nginxService->createRedirectConfigFile();
+        $io->writeln('nginx redirect configuration created: ' . $filename);
+        $io->writeln('trigger now the deployment');
+        $this->nginxService->createDeploymentJob($filename);
+        $io->success('done');
     }
 }
