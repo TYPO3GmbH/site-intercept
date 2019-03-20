@@ -26,6 +26,7 @@ security:
                 service: Symfony\Component\Ldap\Ldap
                 dn_string: 'ou=people,dc=typo3,dc=org'
                 query_string: '(&(objectClass=inetOrgPerson)(uid={username}))'
+                success_handler: App\Security\AuthenticationSuccessHandler
             logout:
                 path: /logout
                 target: admin_index
