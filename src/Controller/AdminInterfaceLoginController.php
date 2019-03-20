@@ -13,10 +13,11 @@ namespace App\Controller;
 use App\Form\LoginFormType;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
@@ -34,12 +35,14 @@ class AdminInterfaceLoginController extends AbstractController
      * @param Request $request
      * @param LoggerInterface $logger
      * @param AuthenticationUtils $authUtils
+     * @param TokenStorageInterface $tokenStorage
      * @return Response
      */
     public function index(
         Request $request,
         LoggerInterface $logger,
-        AuthenticationUtils $authUtils
+        AuthenticationUtils $authUtils,
+        TokenStorageInterface $tokenStorage
     ): Response {
         $this->logger = $logger;
 
@@ -49,7 +52,7 @@ class AdminInterfaceLoginController extends AbstractController
         // last username entered by the user
         $lastUsername = $authUtils->getLastUsername();
 
-        if ($this->get('security.token_storage')->getToken()->getUser() instanceof User) {
+        if ($tokenStorage->getToken()->getUser() instanceof User) {
             return $this->redirect($this->generateUrl('admin_index'));
         }
 
