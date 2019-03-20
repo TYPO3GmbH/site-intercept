@@ -11,6 +11,10 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Client\GeneralClient;
+use App\Entity\DeploymentInformation;
+use App\Entity\DocumentationJar;
+use App\Repository\DocumentationJarRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,6 +22,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Command to create a shell script that set environment variables required for further documentation
@@ -27,6 +32,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class CreateDocumentationInformationScriptCommand extends Command
 {
+    /**
+     * @var array
+     */
     private static $typeMap = [
         'typo3-cms-documentation' => ['m' => 'manual'],
         'typo3-cms-framework' => ['c' => 'core-extension'],
@@ -35,14 +43,9 @@ class CreateDocumentationInformationScriptCommand extends Command
     ];
 
     /**
-     * @var string
+     * @var KernelInterface
      */
-    private $composerFile = '';
-
-    /**
-     * @var string
-     */
-    private $targetFile = '';
+    private $kernel;
 
     /**
      * @var Filesystem
@@ -60,20 +63,38 @@ class CreateDocumentationInformationScriptCommand extends Command
     private $logger;
 
     /**
+     * @var string
+     */
+    private $composerFile = '';
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
+     * @var DocumentationJarRepository
+     */
+    private $documentationJarRepository;
+
+    /**
      * Constructor
      *
-     * @param string|null $name
+     * @param KernelInterface $kernel
      * @param Filesystem $fileSystem
      * @param GeneralClient $client
      * @param LoggerInterface $logger
+     * @param EntityManagerInterface $entityManager
      */
-    public function __construct(?string $name, Filesystem $fileSystem, GeneralClient $client, LoggerInterface $logger)
+    public function __construct(KernelInterface $kernel, Filesystem $fileSystem, GeneralClient $client, LoggerInterface $logger, EntityManagerInterface $entityManager)
     {
-        parent::__construct($name);
+        parent::__construct();
 
         $this->fileSystem = $fileSystem;
+        $this->kernel = $kernel;
         $this->client = $client;
         $this->logger = $logger;
+        $this->entityManager = $entityManager;
     }
 
     protected function configure(): void
@@ -81,10 +102,10 @@ class CreateDocumentationInformationScriptCommand extends Command
         $this
             ->setName('prepare:deployment')
             ->setDescription('Prepares deployment, e.g. define some variables.')
-            ->addArgument('targetFile', InputArgument::REQUIRED, 'Path to file containing the output')
+            ->addArgument('version', InputArgument::REQUIRED, 'The rendered version, e.g. "master" or "10.5.2"')
             ->addArgument('repositoryUrl', InputArgument::REQUIRED, 'URL to the remote repository')
             ->addArgument('composerFile', InputArgument::REQUIRED, 'URL of the remote composer.json')
-            ->addArgument('version', InputArgument::REQUIRED, 'The rendered version, e.g. "master" or "10.5.2"');
+            ->addArgument('targetFileName', InputArgument::REQUIRED, 'Microtime of build');
     }
 
     /**
@@ -94,43 +115,83 @@ class CreateDocumentationInformationScriptCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $returnCode = 0;
+
+        $targetFileName = $input->getArgument('targetFileName');
+        $repositoryUrl = $input->getArgument('repositoryUrl');
         $this->composerFile = $input->getArgument('composerFile');
-        $this->targetFile = $input->getArgument('targetFile');
-        $this->assertFileOrFolderIsAccessible(dirname($this->targetFile));
         $version = $this->normalizeVersionString($input->getArgument('version'));
+        $this->documentationJarRepository = $this->entityManager->getRepository(DocumentationJar::class);
 
+        $deploymentInformation = $this->generateDeploymentInformation($this->composerFile, $version);
+        $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $input->getArgument('repositoryUrl'));
+
+        $privateFilePath = implode('/', [
+            $this->kernel->getCacheDir(),
+            $deploymentInformation->getVendor(),
+            $deploymentInformation->getName(),
+            $deploymentInformation->getVersion(),
+            basename($targetFileName),
+        ]);
+        $publicFilePath = $this->kernel->getProjectDir() . $targetFileName;
+
+        $this->entityManager->getConnection()->beginTransaction();
         try {
-            // TODO: Store information somewhere in sqlite
+            $documentationJar = (new DocumentationJar())
+                ->setRepositoryUrl($repositoryUrl)
+                ->setPackageName($deploymentInformation->getPackageName())
+                ->setBranch($deploymentInformation->getVersion());
+            $this->entityManager->persist($documentationJar);
+            $this->entityManager->flush();
 
-            $deploymentInformation = $this->generateDeploymentInformation($this->composerFile, $version);
+            if (!$this->fileSystem->exists($privateFilePath)) {
+                // TODO: Move the string concatenation magic in an Encoder class?
+                $this->fileSystem->appendToFile($privateFilePath, '#!/bin/bash' . PHP_EOL);
+                // Write deployment information as file content for `source`ing in shell
+                foreach ($deploymentInformation->toArray() as $property => $value) {
+                    $envAssignmentString = $property . '=' . $value;
+                    $this->fileSystem->appendToFile($privateFilePath, $envAssignmentString . PHP_EOL);
+                }
 
-            // TODO: Store array in file
-        } catch (\Exception $e)  {
-            // TODO: Rollback
+                if (!$this->fileSystem->exists(dirname($publicFilePath))) {
+                    $this->fileSystem->mkdir(dirname($publicFilePath));
+                }
+                $this->fileSystem->symlink($privateFilePath, $publicFilePath);
+            }
+            $this->entityManager->commit();
+        } catch (\Exception $e) {
+            if ($this->fileSystem->exists($privateFilePath)) {
+                $this->fileSystem->remove($privateFilePath);
+            }
+            $this->entityManager->getConnection()->rollBack();
             $output->writeln('<error>' . $e->getMessage() . '</error>');
-            return 2;
+            $returnCode = 2;
+        } finally {
+            if ($this->fileSystem->exists($publicFilePath)) {
+                $this->fileSystem->remove($publicFilePath);
+            }
         }
 
-        return 0;
+        return $returnCode;
     }
 
     /**
      * @param string $composerFilePath
      * @param string $version
-     * @return array
+     * @return DeploymentInformation
      */
-    private function generateDeploymentInformation(string $composerFilePath, string $version): array
+    private function generateDeploymentInformation(string $composerFilePath, string $version): DeploymentInformation
     {
         $composerJson = json_decode($this->fetchRemoteFile($composerFilePath), true);
-        $packageType = $this->determinePackageType($composerJson);
         $packageName = $this->determinePackageName($composerJson);
-        $deploymentInformation = [
-            'type_long' => key($packageType),
-            'type_short' => current($packageType),
-            'vendor' => key($packageName),
-            'name' => current($packageName),
-            'version' => $version,
-        ];
+        $packageType = $this->determinePackageType($composerJson);
+
+        $deploymentInformation = (new DeploymentInformation())
+            ->setVendor(key($packageName))
+            ->setName(current($packageName))
+            ->setVersion($version)
+            ->setTypeLong(key($packageType))
+            ->setTypeShort(current($packageType));
 
         return $deploymentInformation;
     }
@@ -152,17 +213,20 @@ class CreateDocumentationInformationScriptCommand extends Command
     }
 
     /**
-     * @param string $path
-     * @throws IOException
+     * @param DeploymentInformation $deploymentInformation
+     * @param string $repositoryUrl
      */
-    private function assertFileOrFolderIsAccessible(string $path): void
+    private function assertBuildWasTriggeredByRepositoryOwner(DeploymentInformation $deploymentInformation, string $repositoryUrl): void
     {
-        if (!is_readable($path)) {
-            throw new IOException('Directory or file ' . $path . ' is not readable', 1553077522);
-        }
+        $record = $this->documentationJarRepository->findOneBy([
+            'package_name' => $deploymentInformation->getPackageName()
+        ]);
 
-        if (!file_exists($path)) {
-            throw new IOException('Directory or file ' . $path . ' does not exist', 1553077528);
+        if ($record instanceof DocumentationJar && $record->getRepositoryUrl() !== $repositoryUrl) {
+            throw new \RuntimeException(
+                'Build was triggered by ' . $repositoryUrl . ' which seems to be a fork of ' . $record->getRepositoryUrl(),
+                1553090750
+            );
         }
     }
 

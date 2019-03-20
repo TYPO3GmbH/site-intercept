@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Extractor;
 
+use App\Client\GeneralClient;
 use App\Exception\DoNotCareException;
 
 /**
@@ -51,6 +52,11 @@ class GithubPushEventForDocs
         $this->composerFile = 'https://raw.githubusercontent.com/' . $repositoryName . '/' . $this->versionNumber . '/composer.json';
         if (empty($this->versionNumber) || empty($this->repositoryUrl)) {
             throw new DoNotCareException();
+        }
+
+        $response = (new GeneralClient())->request('HEAD', $this->composerFile);
+        if ($response->getStatusCode() !== 200) {
+            throw new DoNotCareException('Response status of file ' . $this->composerFile . ' is ' . $response->getStatusCode());
         }
     }
 

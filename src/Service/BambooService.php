@@ -110,6 +110,7 @@ class BambooService
                 'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->versionNumber),
                 'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->repositoryUrl),
                 'bamboo.variable.COMPOSER_FILE=' . urlencode($pushEventInformation->composerFile),
+                'bamboo.variable.TARGET_FILENAME=' . urlencode('builds/' . ceil(microtime(true) * 10000)),
             ]);
         return $this->sendBamboo('post', $uri);
     }
