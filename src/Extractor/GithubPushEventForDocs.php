@@ -10,7 +10,6 @@ declare(strict_types = 1);
 
 namespace App\Extractor;
 
-use App\Client\GeneralClient;
 use App\Exception\DoNotCareException;
 
 /**
@@ -53,11 +52,6 @@ class GithubPushEventForDocs
         if (empty($this->versionNumber) || empty($this->repositoryUrl)) {
             throw new DoNotCareException();
         }
-
-        $response = (new GeneralClient())->request('HEAD', $this->composerFile);
-        if ($response->getStatusCode() !== 200) {
-            throw new DoNotCareException('Response status of file ' . $this->composerFile . ' is ' . $response->getStatusCode());
-        }
     }
 
     /**
@@ -88,8 +82,8 @@ class GithubPushEventForDocs
         $path = trim(parse_url($repositoryUrl, PHP_URL_PATH), '/');
 
         // Remove .git suffix
-        $path = substr($path, 0, 4);
+        $path = substr($path, 0, -4);
 
-        return $path;
+        return $path ?: '';
     }
 }
