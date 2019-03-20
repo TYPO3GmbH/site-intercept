@@ -109,6 +109,7 @@ class BambooService
                 'os_authType=basic',
                 'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->versionNumber),
                 'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->repositoryUrl),
+                'bamboo.variable.COMPOSER_FILE=' . urlencode($pushEventInformation->composerFile),
             ]);
         return $this->sendBamboo('post', $uri);
     }

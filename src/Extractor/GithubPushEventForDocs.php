@@ -29,6 +29,13 @@ class GithubPushEventForDocs
     public $repositoryUrl = '';
 
     /**
+     * Path to composer.json in repository
+     *
+     * @var string
+     */
+    public $composerFile = '';
+
+    /**
      * Extract information needed by docs trigger from a github
      * push event or throw an exception if not responsible
      *
@@ -40,6 +47,8 @@ class GithubPushEventForDocs
         $payload = json_decode($payload, true);
         $this->versionNumber = $this->getVersionNumberFromRef($payload['ref']);
         $this->repositoryUrl = $payload['repository']['clone_url'];
+        $repositoryName = $this->extractRepositoryNameFromUrl($this->repositoryUrl);
+        $this->composerFile = 'https://raw.githubusercontent.com/' . $repositoryName . '/' . $this->versionNumber . '/composer.json';
         if (empty($this->versionNumber) || empty($this->repositoryUrl)) {
             throw new DoNotCareException();
         }
@@ -61,5 +70,20 @@ class GithubPushEventForDocs
             return str_replace('refs/heads/', '', $ref);
         }
         throw new DoNotCareException();
+    }
+
+    /**
+     * @param $repositoryUrl
+     * @return string
+     */
+    private function extractRepositoryNameFromUrl($repositoryUrl): string
+    {
+        // Extract repository name from URL
+        $path = trim(parse_url($repositoryUrl, PHP_URL_PATH), '/');
+
+        // Remove .git suffix
+        $path = substr($path, 0, 4);
+
+        return $path;
     }
 }
