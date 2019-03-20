@@ -23,6 +23,9 @@
                         <a href="{{ path('admin_index') }}" {% if active == 'home' %}class="active"{% endif %}>Home</a>
                     </li>
                     <li>
+                        <a href="{{ path('admin_login') }}" {% if active == 'login' %}class="active"{% endif %}>Login</a>
+                    </li>
+                    <li>
                         <a href="{{ path('admin_bamboo_core') }}" {% if active == 'bambooCore' %}class="active"{% endif %}>Bamboo Core</a>
                     </li>
                     <li>
