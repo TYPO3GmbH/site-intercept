@@ -10,7 +10,6 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
-use App\Form\LoginFormType;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
