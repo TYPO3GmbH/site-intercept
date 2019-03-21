@@ -1,6 +1,6 @@
 <?php
 declare(strict_types = 1);
-namespace App\Tests\Unit\Monolog\Processor;
+namespace App\Tests\Unit\Security;
 
 use App\Security\AuthenticationSuccessHandler;
 use PHPUnit\Framework\TestCase;

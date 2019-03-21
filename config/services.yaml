@@ -136,4 +136,3 @@ services:
             $searchDn: '%env(LDAP_SEARCH_USER)%'
             $searchPassword: '%env(LDAP_SEARCH_PASSWORD)%'
             $defaultRoles: [ 'ROLE_USER' ]
-            $uidKey: 'uid'
