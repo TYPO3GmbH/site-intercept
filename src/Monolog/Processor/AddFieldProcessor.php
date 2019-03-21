@@ -10,7 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Monolog\Processor;
 
-use App\Security\User;
+use App\Entity\User;
 use Symfony\Component\Security\Core\Security;
 
 /**

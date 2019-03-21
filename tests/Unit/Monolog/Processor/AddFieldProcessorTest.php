@@ -3,7 +3,7 @@ declare(strict_types = 1);
 namespace App\Tests\Unit\Monolog\Processor;
 
 use App\Monolog\Processor\AddFieldProcessor;
-use App\Security\User;
+use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Security\Core\Security;

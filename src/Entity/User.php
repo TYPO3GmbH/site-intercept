@@ -8,12 +8,14 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Security;
+namespace App\Entity;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Extend default LDAP user provider to handle isMemberOf attribute for roles
+ *
+ * @codeCoverageIgnore
  */
 class User implements UserInterface
 {

@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use App\Entity\User;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\LdapInterface;
