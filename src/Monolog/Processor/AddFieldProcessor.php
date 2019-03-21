@@ -10,6 +10,9 @@ declare(strict_types = 1);
 
 namespace App\Monolog\Processor;
 
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\User;
+
 /**
  * Adds key / values to a log record. Used by graylog logging
  * to add application and context information
@@ -26,7 +29,16 @@ class AddFieldProcessor
     public function __invoke(array $record)
     {
         foreach ($this->fieldValues as $fieldName => $fieldValue) {
-            $record['extra'][$fieldName] = $fieldValue;
+            if (!is_object($fieldValue)) {
+                $record['extra'][$fieldName] = $fieldValue;
+            } else {
+                if ($fieldValue instanceof Security) {
+                    $user = $fieldValue->getUser();
+                    if ($user instanceof User) {
+                        $record['extra']['username'] = $user->getUsername();
+                    }
+                }
+            }
         }
         return $record;
     }
