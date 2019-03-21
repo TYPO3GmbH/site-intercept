@@ -46,7 +46,10 @@ class AdminInterfaceLoginController extends AbstractController
         $this->logger = $logger;
 
         if ($tokenStorage->getToken()->getUser() instanceof User) {
+            // @codeCoverageIgnoreStart
+            // Successful login can't be tested directly
             return $this->redirect($this->generateUrl('admin_index'));
+            // @codeCoverageIgnoreEnd
         }
 
         // Get the login error if there is one and create a flash message from it
