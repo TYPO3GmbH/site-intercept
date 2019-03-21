@@ -1,3 +1,4 @@
+@import "~font-awesome/scss/font-awesome";
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
@@ -11,6 +12,8 @@
 @import "~bootstrap/scss/grid";
 @import "~bootstrap/scss/navbar";
 @import "~bootstrap/scss/transitions";
+@import "~bootstrap/scss/tables";
+@import "~bootstrap/scss/utilities";
 
 // Default collapse transition
 @mixin transition() {
@@ -24,6 +27,7 @@ $navbar-width: 250px;
 
 body {
   overflow-x: hidden;
+  background-color: $gray-100;
 }
 
 #top-wrapper {
