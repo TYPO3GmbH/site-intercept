@@ -68,6 +68,18 @@ services:
             $pullRequestPatchPath: '%kernel.project_dir%/var/patches/'
             $client: '@App\Client\GeneralClient'
 
+    App\Service\DocumentationBuildInformationService:
+        class: App\Service\DocumentationBuildInformationService
+        public: true
+        arguments:
+            $publicDir: '%kernel.project_dir%/public'
+            $cacheDir: '%kernel.cache_dir%'
+            $entityManager: '@Doctrine\ORM\EntityManagerInterface'
+            $fileSystem: '@Symfony\Component\Filesystem\Filesystem'
+            $logger: '@monolog.logger.request'
+        tags:
+            - testDouble
+
     App\Service\RabbitPublisherService:
         class: App\Service\RabbitPublisherService
         arguments:

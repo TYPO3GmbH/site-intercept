@@ -8,19 +8,20 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Generator;
+namespace App\Service;
 
 use App\Client\GeneralClient;
-use App\Entity\DeploymentInformation;
 use App\Entity\DocumentationJar;
+use App\Extractor\DeploymentInformation;
+use App\Extractor\DocumentationBuildInformation;
 use App\Extractor\GithubPushEventForDocs;
-use App\Kernel;
 use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
-class BuildInstruction
+class DocumentationBuildInformationService
 {
     /**
      * @var array
@@ -33,9 +34,14 @@ class BuildInstruction
     ];
 
     /**
-     * @var Kernel
+     * @var string
      */
-    private $kernel;
+    private $publicDir;
+
+    /**
+     * @var string
+     */
+    private $cacheDir;
 
     /**
      * @var EntityManagerInterface
@@ -48,65 +54,75 @@ class BuildInstruction
     private $fileSystem;
 
     /**
-     * @var int
+     * @var LoggerInterface
      */
-    private $buildTime;
+    private $logger;
 
     /**
      * @var DocumentationJarRepository
      */
     private $documentationJarRepository;
 
-    public function __construct(Kernel $kernel, EntityManagerInterface $entityManager, Filesystem $fileSystem)
+    /**
+     * Constructor
+     *
+     * @param string $publicDir
+     * @param string $cacheDir
+     * @param EntityManagerInterface $entityManager
+     * @param Filesystem $fileSystem
+     * @param LoggerInterface $logger
+     */
+    public function __construct(string $publicDir, string $cacheDir, EntityManagerInterface $entityManager, Filesystem $fileSystem, LoggerInterface $logger)
     {
-        $this->kernel = $kernel;
+        $this->publicDir = $publicDir;
+        $this->cacheDir = $cacheDir;
         $this->entityManager = $entityManager;
         $this->fileSystem = $fileSystem;
-        $this->buildTime = ceil(microtime(true) * 10000);
+        $this->logger = $logger;
+        $this->documentationJarRepository = $this->entityManager->getRepository(DocumentationJar::class);
     }
 
     /**
      * @param GithubPushEventForDocs $pushEventForDocs
-     * @return string
+     * @return DocumentationBuildInformation
      * @throws \Exception
      */
-    public function generate(GithubPushEventForDocs $pushEventForDocs): string
+    public function generateBuildInformation(GithubPushEventForDocs $pushEventForDocs): DocumentationBuildInformation
     {
-        $deploymentInformation = $this->generateDeploymentInformation($pushEventForDocs->composerFile, $pushEventForDocs->versionNumber);
+        $buildTime = ceil(microtime(true) * 10000);
+        $branchName = $this->normalizeBranchName($pushEventForDocs->tagOrBranchName);
+        $deploymentInformation = $this->generateDeploymentInformation($pushEventForDocs->composerFile, $branchName);
         $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $pushEventForDocs->repositoryUrl);
 
         $privateFilePath = implode('/', [
-            $this->kernel->getCacheDir(),
+            $this->cacheDir,
             $deploymentInformation->getVendor(),
             $deploymentInformation->getName(),
-            $deploymentInformation->getVersion(),
+            $deploymentInformation->getBranch(),
             'builds',
-            $this->buildTime,
+            $buildTime,
         ]);
-        $publicFilePath = $this->kernel->getProjectDir() . '/builds/' . $this->buildTime;
+        $relativePublicFilePath = 'builds/' . $buildTime;
+        $absolutePublicFilePath = $this->publicDir . '/' . $relativePublicFilePath;
 
         $this->entityManager->getConnection()->beginTransaction();
         try {
             $documentationJar = (new DocumentationJar())
                 ->setRepositoryUrl($pushEventForDocs->repositoryUrl)
                 ->setPackageName($deploymentInformation->getPackageName())
-                ->setBranch($deploymentInformation->getVersion());
+                ->setBranch($deploymentInformation->getBranch());
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
 
             if (!$this->fileSystem->exists($privateFilePath)) {
                 // TODO: Move the string concatenation magic in an Encoder class?
-                $this->fileSystem->appendToFile($privateFilePath, '#!/bin/bash' . PHP_EOL);
-                // Write deployment information as file content for `source`ing in shell
+                $fileContent = '#!/bin/bash' . PHP_EOL;
                 foreach ($deploymentInformation->toArray() as $property => $value) {
-                    $envAssignmentString = $property . '=' . $value;
-                    $this->fileSystem->appendToFile($privateFilePath, $envAssignmentString . PHP_EOL);
+                    $fileContent .= $property . '=' . $value . PHP_EOL;
                 }
 
-                if (!$this->fileSystem->exists(dirname($publicFilePath))) {
-                    $this->fileSystem->mkdir(dirname($publicFilePath));
-                }
-                $this->fileSystem->symlink($privateFilePath, $publicFilePath);
+                $this->fileSystem->dumpFile($privateFilePath, $fileContent);
+                $this->fileSystem->symlink($privateFilePath, $absolutePublicFilePath);
             }
             $this->entityManager->commit();
         } catch (\Exception $e) {
@@ -114,36 +130,34 @@ class BuildInstruction
                 $this->fileSystem->remove($privateFilePath);
             }
 
-            if ($this->fileSystem->exists($publicFilePath)) {
-                $this->fileSystem->remove($publicFilePath);
+            if ($this->fileSystem->exists($absolutePublicFilePath)) {
+                $this->fileSystem->remove($absolutePublicFilePath);
             }
             $this->entityManager->getConnection()->rollBack();
 
             throw $e;
         }
 
-        return $publicFilePath;
+        return new DocumentationBuildInformation($relativePublicFilePath);
     }
 
     /**
      * @param string $composerFilePath
-     * @param string $version
+     * @param string $branch
      * @return DeploymentInformation
      */
-    private function generateDeploymentInformation(string $composerFilePath, string $version): DeploymentInformation
+    private function generateDeploymentInformation(string $composerFilePath, string $branch): DeploymentInformation
     {
         $composerJson = json_decode($this->fetchRemoteFile($composerFilePath), true);
         $packageName = $this->determinePackageName($composerJson);
         $packageType = $this->determinePackageType($composerJson);
 
-        $deploymentInformation = (new DeploymentInformation())
-            ->setVendor(key($packageName))
-            ->setName(current($packageName))
-            ->setVersion($version)
-            ->setTypeLong(key($packageType))
-            ->setTypeShort(current($packageType));
+        $vendor = key($packageName);
+        $name = current($packageName);
+        $longPackageType = current($packageType);
+        $shortPackageType = key($packageType);
 
-        return $deploymentInformation;
+        return new DeploymentInformation($vendor, $name, $branch, $longPackageType, $shortPackageType);
     }
 
     /**
@@ -186,14 +200,14 @@ class BuildInstruction
      * @param string $version
      * @return string
      */
-    private function normalizeVersionString(string $version): string
+    private function normalizeBranchName(string $version): string
     {
         if ($version === 'latest') {
-            // TODO: For the time being, the version "latest" is mapped to "master"
+            // TODO: For the time being the version "latest" is mapped to "master"
             $version = 'master';
         }
 
-        if (!preg_match('/^master|(?:v?\d+.\d+.\d+)/$', $version)) {
+        if (!preg_match('/^master|(?:v?\d+.\d+.\d+)$/', $version)) {
             throw new \InvalidArgumentException('Invalid version format given, expected either "latest" "master" or \d.\d.\d.');
         }
 
@@ -216,7 +230,7 @@ class BuildInstruction
             return self::$typeMap[$composerJson['type']];
         }
 
-        $this->logger->info('Received unmapped package type ' . $composerJson['type'] . ' as defined in ' . $this->composerFile . ', falling back to default');
+        $this->logger->info('Received unmapped package type "' . $composerJson['type'] . '" as defined in composer.json, falling back to default');
         return self::$typeMap['__default'];
     }
 

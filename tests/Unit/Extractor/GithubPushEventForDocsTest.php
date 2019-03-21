@@ -5,8 +5,6 @@ namespace App\Tests\Unit\Extractor;
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubPushEventForDocs;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class GithubPushEventForDocsTest extends TestCase
 {
@@ -22,8 +20,8 @@ class GithubPushEventForDocsTest extends TestCase
      */
     public function constructorExtractsValues()
     {
-        $subject = new GithubPushEventForDocs($this->generateRequestStackWithPayload($this->payload));
-        $this->assertSame('1.2.3', $subject->versionNumber);
+        $subject = new GithubPushEventForDocs(json_encode($this->payload));
+        $this->assertSame('1.2.3', $subject->tagOrBranchName);
         $this->assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
     }
 
@@ -34,8 +32,8 @@ class GithubPushEventForDocsTest extends TestCase
     {
         $payload = $this->payload;
         $payload['ref'] = 'refs/heads/latest';
-        $subject = new GithubPushEventForDocs($this->generateRequestStackWithPayload($payload));
-        $this->assertSame('latest', $subject->versionNumber);
+        $subject = new GithubPushEventForDocs(json_encode($payload));
+        $this->assertSame('latest', $subject->tagOrBranchName);
         $this->assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
     }
 
@@ -47,7 +45,7 @@ class GithubPushEventForDocsTest extends TestCase
         $this->expectException(DoNotCareException::class);
         $payload = $this->payload;
         $payload['ref'] = 'refs/foo/latest';
-        new GithubPushEventForDocs($this->generateRequestStackWithPayload($payload));
+        new GithubPushEventForDocs(json_encode($payload));
     }
 
     /**
@@ -58,18 +56,6 @@ class GithubPushEventForDocsTest extends TestCase
         $this->expectException(DoNotCareException::class);
         $payload = $this->payload;
         $payload['repository']['clone_url'] = '';
-        new GithubPushEventForDocs($this->generateRequestStackWithPayload($payload));
-    }
-
-    /**
-     * @param array $payload
-     * @return RequestStack
-     */
-    private function generateRequestStackWithPayload(array $payload): RequestStack
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request([], [], [], [], [], [], json_encode($payload)));
-
-        return $requestStack;
+        new GithubPushEventForDocs(json_encode($payload));
     }
 }

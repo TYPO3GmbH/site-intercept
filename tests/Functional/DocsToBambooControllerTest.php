@@ -4,7 +4,8 @@ namespace App\Tests\Functional;
 
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
-use App\Generator\BuildInstruction;
+use App\Extractor\DocumentationBuildInformation;
+use App\Service\DocumentationBuildInformationService;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -16,9 +17,12 @@ class DocsToBambooControllerTest extends TestCase
      */
     public function bambooBuildIsTriggered()
     {
-        $buildInstructionProphecy = $this->prophesize(BuildInstruction::class);
-        $buildInstructionProphecy->generate(Argument::any())->willReturn('/var/www/intercept/public/builds/1553095156937');
-        TestDoubleBundle::addProphecy('App\Generator\BuildInstruction', $buildInstructionProphecy);
+        $documentationBuildInformationServiceProphecy = $this->prophesize(DocumentationBuildInformationService::class);
+        TestDoubleBundle::addProphecy(DocumentationBuildInformationService::class, $documentationBuildInformationServiceProphecy);
+
+        $documentationBuildInformationServiceProphecy->generateBuildInformation(Argument::any())->shouldBeCalled()->willReturn(
+            new DocumentationBuildInformation('builds/1553095156937')
+        );
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy

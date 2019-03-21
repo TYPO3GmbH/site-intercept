@@ -11,7 +11,6 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\DoNotCareException;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Extract information from a github push event hook
@@ -22,7 +21,7 @@ class GithubPushEventForDocs
     /**
      * @var string A tag or a branch name
      */
-    public $versionNumber = '';
+    public $tagOrBranchName = '';
 
     /**
      * @var string Repository url to clone, eg. 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git'
@@ -40,17 +39,17 @@ class GithubPushEventForDocs
      * Extract information needed by docs trigger from a github
      * push event or throw an exception if not responsible
      *
-     * @param RequestStack $requestStack
+     * @param string $payload
      * @throws DoNotCareException
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(string $payload)
     {
-        $payload = json_decode($requestStack->getCurrentRequest()->getContent(), true);
-        $this->versionNumber = $this->getVersionNumberFromRef($payload['ref']);
+        $payload = json_decode($payload, true);
+        $this->tagOrBranchName = $this->getTagOrBranchFromRef($payload['ref']);
         $this->repositoryUrl = $payload['repository']['clone_url'];
         $repositoryName = $this->extractRepositoryNameFromUrl($this->repositoryUrl);
-        $this->composerFile = 'https://raw.githubusercontent.com/' . $repositoryName . '/' . $this->versionNumber . '/composer.json';
-        if (empty($this->versionNumber) || empty($this->repositoryUrl)) {
+        $this->composerFile = 'https://raw.githubusercontent.com/' . $repositoryName . '/' . $this->tagOrBranchName . '/composer.json';
+        if (empty($this->tagOrBranchName) || empty($this->repositoryUrl)) {
             throw new DoNotCareException();
         }
     }
@@ -62,7 +61,7 @@ class GithubPushEventForDocs
      * @return string
      * @throws DoNotCareException
      */
-    private function getVersionNumberFromRef(string $ref): string
+    private function getTagOrBranchFromRef(string $ref): string
     {
         if (strpos($ref, 'refs/tags/') === 0) {
             return str_replace('refs/tags/', '', $ref);

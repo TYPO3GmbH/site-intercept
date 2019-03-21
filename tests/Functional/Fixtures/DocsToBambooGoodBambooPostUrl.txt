@@ -1,1 +1,1 @@
-latest/queue/CORE-DR?stage=&executeAllStages=&os_authType=basic&bamboo.variable.VERSION_NUMBER=latest&bamboo.variable.REPOSITORY_URL=https%3A%2F%2Fgithub.com%2FTYPO3-Documentation%2FTYPO3CMS-Reference-CoreApi.git&bamboo.variable.TARGET_FILENAME=%2Fvar%2Fwww%2Fintercept%2Fpublic%2Fbuilds%2F1553095156937
+latest/queue/CORE-DR?stage=&executeAllStages=&os_authType=basic&bamboo.variable.BUILD_INFORMATION_FILE=builds%2F1553095156937

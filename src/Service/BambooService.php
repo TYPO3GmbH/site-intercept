@@ -14,9 +14,8 @@ use App\Client\BambooClient;
 use App\Extractor\BambooBuildStatus;
 use App\Extractor\BambooBuildTriggered;
 use App\Extractor\BambooSlackMessage;
+use App\Extractor\DocumentationBuildInformation;
 use App\Extractor\GerritToBambooCore;
-use App\Extractor\GithubPushEventForDocs;
-use App\Generator\BuildInstruction;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -105,23 +104,18 @@ class BambooService
     /**
      * Triggers new build in project CORE-DR
      *
-     * @param GithubPushEventForDocs $pushEventInformation
+     * @param DocumentationBuildInformation $documentationBuildInformation
      * @return ResponseInterface
      */
-    public function triggerDocumentationPlan(GithubPushEventForDocs $pushEventInformation): ResponseInterface
+    public function triggerDocumentationPlan(DocumentationBuildInformation $documentationBuildInformation): ResponseInterface
     {
-        $buildInstruction = $this->container->get(BuildInstruction::class);
-        $publicBuildFilePath = $buildInstruction->generate($pushEventInformation);
-
         $uri = 'latest/queue/'
             . 'CORE-DR?'
             . implode('&', [
                 'stage=',
                 'executeAllStages=',
                 'os_authType=basic',
-                'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->versionNumber),
-                'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->repositoryUrl),
-                'bamboo.variable.TARGET_FILENAME=' . urlencode($publicBuildFilePath),
+                'bamboo.variable.BUILD_INFORMATION_FILE=' . urlencode($documentationBuildInformation->getFilePath()),
             ]);
         return $this->sendBamboo('post', $uri);
     }
