@@ -16,7 +16,6 @@ use App\Extractor\BambooBuildTriggered;
 use App\Extractor\BambooSlackMessage;
 use App\Extractor\DocumentationBuildInformation;
 use App\Extractor\GerritToBambooCore;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -30,20 +29,13 @@ class BambooService
     private $client;
 
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
      * BambooService constructor.
      *
      * @param BambooClient $client
-     * @param ContainerInterface $container
      */
-    public function __construct(BambooClient $client, ContainerInterface $container)
+    public function __construct(BambooClient $client)
     {
         $this->client = $client;
-        $this->container = $container;
     }
 
     /**
