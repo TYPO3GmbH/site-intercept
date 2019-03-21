@@ -16,6 +16,8 @@ use App\Extractor\BambooBuildTriggered;
 use App\Extractor\BambooSlackMessage;
 use App\Extractor\GerritToBambooCore;
 use App\Extractor\GithubPushEventForDocs;
+use App\Generator\BuildInstruction;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -29,13 +31,20 @@ class BambooService
     private $client;
 
     /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
      * BambooService constructor.
      *
      * @param BambooClient $client
+     * @param ContainerInterface $container
      */
-    public function __construct(BambooClient $client)
+    public function __construct(BambooClient $client, ContainerInterface $container)
     {
         $this->client = $client;
+        $this->container = $container;
     }
 
     /**
@@ -101,6 +110,9 @@ class BambooService
      */
     public function triggerDocumentationPlan(GithubPushEventForDocs $pushEventInformation): ResponseInterface
     {
+        $buildInstruction = $this->container->get(BuildInstruction::class);
+        $publicBuildFilePath = $buildInstruction->generate($pushEventInformation);
+
         $uri = 'latest/queue/'
             . 'CORE-DR?'
             . implode('&', [
@@ -109,8 +121,7 @@ class BambooService
                 'os_authType=basic',
                 'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->versionNumber),
                 'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->repositoryUrl),
-                'bamboo.variable.COMPOSER_FILE=' . urlencode($pushEventInformation->composerFile),
-                'bamboo.variable.TARGET_FILENAME=' . urlencode('builds/' . ceil(microtime(true) * 10000)),
+                'bamboo.variable.TARGET_FILENAME=' . urlencode($publicBuildFilePath),
             ]);
         return $this->sendBamboo('post', $uri);
     }

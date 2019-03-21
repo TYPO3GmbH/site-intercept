@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\DoNotCareException;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Extract information from a github push event hook
@@ -39,12 +40,12 @@ class GithubPushEventForDocs
      * Extract information needed by docs trigger from a github
      * push event or throw an exception if not responsible
      *
-     * @param string $payload
+     * @param RequestStack $requestStack
      * @throws DoNotCareException
      */
-    public function __construct(string $payload)
+    public function __construct(RequestStack $requestStack)
     {
-        $payload = json_decode($payload, true);
+        $payload = json_decode($requestStack->getCurrentRequest()->getContent(), true);
         $this->versionNumber = $this->getVersionNumberFromRef($payload['ref']);
         $this->repositoryUrl = $payload['repository']['clone_url'];
         $repositoryName = $this->extractRepositoryNameFromUrl($this->repositoryUrl);

@@ -2,10 +2,9 @@
 declare(strict_types = 1);
 namespace App\Tests\Functional;
 
-use App\Bundle\ClockMock;
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
-use App\Service\BambooService;
+use App\Generator\BuildInstruction;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -17,8 +16,9 @@ class DocsToBambooControllerTest extends TestCase
      */
     public function bambooBuildIsTriggered()
     {
-        ClockMock::register(BambooService::class);
-        ClockMock::withClockMock(155309515.6937);
+        $buildInstructionProphecy = $this->prophesize(BuildInstruction::class);
+        $buildInstructionProphecy->generate(Argument::any())->willReturn('/var/www/intercept/public/builds/1553095156937');
+        TestDoubleBundle::addProphecy('App\Generator\BuildInstruction', $buildInstructionProphecy);
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy

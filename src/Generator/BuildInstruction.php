@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -8,29 +8,19 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Command;
+namespace App\Generator;
 
 use App\Client\GeneralClient;
 use App\Entity\DeploymentInformation;
 use App\Entity\DocumentationJar;
+use App\Extractor\GithubPushEventForDocs;
+use App\Kernel;
 use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
- * Command to create a shell script that set environment variables required for further documentation
- * rendering and deployment.
- *
- * @codeCoverageIgnore
- */
-class CreateDocumentationInformationScriptCommand extends Command
+class BuildInstruction
 {
     /**
      * @var array
@@ -43,29 +33,9 @@ class CreateDocumentationInformationScriptCommand extends Command
     ];
 
     /**
-     * @var KernelInterface
+     * @var Kernel
      */
     private $kernel;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
-    /**
-     * @var GeneralClient
-     */
-    private $client;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var string
-     */
-    private $composerFile = '';
 
     /**
      * @var EntityManagerInterface
@@ -73,72 +43,52 @@ class CreateDocumentationInformationScriptCommand extends Command
     private $entityManager;
 
     /**
+     * @var Filesystem
+     */
+    private $fileSystem;
+
+    /**
+     * @var int
+     */
+    private $buildTime;
+
+    /**
      * @var DocumentationJarRepository
      */
     private $documentationJarRepository;
 
-    /**
-     * Constructor
-     *
-     * @param KernelInterface $kernel
-     * @param Filesystem $fileSystem
-     * @param GeneralClient $client
-     * @param LoggerInterface $logger
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct(KernelInterface $kernel, Filesystem $fileSystem, GeneralClient $client, LoggerInterface $logger, EntityManagerInterface $entityManager)
+    public function __construct(Kernel $kernel, EntityManagerInterface $entityManager, Filesystem $fileSystem)
     {
-        parent::__construct();
-
-        $this->fileSystem = $fileSystem;
         $this->kernel = $kernel;
-        $this->client = $client;
-        $this->logger = $logger;
         $this->entityManager = $entityManager;
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setName('prepare:deployment')
-            ->setDescription('Prepares deployment, e.g. define some variables.')
-            ->addArgument('version', InputArgument::REQUIRED, 'The rendered version, e.g. "master" or "10.5.2"')
-            ->addArgument('repositoryUrl', InputArgument::REQUIRED, 'URL to the remote repository')
-            ->addArgument('composerFile', InputArgument::REQUIRED, 'URL of the remote composer.json')
-            ->addArgument('targetFileName', InputArgument::REQUIRED, 'Microtime of build');
+        $this->fileSystem = $fileSystem;
+        $this->buildTime = ceil(microtime(true) * 10000);
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
+     * @param GithubPushEventForDocs $pushEventForDocs
+     * @return string
+     * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function generate(GithubPushEventForDocs $pushEventForDocs): string
     {
-        $returnCode = 0;
-
-        $targetFileName = $input->getArgument('targetFileName');
-        $repositoryUrl = $input->getArgument('repositoryUrl');
-        $this->composerFile = $input->getArgument('composerFile');
-        $version = $this->normalizeVersionString($input->getArgument('version'));
-        $this->documentationJarRepository = $this->entityManager->getRepository(DocumentationJar::class);
-
-        $deploymentInformation = $this->generateDeploymentInformation($this->composerFile, $version);
-        $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $input->getArgument('repositoryUrl'));
+        $deploymentInformation = $this->generateDeploymentInformation($pushEventForDocs->composerFile, $pushEventForDocs->versionNumber);
+        $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $pushEventForDocs->repositoryUrl);
 
         $privateFilePath = implode('/', [
             $this->kernel->getCacheDir(),
             $deploymentInformation->getVendor(),
             $deploymentInformation->getName(),
             $deploymentInformation->getVersion(),
-            basename($targetFileName),
+            'builds',
+            $this->buildTime,
         ]);
-        $publicFilePath = $this->kernel->getProjectDir() . $targetFileName;
+        $publicFilePath = $this->kernel->getProjectDir() . '/builds/' . $this->buildTime;
 
         $this->entityManager->getConnection()->beginTransaction();
         try {
             $documentationJar = (new DocumentationJar())
-                ->setRepositoryUrl($repositoryUrl)
+                ->setRepositoryUrl($pushEventForDocs->repositoryUrl)
                 ->setPackageName($deploymentInformation->getPackageName())
                 ->setBranch($deploymentInformation->getVersion());
             $this->entityManager->persist($documentationJar);
@@ -163,16 +113,16 @@ class CreateDocumentationInformationScriptCommand extends Command
             if ($this->fileSystem->exists($privateFilePath)) {
                 $this->fileSystem->remove($privateFilePath);
             }
-            $this->entityManager->getConnection()->rollBack();
-            $output->writeln('<error>' . $e->getMessage() . '</error>');
-            $returnCode = 2;
-        } finally {
+
             if ($this->fileSystem->exists($publicFilePath)) {
                 $this->fileSystem->remove($publicFilePath);
             }
+            $this->entityManager->getConnection()->rollBack();
+
+            throw $e;
         }
 
-        return $returnCode;
+        return $publicFilePath;
     }
 
     /**
@@ -197,22 +147,6 @@ class CreateDocumentationInformationScriptCommand extends Command
     }
 
     /**
-     * @param string $path
-     * @return string
-     */
-    private function fetchRemoteFile(string $path): string
-    {
-        $response = $this->client->request('GET', $path);
-        $statusCode = $response->getStatusCode();
-
-        if ($statusCode !== 200) {
-            throw new IOException('Could not read remote file ' . $path . ', received status code ' . $statusCode, 1553081065);
-        }
-
-        return $response->getBody()->getContents();
-    }
-
-    /**
      * @param DeploymentInformation $deploymentInformation
      * @param string $repositoryUrl
      */
@@ -228,6 +162,22 @@ class CreateDocumentationInformationScriptCommand extends Command
                 1553090750
             );
         }
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    private function fetchRemoteFile(string $path): string
+    {
+        $response = (new GeneralClient())->request('GET', $path);
+        $statusCode = $response->getStatusCode();
+
+        if ($statusCode !== 200) {
+            throw new IOException('Could not read remote file ' . $path . ', received status code ' . $statusCode, 1553081065);
+        }
+
+        return $response->getBody()->getContents();
     }
 
     /**

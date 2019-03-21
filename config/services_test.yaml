@@ -17,3 +17,6 @@ services:
     App\Client\SlackClient:
         tags:
             - testDouble
+    App\Generator\BuildInstruction:
+        tags:
+            - testDouble
