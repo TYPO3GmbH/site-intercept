@@ -14,6 +14,7 @@ namespace App\Tests\Unit\Security;
 use App\Entity\User;
 use App\Security\LdapUserProvider;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
@@ -62,6 +63,77 @@ class LdapUserProviderTest extends TestCase
         $ldapProphecy = $this->prophesize(LdapInterface::class);
         $subject = new LdapUserProvider($ldapProphecy->reveal(), '');
         $this->assertTrue($subject->supportsClass(User::class));
+    }
+
+    /**
+     * @test
+     */
+    public function loadUserByUsernameLoadsUserWithRoles()
+    {
+        /** @var ObjectProphecy|LdapInterface $ldapProphecy */
+        $ldapProphecy = $this->prophesize(LdapInterface::class);
+        $queryProphecy = $this->prophesize(QueryInterface::class);
+        $ldapProphecy->bind(Argument::cetera())->shouldBeCalled();
+        $ldapProphecy->escape(Argument::cetera())->willReturnArgument(0);
+        $ldapProphecy->query(Argument::cetera())->willReturn($queryProphecy->reveal());
+        $entryProphecy = $this->prophesize(Entry::class);
+        $queryProphecy->execute()->willReturn([$entryProphecy->reveal()]);
+        $entryProphecy->hasAttribute('uid')->willReturn(true);
+        $entryProphecy->getAttribute('uid')->willReturn(['myUser']);
+        $entryProphecy->hasAttribute('displayName')->willReturn(true);
+        $entryProphecy->getAttribute('displayName')->willReturn(['myDisplayName']);
+        $entryProphecy->hasAttribute('isMemberOf')->willReturn(true);
+        $entryProphecy->getAttribute('isMemberOf')->willReturn(['typo3.com-gmbh']);
+        $subject = new LdapUserProvider($ldapProphecy->reveal(), '');
+        $result = $subject->loadUserByUsername('uid');
+        $this->assertEquals('myUser', $result->getUsername());
+        $this->assertEquals('myDisplayName', $result->getDisplayName());
+        $this->assertEquals(['typo3.com-gmbh' => 'ROLE_ADMIN'], $result->getRoles());
+    }
+
+    /**
+     * @test
+     */
+    public function loadUserByUsernameLoadsUserIfNoIsMemberOfAttributeIsSet()
+    {
+        /** @var ObjectProphecy|LdapInterface $ldapProphecy */
+        $ldapProphecy = $this->prophesize(LdapInterface::class);
+        $queryProphecy = $this->prophesize(QueryInterface::class);
+        $ldapProphecy->bind(Argument::cetera())->shouldBeCalled();
+        $ldapProphecy->escape(Argument::cetera())->willReturnArgument(0);
+        $ldapProphecy->query(Argument::cetera())->willReturn($queryProphecy->reveal());
+        $entryProphecy = $this->prophesize(Entry::class);
+        $queryProphecy->execute()->willReturn([$entryProphecy->reveal()]);
+        $entryProphecy->hasAttribute('uid')->willReturn(true);
+        $entryProphecy->getAttribute('uid')->willReturn(['myUser']);
+        $entryProphecy->hasAttribute('displayName')->willReturn(true);
+        $entryProphecy->getAttribute('displayName')->willReturn(['myDisplayName']);
+        $entryProphecy->hasAttribute('isMemberOf')->willReturn(false);
+        $subject = new LdapUserProvider($ldapProphecy->reveal(), '');
+        $result = $subject->loadUserByUsername('uid');
+        $this->assertEquals('myUser', $result->getUsername());
+        $this->assertEquals('myDisplayName', $result->getDisplayName());
+        $this->assertEquals([], $result->getRoles());
+    }
+
+    /**
+     * @test
+     * @expectedException \Symfony\Component\Security\Core\Exception\InvalidArgumentException
+     */
+    public function loadUserByUsernameThrowsIfUidAttributeIsSetTwice()
+    {
+        /** @var ObjectProphecy|LdapInterface $ldapProphecy */
+        $ldapProphecy = $this->prophesize(LdapInterface::class);
+        $queryProphecy = $this->prophesize(QueryInterface::class);
+        $ldapProphecy->bind(Argument::cetera())->shouldBeCalled();
+        $ldapProphecy->escape(Argument::cetera())->willReturnArgument(0);
+        $ldapProphecy->query(Argument::cetera())->willReturn($queryProphecy->reveal());
+        $entryProphecy = $this->prophesize(Entry::class);
+        $queryProphecy->execute()->willReturn([$entryProphecy->reveal()]);
+        $entryProphecy->hasAttribute('uid')->willReturn(true);
+        $entryProphecy->getAttribute('uid')->willReturn(['myUser', 'myOtherUser']);
+        $subject = new LdapUserProvider($ldapProphecy->reveal(), '');
+        $subject->loadUserByUsername('uid');
     }
 
     /**

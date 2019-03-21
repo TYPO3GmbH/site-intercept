@@ -36,7 +36,6 @@ class LdapUserProvider implements UserProviderInterface
     private $searchPassword;
     private $defaultRoles;
     private $defaultSearch;
-    private $passwordAttribute;
 
     /**
      * Map ldap isMemberOf attributes to roles
@@ -54,15 +53,13 @@ class LdapUserProvider implements UserProviderInterface
      * @param string $searchDn
      * @param string $searchPassword
      * @param array $defaultRoles
-     * @param string $passwordAttribute
      */
     public function __construct(
         LdapInterface $ldap,
         string $baseDn,
         string $searchDn = null,
         $searchPassword = null,
-        array $defaultRoles = [],
-        string $passwordAttribute = null
+        array $defaultRoles = []
     ) {
         $this->ldap = $ldap;
         $this->baseDn = $baseDn;
@@ -70,7 +67,6 @@ class LdapUserProvider implements UserProviderInterface
         $this->searchPassword = $searchPassword;
         $this->defaultRoles = $defaultRoles;
         $this->defaultSearch = '(uid={username})';
-        $this->passwordAttribute = $passwordAttribute;
     }
 
     /**
@@ -83,23 +79,19 @@ class LdapUserProvider implements UserProviderInterface
      */
     protected function loadUser($username, Entry $entry): User
     {
-        $password = null;
-        if (null !== $this->passwordAttribute) {
-            $password = $this->getAttributeValue($entry, $this->passwordAttribute);
-        }
         $displayName = '';
         if ($entry->hasAttribute('displayName')) {
             $displayName = $this->getAttributeValue($entry, 'displayName');
         }
         if (!$entry->hasAttribute('isMemberOf')) {
             // If user does not have this attribute at all, he's just ROLE_USER
-            return new User($username, $password, $displayName, $this->defaultRoles);
+            return new User($username, null, $displayName, $this->defaultRoles);
         }
         // If user has attribute, assign roles that map
         $isMemberOfValues = $entry->getAttribute('isMemberOf');
         $hasRoles = array_intersect_key($this->roleMapping, array_flip($isMemberOfValues));
         $roles = array_merge($this->defaultRoles, $hasRoles);
-        return new User($username, $password, $displayName, $roles);
+        return new User($username, null, $displayName, $roles);
     }
 
     /**
