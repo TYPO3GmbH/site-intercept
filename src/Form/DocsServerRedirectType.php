@@ -9,13 +9,17 @@
 
 namespace App\Form;
 
-use App\Entity\Redirect;
+use App\Entity\DocsServerRedirect;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class RedirectType extends AbstractType
+/**
+ * Class DocsServerRedirectType
+ * Form definition for the redirect entity
+ */
+class DocsServerRedirectType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -23,7 +27,7 @@ class RedirectType extends AbstractType
             ->add('source')
             ->add('target')
             ->add('statusCode', ChoiceType::class, [
-                'choices' => Redirect::$allowedStatusCodes,
+                'choices' => DocsServerRedirect::$allowedStatusCodes,
                 'choice_label' => function ($value) {
                     return $value;
                 }
@@ -34,7 +38,7 @@ class RedirectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Redirect::class,
+            'data_class' => DocsServerRedirect::class,
         ]);
     }
 }

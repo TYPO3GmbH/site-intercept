@@ -10,6 +10,9 @@ declare(strict_types = 1);
 
 namespace App\Exception;
 
+/**
+ * Thrown if given HTTP status code is invalid for a redirect
+ */
 class InvalidStatusException extends \RuntimeException
 {
 }

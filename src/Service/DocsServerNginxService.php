@@ -10,15 +10,19 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use App\Repository\RedirectRepository;
-use Psr\Log\LoggerInterface;
+use App\Repository\DocsServerRedirectRepository;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class NginxService
+/**
+ * This class creates a nginx configuration file which contains all redirects from database.
+ * It contains also a helper method to get the content of this file.
+ *
+ */
+class DocsServerNginxService
 {
     /**
-     * @var RedirectRepository
+     * @var DocsServerRedirectRepository
      */
     protected $redirectRepository;
 
@@ -33,11 +37,6 @@ class NginxService
     protected $filesystem;
 
     /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * @var BambooService
      */
     protected $bambooService;
@@ -49,18 +48,16 @@ location = %s {
 
     /**
      * NginxService constructor.
-     * @param RedirectRepository $redirectRepository
+     * @param DocsServerRedirectRepository $redirectRepository
      * @param KernelInterface $kernel
      * @param Filesystem $filesystem
-     * @param LoggerInterface $logger
      * @param BambooService $bambooService
      */
-    public function __construct(RedirectRepository $redirectRepository, KernelInterface $kernel, Filesystem $filesystem, LoggerInterface $logger, BambooService $bambooService)
+    public function __construct(DocsServerRedirectRepository $redirectRepository, KernelInterface $kernel, Filesystem $filesystem, BambooService $bambooService)
     {
         $this->redirectRepository = $redirectRepository;
         $this->kernel = $kernel;
         $this->filesystem = $filesystem;
-        $this->logger = $logger;
         $this->bambooService = $bambooService;
     }
 
@@ -93,10 +90,5 @@ location = %s {
             return file_get_contents($filename);
         }
         return '';
-    }
-
-    public function createDeploymentJob(string $filename): void
-    {
-        $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
     }
 }

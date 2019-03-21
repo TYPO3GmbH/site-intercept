@@ -14,10 +14,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\RedirectRepository")
+ * This is a stupid simple entity class and represent a redirect.
+ *
+ * @ORM\Entity(repositoryClass="App\Repository\DocsServerRedirectRepository")
+ * @ORM\Table("redirect")
  * @ORM\HasLifecycleCallbacks()
+ * @codeCoverageIgnore
  */
-class Redirect
+class DocsServerRedirect
 {
     public const STATUS_CODE_301 = 301; // Moved Permanently
     public const STATUS_CODE_302 = 302; // Found

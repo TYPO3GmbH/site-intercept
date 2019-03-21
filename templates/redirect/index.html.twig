@@ -28,8 +28,8 @@
                 <td>{{ redirect.statusCode }}</td>
                 <td>
                     <div class="btn-group btn-group-sm">
-                        <a href="{{ path('redirect_show', {'id': redirect.id}) }}" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
-                        <a href="{{ path('redirect_edit', {'id': redirect.id}) }}" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i></a>
+                        <a href="{{ path('admin_redirect_show', {'id': redirect.id}) }}" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                        <a href="{{ path('admin_redirect_edit', {'id': redirect.id}) }}" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i></a>
                     </div>
                 </td>
             </tr>
@@ -41,5 +41,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('redirect_new') }}" class="btn btn-success"><i class="fa fa-plus"></i> Create new</a>
+    <a href="{{ path('admin_redirect_new') }}" class="btn btn-success"><i class="fa fa-plus"></i> Create new</a>
 {% endblock %}

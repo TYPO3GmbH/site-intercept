@@ -9,25 +9,35 @@
 
 namespace App\Command;
 
-use App\Service\NginxService;
+use App\Service\BambooService;
+use App\Service\DocsServerNginxService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class RedirectCreateConfigFileCommand extends Command
+/**
+ * Use this command to create the nginx redirects configuration file and trigger a deployment.
+ */
+class DocsServerRedirectCreateConfigurationFileCommand extends Command
 {
     protected static $defaultName = 'redirect:create-config-and-deploy';
 
     /**
-     * @var NginxService
+     * @var DocsServerNginxService
      */
     protected $nginxService;
 
-    public function __construct(?string $name = null, NginxService $nginxService)
+    /**
+     * @var BambooService
+     */
+    protected $bambooService;
+
+    public function __construct(?string $name = null, DocsServerNginxService $nginxService, BambooService $bambooService)
     {
         parent::__construct($name);
         $this->nginxService = $nginxService;
+        $this->bambooService = $bambooService;
     }
 
     protected function configure()
@@ -44,7 +54,7 @@ class RedirectCreateConfigFileCommand extends Command
         $filename = $this->nginxService->createRedirectConfigFile();
         $io->writeln('nginx redirect configuration created: ' . $filename);
         $io->writeln('trigger now the deployment');
-        $this->nginxService->createDeploymentJob($filename);
+        $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
         $io->success('done');
     }
 }
