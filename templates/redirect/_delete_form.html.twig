@@ -3,6 +3,6 @@
     <input type="hidden" name="_method" value="DELETE">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ redirect.id) }}">
     <div class="text-right">
-        <button class="btn btn-danger"><i class="fa fa-trash"></i> Delete</button>
+        <button class="btn btn-danger" id="redirectformdelete"><i class="fa fa-trash"></i> Delete</button>
     </div>
 </form>

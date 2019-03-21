@@ -18,6 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Use this command to create the nginx redirects configuration file and trigger a deployment.
+ * @codeCoverageIgnore
  */
 class DocsServerRedirectCreateConfigurationFileCommand extends Command
 {

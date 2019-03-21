@@ -16,6 +16,7 @@ use Doctrine\Migrations\AbstractMigration;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
+ * @codeCoverageIgnore
  */
 final class Version20190320164006 extends AbstractMigration
 {

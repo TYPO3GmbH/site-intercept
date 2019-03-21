@@ -65,6 +65,7 @@ class AdminInterfaceRedirectController extends AbstractController
      * @Route("/get/{filename}", name="admin_redirect_get", methods={"GET"})
      * @param string $filename
      * @return Response
+     * @codeCoverageIgnore the code is tested with service tests
      */
     public function get(string $filename): Response
     {

@@ -36,11 +36,6 @@ class DocsServerNginxService
      */
     protected $filesystem;
 
-    /**
-     * @var BambooService
-     */
-    protected $bambooService;
-
     protected $redirectTemplate = '# Rule: %d | Created: %s | Updated: %s
 location = %s {
     return %d https://$host%s;
@@ -51,14 +46,12 @@ location = %s {
      * @param DocsServerRedirectRepository $redirectRepository
      * @param KernelInterface $kernel
      * @param Filesystem $filesystem
-     * @param BambooService $bambooService
      */
-    public function __construct(DocsServerRedirectRepository $redirectRepository, KernelInterface $kernel, Filesystem $filesystem, BambooService $bambooService)
+    public function __construct(DocsServerRedirectRepository $redirectRepository, KernelInterface $kernel, Filesystem $filesystem)
     {
         $this->redirectRepository = $redirectRepository;
         $this->kernel = $kernel;
         $this->filesystem = $filesystem;
-        $this->bambooService = $bambooService;
     }
 
     public function createRedirectConfigFile(): string

@@ -39,6 +39,7 @@ class DocsServerRedirectType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => DocsServerRedirect::class,
+            'csrf_protection' => getenv('APP_ENV') !== 'test',
         ]);
     }
 }

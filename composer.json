@@ -9,6 +9,7 @@
     }
   ],
   "require": {
+    "php": "^7.2",
     "ext-SimpleXML": "*",
     "ext-bcmath": "*",
     "ext-json": "*",
@@ -16,6 +17,8 @@
     "doctrine/annotations": "^1.6",
     "doctrine/collections": "^1.5",
     "doctrine/doctrine-bundle": "^1.10",
+    "doctrine/orm": "^2.6",
+    "doctrine/persistence": "^1.1",
     "eightpoints/guzzle-bundle": "^7.4",
     "graylog2/gelf-php": "^1.6",
     "kbsali/redmine-api": "~1.0",
@@ -49,6 +52,7 @@
     "symfony/yaml": "^4.2"
   },
   "require-dev": {
+    "doctrine/doctrine-fixtures-bundle": "^3.1",
     "friendsofphp/php-cs-fixer": "^2.12",
     "phpunit/phpunit": "^7.4",
     "roave/security-advisories": "dev-master",
@@ -62,15 +66,18 @@
     "bin-dir": "bin/",
     "sort-packages": true,
     "optimize-autoloader": true,
-    "platform": {
-      "php": "7.2.4"
-    },
     "preferred-install": {
       "*": "dist"
     }
   },
   "scripts": {
     "t3g:test:php:unit": [
+      "mkdir -p var/phpunit/; phpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml --testsuite \"Unit Test Suite\""
+    ],
+    "t3g:test:php:functional": [
+      "mkdir -p var/phpunit/; phpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml --testsuite \"Unit Test Suite\""
+    ],
+    "t3g:test:php:cover": [
       "mkdir -p var/phpunit/; phpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml  --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/"
     ],
     "t3g:test": [
