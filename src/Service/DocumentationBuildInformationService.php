@@ -64,6 +64,11 @@ class DocumentationBuildInformationService
     private $documentationJarRepository;
 
     /**
+     * @var GeneralClient
+     */
+    private $client;
+
+    /**
      * Constructor
      *
      * @param string $publicDir
@@ -71,15 +76,23 @@ class DocumentationBuildInformationService
      * @param EntityManagerInterface $entityManager
      * @param Filesystem $fileSystem
      * @param LoggerInterface $logger
+     * @param GeneralClient $client
      */
-    public function __construct(string $publicDir, string $cacheDir, EntityManagerInterface $entityManager, Filesystem $fileSystem, LoggerInterface $logger)
-    {
+    public function __construct(
+        string $publicDir,
+        string $cacheDir,
+        EntityManagerInterface $entityManager,
+        Filesystem $fileSystem,
+        LoggerInterface $logger,
+        GeneralClient $client
+    ) {
         $this->publicDir = $publicDir;
         $this->cacheDir = $cacheDir;
         $this->entityManager = $entityManager;
         $this->fileSystem = $fileSystem;
         $this->logger = $logger;
         $this->documentationJarRepository = $this->entityManager->getRepository(DocumentationJar::class);
+        $this->client = $client;
     }
 
     /**
@@ -96,10 +109,10 @@ class DocumentationBuildInformationService
 
         $privateFilePath = implode('/', [
             $this->cacheDir,
+            'builds',
             $deploymentInformation->getVendor(),
             $deploymentInformation->getName(),
             $deploymentInformation->getBranch(),
-            'builds',
             $buildTime,
         ]);
         $relativePublicFilePath = 'builds/' . $buildTime;
@@ -167,7 +180,7 @@ class DocumentationBuildInformationService
     private function assertBuildWasTriggeredByRepositoryOwner(DeploymentInformation $deploymentInformation, string $repositoryUrl): void
     {
         $record = $this->documentationJarRepository->findOneBy([
-            'package_name' => $deploymentInformation->getPackageName()
+            'packageName' => $deploymentInformation->getPackageName()
         ]);
 
         if ($record instanceof DocumentationJar && $record->getRepositoryUrl() !== $repositoryUrl) {
@@ -184,7 +197,7 @@ class DocumentationBuildInformationService
      */
     private function fetchRemoteFile(string $path): string
     {
-        $response = (new GeneralClient())->request('GET', $path);
+        $response = $this->client->request('GET', $path);
         $statusCode = $response->getStatusCode();
 
         if ($statusCode !== 200) {

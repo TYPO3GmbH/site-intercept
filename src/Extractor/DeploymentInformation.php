@@ -110,6 +110,6 @@ class DeploymentInformation
      */
     public function toArray(): array
     {
-        return get_class_vars($this);
+        return get_object_vars($this);
     }
 }

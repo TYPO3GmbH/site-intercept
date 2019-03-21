@@ -2,27 +2,37 @@
 declare(strict_types = 1);
 namespace App\Tests\Functional;
 
+use App\Bundle\ClockMockBundle;
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
-use App\Extractor\DocumentationBuildInformation;
+use App\Client\GeneralClient;
 use App\Service\DocumentationBuildInformationService;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class DocsToBambooControllerTest extends TestCase
+class DocsToBambooControllerTest extends KernelTestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        self::bootKernel();
+        DatabasePrimer::prime(self::$kernel);
+    }
     /**
      * @test
      */
     public function bambooBuildIsTriggered()
     {
-        $documentationBuildInformationServiceProphecy = $this->prophesize(DocumentationBuildInformationService::class);
-        TestDoubleBundle::addProphecy(DocumentationBuildInformationService::class, $documentationBuildInformationServiceProphecy);
+        ClockMockBundle::register(DocumentationBuildInformationService::class);
+        ClockMockBundle::withClockMock(155309515.6937);
 
-        $documentationBuildInformationServiceProphecy->generateBuildInformation(Argument::any())->shouldBeCalled()->willReturn(
-            new DocumentationBuildInformation('builds/1553095156937')
-        );
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        $generalClientProphecy
+            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
+            ->shouldBeCalled()
+            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
@@ -31,7 +41,7 @@ class DocsToBambooControllerTest extends TestCase
                 require __DIR__ . '/Fixtures/DocsToBambooGoodBambooPostData.php'
             )->shouldBeCalled()
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
@@ -47,7 +57,7 @@ class DocsToBambooControllerTest extends TestCase
     {
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy->post(Argument::cetera())->shouldNotBeCalled();
-        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
