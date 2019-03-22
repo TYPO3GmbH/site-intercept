@@ -7,11 +7,10 @@ use App\Client\BambooClient;
 use App\Tests\Functional\Fixtures\AdminInterfaceRedirectControllerTestData;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-class AdminInterfaceRedirectControllerTest extends WebTestCase
+class AdminInterfaceRedirectControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Client
@@ -35,7 +34,7 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
      */
     public function indexRenderTableWithRedirectEntries()
     {
-        $this->logIn();
+        $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
         $this->assertContains('<table class="table table-sm table-striped table-bordered">', $content);
@@ -48,7 +47,7 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
      */
     public function showRenderTableWithRedirectEntries()
     {
-        $this->logIn();
+        $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1');
         $content = $this->client->getResponse()->getContent();
         $this->assertContains('<table class="table table-sm table-striped table-bordered">', $content);
@@ -61,7 +60,7 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
      */
     public function editRenderTableWithRedirectEntries()
     {
-        $this->logIn();
+        $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
         $this->assertContains('/p/vendor/packageOld/1.0/Foo.html', $content);
@@ -75,7 +74,7 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
     {
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $this->client = static::createClient();
-        $this->logIn();
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
@@ -100,7 +99,7 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
 
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $this->client = static::createClient();
-        $this->logIn();
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
@@ -116,7 +115,7 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
     {
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $this->client = static::createClient();
-        $this->logIn();
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -135,7 +134,7 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
 
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $this->client = static::createClient();
-        $this->logIn();
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
@@ -150,7 +149,7 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
     {
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $this->client = static::createClient();
-        $this->logIn();
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
@@ -168,7 +167,7 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
 
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $this->client = static::createClient();
-        $this->logIn();
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
 
@@ -176,24 +175,5 @@ class AdminInterfaceRedirectControllerTest extends WebTestCase
         $this->assertNotContains('/p/vendor/packageOld/1.0/Foo.html', $content);
         $this->assertNotContains('/p/vendor/packageNew/1.0/Foo.html', $content);
         $this->assertContains('no records found', $content);
-    }
-
-    private function logIn()
-    {
-        $session = $this->client->getContainer()->get('session');
-
-        $firewallName = 'main';
-        // if you don't define multiple connected firewalls, the context defaults to the firewall name
-        // See https://symfony.com/doc/current/reference/configuration/security.html#firewall-context
-        $firewallContext = 'main';
-
-        // you may need to use a different token class depending on your application.
-        // for example, when using Guard authentication you must instantiate PostAuthenticationGuardToken
-        $token = new UsernamePasswordToken('admin', null, $firewallName, ['ROLE_DOCUMENTATION_MAINTAINER']);
-        $session->set('_security_'.$firewallContext, serialize($token));
-        $session->save();
-
-        $cookie = new Cookie($session->getName(), $session->getId());
-        $this->client->getCookieJar()->set($cookie);
     }
 }

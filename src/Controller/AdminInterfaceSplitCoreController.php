@@ -46,6 +46,7 @@ class AdminInterfaceSplitCoreController extends AbstractController
 
         $splitForm->handleRequest($request);
         if ($splitForm->isSubmitted() && $splitForm->isValid()) {
+            $this->denyAccessUnlessGranted('ROLE_USER');
             $branch = $splitForm->getClickedButton()->getName();
             $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/heads/' . $branch]);
             $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'interface');
@@ -57,6 +58,7 @@ class AdminInterfaceSplitCoreController extends AbstractController
 
         $tagForm->handleRequest($request);
         if ($tagForm->isSubmitted() && $tagForm->isValid()) {
+            $this->denyAccessUnlessGranted('ROLE_USER');
             $tag = $tagForm->getData()['tag'];
             $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/tags/' . $tag, 'created' => true]);
             $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'interface');
