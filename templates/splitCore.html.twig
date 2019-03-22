@@ -116,8 +116,8 @@
                         {% elseif log.queueLog.triggeredBy == 'interface' %}
                             | <span>Trigger: Web</span>
                         {% endif %}
-                        {% if log.userDisplayName %}
-                            | <span>User: {{ log.userDisplayName }}</span>
+                        {% if log.queueLog.userDisplayName %}
+                            | <span>User: {{ log.queueLog.userDisplayName }}</span>
                         {% endif %}
                     </button>
                 </div>
