@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -27,10 +28,26 @@ class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler i
      */
     private $flashBag;
 
-    public function __construct(HttpUtils $httpUtils, array $options = [], FlashBagInterface $flashBag = null)
-    {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param HttpUtils $httpUtils
+     * @param array $options
+     * @param FlashBagInterface|null $flashBag
+     * @param LoggerInterface|null $logger
+     */
+    public function __construct(
+        HttpUtils $httpUtils,
+        array $options = [],
+        FlashBagInterface $flashBag = null,
+        LoggerInterface $logger = null
+    ) {
         parent::__construct($httpUtils, $options);
         $this->flashBag = $flashBag;
+        $this->logger = $logger;
     }
 
     /**
@@ -40,6 +57,12 @@ class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler i
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
+        $this->logger->info(
+            'User login succesful, username: "' . $token->getUsername() . '"',
+            [
+                'type' => 'loginSuccessful',
+            ]
+        );
         $this->flashBag->add(
             'success',
             'Successfully logged in.'

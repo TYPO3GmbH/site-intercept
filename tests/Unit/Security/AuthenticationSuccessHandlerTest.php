@@ -4,6 +4,7 @@ namespace App\Tests\Unit\Security;
 
 use App\Security\AuthenticationSuccessHandler;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -20,7 +21,8 @@ class AuthenticationSuccessHandlerTest extends TestCase
         $subject = new AuthenticationSuccessHandler(
             $this->prophesize(HttpUtils::class)->reveal(),
             [],
-            $flashBackProphecy->reveal()
+            $flashBackProphecy->reveal(),
+            $this->prophesize(LoggerInterface::class)->reveal()
         );
         $subject->onAuthenticationSuccess(
             $this->prophesize(Request::class)->reveal(),

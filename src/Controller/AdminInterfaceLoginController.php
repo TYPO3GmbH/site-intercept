@@ -59,6 +59,13 @@ class AdminInterfaceLoginController extends AbstractController
                 'danger',
                 'Login not successful: ' . $error->getMessage()
             );
+            $this->logger->warning(
+                'Failed user login, username: "' . $authUtils->getLastUsername() . '"',
+                [
+                    'type' => 'loginFailed',
+                    'username' => $authUtils->getLastUsername(),
+                ]
+            );
         }
 
         return $this->render(
