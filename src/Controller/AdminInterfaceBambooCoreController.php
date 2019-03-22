@@ -83,6 +83,7 @@ class AdminInterfaceBambooCoreController extends AbstractController
     private function handleUrlForm(FormInterface $form, BambooService $bambooService, GerritService $gerritService): void
     {
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('ROLE_USER');
             $formData = $form->getData();
             try {
                 $gerritUrl = new GerritUrl($formData['url']);
@@ -137,6 +138,7 @@ class AdminInterfaceBambooCoreController extends AbstractController
     private function handlePatchForm(FormInterface $form, BambooService $bambooService): void
     {
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('ROLE_USER');
             $formData = $form->getData();
             try {
                 $bambooData = new GerritToBambooCore(

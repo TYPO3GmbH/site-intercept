@@ -20,24 +20,26 @@
 {% endblock %}
 
 {% block content %}
-    <h2>
-        Trigger Fluid View Helper Reference rendering and deployment
-    </h2>
-    <p>
-        Interface to render the Fluid View Helper Reference and deploy it to the
-        <a target="_blank" href="https://docs.typo3.org/typo3cms/ViewHelperReference/Index.html">OLD docs server</a>.
-        This build and deployment is scheduled on  a daily basis, but can be triggered here manually
-        if an urgent update is wanted.
-    </p>
-    {{ form_start(fluidVhForm) }}
-        {{ form_errors(fluidVhForm) }}
-        <div class="form-group row">
-            <div class="col-1">
-                {{ form_widget(fluidVhForm.trigger) }}
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <h2>
+            Trigger Fluid View Helper Reference rendering and deployment
+        </h2>
+        <p>
+            Interface to render the Fluid View Helper Reference and deploy it to the
+            <a target="_blank" href="https://docs.typo3.org/typo3cms/ViewHelperReference/Index.html">OLD docs server</a>.
+            This build and deployment is scheduled on  a daily basis, but can be triggered here manually
+            if an urgent update is wanted.
+        </p>
+        {{ form_start(fluidVhForm) }}
+            {{ form_errors(fluidVhForm) }}
+            <div class="form-group row">
+                <div class="col-1">
+                    {{ form_widget(fluidVhForm.trigger) }}
+                </div>
             </div>
-        </div>
-        {{ form_widget(fluidVhForm._token) }}
-    {{ form_end(fluidVhForm, {'render_rest': false}) }}
+            {{ form_widget(fluidVhForm._token) }}
+        {{ form_end(fluidVhForm, {'render_rest': false}) }}
+    {% endif %}
 
     <h2>
         Recent actions
@@ -56,6 +58,9 @@
                 | <span>Trigger: API</span>
             {% elseif log.triggeredBy == 'interface' %}
                 | <span>Trigger: Web</span>
+            {% endif %}
+            {% if log.userDisplayName %}
+                | <span>User: {{ log.userDisplayName }}</span>
             {% endif %}
         </div>
     {% endfor %}

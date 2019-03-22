@@ -29,32 +29,32 @@
         {% endif %}
     </h2>
 
-    <h2>
-        Core mono repo splitting and tagging to sub repos
-    </h2>
-    <p>
-        All core extensions are handled in monolithic repository at
-        <a href="https://git.typo3.org/Packages/TYPO3.CMS.git">git.typo3.org</a>, which is mirrored
-        to <a href="https://github.com/TYPO3/TYPO3.CMS">github</a>.
-        To base a project on only a sub set of core extensions, this mono repo is split to single
-        repositories per extension, which are then packaged for use via composer on
-        <a href="https://packagist.org/?query=typo3%2Fcms-">packagist.org</a>.
-    </p>
-    <p>
-        The split and tag actions themselves are performed through a rabbit queue
-        with one worker to have them decoupled from web requests.
-    </p>
-    <p>
-        This split operation can be triggered manually, and pushing tags from
-        the mono repo to the single repos can be triggered, too. Note these
-        steps are usually triggered via hooks on github and don't need to be triggered
-        manually here.
-    </p>
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <h2>
+            Core mono repo splitting and tagging to sub repos
+        </h2>
+        <p>
+            All core extensions are handled in monolithic repository at
+            <a href="https://git.typo3.org/Packages/TYPO3.CMS.git">git.typo3.org</a>, which is mirrored
+            to <a href="https://github.com/TYPO3/TYPO3.CMS">github</a>.
+            To base a project on only a sub set of core extensions, this mono repo is split to single
+            repositories per extension, which are then packaged for use via composer on
+            <a href="https://packagist.org/?query=typo3%2Fcms-">packagist.org</a>.
+        </p>
+        <p>
+            The split and tag actions themselves are performed through a rabbit queue
+            with one worker to have them decoupled from web requests.
+        </p>
+        <p>
+            This split operation can be triggered manually, and pushing tags from
+            the mono repo to the single repos can be triggered, too. Note these
+            steps are usually triggered via hooks on github and don't need to be triggered
+            manually here.
+        </p>
 
-    <h2>
-        Trigger core split
-    </h2>
-    <p>
+        <h2>
+            Trigger core split
+        </h2>
         {{ form_start(splitCoreSplit) }}
             {{ form_errors(splitCoreSplit) }}
             {{ form_widget(splitCoreSplit.master) }}
@@ -62,12 +62,10 @@
             {{ form_widget(splitCoreSplit.branch8_7) }}
             {{ form_widget(splitCoreSplit._token) }}
         {{ form_end(splitCoreSplit, {'render_rest': false}) }}
-    </p>
 
-    <h2>
-        Trigger sub repository tagging
-    </h2>
-    <p>
+        <h2>
+            Trigger sub repository tagging
+        </h2>
         {{ form_start(splitCoreTag) }}
             {{ form_errors(splitCoreTag) }}
             <div class="form-group row">
@@ -80,7 +78,7 @@
             </div>
             {{ form_widget(splitCoreTag._token) }}
         {{ form_end(splitCoreTag, {'render_rest': false}) }}
-    </p>
+    {% endif %}
 
     <h2>
         Recent actions
@@ -115,6 +113,9 @@
                             | <span>Trigger: API</span>
                         {% elseif log.queueLog.triggeredBy == 'interface' %}
                             | <span>Trigger: Web</span>
+                        {% endif %}
+                        {% if log.queueLog.userDisplayName %}
+                            | <span>User: {{ log.queueLog.userDisplayName }}</span>
                         {% endif %}
                     </button>
                 </div>

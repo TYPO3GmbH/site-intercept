@@ -50,6 +50,7 @@ class AdminInterfaceDocsController extends AbstractController
         $fluidVhForm = $this->createForm(BambooDocsFluidVhTriggerFormType::class);
         $fluidVhForm->handleRequest($request);
         if ($fluidVhForm->isSubmitted() && $fluidVhForm->isValid()) {
+            $this->denyAccessUnlessGranted('ROLE_USER');
             $bambooTriggered = $bambooService->triggerDocumentationFluidVhPlan();
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(

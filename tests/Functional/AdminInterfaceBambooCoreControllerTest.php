@@ -11,9 +11,8 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class AdminInterfaceBambooCoreControllerTest extends WebTestCase
+class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @test
@@ -99,6 +98,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
         // Bamboo client double for the first request
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
         // Bamboo client double for the second request
@@ -126,6 +126,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
         // Bamboo client double for the first request
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
         // Bamboo client double for the second request
@@ -153,6 +154,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
         // Bamboo client double for the first request
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
         // Bamboo client double for the second request
@@ -179,6 +181,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -219,6 +222,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -259,6 +263,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
@@ -286,6 +291,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
@@ -323,6 +329,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
@@ -359,6 +366,7 @@ class AdminInterfaceBambooCoreControllerTest extends WebTestCase
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);

@@ -24,27 +24,25 @@
         Please log in with your typo3.org credentials for extended access permissions.
     </p>
 
-    <p>
-        <form action="{{ path('admin_login') }}" method="post">
-            <div class="form-group row">
-                <div class="col-4">
-                    <label for="username">Username:</label>
-                    <input class="form-control" id="username" name="_username" value="{{ last_username }}"/>
-                </div>
+    <form action="{{ path('admin_login') }}" method="post">
+        <div class="form-group row">
+            <div class="col-4">
+                <label for="username">Username:</label>
+                <input class="form-control" id="username" name="_username" value="{{ last_username }}"/>
             </div>
-            <div class="form-group row">
-                <div class="col-4">
-                    <label for="password">Password:</label>
-                    <input type="password" class="form-control" id="password" name="_password"/>
-                </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-4">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="_password"/>
             </div>
-            <div class="form-group row">
-                <div class="col-1">
-                    <button class="btn btn-primary">Login <i class="fa fa-unlock"></i></button>
-                </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-1">
+                <button class="btn btn-primary">Login <i class="fa fa-unlock"></i></button>
             </div>
-            <input type="hidden" name="_target_path" value="{{ path('admin_index') }}"/>
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-        </form>
-    </p>
+        </div>
+        <input type="hidden" name="_target_path" value="{{ path('admin_index') }}"/>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+    </form>
 {% endblock %}

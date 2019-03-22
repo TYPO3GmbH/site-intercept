@@ -160,15 +160,27 @@ An alternative is to start an explicit watcher process to recompile if css files
 
 ### Test execution
 
-* $ ddev composer t3g:test
-* OR $ ddev exec bin/phpunit -c build/phpunit.xml
+#### Unit tests
+
+* $ ddev composer t3g:test:php:unit
+* OR $ ddev exec bin/phpunit -c build/phpunit.xml --testsuite "Unit Test Suite"
+
+#### Functional tests
+
+* $ ddev composer t3g:test:php:functional
+* OR $ ddev exec bin/phpunit -c build/phpunit.xml --testsuite "Functional Test Suite"
+
+#### Unit and functional tests with coverage
 
 Find rendered coverage data at var/phpunit/coverage/index.html
 
+* $ ddev composer t3g:tests:php:cover
+* OR $ ddev exec bin/phpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml  --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/
+
 ### Fix CGL
 
-* OR $ ddev composer t3g:cgl
-* $ ddev exec php-cs-fixer fix --config build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml
+* $ ddev composer t3g:cgl
+* OR $ ddev exec php-cs-fixer fix --config build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml
 
 ### Creating a new mongo dump
 

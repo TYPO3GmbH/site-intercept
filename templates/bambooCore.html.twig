@@ -20,20 +20,20 @@
 {% endblock %}
 
 {% block content %}
-    <h2>
-        Bamboo core tests with specific patch
-    </h2>
-    <p>
-        Interface to trigger bamboo pre-merge and nightly builds with specific change and patch sets. Finished
-        pre-merge builds will vote on gerrit. These patches will be cherry picked on top of the current clean
-        branch. Do not abuse this interface - triggering many builds can <strong>easily</strong> occupy bamboo
-        for hours.
-    </p>
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        <h2>
+            Bamboo core tests with specific patch
+        </h2>
+        <p>
+            Interface to trigger bamboo pre-merge and nightly builds with specific change and patch sets. Finished
+            pre-merge builds will vote on gerrit. These patches will be cherry picked on top of the current clean
+            branch. Do not abuse this interface - triggering many builds can <strong>easily</strong> occupy bamboo
+            for hours.
+        </p>
 
-    <h2>
-        Trigger by change id and patch set
-    </h2>
-    <p>
+        <h2>
+            Trigger by change id and patch set
+        </h2>
         {{ form_start(patchForm) }}
             {{ form_errors(patchForm) }}
             <div class="form-group row">
@@ -58,17 +58,15 @@
             {{ form_widget(patchForm.nightly8_7) }}
             {{ form_widget(patchForm._token) }}
         {{ form_end(patchForm, {'render_rest': false}) }}
-    </p>
 
-    <h2>
-        Trigger pre merge testing by url
-    </h2>
-    <p>
-        Insert a casual review.typo3.org url. If a specific patch set is given, it will be used. If not, the
-        latest patch set of the change will be determined. The patch will be automatically rebased on top of
-        current head of the target branch which may fail if it has merge conflicts.
-    </p>
-    <p>
+        <h2>
+            Trigger pre merge testing by url
+        </h2>
+        <p>
+            Insert a casual review.typo3.org url. If a specific patch set is given, it will be used. If not, the
+            latest patch set of the change will be determined. The patch will be automatically rebased on top of
+            current head of the target branch which may fail if it has merge conflicts.
+        </p>
         {{ form_start(urlForm) }}
             {{ form_errors(urlForm) }}
             <div class="form-group row">
@@ -83,7 +81,7 @@
             </div>
             {{ form_widget(urlForm._token) }}
         {{ form_end(urlForm, {'render_rest': false}) }}
-    </p>
+    {% endif %}
 
     <h2>
         Recent actions
@@ -106,7 +104,7 @@
             <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
             {% if log.type == 'voteGerrit' %}
                 <span>
-                    <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Vote on gerrit</a>
+                    <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Voted on gerrit</a>
                     by
                     <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">bamboo result</a>
                 </span>
@@ -145,6 +143,9 @@
                 | <span>Trigger: API</span>
             {% elseif log.triggeredBy == 'interface' %}
                 | <span>Trigger: Web</span>
+            {% endif %}
+            {% if log.userDisplayName %}
+                | <span>User: {{ log.userDisplayName }}</span>
             {% endif %}
         </div>
     {% endfor %}
