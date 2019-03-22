@@ -45,21 +45,33 @@ class AdminInterfaceLoginController extends AbstractController
     ): Response {
         $this->logger = $logger;
 
-        // get the login error if there is one
-        $error = $authUtils->getLastAuthenticationError();
-
-        // last username entered by the user
-        $lastUsername = $authUtils->getLastUsername();
-
         if ($tokenStorage->getToken()->getUser() instanceof User) {
+            // @codeCoverageIgnoreStart
+            // Successful login can't be tested directly
             return $this->redirect($this->generateUrl('admin_index'));
+            // @codeCoverageIgnoreEnd
+        }
+
+        // Get the login error if there is one and create a flash message from it
+        $error = $authUtils->getLastAuthenticationError();
+        if ($error) {
+            $this->addFlash(
+                'danger',
+                'Login not successful: ' . $error->getMessage()
+            );
+            $this->logger->warning(
+                'Failed user login, username: "' . $authUtils->getLastUsername() . '"',
+                [
+                    'type' => 'loginFailed',
+                    'username' => $authUtils->getLastUsername(),
+                ]
+            );
         }
 
         return $this->render(
             'login.html.twig',
             [
-                'last_username' => $lastUsername,
-                'error' => $error,
+                'last_username' => $authUtils->getLastUsername(),
             ]
         );
     }
