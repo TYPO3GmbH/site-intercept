@@ -29,7 +29,7 @@ class BambooCoreByUrlTriggerFormType extends AbstractType
                 TextType::class,
                 [
                     'attr' => [
-                        'placeholder' => 'https://review.typo3.org/#/c/Packages/TYPO3.CMS/+/48574/',
+                        'placeholder' => 'https://review.typo3.org/c/Packages/TYPO3.CMS/+/48574/',
                     ],
                 ]
             )

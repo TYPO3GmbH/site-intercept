@@ -11,9 +11,8 @@ use GuzzleHttp\Psr7\Response;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Prophecy\Argument;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class AdminInterfaceSplitCoreControllerTest extends WebTestCase
+class AdminInterfaceSplitCoreControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @test
@@ -161,6 +160,7 @@ class AdminInterfaceSplitCoreControllerTest extends WebTestCase
         $rabbitChannelProphecy->basic_publish(Argument::cetera())->shouldBeCalled();
 
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/split/core');
 
         // Get the rendered form, feed it with some data and submit it
@@ -202,6 +202,7 @@ class AdminInterfaceSplitCoreControllerTest extends WebTestCase
         $rabbitChannelProphecy->basic_publish(Argument::cetera())->shouldBeCalled();
 
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/split/core');
 
         // Get the rendered form, feed it with some data and submit it

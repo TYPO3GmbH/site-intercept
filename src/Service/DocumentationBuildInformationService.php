@@ -14,7 +14,7 @@ use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\DocumentationBuildInformation;
-use App\Extractor\GithubPushEventForDocs;
+use App\Extractor\PushEvent;
 use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -90,20 +90,20 @@ class DocumentationBuildInformationService
     }
 
     /**
-     * @param GithubPushEventForDocs $pushEventForDocs
+     * @param PushEvent $pushEvent
      * @return DocumentationBuildInformation
      * @throws \Exception
      */
-    public function generateBuildInformation(GithubPushEventForDocs $pushEventForDocs): DocumentationBuildInformation
+    public function generateBuildInformation(PushEvent $pushEvent): DocumentationBuildInformation
     {
         $buildTime = ceil(microtime(true) * 10000);
-        $composerJson = json_decode($this->fetchRemoteFile($pushEventForDocs->composerFile), true);
-        $deploymentInformation = new DeploymentInformation($composerJson, $pushEventForDocs->tagOrBranchName);
+        $composerJson = json_decode($this->fetchRemoteFile($pushEvent->getUrlToComposerFile()), true);
+        $deploymentInformation = new DeploymentInformation($composerJson, $pushEvent->getVersionString());
         if ($deploymentInformation->getTypeLong() === 'package') {
-            $this->logger->info('Received unmapped package type "' . $composerJson['type'] . '" as defined in ' . $pushEventForDocs->composerFile . ', falling back to default');
+            $this->logger->info('Received unmapped package type "' . $composerJson['type'] . '" as defined in ' . $pushEvent->getUrlToComposerFile() . ', falling back to default');
         }
 
-        $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $pushEventForDocs->repositoryUrl);
+        $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $pushEvent->getRepositoryUrl());
 
         $privateFilePath = implode('/', [
             $this->cacheDir,
@@ -118,7 +118,7 @@ class DocumentationBuildInformationService
 
         $this->entityManager->getConnection()->beginTransaction();
         try {
-            $this->registerDocumentationRendering($pushEventForDocs->repositoryUrl, $deploymentInformation);
+            $this->registerDocumentationRendering($pushEvent->getRepositoryUrl(), $deploymentInformation);
 
             if (!$this->fileSystem->exists($privateFilePath)) {
                 // TODO: Move the string concatenation magic in an Encoder class?

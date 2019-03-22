@@ -5,7 +5,7 @@ namespace App\Tests\Functional\Service;
 use App\Bundle\ClockMockBundle;
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
-use App\Extractor\GithubPushEventForDocs;
+use App\Extractor\PushEvent;
 use App\Service\DocumentationBuildInformationService;
 use App\Tests\Functional\DatabasePrimer;
 use Doctrine\ORM\EntityManagerInterface;
@@ -55,6 +55,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         ClockMockBundle::register(DocumentationBuildInformationService::class);
         ClockMockBundle::withClockMock($currentTime);
 
+        $pushEvent = $this->getPushEvent();
         $subject = new DocumentationBuildInformationService(
             '/tmp/',
             '/tmp/',
@@ -62,7 +63,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             new Filesystem(),
             $this->prophesize(LoggerInterface::class)->reveal(),
             $this->getClientProphecy(
-                'https://raw.githubusercontent.com/' . $this->packageName . '/' . $this->branch . '/composer.json',
+                $pushEvent->getUrlToComposerFile(),
                 200,
                 json_encode([
                     'name' => $this->packageName,
@@ -71,7 +72,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             )->reveal()
         );
 
-        $buildInformation = $subject->generateBuildInformation($this->getPushEvent());
+        $buildInformation = $subject->generateBuildInformation($pushEvent);
 
         $this->assertSame('builds/' . $currentTimeInt, $buildInformation->getFilePath());
         $this->assertFileExists('/tmp/builds/' . $currentTimeInt);
@@ -96,6 +97,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         $this->entityManager->persist($originalRepository);
         $this->entityManager->flush();
 
+        $pushEvent = $this->getPushEvent();
         $subject = new DocumentationBuildInformationService(
             '/tmp/',
             '/tmp/',
@@ -103,7 +105,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             new Filesystem(),
             $this->prophesize(LoggerInterface::class)->reveal(),
             $this->getClientProphecy(
-                'https://raw.githubusercontent.com/' . $this->packageName . '/' . $this->branch . '/composer.json',
+                $pushEvent->getUrlToComposerFile(),
                 200,
                 json_encode([
                     'name' => $this->packageName,
@@ -112,7 +114,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             )->reveal()
         );
 
-        $subject->generateBuildInformation($this->getPushEvent());
+        $subject->generateBuildInformation($pushEvent);
     }
 
     /**
@@ -123,6 +125,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         $this->expectException(IOException::class);
         $this->expectExceptionCode(1553081065);
 
+        $pushEvent = $this->getPushEvent();
         $subject = new DocumentationBuildInformationService(
             '/tmp/',
             '/tmp/',
@@ -130,13 +133,13 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             new Filesystem(),
             $this->prophesize(LoggerInterface::class)->reveal(),
             $this->getClientProphecy(
-                'https://raw.githubusercontent.com/' . $this->packageName . '/' . $this->branch . '/composer.json',
+                $pushEvent->getUrlToComposerFile(),
                 404,
                 ''
             )->reveal()
         );
 
-        $subject->generateBuildInformation($this->getPushEvent());
+        $subject->generateBuildInformation($pushEvent);
     }
 
     /**
@@ -147,6 +150,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         $loggerProphecy = $this->prophesize(LoggerInterface::class);
         $loggerProphecy->info(Argument::any())->shouldBeCalled();
 
+        $pushEvent = $this->getPushEvent();
         $subject = new DocumentationBuildInformationService(
             '/tmp/',
             '/tmp/',
@@ -154,7 +158,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             new Filesystem(),
             $loggerProphecy->reveal(),
             $this->getClientProphecy(
-                'https://raw.githubusercontent.com/' . $this->packageName . '/' . $this->branch . '/composer.json',
+                $pushEvent->getUrlToComposerFile(),
                 200,
                 json_encode([
                     'name' => $this->packageName,
@@ -163,7 +167,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             )->reveal()
         );
 
-        $subject->generateBuildInformation($this->getPushEvent());
+        $subject->generateBuildInformation($pushEvent);
     }
 
     /**
@@ -173,6 +177,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
     {
         $iterations = 3;
         for ($i = 0; $i < $iterations; ++$i) {
+            $pushEvent = $this->getPushEvent();
             $subject = new DocumentationBuildInformationService(
                 '/tmp/',
                 '/tmp/',
@@ -180,7 +185,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
                 new Filesystem(),
                 $this->prophesize(LoggerInterface::class)->reveal(),
                 $this->getClientProphecy(
-                    'https://raw.githubusercontent.com/' . $this->packageName . '/' . $this->branch . '/composer.json',
+                    $pushEvent->getUrlToComposerFile(),
                     200,
                     json_encode([
                         'name' => $this->packageName,
@@ -189,25 +194,22 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
                 )->reveal()
             );
 
-            $subject->generateBuildInformation($this->getPushEvent());
+            $subject->generateBuildInformation($pushEvent);
         }
 
         $this->assertCount(1, $this->entityManager->getRepository(DocumentationJar::class)->findAll());
     }
 
     /**
-     * @return GithubPushEventForDocs
+     * @return PushEvent
      */
-    private function getPushEvent(): GithubPushEventForDocs
+    private function getPushEvent(): PushEvent
     {
-        $payload = [
-            'ref' => 'refs/tags/' . $this->branch,
-            'repository' => [
-                'clone_url' => 'http://myserver.com/' . $this->packageName . '.git'
-            ],
-        ];
-
-        return new GithubPushEventForDocs(json_encode($payload));
+        return new PushEvent(
+            'http://myserver.com/' . $this->packageName . '.git',
+            $this->branch,
+            'https://raw.githubusercontent.com/' . $this->packageName . '/' . $this->branch . '/composer.json'
+        );
     }
 
     /**

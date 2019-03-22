@@ -8,7 +8,7 @@ return Request::create(
     [],
     [],
     [],
-    [],
+    ['HTTP_X-GitHub-Event' => 'push'],
     '{
       "ref": "refs/heads/latest",
       "before": "5c8463e02ff0db554b1599859542c293e39cadb3",

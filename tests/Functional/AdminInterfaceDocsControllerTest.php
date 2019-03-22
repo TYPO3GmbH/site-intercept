@@ -11,9 +11,8 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class AdminInterfaceDocsControllerTest extends WebTestCase
+class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @test
@@ -82,6 +81,7 @@ class AdminInterfaceDocsControllerTest extends WebTestCase
     public function bambooDocsFluidVhFormIsRendered()
     {
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/docs');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Trigger Fluid View Helper Reference rendering and deployment/', $client->getResponse()->getContent());
@@ -95,6 +95,7 @@ class AdminInterfaceDocsControllerTest extends WebTestCase
         // Bamboo client double for the first request
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/docs');
 
         // Bamboo client double for the second request
@@ -120,6 +121,7 @@ class AdminInterfaceDocsControllerTest extends WebTestCase
         // Bamboo client double for the first request
         TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/docs');
 
         // Bamboo client double for the second request
