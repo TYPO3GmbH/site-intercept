@@ -101,7 +101,7 @@ services:
             $client: '@App\Client\RabbitManagementClient'
 
     PhpAmqpLib\Connection\AMQPStreamConnection:
-        class: PhpAmqpLib\Connection\AMQPStreamConnection
+        class: PhpAmqpLib\Connection\AMQPLazyConnection
         public: true
         arguments:
             $host: '%env(RABBITMQ_HOST)%'
