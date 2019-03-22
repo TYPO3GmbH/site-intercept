@@ -21,18 +21,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * This service class generates a `source`-able file that contains some deployment-related
+ * environment variables based on the push event it receives.
+ */
 class DocumentationBuildInformationService
 {
-    /**
-     * @var array
-     */
-    private static $typeMap = [
-        'typo3-cms-documentation' => ['m' => 'manual'],
-        'typo3-cms-framework' => ['c' => 'core-extension'],
-        'typo3-cms-extension' => ['p' => 'extension'],
-        '__default' => ['p', 'package']
-    ];
-
     /**
      * @var string
      */
@@ -103,8 +97,12 @@ class DocumentationBuildInformationService
     public function generateBuildInformation(GithubPushEventForDocs $pushEventForDocs): DocumentationBuildInformation
     {
         $buildTime = ceil(microtime(true) * 10000);
-        $branchName = $this->normalizeBranchName($pushEventForDocs->tagOrBranchName);
-        $deploymentInformation = $this->generateDeploymentInformation($pushEventForDocs->composerFile, $branchName);
+        $composerJson = json_decode($this->fetchRemoteFile($pushEventForDocs->composerFile));
+        $deploymentInformation = new DeploymentInformation($composerJson, $pushEventForDocs->tagOrBranchName);
+        if ($deploymentInformation->getTypeLong() === 'package') {
+            $this->logger->info('Received unmapped package type "' . $composerJson['type'] . '" as defined in ' . $pushEventForDocs->composerFile . ', falling back to default');
+        }
+
         $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $pushEventForDocs->repositoryUrl);
 
         $privateFilePath = implode('/', [
@@ -155,25 +153,6 @@ class DocumentationBuildInformationService
     }
 
     /**
-     * @param string $composerFilePath
-     * @param string $branch
-     * @return DeploymentInformation
-     */
-    private function generateDeploymentInformation(string $composerFilePath, string $branch): DeploymentInformation
-    {
-        $composerJson = json_decode($this->fetchRemoteFile($composerFilePath), true);
-        $packageName = $this->determinePackageName($composerJson);
-        $packageType = $this->determinePackageType($composerJson);
-
-        $vendor = key($packageName);
-        $name = current($packageName);
-        $longPackageType = current($packageType);
-        $shortPackageType = key($packageType);
-
-        return new DeploymentInformation($vendor, $name, $branch, $longPackageType, $shortPackageType);
-    }
-
-    /**
      * @param DeploymentInformation $deploymentInformation
      * @param string $repositoryUrl
      */
@@ -205,63 +184,5 @@ class DocumentationBuildInformationService
         }
 
         return $response->getBody()->getContents();
-    }
-
-    /**
-     * Check whether given version matches expected format and remove patch level from version
-     *
-     * @param string $version
-     * @return string
-     */
-    private function normalizeBranchName(string $version): string
-    {
-        if ($version === 'latest') {
-            // TODO: For the time being the version "latest" is mapped to "master"
-            $version = 'master';
-        }
-
-        if (!preg_match('/^master|(?:v?\d+.\d+.\d+)$/', $version)) {
-            throw new \InvalidArgumentException('Invalid version format given, expected either "latest" "master" or \d.\d.\d.');
-        }
-
-        $version = ltrim($version, 'v');
-        return implode('.', array_slice(explode('.', $version), 0, 2));
-    }
-
-    /**
-     * @param array $composerJson
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    private function determinePackageType(array $composerJson): array
-    {
-        if (empty($composerJson['type'])) {
-            throw new \InvalidArgumentException('No package type defined in composer.json', 1553081747);
-        }
-
-        if (isset(self::$typeMap[$composerJson['type']])) {
-            return self::$typeMap[$composerJson['type']];
-        }
-
-        $this->logger->info('Received unmapped package type "' . $composerJson['type'] . '" as defined in composer.json, falling back to default');
-        return self::$typeMap['__default'];
-    }
-
-    /**
-     * @param array $composerJson
-     * @return array
-     */
-    private function determinePackageName(array $composerJson): array
-    {
-        if (empty($composerJson['name'])) {
-            throw new \InvalidArgumentException('No package name defined in composer.json', 1553082362);
-        }
-
-        if (!preg_match('/^[\w-]+\/[\w-]+$/', $composerJson['name'])) {
-            throw new \InvalidArgumentException('Invalid package name ' . $composerJson['name'] . ' provided', 1553082490);
-        }
-
-        [$vendor, $name] = explode('/', $composerJson['name']);
-        return [$vendor => $name];
     }
 }

@@ -10,31 +10,50 @@
 namespace App\Extractor;
 
 /**
- * Class DeploymentInformation
+ * Holds the environment information required for deployment
  */
 class DeploymentInformation
 {
     /**
+     * @var array
+     */
+    private static $typeMap = [
+        'typo3-cms-documentation' => ['m' => 'manual'],
+        'typo3-cms-framework' => ['c' => 'core-extension'],
+        'typo3-cms-extension' => ['p' => 'extension'],
+        '__default' => ['p', 'package']
+    ];
+
+    /**
+     * The vendor of a package, e.g. "georgringer"
+     *
      * @var string
      */
     private $vendor;
 
     /**
+     * The plain name of a package, e.g. "news"
+     *
      * @var string
      */
     private $name;
 
     /**
+     * The branch or tag of the repository supposed to be checked out
+     *
      * @var string
      */
     private $branch;
 
     /**
+     * The long type name of a composer package, e.g. "manual" or "package"
+     *
      * @var string
      */
     private $typeLong;
 
     /**
+     * The short type name of a composer package, e.g. "m" or "p"
      * @var string
      */
     private $typeShort;
@@ -42,19 +61,19 @@ class DeploymentInformation
     /**
      * Constructor
      *
-     * @param string $vendor
-     * @param string $name
+     * @param array $composerJson
      * @param string $branch
-     * @param string $typeLong
-     * @param string $typeShort
      */
-    public function __construct(string $vendor, string $name, string $branch, string $typeLong, string $typeShort)
+    public function __construct(array $composerJson, string $branch)
     {
-        $this->vendor = $vendor;
-        $this->name = $name;
-        $this->branch = $branch;
-        $this->typeLong = $typeLong;
-        $this->typeShort = $typeShort;
+        $packageName = $this->determinePackageName($composerJson);
+        $packageType = $this->determinePackageType($composerJson);
+
+        $this->vendor = key($packageName);
+        $this->name = current($packageName);
+        $this->branch = $this->normalizeBranchName($branch);
+        $this->typeLong = current($packageType);
+        $this->typeShort = key($packageType);
     }
 
     /**
@@ -111,5 +130,60 @@ class DeploymentInformation
     public function toArray(): array
     {
         return get_object_vars($this);
+    }
+
+    /**
+     * Check whether given version matches expected format and remove patch level from version
+     *
+     * @param string $branch
+     * @return string
+     */
+    private function normalizeBranchName(string $branch): string
+    {
+        if ($branch === 'latest') {
+            // TODO: For the time being the version "latest" is mapped to "master"
+            $branch = 'master';
+        }
+
+        if (!preg_match('/^master|(?:v?\d+.\d+.\d+)$/', $branch)) {
+            throw new \InvalidArgumentException('Invalid format given, expected either "latest", "master" or \d.\d.\d.');
+        }
+
+        $branch = ltrim($branch, 'v');
+
+        // Remove patch level
+        return implode('.', array_slice(explode('.', $branch), 0, 2));
+    }
+
+    /**
+     * @param array $composerJson
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    private function determinePackageType(array $composerJson): array
+    {
+        if (empty($composerJson['type'])) {
+            throw new \InvalidArgumentException('No package type defined in composer.json', 1553081747);
+        }
+
+        return self::$typeMap[$composerJson['type']] ?? self::$typeMap['__default'];
+    }
+
+    /**
+     * @param array $composerJson
+     * @return array
+     */
+    private function determinePackageName(array $composerJson): array
+    {
+        if (empty($composerJson['name'])) {
+            throw new \InvalidArgumentException('No package name defined in composer.json', 1553082362);
+        }
+
+        if (!preg_match('/^[\w-]+\/[\w-]+$/', $composerJson['name'])) {
+            throw new \InvalidArgumentException('Invalid package name ' . $composerJson['name'] . ' provided', 1553082490);
+        }
+
+        [$vendor, $name] = explode('/', $composerJson['name']);
+        return [$vendor => $name];
     }
 }

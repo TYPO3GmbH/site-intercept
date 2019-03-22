@@ -10,10 +10,13 @@ declare(strict_types = 1);
 
 namespace App\Extractor;
 
+/**
+ * Properties passed as variables to Bamboo to render documentation
+ */
 class DocumentationBuildInformation
 {
     /**
-     * Path to generated build information file, relative to document root
+     * Path to generated build information file, relative to document root, e.g. builds/1893678543347
      *
      * @var int
      */
