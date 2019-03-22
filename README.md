@@ -167,7 +167,7 @@ An alternative is to start an explicit watcher process to recompile if css files
 
 #### Functional tests
 
-* $ ddev composer t3g:test:php:unit
+* $ ddev composer t3g:test:php:functional
 * OR $ ddev exec bin/phpunit -c build/phpunit.xml --testsuite "Functional Test Suite"
 
 #### Unit and functional tests with coverage
