@@ -30,14 +30,14 @@
         if an urgent update is wanted.
     </p>
     {{ form_start(fluidVhForm) }}
-    {{ form_errors(fluidVhForm) }}
-    <div class="form-group row">
-        <div class="col-1">
-            {{ form_widget(fluidVhForm.trigger) }}
+        {{ form_errors(fluidVhForm) }}
+        <div class="form-group row">
+            <div class="col-1">
+                {{ form_widget(fluidVhForm.trigger) }}
+            </div>
         </div>
-    </div>
+        {{ form_widget(fluidVhForm._token) }}
     {{ form_end(fluidVhForm, {'render_rest': false}) }}
-
 
     <h2>
         Recent actions

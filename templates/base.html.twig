@@ -31,6 +31,16 @@
                     <li>
                         <a href="{{ path('admin_docs') }}" {% if active == 'docs' %}class="active"{% endif %}>Documentation</a>
                     </li>
+                    {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                        <li>
+                            <a href="{{ path('admin_redirect_index') }}" {% if active == 'redirects' %}class="active"{% endif %}>Documentation Redirects</a>
+                        </li>
+                    {% endif %}
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        <li><a href="{{ path('logout') }}">Logout <i class="fa fa-lock"></i></a></li>
+                    {% else %}
+                        <li><a href="{{ path('admin_login') }}">Login <i class="fa fa-unlock"></i></a></li>
+                    {% endif %}
                 </ul>
             </div>
             <div id="page-content-wrapper">

@@ -56,6 +56,7 @@
             {{ form_widget(patchForm.nightlyMaster) }}
             {{ form_widget(patchForm.nightly9_5) }}
             {{ form_widget(patchForm.nightly8_7) }}
+            {{ form_widget(patchForm._token) }}
         {{ form_end(patchForm, {'render_rest': false}) }}
     </p>
 
@@ -80,6 +81,7 @@
                     {{ form_widget(urlForm.trigger) }}
                 </div>
             </div>
+            {{ form_widget(urlForm._token) }}
         {{ form_end(urlForm, {'render_rest': false}) }}
     </p>
 

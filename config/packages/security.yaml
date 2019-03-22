@@ -1,0 +1,41 @@
+security:
+    providers:
+        typo3_org_ldap:
+            # The default LdapUserProvider is set to
+            # App\Security\LdapUserProvider to manage the isMemberOf
+            # role mapping. This injection is done via App\Bundle\LdapBundle.
+            ldap:
+                service: Symfony\Component\Ldap\Ldap
+                base_dn: ou=people,dc=typo3,dc=org
+                search_dn: '%env(LDAP_SEARCH_USER)%'
+                search_password: '%env(LDAP_SEARCH_PASSWORD)%'
+                default_roles: ROLE_USER
+                uid_key: uid
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            anonymous: true
+
+            form_login_ldap:
+                login_path: admin_login
+                check_path: admin_login
+                csrf_token_generator: security.csrf.token_manager
+                service: Symfony\Component\Ldap\Ldap
+                dn_string: 'ou=people,dc=typo3,dc=org'
+                query_string: '(&(objectClass=inetOrgPerson)(uid={username}))'
+            logout:
+                path: /logout
+                target: admin_index
+
+    role_hierarchy:
+        # Admin role has documentation maintainer automatically
+        ROLE_ADMIN: ROLE_DOCUMENTATION_MAINTAINER
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/admin/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+#        - { path: ^/admin/docs, roles: ROLE_DOCUMENTATION_MAINTAINER }

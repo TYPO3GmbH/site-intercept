@@ -35,5 +35,7 @@ class DatabasePrimer
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->dropDatabase();
         $schemaTool->createSchema($metadatas);
+
+        // If you are using the Doctrine Fixtures Bundle you could load these here
     }
 }
