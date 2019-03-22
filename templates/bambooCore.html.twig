@@ -146,6 +146,9 @@
             {% elseif log.triggeredBy == 'interface' %}
                 | <span>Trigger: Web</span>
             {% endif %}
+            {% if log.userDisplayName %}
+                | <span>User: {{ log.userDisplayName }}</span>
+            {% endif %}
         </div>
     {% endfor %}
 

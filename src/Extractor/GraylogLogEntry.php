@@ -96,6 +96,16 @@ class GraylogLogEntry
     public $tag;
 
     /**
+     * @var string Optional LDAP user name that triggered something
+     */
+    public $username;
+
+    /**
+     * @var string Optional LDAP display name that triggered something
+     */
+    public $userDisplayName;
+
+    /**
      * Extract information from a graylog log entry
      *
      * @param array $entry
@@ -128,5 +138,8 @@ class GraylogLogEntry
         $this->sourceBranch = $entry['ctxt_sourceBranch'] ?? '';
         $this->targetBranch = $entry['ctxt_targetBranch'] ?? '';
         $this->tag = $entry['ctxt_tag'] ?? '';
+
+        $this->username = $entry['username'] ?? '';
+        $this->userDisplayName = $entry['userDisplayName'] ?? '';
     }
 }

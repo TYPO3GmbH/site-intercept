@@ -116,6 +116,9 @@
                         {% elseif log.queueLog.triggeredBy == 'interface' %}
                             | <span>Trigger: Web</span>
                         {% endif %}
+                        {% if log.userDisplayName %}
+                            | <span>User: {{ log.userDisplayName }}</span>
+                        {% endif %}
                     </button>
                 </div>
                 <div id="uuid{{ log.queueLog.uuid }}" class="collapse" aria-labelledby="uuid{{ log.queueLog.uuid }}" data-parent="#accordion">
