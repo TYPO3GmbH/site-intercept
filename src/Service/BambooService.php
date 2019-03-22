@@ -14,8 +14,10 @@ use App\Client\BambooClient;
 use App\Extractor\BambooBuildStatus;
 use App\Extractor\BambooBuildTriggered;
 use App\Extractor\BambooSlackMessage;
+use App\Extractor\BambooStatus;
 use App\Extractor\DocumentationBuildInformation;
 use App\Extractor\GerritToBambooCore;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -36,6 +38,22 @@ class BambooService
     public function __construct(BambooClient $client)
     {
         $this->client = $client;
+    }
+
+    /**
+     * Get a bamboo status: Number of online agents and queue length
+     *
+     * @return BambooStatus
+     */
+    public function getBambooStatus(): BambooStatus
+    {
+        try {
+            $agentStatus = $this->sendBamboo('get', 'latest/agent/remote?os_authType=basic', true);
+            $queueStatus = $this->sendBamboo('get', 'latest/queue?os_authType=basic');
+        } catch (RequestException $e) {
+            return new BambooStatus(false);
+        }
+        return new BambooStatus(true, (string)$agentStatus->getBody(), (string)$queueStatus->getBody());
     }
 
     /**
@@ -150,20 +168,24 @@ class BambooService
     }
 
     /**
-     * Execute http request to bamboo
+     * Execute http request to bamboo.
+     *
+     * Argument $elevated needs to be set to true if a "system" related bamboo call is executed
+     * like fetching list of remote agents. This is *not* needed for casual build triggers and similar.
      *
      * @param string $method
      * @param string $uri
+     * @param bool $elevated If true, the "elevated" user credentials of .env BAMBOO_ELEVATED_AUTHORIZATION are used
      * @return ResponseInterface
      */
-    private function sendBamboo(string $method, string $uri): ResponseInterface
+    private function sendBamboo(string $method, string $uri, bool $elevated = false): ResponseInterface
     {
         return $this->client->$method(
             $uri,
             [
                 'headers' => [
                     'accept' => 'application/json',
-                    'authorization' => getenv('BAMBOO_AUTHORIZATION'),
+                    'authorization' => $elevated ? getenv('BAMBOO_ELEVATED_AUTHORIZATION') : getenv('BAMBOO_AUTHORIZATION'),
                     'cache-control' => 'no-cache',
                     'content-type' => 'application/json',
                     'x-atlassian-token' => 'nocheck'

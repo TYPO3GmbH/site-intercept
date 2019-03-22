@@ -8,12 +8,64 @@ use App\Client\GerritClient;
 use App\Client\GraylogClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 
 class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCase
 {
+    /**
+     * @test
+     */
+    public function bambooOfflineStatusIsRendered()
+    {
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $client->request('GET', '/admin/bamboo/core');
+        $this->assertRegExp('/Bamboo: offline/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function bambooOnlineStatusIsRendered()
+    {
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get('latest/agent/remote?os_authType=basic', Argument::cetera())->willReturn(
+            new Response(200, [], json_encode([
+                [
+                    'enabled' => true,
+                    'busy' => true,
+                ],
+                [
+                    'enabled' => true,
+                    'busy' => false
+                ]
+            ]))
+        );
+        $bambooClientProphecy->get('latest/queue?os_authType=basic', Argument::cetera())->willReturn(
+            new Response(200, [], json_encode([
+                'queuedBuilds' => [
+                    'size' => 3
+                ]
+            ]))
+        );
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $client->request('GET', '/admin/bamboo/core');
+        $this->assertRegExp('/Bamboo: online/', $client->getResponse()->getContent());
+        $this->assertRegExp('/Agents: 2/', $client->getResponse()->getContent());
+        $this->assertRegExp('/Busy agents: 1/', $client->getResponse()->getContent());
+        $this->assertRegExp('/Queued jobs: 3/', $client->getResponse()->getContent());
+    }
+
     /**
      * @test
      */
@@ -96,7 +148,11 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
     public function bambooCoreCanBeTriggered()
     {
         // Bamboo client double for the first request
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
@@ -104,6 +160,9 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $bambooClientProphecy->post(Argument::cetera())->willReturn(
             new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTC-123456']))
         );
@@ -124,7 +183,11 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
     public function bambooCoreTriggeredReturnsErrorIfBambooClientDoesNotCreateBuild()
     {
         // Bamboo client double for the first request
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
@@ -132,6 +195,9 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         // Simulate bamboo did not trigger a build - buildResultKey missing in response
         $bambooClientProphecy->post(Argument::cetera())->willReturn(
             new Response(200, [], json_encode([]))
@@ -152,7 +218,11 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
     public function bambooCoreTriggeredReturnsErrorIfBrokenFormIsSubmitted()
     {
         // Bamboo client double for the first request
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
@@ -160,6 +230,9 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $bambooClientProphecy->post(Argument::cetera())->willReturn(
             new Response(200, [], json_encode([]))
         );
@@ -178,7 +251,11 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
      */
     public function bambooCoreCanBeTriggeredByUrl()
     {
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
@@ -186,6 +263,9 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $bambooClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(
             new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTC-123456']))
         );
@@ -219,7 +299,11 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
      */
     public function bambooCoreCanBeTriggeredByUrlWithPatchSet()
     {
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
@@ -227,6 +311,9 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $bambooClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(
             new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTC-123456']))
         );
@@ -260,13 +347,21 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
      */
     public function bambooCoreByUrlHandlesGerritException()
     {
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
 
         $gerritClientProphecy = $this->prophesize(GerritClient::class);
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
@@ -288,13 +383,21 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
      */
     public function bambooCoreByUrlHandlesUnknownPatchSet()
     {
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
 
         $gerritClientProphecy = $this->prophesize(GerritClient::class);
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
@@ -326,13 +429,21 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
      */
     public function bambooCoreByUrlHandlesWrongProject()
     {
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/bamboo/core');
 
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
 
         $gerritClientProphecy = $this->prophesize(GerritClient::class);
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
@@ -363,7 +474,11 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
      */
     public function bambooCoreByUrlHandlesBambooErrorResponse()
     {
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
@@ -371,6 +486,9 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $bambooClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(
             new Response(200, [], json_encode([]))
         );

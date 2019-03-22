@@ -20,6 +20,10 @@
 {% endblock %}
 
 {% block content %}
+    <h2>
+        {{ include('partials/bambooStatus.html.twig') }}
+    </h2>
+
     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
         <h2>
             Trigger Fluid View Helper Reference rendering and deployment

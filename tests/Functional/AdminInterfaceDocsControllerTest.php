@@ -8,6 +8,7 @@ use App\Client\GerritClient;
 use App\Client\GraylogClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
@@ -93,7 +94,11 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
     public function bambooDocsFluidVhCanBeTriggered()
     {
         // Bamboo client double for the first request
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/docs');
@@ -101,6 +106,9 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $bambooClientProphecy->post(Argument::cetera())->willReturn(
             new Response(200, [], json_encode(['buildResultKey' => 'CORE-DRF-123']))
         );
@@ -119,7 +127,11 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
     public function bambooDocsFluidVhReturnsErrorIfBambooClientDoesNotCreateBuild()
     {
         // Bamboo client double for the first request
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $crawler = $client->request('GET', '/admin/docs');
@@ -127,6 +139,9 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
         // Simulate bamboo did not trigger a build - buildResultKey missing in response
         $bambooClientProphecy->post(Argument::cetera())->willReturn(
             new Response(200, [], json_encode([]))

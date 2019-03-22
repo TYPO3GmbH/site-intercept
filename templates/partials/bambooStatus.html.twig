@@ -1,0 +1,18 @@
+{% if bambooStatus.isOnline == true %}
+    <span class="badge badge-success">Bamboo: online</span>
+{% else %}
+    <span class="badge badge-danger">Bamboo: offline</span>
+{% endif %}
+
+{% if bambooStatus.isOnline == true %}
+    <span class="badge badge-success">Agents: {{ bambooStatus.onlineAgents }}</span>
+{% endif %}
+{% if bambooStatus.isOnline == true %}
+    <span class="badge badge-success">Busy agents: {{ bambooStatus.busyAgents }}</span>
+{% endif %}
+{% if bambooStatus.isOnline == true and bambooStatus.queueLength == 0 %}
+    <span class="badge badge-success">Queued jobs: {{ bambooStatus.queueLength }}</span>
+{% endif %}
+{% if bambooStatus.isOnline == true and bambooStatus.queueLength > 0 %}
+    <span class="badge badge-warning">Queued jobs: {{ bambooStatus.queueLength }}</span>
+{% endif %}
