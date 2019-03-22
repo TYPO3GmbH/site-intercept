@@ -21,7 +21,7 @@ class DeploymentInformation
         'typo3-cms-documentation' => ['m' => 'manual'],
         'typo3-cms-framework' => ['c' => 'core-extension'],
         'typo3-cms-extension' => ['p' => 'extension'],
-        '__default' => ['p', 'package']
+        '__default' => ['p' => 'package']
     ];
 
     /**
@@ -129,7 +129,13 @@ class DeploymentInformation
      */
     public function toArray(): array
     {
-        return get_object_vars($this);
+        return [
+            'vendor' => $this->vendor,
+            'name' => $this->name,
+            'branch' => $this->branch,
+            'type_long' => $this->typeLong,
+            'type_short' => $this->typeShort,
+        ];
     }
 
     /**
@@ -145,8 +151,8 @@ class DeploymentInformation
             $branch = 'master';
         }
 
-        if (!preg_match('/^master|(?:v?\d+.\d+.\d+)$/', $branch)) {
-            throw new \InvalidArgumentException('Invalid format given, expected either "latest", "master" or \d.\d.\d.');
+        if (!preg_match('/^(master|(?:v?\d+.\d+.\d+))$/', $branch)) {
+            throw new \InvalidArgumentException('Invalid format given, expected either "latest", "master" or \d.\d.\d.', 1553257961);
         }
 
         $branch = ltrim($branch, 'v');

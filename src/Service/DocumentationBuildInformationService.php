@@ -97,7 +97,7 @@ class DocumentationBuildInformationService
     public function generateBuildInformation(GithubPushEventForDocs $pushEventForDocs): DocumentationBuildInformation
     {
         $buildTime = ceil(microtime(true) * 10000);
-        $composerJson = json_decode($this->fetchRemoteFile($pushEventForDocs->composerFile));
+        $composerJson = json_decode($this->fetchRemoteFile($pushEventForDocs->composerFile), true);
         $deploymentInformation = new DeploymentInformation($composerJson, $pushEventForDocs->tagOrBranchName);
         if ($deploymentInformation->getTypeLong() === 'package') {
             $this->logger->info('Received unmapped package type "' . $composerJson['type'] . '" as defined in ' . $pushEventForDocs->composerFile . ', falling back to default');
@@ -118,12 +118,7 @@ class DocumentationBuildInformationService
 
         $this->entityManager->getConnection()->beginTransaction();
         try {
-            $documentationJar = (new DocumentationJar())
-                ->setRepositoryUrl($pushEventForDocs->repositoryUrl)
-                ->setPackageName($deploymentInformation->getPackageName())
-                ->setBranch($deploymentInformation->getBranch());
-            $this->entityManager->persist($documentationJar);
-            $this->entityManager->flush();
+            $this->registerDocumentationRendering($pushEventForDocs->repositoryUrl, $deploymentInformation);
 
             if (!$this->fileSystem->exists($privateFilePath)) {
                 // TODO: Move the string concatenation magic in an Encoder class?
@@ -167,6 +162,28 @@ class DocumentationBuildInformationService
                 'Build was triggered by ' . $repositoryUrl . ' which seems to be a fork of ' . $record->getRepositoryUrl(),
                 1553090750
             );
+        }
+    }
+
+    /**
+     * @param string $repositoryUrl
+     * @param DeploymentInformation $deploymentInformation
+     */
+    private function registerDocumentationRendering(string $repositoryUrl, DeploymentInformation $deploymentInformation): void
+    {
+        $record = $this->documentationJarRepository->findOneBy([
+            'repositoryUrl' => $repositoryUrl,
+            'packageName' => $deploymentInformation->getPackageName(),
+            'branch' => $deploymentInformation->getBranch(),
+        ]);
+
+        if (!$record instanceof DocumentationJar) {
+            $documentationJar = (new DocumentationJar())
+                ->setRepositoryUrl($repositoryUrl)
+                ->setPackageName($deploymentInformation->getPackageName())
+                ->setBranch($deploymentInformation->getBranch());
+            $this->entityManager->persist($documentationJar);
+            $this->entityManager->flush();
         }
     }
 

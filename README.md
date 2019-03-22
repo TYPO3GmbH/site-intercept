@@ -174,7 +174,7 @@ An alternative is to start an explicit watcher process to recompile if css files
 
 Find rendered coverage data at var/phpunit/coverage/index.html
 
-* $ ddev composer t3g:tests:php:cover
+* $ ddev composer t3g:test:php:cover
 * OR $ ddev exec bin/phpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml  --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/
 
 ### Fix CGL
