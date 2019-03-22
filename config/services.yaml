@@ -77,10 +77,6 @@ services:
         arguments:
             $publicDir: '%kernel.project_dir%/public'
             $cacheDir: '%kernel.cache_dir%'
-            $entityManager: '@Doctrine\ORM\EntityManagerInterface'
-            $fileSystem: '@Symfony\Component\Filesystem\Filesystem'
-            $logger: '@monolog.logger.request'
-            $client: '@App\Client\GeneralClient'
         tags:
             - testDouble
 
