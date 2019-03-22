@@ -10,16 +10,17 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
-use App\Exception\DoNotCareException;
-use App\Extractor\GithubPushEventForDocs;
+use App\Exception\UnsupportedWebHookRequestException;
 use App\Service\BambooService;
+use App\Service\WebHookService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Trigger documentation rendering from a github hook that calls
+ * Trigger documentation rendering from a repository hook that calls
  * https://docs-hook.typo3.org/ or /docs/ route
  */
 class DocsToBambooController extends AbstractController
@@ -29,16 +30,18 @@ class DocsToBambooController extends AbstractController
      * @Route("/", host="docs-hook.typo3.org", name="docs_hook_to_bamboo")
      * @param Request $request
      * @param BambooService $bambooService
+     * @param WebHookService $webhookService
+     * @param LoggerInterface $logger
      * @return Response
      */
-    public function index(Request $request, BambooService $bambooService): Response
+    public function index(Request $request, BambooService $bambooService, WebHookService $webhookService, LoggerInterface $logger): Response
     {
         try {
-            $pushEventInformation = new GithubPushEventForDocs($request->getContent());
-            $bambooService->triggerDocumentationPlan($pushEventInformation);
-        } catch (DoNotCareException $e) {
+            $bambooService->triggerDocumentationPlan($webhookService->createPushEvent($request));
+        } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that
             // should trigger rendering
+            $logger->info($e->getMessage(), ['headers' => $request->headers, 'payload' => $request->getContent()]);
         }
         return Response::create();
     }

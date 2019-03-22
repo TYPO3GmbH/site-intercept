@@ -23,7 +23,7 @@ class DocsToBambooControllerTest extends TestCase
                 require __DIR__ . '/Fixtures/DocsToBambooGoodBambooPostData.php'
             )->shouldBeCalled()
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
@@ -39,7 +39,7 @@ class DocsToBambooControllerTest extends TestCase
     {
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy->post(Argument::cetera())->shouldNotBeCalled();
-        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();

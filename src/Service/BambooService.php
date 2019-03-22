@@ -15,7 +15,7 @@ use App\Extractor\BambooBuildStatus;
 use App\Extractor\BambooBuildTriggered;
 use App\Extractor\BambooSlackMessage;
 use App\Extractor\GerritToBambooCore;
-use App\Extractor\GithubPushEventForDocs;
+use App\Extractor\PushEvent;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -96,10 +96,10 @@ class BambooService
     /**
      * Triggers new build in project CORE-DR
      *
-     * @param GithubPushEventForDocs $pushEventInformation
+     * @param PushEvent $pushEvent
      * @return ResponseInterface
      */
-    public function triggerDocumentationPlan(GithubPushEventForDocs $pushEventInformation): ResponseInterface
+    public function triggerDocumentationPlan(PushEvent $pushEvent): ResponseInterface
     {
         $uri = 'latest/queue/'
             . 'CORE-DR?'
@@ -107,8 +107,8 @@ class BambooService
                 'stage=',
                 'executeAllStages=',
                 'os_authType=basic',
-                'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEventInformation->versionNumber),
-                'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEventInformation->repositoryUrl),
+                'bamboo.variable.VERSION_NUMBER=' . urlencode($pushEvent->getVersionString()),
+                'bamboo.variable.REPOSITORY_URL=' . urlencode($pushEvent->getRepositoryUrl()),
             ]);
         return $this->sendBamboo('post', $uri);
     }
