@@ -7,12 +7,10 @@ services:
       - 27017
     labels:
       com.ddev.site-name: ${DDEV_SITENAME}
-    restart: always
 
   graylogelastic:
     build: graylogelastic/build
     container_name: ddev-${DDEV_SITENAME}-graylogelastic
-    restart: always
     ports:
       - 9200
     labels:
@@ -29,7 +27,6 @@ services:
   graylog:
     build: graylog/build/
     container_name: ddev-${DDEV_SITENAME}-graylog
-    restart: always
     labels:
       com.ddev.site-name: ${DDEV_SITENAME}
     environment:
