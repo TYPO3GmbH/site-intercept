@@ -17,7 +17,7 @@ namespace App\Extractor;
 class GitPushOutput
 {
     /**
-     * @var string Review extracted from a git push output, eg. 'https://review.typo3.org/12345'
+     * @var string Review extracted from a git push output, eg. 'https://review.typo3.org/c/Packages/TYPO3.CMS/+/60480'
      */
     public $reviewUrl;
 
@@ -28,7 +28,7 @@ class GitPushOutput
      */
     public function __construct(string $output)
     {
-        if (preg_match('/(?<reviewUrl>https\:\/\/review\.typo3\.org\/\d+)/m', $output, $matches) > 0) {
+        if (preg_match('/(?<reviewUrl>https\:\/\/review\.typo3\.org\/c\/Packages\/TYPO3\.CMS\/\+\/\d+)/m', $output, $matches) > 0) {
             $this->reviewUrl = $matches['reviewUrl'];
         } else {
             throw new \RuntimeException('No review url found - push went wrong?');
