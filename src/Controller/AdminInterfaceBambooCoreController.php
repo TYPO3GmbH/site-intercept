@@ -15,6 +15,7 @@ use App\Extractor\GerritToBambooCore;
 use App\Extractor\GerritUrl;
 use App\Form\BambooCoreByUrlTriggerFormType;
 use App\Form\BambooCoreTriggerFormType;
+use App\Form\BambooCoreTriggerFormWithoutPatchSetType;
 use App\Service\BambooService;
 use App\Service\GerritService;
 use App\Service\GraylogService;
@@ -61,6 +62,10 @@ class AdminInterfaceBambooCoreController extends AbstractController
         $urlForm->handleRequest($request);
         $this->handleUrlForm($urlForm, $bambooService, $gerritService);
 
+        $triggerForm = $this->createForm(BambooCoreTriggerFormWithoutPatchSetType::class);
+        $triggerForm->handleRequest($request);
+        //$this->handlePatchForm($urlForm, $bambooService);
+
         $recentLogsMessages = $graylogService->getRecentBambooTriggersAndVotes();
 
         return $this->render(
@@ -68,6 +73,7 @@ class AdminInterfaceBambooCoreController extends AbstractController
             [
                 'patchForm' => $patchForm->createView(),
                 'urlForm' => $urlForm->createView(),
+                'triggerForm' => $triggerForm->createView(),
                 'logMessages' => $recentLogsMessages,
                 'bambooStatus' => $bambooService->getBambooStatus(),
             ]
