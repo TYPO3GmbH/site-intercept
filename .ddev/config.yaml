@@ -17,8 +17,7 @@ hooks:
   post-start:
   - exec: bash -c "sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg"
   - exec: bash -c "sudo apt-get update"
-  - exec: bash -c "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -o Dpkg::Options::='--force-confdef'
-      -o Dpkg::Options::='--force-confold' php7.2-ldap"
+  - exec: bash -c "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' php7.2-ldap"
   - exec: bash -c "sudo killall -HUP php-fpm"
 omit_containers: [dba]
 
