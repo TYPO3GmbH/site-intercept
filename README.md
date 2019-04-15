@@ -1,33 +1,34 @@
 # TYPO3 Intercept
 
 Intercept is a small middleware that communicates between various services
-used in TYPO3 core or core-near world.
+used in TYPO3 core or core-near world. Intercept can be found online at
+https://intercept.typo3.com.
 
-Processes, setup, architecture and so on are found in this README, some minor
+Processes, setup, architecture and so on are found in this README. Minor
 additional information can be found (for TYPO3 GmbH users) at the
 [TYPO3s Wiki](https://confluence.typo3.com/display/TC/Process+Flow+pre-merge+Tests).
 
 
 ## Services
 
-### Bamboo post build
+#### Bamboo post build
 End point "/bamboo" - Called by bamboo when a core build finished. Triggers votes
 on gerrit for pending (pre-merge) patches, retriggers a failed nightly build once,
 escalates a finally failed nightly core build to slack.
 
-### Docs to bamboo
+#### Docs to bamboo
 Hook end point for domain "docs-hook.typo3.com" (primary) or "intercept.typo3.com/docs"
 (test use only!). Triggers rendering and deployment of a documentation to new docs server.
 
-## Gerrit to bamboo
+#### Gerrit to bamboo
 End point "/gerrit". A hook fired by gerrit for core patch push events to trigger
 a bamboo pre-merge build.
 
-## Github pull request
+#### Github pull request
 End point "/githubpr" - Hook fired by github TYPO3 core main mirror if a pull request
 has been pushed to github to transfer that PR to a forge issue and a gerrit review.
 
-## Git subtree split
+#### Git subtree split
 End point "/split" - Hook fired by github core main mirror https://github.com/typo3/typo3.cms/ for new
 pushes (merged patch / new tag), used to update the git split packages at https://github.com/typo3-cms/.
 Sub tree splitting and tagging takes a while, jobs are queued with a rabbitmq and a single
@@ -36,13 +37,13 @@ symfony command cli worker does the main job.
 
 ## Web interface
 
-### Bamboo control
+#### Bamboo control
 Trigger single bamboo builds manually for core patches.
 
-### Git subtree split control
+#### Git subtree split control
 Trigger subtree splitting and tagging manually.
 
-### Docs control
+#### Docs control
 Interface to deal with documentation rendering and management.
 
 
@@ -75,7 +76,7 @@ hight to specify in detail what intercept does, and which data is expected from 
 service.
 
 
-### Class folders
+#### Class folders
 * Bundle/ contains a helper class for functional testing
 * Client/ contains HTTP clients injected into Services to execute remote calls
 * Command/ contains a symfony console cli worker that connects to a rabbitmq and
@@ -96,7 +97,18 @@ service.
 * Service/ contains classes doing the heavy lifting, usually calling Client/ objects and
   returning Extractor/ objects
 * Utility/ contains static helper stuff like date munging or a semver helper
-  
+
+
+## Git branches
+
+Changes to intercept should go to the develop branch. This branch is deployed to life
+https://intercept.typo3.com/ immediately by bamboo deployment if the test build goes green.
+The master branch is currently not maintained.
+
+Test coverage can be found (for TYPO3 GmbH members) at https://bamboo.typo3.com/browse/T3G-IN
+-> a single run -> the test job -> tab 'Artifacts' for the raw html output by phpunit and
+tab 'Clover' for a summary graph.
+
 
 ## Installation & upgrading
 
