@@ -168,9 +168,42 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
 
         // Get the rendered form, feed it with some data and submit it
-        $form = $crawler->selectButton('Trigger master')->form();
+        $form = $crawler->selectButton('bamboo_core_trigger_form[master]')->form();
         $form['bamboo_core_trigger_form[change]'] = '58920';
         $form['bamboo_core_trigger_form[set]'] = 3;
+        $client->submit($form);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        // The build key is shown
+        $this->assertRegExp('/CORE-GTC-123456/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function bambooCoreCanBeTriggeredWithoutPatchSet()
+    {
+        // Bamboo client double for the first request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core');
+
+        // Bamboo client double for the second request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        $bambooClientProphecy->post(Argument::cetera())->willReturn(
+            new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTC-123456']))
+        );
+
+        // Get the rendered form, feed it with some data and submit it
+        $form = $crawler->selectButton('bamboo_core_trigger_form_without_patch_set[nightlyMaster]')->form();
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
@@ -204,7 +237,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
 
         // Get the rendered form, feed it with some data and submit it
-        $form = $crawler->selectButton('Trigger master')->form();
+        $form = $crawler->selectButton('bamboo_core_trigger_form[master]')->form();
         $form['bamboo_core_trigger_form[change]'] = '58920';
         $form['bamboo_core_trigger_form[set]'] = 3;
         $client->submit($form);
@@ -237,7 +270,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             new Response(200, [], json_encode([]))
         );
 
-        $form = $crawler->selectButton('Trigger master')->form();
+        $form = $crawler->selectButton('bamboo_core_trigger_form[master]')->form();
         // Empty change is not allowed
         $form['bamboo_core_trigger_form[change]'] = '';
         $form['bamboo_core_trigger_form[set]'] = 3;
