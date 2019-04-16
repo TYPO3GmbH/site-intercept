@@ -95,6 +95,25 @@ class BambooService
     }
 
     /**
+     * Triggers a new build in one of the bamboo core branches without a specific patch
+     *
+     * @param string $bambooProject
+     * @return BambooBuildTriggered
+     */
+    public function triggerNewCoreBuildWithoutPatch(string $bambooProject): BambooBuildTriggered
+    {
+        $url = 'latest/queue/'
+            . $bambooProject . '?'
+            . implode('&', [
+                'stage=',
+                'os_authType=basic',
+                'executeAllStages=',
+            ]);
+        $response = $this->sendBamboo('post', $url);
+        return new BambooBuildTriggered((string)$response->getBody());
+    }
+
+    /**
      * Re-trigger a failed (?) (core nightly?!) build
      *
      * @param string $buildKey, eg. CORE-GTN-4711

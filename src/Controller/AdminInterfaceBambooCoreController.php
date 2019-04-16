@@ -19,6 +19,7 @@ use App\Form\BambooCoreTriggerFormWithoutPatchSetType;
 use App\Service\BambooService;
 use App\Service\GerritService;
 use App\Service\GraylogService;
+use App\Utility\BranchUtility;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -64,7 +65,7 @@ class AdminInterfaceBambooCoreController extends AbstractController
 
         $triggerForm = $this->createForm(BambooCoreTriggerFormWithoutPatchSetType::class);
         $triggerForm->handleRequest($request);
-        //$this->handlePatchForm($urlForm, $bambooService);
+        $this->handleTriggerForm($triggerForm, $bambooService);
 
         $recentLogsMessages = $graylogService->getRecentBambooTriggersAndVotes();
 
@@ -183,6 +184,49 @@ class AdminInterfaceBambooCoreController extends AbstractController
                         'Bamboo trigger not successful with change "' . $bambooData->changeId . '"'
                         . ' and patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'
+                    );
+                }
+            } catch (DoNotCareException $e) {
+                $this->addFlash('danger', $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Handle form submit for change and patch number
+     *
+     * @param FormInterface $form
+     * @param BambooService $bambooService
+     */
+    private function handleTriggerForm(FormInterface $form, BambooService $bambooService): void
+    {
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('ROLE_USER');
+            try {
+                $branch = $form->getClickedButton()->getName();
+                $bambooProject = BranchUtility::resolveBambooProjectKey($branch);
+                $bambooTriggered = $bambooService->triggerNewCoreBuildWithoutPatch($bambooProject);
+                if (!empty($bambooTriggered->buildResultKey)) {
+                    $this->addFlash(
+                        'success',
+                        'Triggered bamboo build'
+                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
+                        . ' to plan key "' . $bambooProject . '".'
+                    );
+                    $this->logger->info(
+                        'Triggered bamboo core build "' . $bambooTriggered->buildResultKey . '"'
+                        . ' on branch "' . $bambooProject . '".',
+                        [
+                            'type' => 'triggerBamboo',
+                            'branch' => $branch,
+                            'bambooKey' => $bambooTriggered->buildResultKey,
+                            'triggeredBy' => 'interface',
+                        ]
+                    );
+                } else {
+                    $this->addFlash(
+                        'danger',
+                        'Bamboo trigger not successful to plan key "' . $bambooProject . '".'
                     );
                 }
             } catch (DoNotCareException $e) {
