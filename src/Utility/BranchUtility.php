@@ -31,24 +31,41 @@ class BranchUtility
     ];
 
     /**
+     * @var array Identifiers to bamboo project keys mapping for core security tests. Extend this for new plans.
+     */
+    private static $securityBranchToProjectKeys = [
+        'master' => 'CORE-GTS',
+        '9.5' => 'CORE-GTS95',
+        '8.7' => 'CORE-GTS87',
+    ];
+
+    /**
      * Have an identifier like 'master', 'masterNightly', 'branch9_5', '9.5'
      * and get the target bamboo plan key. Incoming identifiers are
      * branch names from git, or button values from the web interface.
      *
      * @param string $identifier
+     * @param bool $isSecurity
      * @return string
      * @throws DoNotCareException
      */
-    public static function resolveBambooProjectKey(string $identifier): string
+    public static function resolveBambooProjectKey(string $identifier, bool $isSecurity): string
     {
         $identifier = str_replace('branch', '', $identifier);
         $identifier = str_replace('TYPO3_', '', $identifier);
         $identifier = str_replace('_', '.', $identifier);
         $identifier = str_replace('-', '.', $identifier);
-        if (!array_key_exists($identifier, static::$branchToProjectKeys)) {
-            throw new DoNotCareException('Did not find bamboo project for key "' . $identifier . '"');
+        if (!$isSecurity) {
+            if (!array_key_exists($identifier, static::$branchToProjectKeys)) {
+                throw new DoNotCareException('Did not find bamboo project for key "' . $identifier . '"');
+            }
+            return static::$branchToProjectKeys[$identifier];
+        } else {
+            if (!array_key_exists($identifier, static::$securityBranchToProjectKeys)) {
+                throw new DoNotCareException('Did not find bamboo security project for key "' . $identifier . '"');
+            }
+            return static::$securityBranchToProjectKeys[$identifier];
         }
-        return static::$branchToProjectKeys[$identifier];
     }
 
     /**
@@ -106,7 +123,7 @@ class BranchUtility
     /**
      * True if given bamboo plan key name is a core nightly build
      *
-     * @param string $incomingPlanKey
+     * @param string $incomingPlanKey, eg. 'CORE-GTN95-42'
      * @return bool
      */
     public static function isBambooNightlyBuild(string $incomingPlanKey): bool
@@ -117,5 +134,39 @@ class BranchUtility
             }
         }
         return false;
+    }
+
+    /**
+     * True if given bamboo plan key name is a core security build
+     *
+     * @param string $incomingPlanKey, eg. 'CORE-GTS95-42'
+     * @return bool
+     */
+    public static function isBambooSecurityBuild(string $incomingPlanKey): bool
+    {
+        foreach (static::$securityBranchToProjectKeys as $branch => $planKey) {
+            if (strpos($incomingPlanKey, $planKey . '-') === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * True if given gerrit project name is the core security project
+     *
+     * @param string $project
+     * @return bool
+     * @throws DoNotCareException
+     */
+    public static function isSecurityProject(string $project): bool
+    {
+        if ($project === 'Teams/Security/TYPO3v4-Core') {
+            return true;
+        } elseif ($project === 'Packages/TYPO3.CMS') {
+            return false;
+        } else {
+            throw new DoNotCareException();
+        }
     }
 }

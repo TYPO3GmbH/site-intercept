@@ -44,6 +44,22 @@ class GraylogService
             'application:intercept AND level:6'
             . ' AND env:' . getenv('GRAYLOG_ENV')
             . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
+            . ' AND ctxt_isSecurity:0'
+        );
+    }
+
+    /**
+     * Get a list of graylog bamboo trigger calls and gerrit votes of core security builds
+     *
+     * @return GraylogLogEntry[]
+     */
+    public function getRecentBambooCoreSecurityTriggersAndVotes(): array
+    {
+        return $this->getLogs(
+            'application:intercept AND level:6'
+            . ' AND env:' . getenv('GRAYLOG_ENV')
+            . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
+            . ' AND ctxt_isSecurity:1'
         );
     }
 

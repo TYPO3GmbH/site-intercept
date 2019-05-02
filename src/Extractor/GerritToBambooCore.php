@@ -41,14 +41,20 @@ class GerritToBambooCore
     public $bambooProject;
 
     /**
+     * @var bool True if core security repo is triggered
+     */
+    public $isSecurity;
+
+    /**
      * Extract information needed from a gerrit push event hook
      *
      * @param string $change Something like '48574' or 'https://review.typo3.org/48574/' or 'https://review.typo3.org/#/c/48574/11'
      * @param int $set Patch set, eg 5
      * @param string $branch 'master' or 'TYPO3_8-7' or 'branch8_7' or 'nightly9_5', see utility tests
+     * @param string $project Name of gerrit project: 'Packages/TYPO3.CMS' for casual core, 'Teams/Security/TYPO3v4-Core' for core security
      * @throws DoNotCareException
      */
-    public function __construct(string $change, int $set, string $branch)
+    public function __construct(string $change, int $set, string $branch, string $project)
     {
         if ($change === (string)(int)$change) {
             $this->changeId = (int)$change;
@@ -61,7 +67,11 @@ class GerritToBambooCore
         if (empty($this->patchSet)) {
             throw new DoNotCareException('Could not determine a patch set from "' . $set . '"');
         }
+        if (empty($project)) {
+            throw new DoNotCareException('No gerrit project string like "Packages/TYPO3.CMS" given.');
+        }
         $this->branch = BranchUtility::resolveCoreMonoRepoBranch($branch);
-        $this->bambooProject = BranchUtility::resolveBambooProjectKey($branch);
+        $this->isSecurity = BranchUtility::isSecurityProject($project);
+        $this->bambooProject = BranchUtility::resolveBambooProjectKey($branch, $this->isSecurity);
     }
 }

@@ -32,4 +32,27 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
         $cookie = new Cookie($session->getName(), $session->getId());
         $client->getCookieJar()->set($cookie);
     }
+
+    /**
+     * Log in a client as admin
+     *
+     * @param Client $client
+     */
+    protected function logInAsAdmin(Client $client)
+    {
+        $session = $client->getContainer()->get('session');
+
+        $firewallName = 'main';
+        $firewallContext = 'main';
+
+        $roles = [
+            'ROLE_ADMIN',
+        ];
+        $token = new UsernamePasswordToken('admin', null, $firewallName, $roles);
+        $session->set('_security_'.$firewallContext, serialize($token));
+        $session->save();
+
+        $cookie = new Cookie($session->getName(), $session->getId());
+        $client->getCookieJar()->set($cookie);
+    }
 }

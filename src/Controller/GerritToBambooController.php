@@ -37,10 +37,12 @@ class GerritToBambooController extends AbstractController
     {
         try {
             $branch = $request->get('branch');
+            $project = $request->get('project') ?? '';
             $bambooData = new GerritToBambooCore(
                 $request->get('changeUrl'),
                 (int)$request->get('patchset'),
-                $branch
+                $branch,
+                $project
             );
             $bambooBuild = $bambooService->triggerNewCoreBuild($bambooData);
             $logger->info(
@@ -53,6 +55,7 @@ class GerritToBambooController extends AbstractController
                     'change' => $bambooData->changeId,
                     'patch' => $bambooData->patchSet,
                     'branch' => $branch,
+                    'isSecurity' => (int)$bambooData->isSecurity,
                     'bambooKey' => $bambooBuild->buildResultKey,
                     'triggeredBy' => 'api',
                 ]

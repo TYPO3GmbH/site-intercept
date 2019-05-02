@@ -29,6 +29,11 @@ class BambooSlackMessage
     public $isNightlyBuild;
 
     /**
+     * @var bool True if plan key is a security build
+     */
+    public $isSecurityBuild;
+
+    /**
      * Extract relevant information from a bamboo created slack message
      *
      * @param Request $request
@@ -43,6 +48,7 @@ class BambooSlackMessage
         ) {
             $this->buildKey = $matches['buildKey'];
             $this->isNightlyBuild = BranchUtility::isBambooNightlyBuild($matches['buildKey']);
+            $this->isSecurityBuild = BranchUtility::isBambooSecurityBuild($matches['buildKey']);
         } else {
             throw new \InvalidArgumentException('Bamboo slack message could not be parsed.');
         }

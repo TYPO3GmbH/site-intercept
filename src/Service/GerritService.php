@@ -75,20 +75,21 @@ class GerritService
     {
         if (empty($patchSet)) {
             // Fetch latest revision only
-            $apiPath = 'changes/' . $changeId . '?o=CURRENT_REVISION';
+            $apiPath = 'a/changes/' . $changeId . '?o=CURRENT_REVISION';
         } else {
             // Get all revisions to verify the given patch set actually exists
-            $apiPath = 'changes/' . $changeId . '?o=ALL_REVISIONS';
+            $apiPath = 'a/changes/' . $changeId . '?o=ALL_REVISIONS';
         }
         try {
-            $response = $this->client->get($apiPath);
+            $response = $this->sendGerritGet($apiPath);
         } catch (ClientException $e) {
             // Usually: 404, No such change ...
             throw new DoNotCareException();
         }
         // gerrit responses prefix their json with ")]}'\n" which has to be removed first
         $json = json_decode(str_replace(")]}'\n", '', (string)$response->getBody()), true);
-        if ($json['project'] !== 'Packages/TYPO3.CMS') {
+        $project = $json['project'];
+        if ($project !== 'Packages/TYPO3.CMS' && $project !== 'Teams/Security/TYPO3v4-Core') {
             throw new DoNotCareException();
         }
         $branch = $json['branch'];
@@ -107,7 +108,7 @@ class GerritService
                 throw new DoNotCareException();
             }
         }
-        return new GerritToBambooCore((string)$changeId, $patchSet, $branch);
+        return new GerritToBambooCore((string)$changeId, $patchSet, $branch, $project);
     }
 
     /**
@@ -128,6 +129,26 @@ class GerritService
                     'content-type' => 'application/json'
                 ],
                 'json' => $postFields
+            ]
+        );
+    }
+
+    /**
+     * Execute http GET request to gerrit
+     *
+     * @param string $apiPath
+     * @return ResponseInterface
+     */
+    private function sendGerritGet(string $apiPath): ResponseInterface
+    {
+        return $this->client->get(
+            $apiPath,
+            [
+                'headers' => [
+                    'authorization' => getenv('GERRIT_AUTHORIZATION'),
+                    'cache-control' => 'no-cache',
+                    'content-type' => 'application/json'
+                ],
             ]
         );
     }

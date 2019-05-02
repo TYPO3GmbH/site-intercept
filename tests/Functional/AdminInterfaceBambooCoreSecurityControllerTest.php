@@ -13,7 +13,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 
-class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCase
+class AdminInterfaceBambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @test
@@ -26,8 +26,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             new RequestException('testing', new Request('GET', ''))
         );
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $client->request('GET', '/admin/bamboo/core/security');
         $this->assertRegExp('/Bamboo: offline/', $client->getResponse()->getContent());
     }
 
@@ -58,8 +58,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             ]))
         );
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $client->request('GET', '/admin/bamboo/core/security');
         $this->assertRegExp('/Bamboo: online/', $client->getResponse()->getContent());
         $this->assertRegExp('/Agents: 2/', $client->getResponse()->getContent());
         $this->assertRegExp('/Busy agents: 1/', $client->getResponse()->getContent());
@@ -97,7 +97,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
 
         $client = static::createClient();
-        $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $client->request('GET', '/admin/bamboo/core/security');
         $this->assertRegExp('/12345/', $client->getResponse()->getContent());
     }
 
@@ -113,7 +114,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
 
         $client = static::createClient();
-        $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $client->request('GET', '/admin/bamboo/core/security');
     }
 
     /**
@@ -128,7 +130,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
 
         $client = static::createClient();
-        $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $client->request('GET', '/admin/bamboo/core/security');
     }
 
     /**
@@ -137,9 +140,10 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
     public function bambooCoreFormIsRendered()
     {
         $client = static::createClient();
-        $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $client->request('GET', '/admin/bamboo/core/security');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Trigger bamboo builds/', $client->getResponse()->getContent());
+        $this->assertRegExp('/Trigger bamboo security builds/', $client->getResponse()->getContent());
     }
 
     /**
@@ -154,8 +158,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             new RequestException('testing', new Request('GET', ''))
         );
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -164,83 +168,17 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             new RequestException('testing', new Request('GET', ''))
         );
         $bambooClientProphecy->post(Argument::cetera())->willReturn(
-            new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTC-123456']))
+            new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTS-123456']))
         );
 
         // Get the rendered form, feed it with some data and submit it
-        $form = $crawler->selectButton('bamboo_core_trigger_form[master]')->form();
-        $form['bamboo_core_trigger_form[change]'] = '58920';
-        $form['bamboo_core_trigger_form[set]'] = 3;
+        $form = $crawler->selectButton('bamboo_core_security_trigger_form[master]')->form();
+        $form['bamboo_core_security_trigger_form[change]'] = '58920';
+        $form['bamboo_core_security_trigger_form[set]'] = 3;
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-GTC-123456/', $client->getResponse()->getContent());
-    }
-
-    /**
-     * @test
-     */
-    public function bambooCoreCanBeTriggeredWithoutPatchSet()
-    {
-        // Bamboo client double for the first request
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-        $bambooClientProphecy->get(Argument::cetera())->willThrow(
-            new RequestException('testing', new Request('GET', ''))
-        );
-        $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
-
-        // Bamboo client double for the second request
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-        $bambooClientProphecy->get(Argument::cetera())->willThrow(
-            new RequestException('testing', new Request('GET', ''))
-        );
-        $bambooClientProphecy->post(Argument::cetera())->willReturn(
-            new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTC-123456']))
-        );
-
-        // Get the rendered form, feed it with some data and submit it
-        $form = $crawler->selectButton('bamboo_core_trigger_form_without_patch_set[nightlyMaster]')->form();
-        $client->submit($form);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        // The build key is shown
-        $this->assertRegExp('/CORE-GTC-123456/', $client->getResponse()->getContent());
-    }
-
-    /**
-     * @test
-     */
-    public function bambooCoreTriggeredWithoutPatchSetReturnsErrorIfBambooClientDoesNotCreateBuild()
-    {
-        // Bamboo client double for the first request
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-        $bambooClientProphecy->get(Argument::cetera())->willThrow(
-            new RequestException('testing', new Request('GET', ''))
-        );
-        $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
-
-        // Bamboo client double for the second request
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-        $bambooClientProphecy->get(Argument::cetera())->willThrow(
-            new RequestException('testing', new Request('GET', ''))
-        );
-        // Simulate bamboo did not trigger a build - buildResultKey missing in response
-        $bambooClientProphecy->post(Argument::cetera())->willReturn(
-            new Response(200, [], json_encode([]))
-        );
-
-        // Get the rendered form, feed it with some data and submit it
-        $form = $crawler->selectButton('bamboo_core_trigger_form_without_patch_set[nightlyMaster]')->form();
-        $client->submit($form);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+        $this->assertRegExp('/CORE-GTS-123456/', $client->getResponse()->getContent());
     }
 
     /**
@@ -255,8 +193,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             new RequestException('testing', new Request('GET', ''))
         );
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -270,9 +208,9 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
 
         // Get the rendered form, feed it with some data and submit it
-        $form = $crawler->selectButton('bamboo_core_trigger_form[master]')->form();
-        $form['bamboo_core_trigger_form[change]'] = '58920';
-        $form['bamboo_core_trigger_form[set]'] = 3;
+        $form = $crawler->selectButton('bamboo_core_security_trigger_form[master]')->form();
+        $form['bamboo_core_security_trigger_form[change]'] = '58920';
+        $form['bamboo_core_security_trigger_form[set]'] = 3;
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
@@ -290,8 +228,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             new RequestException('testing', new Request('GET', ''))
         );
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -303,10 +241,10 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             new Response(200, [], json_encode([]))
         );
 
-        $form = $crawler->selectButton('bamboo_core_trigger_form[master]')->form();
+        $form = $crawler->selectButton('bamboo_core_security_trigger_form[master]')->form();
         // Empty change is not allowed
-        $form['bamboo_core_trigger_form[change]'] = '';
-        $form['bamboo_core_trigger_form[set]'] = 3;
+        $form['bamboo_core_security_trigger_form[change]'] = '';
+        $form['bamboo_core_security_trigger_form[set]'] = 3;
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Could not determine a changeId/', $client->getResponse()->getContent());
@@ -324,8 +262,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
@@ -333,14 +271,14 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             new RequestException('testing', new Request('GET', ''))
         );
         $bambooClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(
-            new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTC-123456']))
+            new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTS-123456']))
         );
 
         $gerritClientProphecy = $this->prophesize(GerritClient::class);
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
         $gerritClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
             new Response(200, [], json_encode([
-                'project' => 'Packages/TYPO3.CMS',
+                'project' => 'Teams/Security/TYPO3v4-Core',
                 'branch' => 'master',
                 'current_revision' => '12345',
                 'revisions' => [
@@ -353,11 +291,11 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
-        $form['bamboo_core_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/';
+        $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/';
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-GTC-123456/', $client->getResponse()->getContent());
+        $this->assertRegExp('/CORE-GTS-123456/', $client->getResponse()->getContent());
     }
 
     /**
@@ -372,8 +310,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
@@ -381,14 +319,14 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
             new RequestException('testing', new Request('GET', ''))
         );
         $bambooClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(
-            new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTC-123456']))
+            new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTS-123456']))
         );
 
         $gerritClientProphecy = $this->prophesize(GerritClient::class);
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
         $gerritClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
             new Response(200, [], json_encode([
-                'project' => 'Packages/TYPO3.CMS',
+                'project' => 'Teams/Security/TYPO3v4-Core',
                 'branch' => 'master',
                 'current_revision' => '12345',
                 'revisions' => [
@@ -401,11 +339,11 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
-        $form['bamboo_core_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
+        $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-GTC-123456/', $client->getResponse()->getContent());
+        $this->assertRegExp('/CORE-GTS-123456/', $client->getResponse()->getContent());
     }
 
     /**
@@ -420,8 +358,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
@@ -437,7 +375,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
-        $form['bamboo_core_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
+        $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
@@ -456,8 +394,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
@@ -469,7 +407,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
         $gerritClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
             new Response(200, [], json_encode([
-                'project' => 'Packages/TYPO3.CMS',
+                'project' => 'Teams/Security/TYPO3v4-Core',
                 'branch' => 'master',
                 'current_revision' => '12345',
                 'revisions' => [
@@ -483,7 +421,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
-        $form['bamboo_core_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
+        $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
@@ -502,8 +440,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
@@ -528,7 +466,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
-        $form['bamboo_core_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
+        $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
@@ -538,7 +476,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
     /**
      * @test
      */
-    public function bambooCoreByUrlHandlesSecurityProject()
+    public function bambooCoreByUrlHandlesNonSecurityProject()
     {
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
@@ -547,8 +485,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
@@ -560,7 +498,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
         $gerritClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
             new Response(200, [], json_encode([
-                'project' => 'Teams/Security/TYPO3v4-Core',
+                'project' => 'Packages/TYPO3.CMS',
                 'branch' => 'master',
                 'current_revision' => '12345',
                 'revisions' => [
@@ -573,7 +511,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
-        $form['bamboo_core_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
+        $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
@@ -592,8 +530,8 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         );
         TestDoubleBundle::addProphecy(GerritClient::class, $this->prophesize(GerritClient::class));
         $client = static::createClient();
-        $this->logInAsDocumentationMaintainer($client);
-        $crawler = $client->request('GET', '/admin/bamboo/core');
+        $this->logInAsAdmin($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
@@ -608,7 +546,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
         $gerritClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
             new Response(200, [], json_encode([
-                'project' => 'Packages/TYPO3.CMS',
+                'project' => 'Teams/Security/TYPO3v4-Core',
                 'branch' => 'master',
                 'current_revision' => '12345',
                 'revisions' => [
@@ -621,7 +559,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
-        $form['bamboo_core_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/';
+        $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/';
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown

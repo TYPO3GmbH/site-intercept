@@ -25,6 +25,11 @@
                     <li>
                         <a href="{{ path('admin_bamboo_core') }}" {% if active == 'bambooCore' %}class="active"{% endif %}>Bamboo Core</a>
                     </li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li>
+                            <a href="{{ path('admin_bamboo_core_security') }}" {% if active == 'bambooCoreSecurity' %}class="active"{% endif %}>Bamboo Core Security</a>
+                        </li>
+                    {% endif %}
                     <li>
                         <a href="{{ path('admin_split_core') }}" {% if active == 'splitCore' %}class="active"{% endif %}>Split Core</a>
                     </li>

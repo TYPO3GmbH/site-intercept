@@ -108,6 +108,7 @@ class BambooPostBuildController extends AbstractController
                     'change' => $buildDetails->change,
                     'patch' => $buildDetails->patchSet,
                     'bambooKey' => $buildDetails->buildKey,
+                    'isSecurity' => (int)$bambooSlack->isSecurityBuild,
                     'vote' => $vote,
                     'triggeredBy' => 'api',
                 ]

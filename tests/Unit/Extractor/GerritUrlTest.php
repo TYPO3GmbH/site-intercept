@@ -106,6 +106,31 @@ class GerritUrlTest extends TestCase
                 59676,
                 42
             ],
+            'security new url style of new interface' => [
+                'https://review.typo3.org/c/Teams/Security/TYPO3v4-Core/+/59676',
+                59676,
+                null
+            ],
+            'security new url style of new interface with slash at end' => [
+                'https://review.typo3.org/c/Teams/Security/TYPO3v4-Core/+/59676/',
+                59676,
+                null
+            ],
+            'security new url style of new interface with patch set' => [
+                'https://review.typo3.org/c/Teams/Security/TYPO3v4-Core/+/59676/1',
+                59676,
+                1
+            ],
+            'security new url style of new interface with patch set with slash at end' => [
+                'https://review.typo3.org/c/Teams/Security/TYPO3v4-Core/+/59676/42/',
+                59676,
+                42
+            ],
+            'security new url style of new interface with patch set with file' => [
+                'https://review.typo3.org/c/Teams/Security/TYPO3v4-Core/+/59676/42/typo3/sysext/core/Documentation/Changelog/9.5.x/Index.rst',
+                59676,
+                42
+            ],
         ];
     }
 
