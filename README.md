@@ -20,6 +20,9 @@ escalates a finally failed nightly core build to slack.
 Hook end point for domain "docs-hook.typo3.com" (primary) or "intercept.typo3.com/docs"
 (test use only!). Triggers rendering and deployment of a documentation to new docs server.
 
+##### Legacy Documentation Rendering Hook
+Please check the information in `legacy_hook/` folder
+
 #### Gerrit to bamboo
 End point "/gerrit". A hook fired by gerrit for core patch push events to trigger
 a bamboo pre-merge build.
