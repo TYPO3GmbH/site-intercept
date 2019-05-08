@@ -12,6 +12,9 @@ namespace App\Service;
 
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
+use App\Exception\Composer\DependencyException;
+use App\Exception\Composer\MissingValueException;
+use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\DocumentationBuildInformation;
 use App\Extractor\PushEvent;
@@ -68,6 +71,11 @@ class DocumentationBuildInformationService
     private $client;
 
     /**
+     * @var MailService
+     */
+    private $mailService;
+
+    /**
      * Constructor
      *
      * @param string $publicDir
@@ -77,6 +85,7 @@ class DocumentationBuildInformationService
      * @param Filesystem $fileSystem
      * @param LoggerInterface $logger
      * @param GeneralClient $client
+     * @param MailService $mailService
      */
     public function __construct(
         string $publicDir,
@@ -85,7 +94,8 @@ class DocumentationBuildInformationService
         EntityManagerInterface $entityManager,
         Filesystem $fileSystem,
         LoggerInterface $logger,
-        GeneralClient $client
+        GeneralClient $client,
+        MailService $mailService
     ) {
         $this->publicDir = $publicDir;
         $this->privateDir = $privateDir;
@@ -95,6 +105,7 @@ class DocumentationBuildInformationService
         $this->logger = $logger;
         $this->documentationJarRepository = $this->entityManager->getRepository(DocumentationJar::class);
         $this->client = $client;
+        $this->mailService = $mailService;
     }
 
     /**
@@ -105,10 +116,21 @@ class DocumentationBuildInformationService
     public function generateBuildInformation(PushEvent $pushEvent): DocumentationBuildInformation
     {
         $buildTime = ceil(microtime(true) * 10000);
-        $composerJson = json_decode($this->fetchRemoteFile($pushEvent->getUrlToComposerFile()), true);
+        $composerJsonContent = json_decode($this->fetchRemoteFile($pushEvent->getUrlToComposerFile()), true);
+        $composerJson = new ComposerJson($composerJsonContent);
+
+        try {
+            $this->assertComposerJsonContainsNecessaryData($composerJson);
+        } catch (DependencyException $e) {
+            $this->logger->error($e->getMessage(), ['exception' => $e]);
+            $this->sendRenderingFailedMail($pushEvent, $composerJson, $e->getMessage());
+
+            throw $e;
+        }
+
         $deploymentInformation = new DeploymentInformation($composerJson, $pushEvent->getVersionString());
         if ($deploymentInformation->getTypeLong() === 'package') {
-            $this->logger->info('Received unmapped package type "' . $composerJson['type'] . '" as defined in ' . $pushEvent->getUrlToComposerFile() . ', falling back to default');
+            $this->logger->info('Received unmapped package type "' . $composerJson->getType() . '" as defined in ' . $pushEvent->getUrlToComposerFile() . ', falling back to default');
         }
 
         $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $pushEvent->getRepositoryUrl());
@@ -154,6 +176,27 @@ class DocumentationBuildInformationService
         }
 
         return new DocumentationBuildInformation($relativePublicFilePath);
+    }
+
+    /**
+     * @param ComposerJson $composerJson
+     * @throws MissingValueException
+     * @throws DependencyException
+     */
+    private function assertComposerJsonContainsNecessaryData(ComposerJson $composerJson): void
+    {
+        $author = $composerJson->getFirstAuthor();
+        if (empty($author['email'])) {
+            throw new MissingValueException('Author doesn\'t contain an email address', 1557310245);
+        }
+
+        if (!filter_var($author['email'], FILTER_VALIDATE_EMAIL)) {
+            throw new MissingValueException('Author doesn\'t contain a valid email address: ' . $author['email'], 1557310264);
+        }
+
+        if (!$composerJson->requires('typo3/cms-core')) {
+            throw new DependencyException('Dependency typo3/cms-core is missing', 1557310527);
+        }
     }
 
     /**
@@ -210,5 +253,31 @@ class DocumentationBuildInformationService
         }
 
         return $response->getBody()->getContents();
+    }
+
+    /**
+     * @param PushEvent $pushEvent
+     * @param ComposerJson $composerJson
+     * @param string $exceptionMessage
+     * @return int
+     */
+    private function sendRenderingFailedMail(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
+    {
+        $message = $this->mailService->createMessageWithTemplate(
+            'Documentation rendering failed',
+            'emails/docs/renderingFailed.html.twig',
+            [
+                'author' => $composerJson->getFirstAuthor(),
+                'package' => $composerJson->getName(),
+                'pushEvent' => $pushEvent,
+                'reasonPhrase' => $exceptionMessage,
+            ]
+        );
+        $message
+            ->setFrom('intercept@typo3.com')
+            ->setTo($composerJson->getFirstAuthor()['email'])
+        ;
+
+        return $this->mailService->send($message);
     }
 }

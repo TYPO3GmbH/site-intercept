@@ -1,12 +1,16 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Service;
 
 use App\Bundle\ClockMockBundle;
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
+use App\Exception\Composer\DependencyException;
+use App\Exception\Composer\MissingValueException;
 use App\Extractor\PushEvent;
 use App\Service\DocumentationBuildInformationService;
+use App\Service\MailService;
 use App\Tests\Functional\DatabasePrimer;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
@@ -69,8 +73,13 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
                 json_encode([
                     'name' => $this->packageName,
                     'type' => 'typo3-cms-framework',
+                    'authors' => [
+                        ['name' => 'John Doe', 'email' => 'john.doe@example.com'],
+                    ],
+                    'require' => ['typo3/cms-core' => '*'],
                 ])
-            )->reveal()
+            )->reveal(),
+            $this->prophesize(MailService::class)->reveal()
         );
 
         $buildInformation = $subject->generateBuildInformation($pushEvent);
@@ -122,8 +131,13 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
                 json_encode([
                     'name' => $this->packageName,
                     'type' => 'typo3-cms-framework',
+                    'authors' => [
+                        ['name' => 'John Doe', 'email' => 'john.doe@example.com'],
+                    ],
+                    'require' => ['typo3/cms-core' => '*'],
                 ])
-            )->reveal()
+            )->reveal(),
+            $this->prophesize(MailService::class)->reveal()
         );
 
         $subject->generateBuildInformation($pushEvent);
@@ -149,7 +163,8 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
                 $pushEvent->getUrlToComposerFile(),
                 404,
                 ''
-            )->reveal()
+            )->reveal(),
+            $this->prophesize(MailService::class)->reveal()
         );
 
         $subject->generateBuildInformation($pushEvent);
@@ -177,8 +192,118 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
                 json_encode([
                     'name' => $this->packageName,
                     'type' => 'something-that-triggers-fallback-to-package',
+                    'authors' => [
+                        ['name' => 'John Doe', 'email' => 'john.doe@example.com'],
+                    ],
+                    'require' => ['typo3/cms-core' => '*'],
                 ])
-            )->reveal()
+            )->reveal(),
+            $this->prophesize(MailService::class)->reveal()
+        );
+
+        $subject->generateBuildInformation($pushEvent);
+    }
+
+    /**
+     * @test
+     */
+    public function missingEmailAddressThrowsException(): void
+    {
+        $this->expectException(MissingValueException::class);
+        $this->expectExceptionCode(1557310245);
+
+        $pushEvent = $this->getPushEvent();
+        $subject = new DocumentationBuildInformationService(
+            '/tmp/',
+            '/tmp/',
+            $this->entityManager,
+            new Filesystem(),
+            $this->prophesize(LoggerInterface::class)->reveal(),
+            $this->getClientProphecy(
+                $pushEvent->getUrlToComposerFile(),
+                200,
+                json_encode([
+                    'name' => $this->packageName,
+                    'type' => 'typo3-cms-extension',
+                    'authors' => [
+                        ['name' => 'John Doe', 'email' => ''],
+                    ],
+                ])
+            )->reveal(),
+            $this->prophesize(MailService::class)->reveal()
+        );
+
+        $subject->generateBuildInformation($pushEvent);
+    }
+
+    /**
+     * @test
+     */
+    public function invalidEmailAddressThrowsException(): void
+    {
+        $this->expectException(MissingValueException::class);
+        $this->expectExceptionCode(1557310264);
+
+        $pushEvent = $this->getPushEvent();
+        $subject = new DocumentationBuildInformationService(
+            '/tmp/',
+            '/tmp/',
+            $this->entityManager,
+            new Filesystem(),
+            $this->prophesize(LoggerInterface::class)->reveal(),
+            $this->getClientProphecy(
+                $pushEvent->getUrlToComposerFile(),
+                200,
+                json_encode([
+                    'name' => $this->packageName,
+                    'type' => 'typo3-cms-extension',
+                    'authors' => [
+                        ['name' => 'John Doe', 'email' => 'notvalid'],
+                    ],
+                ])
+            )->reveal(),
+            $this->prophesize(MailService::class)->reveal()
+        );
+
+        $subject->generateBuildInformation($pushEvent);
+    }
+
+    /**
+     * @test
+     */
+    public function missingCoreDependencyThrowsException(): void
+    {
+        $this->expectException(DependencyException::class);
+        $this->expectExceptionCode(1557310527);
+
+        $loggerProphecy = $this->prophesize(LoggerInterface::class);
+        $loggerProphecy->error(Argument::cetera())->shouldBeCalled();
+
+        $message = new \Swift_Message();
+
+        $mailServiceProphecy = $this->prophesize(MailService::class);
+        $mailServiceProphecy->createMessageWithTemplate(Argument::cetera())->willReturn($message);
+        $mailServiceProphecy->send($message)->willReturn(1);
+
+        $pushEvent = $this->getPushEvent();
+        $subject = new DocumentationBuildInformationService(
+            '/tmp/',
+            '/tmp/',
+            $this->entityManager,
+            new Filesystem(),
+            $loggerProphecy->reveal(),
+            $this->getClientProphecy(
+                $pushEvent->getUrlToComposerFile(),
+                200,
+                json_encode([
+                    'name' => $this->packageName,
+                    'type' => 'typo3-cms-extension',
+                    'authors' => [
+                        ['name' => 'John Doe', 'email' => 'john.doe@example.com'],
+                    ],
+                ])
+            )->reveal(),
+            $mailServiceProphecy->reveal()
         );
 
         $subject->generateBuildInformation($pushEvent);
@@ -205,8 +330,13 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
                     json_encode([
                         'name' => $this->packageName,
                         'type' => 'typo3-cms-framework',
+                        'authors' => [
+                            ['name' => 'John Doe', 'email' => 'john.doe@example.com'],
+                        ],
+                        'require' => ['typo3/cms-core' => '*'],
                     ])
-                )->reveal()
+                )->reveal(),
+                $this->prophesize(MailService::class)->reveal()
             );
 
             $subject->generateBuildInformation($pushEvent);

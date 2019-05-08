@@ -66,10 +66,10 @@ class DeploymentInformation
     /**
      * Constructor
      *
-     * @param array $composerJson
+     * @param ComposerJson $composerJson
      * @param string $branch
      */
-    public function __construct(array $composerJson, string $branch)
+    public function __construct(ComposerJson $composerJson, string $branch)
     {
         $packageName = $this->determinePackageName($composerJson);
         $packageType = $this->determinePackageType($composerJson);
@@ -181,40 +181,32 @@ class DeploymentInformation
     {
         if ($branch === 'latest') {
             return 'master';
-        } else {
-            return (string)$branch;
         }
+
+        return $branch;
     }
 
     /**
-     * @param array $composerJson
+     * @param ComposerJson $composerJson
      * @return array
      * @throws \InvalidArgumentException
      */
-    private function determinePackageType(array $composerJson): array
+    private function determinePackageType(ComposerJson $composerJson): array
     {
-        if (empty($composerJson['type'])) {
-            throw new \InvalidArgumentException('No package type defined in composer.json', 1553081747);
-        }
-
-        return self::$typeMap[$composerJson['type']] ?? self::$typeMap['__default'];
+        return self::$typeMap[$composerJson->getType()] ?? self::$typeMap['__default'];
     }
 
     /**
-     * @param array $composerJson
+     * @param ComposerJson $composerJson
      * @return array
      */
-    private function determinePackageName(array $composerJson): array
+    private function determinePackageName(ComposerJson $composerJson): array
     {
-        if (empty($composerJson['name'])) {
-            throw new \InvalidArgumentException('No package name defined in composer.json', 1553082362);
+        if (!preg_match('/^[\w-]+\/[\w-]+$/', $composerJson->getName())) {
+            throw new \InvalidArgumentException('Invalid package name ' . $composerJson->getName() . ' provided', 1553082490);
         }
 
-        if (!preg_match('/^[\w-]+\/[\w-]+$/', $composerJson['name'])) {
-            throw new \InvalidArgumentException('Invalid package name ' . $composerJson['name'] . ' provided', 1553082490);
-        }
-
-        [$vendor, $name] = explode('/', $composerJson['name']);
+        [$vendor, $name] = explode('/', $composerJson->getName());
         return [$vendor => $name];
     }
 }

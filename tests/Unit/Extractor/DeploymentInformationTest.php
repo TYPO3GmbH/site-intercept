@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Extractor;
 
-use App\Extractor\BambooSlackMessage;
+use App\Exception\Composer\MissingValueException;
+use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 class DeploymentInformationTest extends TestCase
 {
@@ -21,7 +21,7 @@ class DeploymentInformationTest extends TestCase
             'type' => 'typo3-cms-framework',
         ];
 
-        $subject = new DeploymentInformation($composerJsonAsArray, $branch);
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
 
         $this->assertSame('foobar', $subject->getVendor());
         $this->assertSame('bazfnord', $subject->getName());
@@ -50,7 +50,7 @@ class DeploymentInformationTest extends TestCase
             'type_long' => 'core-extension',
             'type_short' => 'c',
         ];
-        $this->assertSame($expected, (new DeploymentInformation($composerJsonAsArray, $branch))->toArray());
+        $this->assertSame($expected, (new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch))->toArray());
     }
 
     /**
@@ -82,7 +82,7 @@ class DeploymentInformationTest extends TestCase
             'type' => 'foo',
         ];
 
-        $subject = new DeploymentInformation($composerJsonAsArray, $branch);
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
         $this->assertSame($expectedVendor, $subject->getVendor());
         $this->assertSame($expectedName, $subject->getName());
         $this->assertSame($packageName, $subject->getPackageName());
@@ -94,8 +94,8 @@ class DeploymentInformationTest extends TestCase
     public function invalidPackageNameDataProvider(): array
     {
         return [
-            ['', \InvalidArgumentException::class, 1553082362],
-            [null, \InvalidArgumentException::class, 1553082362],
+            ['', MissingValueException::class, 1557309364],
+            [null, MissingValueException::class, 1557309364],
             ['baz', \InvalidArgumentException::class, 1553082490],
             ['3245345', \InvalidArgumentException::class, 1553082490],
             ['husel_pusel:foobar', \InvalidArgumentException::class, 1553082490],
@@ -118,7 +118,7 @@ class DeploymentInformationTest extends TestCase
             'name' => $packageName,
             'type' => 'foo',
         ];
-        new DeploymentInformation($composerJsonAsArray, 'master');
+        new DeploymentInformation(new ComposerJson($composerJsonAsArray), 'master');
     }
 
     /**
@@ -149,7 +149,7 @@ class DeploymentInformationTest extends TestCase
             $composerJsonAsArray['type'] = $type;
         }
 
-        $subject = new DeploymentInformation($composerJsonAsArray, $branch);
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
         $this->assertSame($expectedLong, $subject->getTypeLong());
         $this->assertSame($expectedShort, $subject->getTypeShort());
     }
@@ -172,15 +172,15 @@ class DeploymentInformationTest extends TestCase
      */
     public function invalidPackageTypesThrowException(?string $type): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionCode(1553081747);
+        $this->expectException(MissingValueException::class);
+        $this->expectExceptionCode(1557309364);
 
         $composerJsonAsArray = ['name' => 'foobar/bazfnord'];
         if (isset($type)) {
             $composerJsonAsArray['type'] = $type;
         }
 
-        new DeploymentInformation($composerJsonAsArray, 'master');
+        new DeploymentInformation(new ComposerJson($composerJsonAsArray), 'master');
     }
 
     /**
@@ -209,7 +209,7 @@ class DeploymentInformationTest extends TestCase
             'type' => 'foo',
         ];
 
-        $subject = new DeploymentInformation($composerJsonAsArray, $branch);
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
         $this->assertSame($expectedBranch, $subject->getBranch());
     }
 
@@ -272,6 +272,6 @@ class DeploymentInformationTest extends TestCase
             'type' => 'foo',
         ];
 
-        new DeploymentInformation($composerJsonAsArray, $branch);
+        new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
     }
 }
