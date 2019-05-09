@@ -39,11 +39,16 @@ class DeploymentInformation
     private $name;
 
     /**
-     * The branch or tag of the repository supposed to be checked out
      *
-     * @var string
+     *
+     * @var string The branch or tag of the repository supposed to be checked out, eg. '1.2.3', '1.2', 'master', 'latest'
      */
     private $branch;
+
+    /**
+     * @var string The target directory on the documentation server, typically identical to $branch, except for $branch='latest', this is deployed to 'master'
+     */
+    private $targetBranchDirectory;
 
     /**
      * The long type name of a composer package, e.g. "manual" or "package"
@@ -72,12 +77,13 @@ class DeploymentInformation
         $this->vendor = key($packageName);
         $this->name = current($packageName);
         $this->branch = $this->normalizeBranchName($branch);
+        $this->targetBranchDirectory = $this->normalizeTargetBranchDirectory($this->branch);
         $this->typeLong = current($packageType);
         $this->typeShort = key($packageType);
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getVendor(): string
     {
@@ -85,7 +91,7 @@ class DeploymentInformation
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getName(): string
     {
@@ -101,7 +107,7 @@ class DeploymentInformation
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getBranch(): string
     {
@@ -109,7 +115,15 @@ class DeploymentInformation
     }
 
     /**
-     * @return string|null
+     * @return string
+     */
+    public function getTargetBranchDirectory(): string
+    {
+        return $this->targetBranchDirectory;
+    }
+
+    /**
+     * @return string
      */
     public function getTypeLong(): string
     {
@@ -117,7 +131,7 @@ class DeploymentInformation
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getTypeShort(): string
     {
@@ -133,6 +147,7 @@ class DeploymentInformation
             'vendor' => $this->vendor,
             'name' => $this->name,
             'branch' => $this->branch,
+            'target_branch_directory' => $this->targetBranchDirectory,
             'type_long' => $this->typeLong,
             'type_short' => $this->typeShort,
         ];
@@ -146,12 +161,7 @@ class DeploymentInformation
      */
     private function normalizeBranchName(string $branch): string
     {
-        if ($branch === 'latest') {
-            // TODO: For the time being the version "latest" is mapped to "master"
-            $branch = 'master';
-        }
-
-        if (!preg_match('/^(master|(?:v?\d+.\d+.\d+))$/', $branch)) {
+        if (!preg_match('/^(master|latest|(?:v?\d+.\d+.\d+))$/', $branch)) {
             throw new \InvalidArgumentException('Invalid format given, expected either "latest", "master" or \d.\d.\d.', 1553257961);
         }
 
@@ -159,6 +169,21 @@ class DeploymentInformation
 
         // Remove patch level
         return implode('.', array_slice(explode('.', $branch), 0, 2));
+    }
+
+    /**
+     * Check whether given version matches expected format and remove patch level from version
+     *
+     * @param string $branch
+     * @return string
+     */
+    private function normalizeTargetBranchDirectory(string $branch): string
+    {
+        if ($branch === 'latest') {
+            return 'master';
+        } else {
+            return (string)$branch;
+        }
     }
 
     /**

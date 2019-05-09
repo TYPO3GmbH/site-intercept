@@ -47,8 +47,7 @@ class DocsToBambooController extends AbstractController
             $documentationBuildInformation = $documentationBuildInformationService->generateBuildInformation($webhookService->createPushEvent($request));
             $bambooService->triggerDocumentationPlan($documentationBuildInformation);
         } catch (UnsupportedWebHookRequestException $e) {
-            // Hook payload could not be identified as hook that
-            // should trigger rendering
+            // Hook payload could not be identified as hook that should trigger rendering
             $logger->info($e->getMessage(), ['headers' => $request->headers, 'payload' => $request->getContent()]);
         }
         return Response::create();

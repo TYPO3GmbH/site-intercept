@@ -78,7 +78,17 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         $this->assertSame('docs-build-information/' . $currentTimeInt, $buildInformation->getFilePath());
         $this->assertFileExists('/tmp/docs-build-information/' . $currentTimeInt);
 
-        $expectedFileContent = ['#!/bin/bash', 'vendor=foobar', 'name=baz', 'branch=master', 'type_long=core-extension', 'type_short=c', 'repository_url=http://myserver.com/foobar/baz.git', ''];
+        $expectedFileContent = [
+            '#!/bin/bash',
+            'vendor=foobar',
+            'name=baz',
+            'branch=master',
+            'target_branch_directory=master',
+            'type_long=core-extension',
+            'type_short=c',
+            'repository_url=http://myserver.com/foobar/baz.git',
+            ''
+        ];
         $this->assertSame(implode(PHP_EOL, $expectedFileContent), file_get_contents('/tmp/docs-build-information/' . $currentTimeInt));
     }
 

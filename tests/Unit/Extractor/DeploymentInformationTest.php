@@ -46,6 +46,7 @@ class DeploymentInformationTest extends TestCase
             'vendor' => 'foobar',
             'name' => 'bazfnord',
             'branch' => $branch,
+            'target_branch_directory' => $branch,
             'type_long' => 'core-extension',
             'type_short' => 'c',
         ];
@@ -189,7 +190,7 @@ class DeploymentInformationTest extends TestCase
     {
         return [
             ['master', 'master'],
-            ['latest', 'master'],
+            ['latest', 'latest'],
             ['1.2.3', '1.2'],
             ['v1.5.8', '1.5'],
         ];
@@ -210,6 +211,35 @@ class DeploymentInformationTest extends TestCase
 
         $subject = new DeploymentInformation($composerJsonAsArray, $branch);
         $this->assertSame($expectedBranch, $subject->getBranch());
+    }
+
+    /**
+     * @return array
+     */
+    public function validTargetBranchDirectoryDataProvider(): array
+    {
+        return [
+            ['master', 'master'],
+            ['latest', 'master'],
+            ['1.2.3', '1.2'],
+            ['v1.5.8', '1.5'],
+        ];
+    }
+
+    /**
+     * @param string $branch
+     * @param string $expectedBranch
+     * @dataProvider validTargetBranchDirectoryDataProvider
+     * @test
+     */
+    public function targetBranchDirectoriesNormalized(string $branch, string $expectedBranch): void
+    {
+        $composerJsonAsArray = [
+            'name' => 'foobar/bazfnord',
+            'type' => 'foo',
+        ];
+        $subject = new DeploymentInformation($composerJsonAsArray, $branch);
+        $this->assertSame($expectedBranch, $subject->getTargetBranchDirectory());
     }
 
     /**
