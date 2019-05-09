@@ -134,6 +134,7 @@ class DocumentationBuildInformationService
                 foreach ($deploymentInformation->toArray() as $property => $value) {
                     $fileContent .= $property . '=' . $value . PHP_EOL;
                 }
+                $fileContent .= 'repository_url=' . $pushEvent->getRepositoryUrl() . PHP_EOL;
 
                 $this->fileSystem->dumpFile($privateFilePath, $fileContent);
                 $this->fileSystem->symlink($privateFilePath, $absolutePublicFilePath);
