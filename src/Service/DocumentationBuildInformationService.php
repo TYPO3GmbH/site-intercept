@@ -28,14 +28,19 @@ use Symfony\Component\Filesystem\Filesystem;
 class DocumentationBuildInformationService
 {
     /**
-     * @var string
+     * @var string Absolute, public base directory where deployment infos are stored, configured via DI, typically '/.../public/'
      */
     private $publicDir;
 
     /**
-     * @var string
+     * @var string Absolute, private base directory where deployment infos are stored, configured via DI, typically '/.../var/'
      */
-    private $cacheDir;
+    private $privateDir;
+
+    /**
+     * @var string Name of sub directory in $publicDir and $privateDir where the files are stored, typically 'docs-build-information'
+     */
+    private $subDir;
 
     /**
      * @var EntityManagerInterface
@@ -66,7 +71,8 @@ class DocumentationBuildInformationService
      * Constructor
      *
      * @param string $publicDir
-     * @param string $cacheDir
+     * @param string $privateDir
+     * @param string $subDir
      * @param EntityManagerInterface $entityManager
      * @param Filesystem $fileSystem
      * @param LoggerInterface $logger
@@ -74,14 +80,16 @@ class DocumentationBuildInformationService
      */
     public function __construct(
         string $publicDir,
-        string $cacheDir,
+        string $privateDir,
+        string $subDir,
         EntityManagerInterface $entityManager,
         Filesystem $fileSystem,
         LoggerInterface $logger,
         GeneralClient $client
     ) {
         $this->publicDir = $publicDir;
-        $this->cacheDir = $cacheDir;
+        $this->privateDir = $privateDir;
+        $this->subDir = $subDir;
         $this->entityManager = $entityManager;
         $this->fileSystem = $fileSystem;
         $this->logger = $logger;
@@ -106,14 +114,14 @@ class DocumentationBuildInformationService
         $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $pushEvent->getRepositoryUrl());
 
         $privateFilePath = implode('/', [
-            $this->cacheDir,
-            'builds',
+            $this->privateDir,
+            $this->subDir,
             $deploymentInformation->getVendor(),
             $deploymentInformation->getName(),
             $deploymentInformation->getBranch(),
             $buildTime,
         ]);
-        $relativePublicFilePath = 'builds/' . $buildTime;
+        $relativePublicFilePath = $this->subDir . '/' . $buildTime;
         $absolutePublicFilePath = $this->publicDir . '/' . $relativePublicFilePath;
 
         $this->entityManager->getConnection()->beginTransaction();

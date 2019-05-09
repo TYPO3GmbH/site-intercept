@@ -76,7 +76,8 @@ services:
         public: true
         arguments:
             $publicDir: '%kernel.project_dir%/public'
-            $cacheDir: '%kernel.cache_dir%'
+            $privateDir: '%kernel.project_dir%/var'
+            $subDir: 'docs-build-information'
         tags:
             - testDouble
 

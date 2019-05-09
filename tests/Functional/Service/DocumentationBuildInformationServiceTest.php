@@ -59,6 +59,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         $subject = new DocumentationBuildInformationService(
             '/tmp/',
             '/tmp/',
+            'docs-build-information',
             $this->entityManager,
             new Filesystem(),
             $this->prophesize(LoggerInterface::class)->reveal(),
@@ -74,11 +75,11 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
 
         $buildInformation = $subject->generateBuildInformation($pushEvent);
 
-        $this->assertSame('builds/' . $currentTimeInt, $buildInformation->getFilePath());
-        $this->assertFileExists('/tmp/builds/' . $currentTimeInt);
+        $this->assertSame('docs-build-information/' . $currentTimeInt, $buildInformation->getFilePath());
+        $this->assertFileExists('/tmp/docs-build-information/' . $currentTimeInt);
 
         $expectedFileContent = ['#!/bin/bash', 'vendor=foobar', 'name=baz', 'branch=master', 'type_long=core-extension', 'type_short=c', ''];
-        $this->assertSame(implode(PHP_EOL, $expectedFileContent), file_get_contents('/tmp/builds/' . $currentTimeInt));
+        $this->assertSame(implode(PHP_EOL, $expectedFileContent), file_get_contents('/tmp/docs-build-information/' . $currentTimeInt));
     }
 
     /**
@@ -101,6 +102,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         $subject = new DocumentationBuildInformationService(
             '/tmp/',
             '/tmp/',
+            'docs-build-information',
             $this->entityManager,
             new Filesystem(),
             $this->prophesize(LoggerInterface::class)->reveal(),
@@ -129,6 +131,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         $subject = new DocumentationBuildInformationService(
             '/tmp/',
             '/tmp/',
+            'docs-build-information',
             $this->entityManager,
             new Filesystem(),
             $this->prophesize(LoggerInterface::class)->reveal(),
@@ -154,6 +157,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         $subject = new DocumentationBuildInformationService(
             '/tmp/',
             '/tmp/',
+            'docs-build-information',
             $this->entityManager,
             new Filesystem(),
             $loggerProphecy->reveal(),
@@ -181,6 +185,7 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             $subject = new DocumentationBuildInformationService(
                 '/tmp/',
                 '/tmp/',
+                'docs-build-information',
                 $this->entityManager,
                 new Filesystem(),
                 $this->prophesize(LoggerInterface::class)->reveal(),
