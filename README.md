@@ -37,6 +37,9 @@ pushes (merged patch / new tag), used to update the git split packages at https:
 Sub tree splitting and tagging takes a while, jobs are queued with a rabbitmq and a single
 symfony command cli worker does the main job.
 
+#### Bitbucket to packagist hook
+Sends bitbucket webhook push events to packagist to update according packages as packagist currently cannot
+use the bitbucket *server* payloads directly. Requests to the hook have to be sent via https://intercept.typo3.com/bitbucketToPackagist?apiToken=token&username=user
 
 ## Web interface
 
