@@ -21,7 +21,7 @@ class AdminInterfaceHomeController extends AbstractController
 {
     /**
      * @Route("/admin", name="admin_index")
-     * @Route("/", name="admin")
+     * @Route("/", host="intercept.typo3.com", name="admin")
      * @return Response
      */
     public function index(): Response
