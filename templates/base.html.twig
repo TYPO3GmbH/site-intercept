@@ -36,6 +36,9 @@
                     <li>
                         <a href="{{ path('admin_docs') }}" {% if active == 'docs' %}class="active"{% endif %}>Documentation</a>
                     </li>
+                    <li>
+                        <a href="{{ path('admin_docs_deployments') }}" {% if active == 'docsDeployments' %}class="active"{% endif %}>Documentation Deployments</a>
+                    </li>
                     {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                         <li>
                             <a href="{{ path('admin_redirect_index') }}" {% if active == 'redirects' %}class="active"{% endif %}>Documentation Redirects</a>

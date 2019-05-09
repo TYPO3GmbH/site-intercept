@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% set active = 'docsDeployments' %}
+
+{% block title %}Documentation deployments{% endblock %}
+
+{% block headline %}
+    <h1>Deployed documentation</h1>
+{% endblock %}
+
+{# flash messages on this page are NOT escaped !#}
+{% block flashMessages %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message | raw}}
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    <h2>
+        {{ include('partials/bambooStatus.html.twig') }}
+    </h2>
+
+    <h2>
+        Deployed documentation projects
+    </h2>
+    <table class="table table-sm table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Repository URL</th>
+            <th>Package Name</th>
+            <th>Branch</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for deployment in deployments %}
+            <tr>
+                <td>{{ deployment.id }}</td>
+                <td><a href="{{ deployment.repositoryUrl }}">{{ deployment.repositoryUrl }}</a></td>
+                <td>{{ deployment.packageName }}</td>
+                <td>{{ deployment.branch }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>
+        Recent actions
+    </h2>
+    {% for log in logMessages %}
+        <div class="alert graylog-log alert-success">
+            <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
+            <span>
+                <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo Fluid View Helper rendering</a>
+            </span>
+
+            {% if log.bambooKey %}
+                | <span>Bamboo key: {{ log.bambooKey }}</span>
+            {% endif %}
+            {% if log.triggeredBy == 'api' %}
+                | <span>Trigger: API</span>
+            {% elseif log.triggeredBy == 'interface' %}
+                | <span>Trigger: Web</span>
+            {% endif %}
+            {% if log.userDisplayName %}
+                | <span>User: {{ log.userDisplayName }}</span>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+{% endblock %}
