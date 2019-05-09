@@ -31,3 +31,7 @@ runYarn encore dev
 
 # Unit tests
 runPhpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml  --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/
+
+# Build legacy hook
+cd legacy_hook
+runComposer install --no-interaction --no-progress
