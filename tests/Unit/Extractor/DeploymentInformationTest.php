@@ -238,7 +238,7 @@ class DeploymentInformationTest extends TestCase
             'name' => 'foobar/bazfnord',
             'type' => 'foo',
         ];
-        $subject = new DeploymentInformation($composerJsonAsArray, $branch);
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
         $this->assertSame($expectedBranch, $subject->getTargetBranchDirectory());
     }
 

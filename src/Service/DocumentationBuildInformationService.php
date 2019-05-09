@@ -13,7 +13,6 @@ namespace App\Service;
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
 use App\Exception\Composer\DependencyException;
-use App\Exception\Composer\MissingValueException;
 use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\DocumentationBuildInformation;
@@ -123,9 +122,14 @@ class DocumentationBuildInformationService
             $this->assertComposerJsonContainsNecessaryData($composerJson);
         } catch (DependencyException $e) {
             $this->logger->error($e->getMessage(), ['exception' => $e]);
-            $this->sendRenderingFailedMail($pushEvent, $composerJson, $e->getMessage());
 
-            throw $e;
+            $author = $composerJson->getFirstAuthor();
+            if (!empty($author['email']) && filter_var($author['email'], FILTER_VALIDATE_EMAIL)) {
+                $this->sendRenderingFailedMail($pushEvent, $composerJson, $e->getMessage());
+
+                // Only re-throw exception if a notification mail can be sent
+                throw $e;
+            }
         }
 
         $deploymentInformation = new DeploymentInformation($composerJson, $pushEvent->getVersionString());
@@ -180,20 +184,10 @@ class DocumentationBuildInformationService
 
     /**
      * @param ComposerJson $composerJson
-     * @throws MissingValueException
      * @throws DependencyException
      */
     private function assertComposerJsonContainsNecessaryData(ComposerJson $composerJson): void
     {
-        $author = $composerJson->getFirstAuthor();
-        if (empty($author['email'])) {
-            throw new MissingValueException('Author doesn\'t contain an email address', 1557310245);
-        }
-
-        if (!filter_var($author['email'], FILTER_VALIDATE_EMAIL)) {
-            throw new MissingValueException('Author doesn\'t contain a valid email address: ' . $author['email'], 1557310264);
-        }
-
         if (!$composerJson->requires('typo3/cms-core')) {
             throw new DependencyException('Dependency typo3/cms-core is missing', 1557310527);
         }
