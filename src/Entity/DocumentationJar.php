@@ -39,6 +39,16 @@ class DocumentationJar
      */
     private $branch;
 
+    /**
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
+     */
+    private $lastRenderedAt;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -78,5 +88,44 @@ class DocumentationJar
         $this->branch = $branch;
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getLastRenderedAt(): \DateTimeInterface
+    {
+        return $this->lastRenderedAt;
+    }
+
+    public function setLastRenderedAt(\DateTimeInterface $lastRenderedAt): self
+    {
+        $this->lastRenderedAt = $lastRenderedAt;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function updatedTimestamps(): void
+    {
+        $dtz = new \DateTimeZone('UTC');
+        if ($this->getCreatedAt() === null) {
+            $this->setCreatedAt(new \DateTime('now', $dtz));
+        }
+        if ($this->getLastRenderedAt() === null) {
+            $this->setLastRenderedAt(new \DateTime('now', $dtz));
+        }
     }
 }
