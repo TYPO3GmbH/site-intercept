@@ -194,7 +194,7 @@ class DeploymentInformationTest extends TestCase
     public function docsHomeTypeIsDetected()
     {
         $pushEvent = new PushEvent(
-            'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage',
+            'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
             'master',
             'https://something'
         );
