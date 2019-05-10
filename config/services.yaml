@@ -75,7 +75,6 @@ services:
         class: App\Service\DocumentationBuildInformationService
         public: true
         arguments:
-            $publicDir: '%kernel.project_dir%/public'
             $privateDir: '%kernel.project_dir%/var'
             $subDir: 'docs-build-information'
         tags:

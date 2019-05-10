@@ -30,6 +30,12 @@ class PushEvent
      */
     protected $urlToComposerFile;
 
+    /**
+     * PushEvent constructor.
+     * @param string $repositoryUrl
+     * @param string $versionString
+     * @param string $urlToComposerFile
+     */
     public function __construct(string $repositoryUrl, string $versionString, string $urlToComposerFile)
     {
         $this->repositoryUrl = $repositoryUrl;

@@ -10,6 +10,10 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Exception\ComposerJsonInvalidException;
+use App\Exception\ComposerJsonNotFoundException;
+use App\Exception\DocsPackageDoNotCareBranch;
+use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
@@ -44,12 +48,99 @@ class DocsToBambooController extends AbstractController
         LoggerInterface $logger
     ): Response {
         try {
-            $documentationBuildInformation = $documentationBuildInformationService->generateBuildInformation($webhookService->createPushEvent($request));
-            $bambooService->triggerDocumentationPlan($documentationBuildInformation);
+            $pushEvent = $webhookService->createPushEvent($request);
+            $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
+            $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerJson);
+            $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
+            $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
+            $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
+            $bambooService->triggerDocumentationPlan($buildInformation);
+            $logger->info(
+                'Triggered docs build',
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'triggered',
+                    'triggeredBy' => 'api',
+                    'repository' => $buildInformation->repositoryUrl,
+                    'package' => $buildInformation->packageName,
+                    'sourceBranch' => $buildInformation->sourceBranch,
+                    'targetBranchDirectory' => $buildInformation->targetBranchDirectory,
+                ]
+            );
+            return Response::create();
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
-            $logger->info($e->getMessage(), ['headers' => $request->headers, 'payload' => $request->getContent()]);
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'unsupportedHook',
+                    'headers' => $request->headers,
+                    'payload' => $request->getContent(),
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                ]
+            );
+            // 412: precondition failed
+            return Response::create('Invalid hook payload. See https://intercept.typo3.com for more information.', 412);
+        } catch (ComposerJsonNotFoundException $e) {
+            // Repository did not provide a composer.json, or fetch failed
+            $logger->warning(
+                'Can not render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' MUST have a composer.json file on top level.',
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'noComposerJson',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $pushEvent->getRepositoryUrl(),
+                    'composerFile' => $pushEvent->getUrlToComposerFile(),
+                ]
+            );
+            return Response::create('No composer.json found, invalid or unable to fetch. See https://intercept.typo3.com for more information.', 412);
+        } catch (ComposerJsonInvalidException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'invalidComposerJson',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $pushEvent->getRepositoryUrl(),
+                    'composerFile' => $pushEvent->getUrlToComposerFile(),
+                ]
+            );
+            return Response::create('Invalid composer.json. See https://intercept.typo3.com for more information.', 412);
+        } catch (DocsPackageRegisteredWithDifferentRepositoryException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'packageRegisteredWithDifferentRepository',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $pushEvent->getRepositoryUrl(),
+                    'package' => $buildInformation->packageName,
+                ]
+            );
+            return Response::create('Package already registered for different repository. See https://intercept.typo3.com for more information.', 412);
+        } catch (DocsPackageDoNotCareBranch $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'noRelevantBranchOrTag',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $pushEvent->getRepositoryUrl(),
+                    'package' => $buildInformation->packageName,
+                    'sourceBranch' => $pushEvent->getVersionString(),
+                ]
+            );
+            return Response::create('Branch or tag name ignored for decumentation rendering. See https://intercept.typo3.com for more information.', 412);
         }
-        return Response::create();
     }
 }

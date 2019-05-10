@@ -65,6 +65,10 @@ class DocumentationJar
         return $this->repositoryUrl;
     }
 
+    /**
+     * @param string $repositoryUrl
+     * @return DocumentationJar
+     */
     public function setRepositoryUrl(string $repositoryUrl): self
     {
         $this->repositoryUrl = $repositoryUrl;
@@ -77,6 +81,10 @@ class DocumentationJar
         return $this->packageName;
     }
 
+    /**
+     * @param string $packageName
+     * @return DocumentationJar
+     */
     public function setPackageName(string $packageName): self
     {
         $this->packageName = $packageName;
@@ -89,6 +97,10 @@ class DocumentationJar
         return $this->branch;
     }
 
+    /**
+     * @param string $branch
+     * @return DocumentationJar
+     */
     public function setBranch(string $branch): self
     {
         $this->branch = $branch;

@@ -12,13 +12,13 @@ namespace App\Service;
 
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
+use App\Exception\ComposerJsonNotFoundException;
+use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Extractor\DeploymentInformation;
-use App\Extractor\DocumentationBuildInformation;
 use App\Extractor\PushEvent;
 use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -27,11 +27,6 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class DocumentationBuildInformationService
 {
-    /**
-     * @var string Absolute, public base directory where deployment infos are stored, configured via DI, typically '/.../public/'
-     */
-    private $publicDir;
-
     /**
      * @var string Absolute, private base directory where deployment infos are stored, configured via DI, typically '/.../var/'
      */
@@ -53,11 +48,6 @@ class DocumentationBuildInformationService
     private $fileSystem;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var DocumentationJarRepository
      */
     private $documentationJarRepository;
@@ -68,147 +58,133 @@ class DocumentationBuildInformationService
     private $client;
 
     /**
-     * Constructor
-     *
-     * @param string $publicDir
      * @param string $privateDir
      * @param string $subDir
      * @param EntityManagerInterface $entityManager
      * @param Filesystem $fileSystem
-     * @param LoggerInterface $logger
      * @param GeneralClient $client
      */
     public function __construct(
-        string $publicDir,
         string $privateDir,
         string $subDir,
         EntityManagerInterface $entityManager,
         Filesystem $fileSystem,
-        LoggerInterface $logger,
         GeneralClient $client
     ) {
-        $this->publicDir = $publicDir;
         $this->privateDir = $privateDir;
         $this->subDir = $subDir;
         $this->entityManager = $entityManager;
         $this->fileSystem = $fileSystem;
-        $this->logger = $logger;
         $this->documentationJarRepository = $this->entityManager->getRepository(DocumentationJar::class);
         $this->client = $client;
     }
 
     /**
-     * @param PushEvent $pushEvent
-     * @return DocumentationBuildInformation
-     * @throws \Exception
+     * Fetch composer.json from a remote repository to get more package information.
+     *
+     * @param string $path
+     * @return string
+     * @throws ComposerJsonNotFoundException
      */
-    public function generateBuildInformation(PushEvent $pushEvent): DocumentationBuildInformation
+    public function fetchRemoteComposerJson(string $path): array
     {
-        $buildTime = ceil(microtime(true) * 10000);
-        $composerJson = json_decode($this->fetchRemoteFile($pushEvent->getUrlToComposerFile()), true);
-        $deploymentInformation = new DeploymentInformation($composerJson, $pushEvent->getVersionString());
-        if ($deploymentInformation->getTypeLong() === 'package') {
-            $this->logger->info('Received unmapped package type "' . $composerJson['type'] . '" as defined in ' . $pushEvent->getUrlToComposerFile() . ', falling back to default');
-        }
-
-        $this->assertBuildWasTriggeredByRepositoryOwner($deploymentInformation, $pushEvent->getRepositoryUrl());
-
-        $privateFilePath = implode('/', [
-            $this->privateDir,
-            $this->subDir,
-            $deploymentInformation->getVendor(),
-            $deploymentInformation->getName(),
-            $deploymentInformation->getBranch(),
-            $buildTime,
-        ]);
-        $relativePublicFilePath = $this->subDir . '/' . $buildTime;
-        $absolutePublicFilePath = $this->publicDir . '/' . $relativePublicFilePath;
-
-        $this->entityManager->getConnection()->beginTransaction();
         try {
-            $this->registerDocumentationRendering($pushEvent->getRepositoryUrl(), $deploymentInformation);
-
-            if (!$this->fileSystem->exists($privateFilePath)) {
-                // TODO: Move the string concatenation magic in an Encoder class?
-                $fileContent = '#!/bin/bash' . PHP_EOL;
-                foreach ($deploymentInformation->toArray() as $property => $value) {
-                    $fileContent .= $property . '=' . $value . PHP_EOL;
-                }
-                $fileContent .= 'repository_url=' . $pushEvent->getRepositoryUrl() . PHP_EOL;
-
-                $this->fileSystem->dumpFile($privateFilePath, $fileContent);
-                $this->fileSystem->symlink($privateFilePath, $absolutePublicFilePath);
-            }
-            $this->entityManager->commit();
-        } catch (\Exception $e) {
-            if ($this->fileSystem->exists($privateFilePath)) {
-                $this->fileSystem->remove($privateFilePath);
-            }
-
-            if ($this->fileSystem->exists($absolutePublicFilePath)) {
-                $this->fileSystem->remove($absolutePublicFilePath);
-            }
-            $this->entityManager->getConnection()->rollBack();
-
-            throw $e;
+            $response = $this->client->request('GET', $path);
+        } catch (GuzzleException $e) {
+            throw new ComposerJsonNotFoundException($e->getMessage(), $e->getCode());
         }
-
-        return new DocumentationBuildInformation($relativePublicFilePath);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            throw new ComposerJsonNotFoundException('Fetching composer.json did not return HTTP 200', 1557489013);
+        }
+        return json_decode($response->getBody()->getContents(), true);
     }
 
     /**
-     * @param DeploymentInformation $deploymentInformation
-     * @param string $repositoryUrl
+     * Create main deployment information from push event. This object will later be sanitized using
+     * other methods of that service and dumped to disk for bamboo to fetch it again.
+     *
+     * @param PushEvent $pushEvent
+     * @param array $composerJson
+     * @return DeploymentInformation
+     * @throws \App\Exception\ComposerJsonInvalidException
+     * @throws \App\Exception\DocsPackageDoNotCareBranch
      */
-    private function assertBuildWasTriggeredByRepositoryOwner(DeploymentInformation $deploymentInformation, string $repositoryUrl): void
+    public function generateBuildInformation(PushEvent $pushEvent, array $composerJson): DeploymentInformation
     {
-        $record = $this->documentationJarRepository->findOneBy([
-            'packageName' => $deploymentInformation->getPackageName()
-        ]);
+        return new DeploymentInformation($composerJson, $pushEvent, $this->privateDir, $this->subDir);
+    }
 
-        if ($record instanceof DocumentationJar && $record->getRepositoryUrl() !== $repositoryUrl) {
-            throw new \RuntimeException(
-                'Build was triggered by ' . $repositoryUrl . ' which seems to be a fork of ' . $record->getRepositoryUrl(),
-                1553090750
-            );
+    /**
+     * Verify the build request for a given vendor/package name and a given repository url is not
+     * already registered with a different repository url.
+     *
+     * @param DeploymentInformation $deploymentInformation
+     * @throws DocsPackageRegisteredWithDifferentRepositoryException
+     */
+    public function assertBuildWasTriggeredByRepositoryOwner(DeploymentInformation $deploymentInformation): void
+    {
+        $records = $this->documentationJarRepository->findBy([
+            'packageName' => $deploymentInformation->packageName
+        ]);
+        foreach ($records as $record) {
+            if ($record instanceof DocumentationJar && $record->getRepositoryUrl() !== $deploymentInformation->repositoryUrl) {
+                throw new DocsPackageRegisteredWithDifferentRepositoryException(
+                    'Package ' . $deploymentInformation->packageName . ' from repository . ' . $deploymentInformation->repositoryUrl
+                    . ' is already registered for repository ' . $record->getRepositoryUrl(),
+                    1553090750
+                );
+            }
         }
     }
 
     /**
-     * @param string $repositoryUrl
+     * Dump the deployment information file to disk to be fetched from bamboo later
+     *
      * @param DeploymentInformation $deploymentInformation
      */
-    private function registerDocumentationRendering(string $repositoryUrl, DeploymentInformation $deploymentInformation): void
+    public function dumpDeploymentInformationFile(DeploymentInformation $deploymentInformation): void
     {
-        $record = $this->documentationJarRepository->findOneBy([
-            'repositoryUrl' => $repositoryUrl,
-            'packageName' => $deploymentInformation->getPackageName(),
-            'branch' => $deploymentInformation->getBranch(),
-        ]);
+        $absoluteDumpFile = $deploymentInformation->absoluteDumpFile;
+        $fileContent = '#!/bin/bash' . PHP_EOL;
+        foreach ($deploymentInformation->toArray() as $property => $value) {
+            $fileContent .= $property . '=' . $value . PHP_EOL;
+        }
+        $this->fileSystem->dumpFile($absoluteDumpFile, $fileContent);
+    }
 
-        if (!$record instanceof DocumentationJar) {
+    /**
+     * Add / update a db entry for this docs deployment
+     *
+     * @param DeploymentInformation $deploymentInformation
+     */
+    public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): void
+    {
+        // @todo: findBy() and verify there is only ONE record per url/packagename/targetBranch, otherwise we have inconsistent DB!
+        $record = $this->documentationJarRepository->findOneBy([
+            'repositoryUrl' => $deploymentInformation->repositoryUrl,
+            'packageName' => $deploymentInformation->packageName,
+            // @todo: Use target branch after it has been added to the model!
+            'branch' => $deploymentInformation->targetBranchDirectory,
+        ]);
+        if ($record instanceof DocumentationJar) {
+            // Update source branch if needed. This way, that db entry always hold the latest tag the
+            // documentation was rendered from, eg. if first target dir '5.7' was rendered from tag '5.7.1'
+            // and later overriden by tag '5.7.2'
+            if ($record->getBranch() !== $deploymentInformation->sourceBranch) {
+                $record->setBranch($deploymentInformation->sourceBranch);
+                $this->entityManager->persist($record);
+                $this->entityManager->flush();
+            }
+        } else {
+            // No entry, yet - create one
             $documentationJar = (new DocumentationJar())
-                ->setRepositoryUrl($repositoryUrl)
-                ->setPackageName($deploymentInformation->getPackageName())
-                ->setBranch($deploymentInformation->getBranch());
+                ->setRepositoryUrl($deploymentInformation->repositoryUrl)
+                ->setPackageName($deploymentInformation->packageName)
+                ->setBranch($deploymentInformation->sourceBranch);
+            // @todo: add target branch!
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
         }
-    }
-
-    /**
-     * @param string $path
-     * @return string
-     */
-    private function fetchRemoteFile(string $path): string
-    {
-        $response = $this->client->request('GET', $path);
-        $statusCode = $response->getStatusCode();
-
-        if ($statusCode !== 200) {
-            throw new IOException('Could not read remote file ' . $path . ', received status code ' . $statusCode, 1553081065);
-        }
-
-        return $response->getBody()->getContents();
     }
 }
