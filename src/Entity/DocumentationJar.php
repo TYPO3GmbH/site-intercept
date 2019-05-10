@@ -144,5 +144,8 @@ class DocumentationJar
         if ($this->getLastRenderedAt() === null) {
             $this->setLastRenderedAt(new \DateTime('now', $dtz));
         }
+        if ($this->getTargetBranchDirectory() === null) {
+            $this->targetBranchDirectory = $this->getBranch();
+        }
     }
 }
