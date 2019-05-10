@@ -12,6 +12,7 @@ namespace App;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -27,8 +28,13 @@ class RequestForwarder
     public function to(Uri $target): void
     {
         try {
-            $response = (new Client())
-                ->send($this->request->withUri($target));
+            $newRequest = new Request(
+                $this->request->getMethod(),
+                (string)$target,
+                $this->request->getHeaders(),
+                (string)$this->request->getBody()
+            );
+            $response = (new Client())->sendAsync($newRequest);
             header('Content-Type:' . implode(chr(10), $response->getHeader('Content-Type')));
             echo (string)$response->getBody();
         } catch (GuzzleException $e) {
