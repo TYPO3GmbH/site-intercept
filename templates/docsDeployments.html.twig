@@ -34,6 +34,7 @@
             <th>Repository URL</th>
             <th>Package Name</th>
             <th>Branch</th>
+            <th>Target Branch Directory</th>
             <th>Created at (UTC)</th>
             <th>Last rendered at (UTC)</th>
         </tr>
@@ -45,6 +46,7 @@
                 <td><a href="{{ deployment.repositoryUrl }}">{{ deployment.repositoryUrl }}</a></td>
                 <td>{{ deployment.packageName }}</td>
                 <td>{{ deployment.branch }}</td>
+                <td>{{ deployment.targetBranchDirectory }}</td>
                 <td>{{ deployment.createdAt.format('Y-m-d H:i:s') }}</td>
                 <td>{{ deployment.lastRenderedAt.format('Y-m-d H:i:s') }}</td>
             </tr>

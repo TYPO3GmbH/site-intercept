@@ -49,6 +49,11 @@ class DocumentationJar
      */
     private $lastRenderedAt;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $targetBranchDirectory;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -102,7 +107,7 @@ class DocumentationJar
         return $this;
     }
 
-    public function getLastRenderedAt(): \DateTimeInterface
+    public function getLastRenderedAt(): ?\DateTimeInterface
     {
         return $this->lastRenderedAt;
     }
@@ -110,6 +115,18 @@ class DocumentationJar
     public function setLastRenderedAt(\DateTimeInterface $lastRenderedAt): self
     {
         $this->lastRenderedAt = $lastRenderedAt;
+
+        return $this;
+    }
+
+    public function getTargetBranchDirectory(): ?string
+    {
+        return $this->targetBranchDirectory;
+    }
+
+    public function setTargetBranchDirectory(string $targetBranchDirectory): self
+    {
+        $this->targetBranchDirectory = $targetBranchDirectory;
 
         return $this;
     }
