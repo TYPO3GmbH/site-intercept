@@ -47,8 +47,16 @@
                 <td>{{ deployment.packageName }}</td>
                 <td>{{ deployment.branch }}</td>
                 <td>{{ deployment.targetBranchDirectory }}</td>
-                <td>{{ deployment.createdAt.format('Y-m-d H:i:s') }}</td>
-                <td>{{ deployment.lastRenderedAt.format('Y-m-d H:i:s') }}</td>
+                <td>
+                    <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}" data-language="en" data-target-format="LLL">
+                        {{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}
+                    </span>
+                </td>
+                <td>
+                    <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}" data-language="en" data-target-format="LLL">
+                        {{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}</span>
+                    </span>
+                </td>
             </tr>
         {% else %}
             <tr>
