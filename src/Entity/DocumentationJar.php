@@ -138,12 +138,11 @@ class DocumentationJar
      */
     public function updatedTimestamps(): void
     {
-        $dtz = new \DateTimeZone('UTC');
         if ($this->getCreatedAt() === null) {
-            $this->setCreatedAt(new \DateTime('now', $dtz));
+            $this->setCreatedAt(new \DateTime('now'));
         }
         if ($this->getLastRenderedAt() === null) {
-            $this->setLastRenderedAt(new \DateTime('now', $dtz));
+            $this->setLastRenderedAt(new \DateTime('now'));
         }
         if ($this->getTargetBranchDirectory() === null) {
             $this->targetBranchDirectory = $this->getBranch();
