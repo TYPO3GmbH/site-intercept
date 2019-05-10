@@ -45,6 +45,6 @@ class RequestForwarder
                 echo $e->getMessage() . "\n";
                 echo $e->getRequest()->getMethod();
             }
-        );
+        )->wait();
     }
 }
