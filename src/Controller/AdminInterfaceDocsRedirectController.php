@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/redirect")
  */
-class AdminInterfaceRedirectController extends AbstractController
+class AdminInterfaceDocsRedirectController extends AbstractController
 {
     /**
      * @var DocsServerNginxService
