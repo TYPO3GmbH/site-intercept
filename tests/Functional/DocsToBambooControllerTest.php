@@ -6,27 +6,18 @@ use App\Bundle\ClockMockBundle;
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
 use App\Client\GeneralClient;
-use App\Service\DocumentationBuildInformationService;
+use App\Extractor\DeploymentInformation;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class DocsToBambooControllerTest extends KernelTestCase
 {
-    public function setUp()
-    {
-        parent::setUp();
-        self::bootKernel();
-        DatabasePrimer::prime(self::$kernel);
-    }
     /**
      * @test
      */
     public function bambooBuildIsTriggered()
     {
-        ClockMockBundle::register(DocumentationBuildInformationService::class);
-        ClockMockBundle::withClockMock(155309515.6937);
-
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
         $generalClientProphecy
             ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
@@ -45,6 +36,11 @@ class DocsToBambooControllerTest extends KernelTestCase
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
+        ClockMockBundle::register(DeploymentInformation::class);
+        ClockMockBundle::withClockMock(155309515.6937);
+
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
