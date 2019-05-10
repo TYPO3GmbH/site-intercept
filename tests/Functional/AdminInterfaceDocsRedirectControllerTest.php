@@ -4,13 +4,13 @@ namespace App\Tests\Functional;
 
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
-use App\Tests\Functional\Fixtures\AdminInterfaceRedirectControllerTestData;
+use App\Tests\Functional\Fixtures\AdminInterfaceDocsRedirectControllerTestData;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-class AdminInterfaceRedirectControllerTest extends AbstractFunctionalWebTestCase
+class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Client
@@ -24,7 +24,7 @@ class AdminInterfaceRedirectControllerTest extends AbstractFunctionalWebTestCase
         DatabasePrimer::prime(self::$kernel);
 
         $this->client = static::createClient();
-        (new AdminInterfaceRedirectControllerTestData())->load(
+        (new AdminInterfaceDocsRedirectControllerTestData())->load(
             self::$kernel->getContainer()->get('doctrine')->getManager()
         );
     }
