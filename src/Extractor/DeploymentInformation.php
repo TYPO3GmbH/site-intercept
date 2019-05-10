@@ -189,7 +189,7 @@ class DeploymentInformation
      */
     private function determinePackageType(array $composerJson, string $repositoryUrl): array
     {
-        if ($repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage') {
+        if ($repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git') {
             // Hard coded final location for the docs homepage repository
             return [
                 'h' => 'docs-home',
