@@ -4,8 +4,55 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "de69eb24a9b7481b65d7cdcf8a6c46a2",
+    "content-hash": "6d264b52117fb42adbe58104dbd13e03",
     "packages": [
+        {
+            "name": "adrenalinkin/doctrine-utc-date-time",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/adrenalinkin/doctrine-utc-date-time.git",
+                "reference": "69a70f57d47c33cf1f25b5350621a40817df94cd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/adrenalinkin/doctrine-utc-date-time/zipball/69a70f57d47c33cf1f25b5350621a40817df94cd",
+                "reference": "69a70f57d47c33cf1f25b5350621a40817df94cd",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/dbal": "^2.6",
+                "php": "^7.1"
+            },
+            "suggest": {
+                "symfony/symfony": "Allows more advanced functionality with full Symfony package"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Linkin\\Component\\DoctrineUTCDateTime\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Viktor Linkin",
+                    "email": "adrenalinkin@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Provides Doctrine DBAL date and time types for storing in UTC format into database",
+            "keywords": [
+                "doctrine-dbal",
+                "doctrine-utc",
+                "symfony-component",
+                "utc-datetime"
+            ],
+            "time": "2019-04-13T17:34:34+00:00"
+        },
         {
             "name": "cpliakas/git-wrapper",
             "version": "v2.1.0",
@@ -6609,17 +6656,6 @@
         {
             "name": "roave/security-advisories",
             "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "33bad66e16fa13d87493018fd339eff48d431ad1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/33bad66e16fa13d87493018fd339eff48d431ad1",
-                "reference": "33bad66e16fa13d87493018fd339eff48d431ad1",
-                "shasum": ""
-            },
             "conflict": {
                 "3f/pygmentize": "<1.2",
                 "adodb/adodb-php": "<5.20.12",
