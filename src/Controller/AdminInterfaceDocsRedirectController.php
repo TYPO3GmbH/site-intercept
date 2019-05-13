@@ -62,22 +62,6 @@ class AdminInterfaceDocsRedirectController extends AbstractController
     }
 
     /**
-     * @Route("/get/{filename}", name="admin_redirect_get", methods={"GET"})
-     * @param string $filename
-     * @return Response
-     * @codeCoverageIgnore the code is tested with service tests
-     */
-    public function get(string $filename): Response
-    {
-        $this->logger->info('Triggered: ' . __CLASS__ . '::' . __METHOD__, [
-            'type' => 'docsRedirectGet',
-            'triggeredBy' => 'interface',
-            'filename' => $filename,
-        ]);
-        return new Response($this->nginxService->getFileContent($filename));
-    }
-
-    /**
      * @Route("/new", name="admin_redirect_new", methods={"GET","POST"})
      * @param Request $request
      * @return Response
