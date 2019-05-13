@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Extractor;
 
-use App\Exception\Composer\MissingValueException;
 use App\Extractor\ComposerJson;
 use App\Bundle\ClockMockBundle;
-use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
@@ -124,8 +122,8 @@ class DeploymentInformationTest extends TestCase
     public function invalidPackageNameDataProvider(): array
     {
         return [
-            ['', 1553082362],
-            [null, 1553082362],
+            ['', 1557309364],
+            [null, 1557309364],
             ['baz', 1553082490],
             ['3245345', 1553082490],
             ['husel_pusel:foobar', 1553082490],
@@ -140,8 +138,8 @@ class DeploymentInformationTest extends TestCase
      */
     public function invalidPackageNameThrowException(?string $packageName, int $expectedExceptionCode): void
     {
-        $this->expectException(ComposerJsonInvalidException::class);
         $this->expectExceptionCode($expectedExceptionCode);
+
         $pushEvent = new PushEvent(
             'https://github.com/lolli42/enetcache/',
             'master',
@@ -192,7 +190,7 @@ class DeploymentInformationTest extends TestCase
     /**
      * @test
      */
-    public function docsHomeTypeIsDetected()
+    public function docsHomeTypeIsDetected(): void
     {
         $pushEvent = new PushEvent(
             'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
@@ -216,11 +214,11 @@ class DeploymentInformationTest extends TestCase
         return [
             'empty string' => [
                 '',
-                1553081747
+                1557309364
             ],
             'nothing set' => [
                 null,
-                1553081747
+                1557309364
             ],
             'something else' => [
                 'something',
@@ -231,12 +229,12 @@ class DeploymentInformationTest extends TestCase
 
     /**
      * @param string $type
+     * @param int $exceptionCode
      * @dataProvider invalidPackageTypeDataProvider
      * @test
      */
     public function invalidPackageTypesThrowException(?string $type, int $exceptionCode): void
     {
-        $this->expectException(ComposerJsonInvalidException::class);
         $this->expectExceptionCode($exceptionCode);
 
         $pushEvent = new PushEvent(
@@ -484,7 +482,9 @@ class DeploymentInformationTest extends TestCase
     }
 
     /**
+     * @param string $type
      * @param string $branch
+     * @param int $exceptionCode
      * @dataProvider invalidBranchNameDataProvider
      * @test
      */

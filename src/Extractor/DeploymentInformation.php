@@ -154,14 +154,6 @@ class DeploymentInformation
     }
 
     /**
-     * @return string
-     */
-    public function getTypeShort(): string
-    {
-        return $this->typeShort;
-    }
-
-    /**
      * Determine the target directory this package with given branch/tag will be deployed to.
      *
      * @param string $branch
@@ -179,7 +171,41 @@ class DeploymentInformation
             return 'master';
         }
 
-        return $branch;
+        // branch 'documentation-draft' becomes 'draft' (and is not indexed spiders later)
+        if ($result === 'documentation-draft') {
+            return 'draft';
+        }
+
+        // Cut off a leading 'v', a tag like v8.7.2 will become 8.7.2
+        $result = ltrim($result, 'v');
+
+        if ($type === 'extension') {
+            // Rules for extensions - verify structure '8.7.2' or 'v8.7.2'
+            if (!preg_match('/^(\d+.\d+.\d+)$/', $result)) {
+                throw new DocsPackageDoNotCareBranch(
+                    'Branch / tag named ' . $branch . ' is ignored, only tags named \'major.minor.patch\' (eg. \'5.7.2\') are considered.',
+                    1557498335
+                );
+            }
+            // Remove patch level, '8.7.2' becomes '8.7'
+            return implode('.', array_slice(explode('.', $result), 0, 2));
+        }
+
+        if ($type === 'core-extension' || $type === 'manual') {
+            // Rules for manuals and core extensions - render branches like '8.5' as '8.5' and '8' as '8'
+            $result = str_replace('_', '.', $result);
+            $result = str_replace('-', '.', $result);
+            if (!preg_match('/^(\d+.\d+)$/', $result) && !preg_match('/^(\d+)$/', $result)) {
+                throw new DocsPackageDoNotCareBranch(
+                    'Branch / tag named ' . $branch . ' is ignored, only branches named \'major.minor\' or \'major\' (eg. \'5.7\') are considered.',
+                    1557503542
+                );
+            }
+            return $result;
+        }
+
+        // docs-home has only master branch, this is returned above already, safe to not handle this here.
+        throw new \RuntimeException('Unknown package type ' . $type);
     }
 
     /**
@@ -197,7 +223,15 @@ class DeploymentInformation
             ];
         }
 
-        return self::$typeMap[$composerJson->getType()] ?? self::$typeMap['__default'];
+        if (empty($composerJson->getType())) {
+            throw new ComposerJsonInvalidException('No \'type\' defined in composer.json', 1553081747);
+        }
+
+        if (!array_key_exists($composerJson->getType(), self::$typeMap)) {
+            throw new ComposerJsonInvalidException('composer.json \'type\' must be set to one of ' . implode(', ', array_keys(self::$typeMap)) . '.', 1557490474);
+        }
+
+        return self::$typeMap[$composerJson->getType()];
     }
 
     /**
@@ -208,7 +242,7 @@ class DeploymentInformation
     private function determinePackageName(ComposerJson $composerJson): array
     {
         if (!preg_match('/^[\w-]+\/[\w-]+$/', $composerJson->getName())) {
-            throw new ComposerJsonInvalidException('composer.json \'name\' must be of form \'vendor/package\', \'' . $composerJson['name'] . '\' given.', 1553082490);
+            throw new ComposerJsonInvalidException('composer.json \'name\' must be of form \'vendor/package\', \'' . $composerJson->getName() . '\' given.', 1553082490);
         }
 
         [$vendor, $name] = explode('/', $composerJson->getName());
