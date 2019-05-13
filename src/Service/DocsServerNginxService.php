@@ -12,7 +12,6 @@ namespace App\Service;
 
 use App\Repository\DocsServerRedirectRepository;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * This class creates a nginx configuration file which contains all redirects from database.
@@ -27,9 +26,14 @@ class DocsServerNginxService
     protected $redirectRepository;
 
     /**
-     * @var KernelInterface
+     * @var string
      */
-    protected $kernel;
+    protected $privateDir;
+
+    /**
+     * @var string
+     */
+    protected $subDir;
 
     /**
      * @var Filesystem
@@ -44,14 +48,16 @@ location = %s {
     /**
      * NginxService constructor.
      * @param DocsServerRedirectRepository $redirectRepository
-     * @param KernelInterface $kernel
-     * @param Filesystem $filesystem
+     * @param Filesystem $fileSystem
+     * @param string $privateDir
+     * @param string $subDir
      */
-    public function __construct(DocsServerRedirectRepository $redirectRepository, KernelInterface $kernel, Filesystem $filesystem)
+    public function __construct(DocsServerRedirectRepository $redirectRepository, Filesystem $fileSystem, string $privateDir, string $subDir)
     {
         $this->redirectRepository = $redirectRepository;
-        $this->kernel = $kernel;
-        $this->filesystem = $filesystem;
+        $this->privateDir = $privateDir;
+        $this->subDir = $subDir;
+        $this->filesystem = $fileSystem;
     }
 
     public function createRedirectConfigFile(): string
@@ -70,7 +76,7 @@ location = %s {
             );
         }
 
-        $filename = $this->kernel->getCacheDir() . '/nginx/nginx_redirects_%s.conf';
+        $filename = $this->getPrivateDirectory() . 'nginx_redirects_%s.conf';
         $filename = sprintf($filename, (new \DateTime())->format('Ymd-His'));
         $this->filesystem->dumpFile($filename, $content);
         return $filename;
@@ -78,10 +84,18 @@ location = %s {
 
     public function getFileContent(string $filename): string
     {
-        $filename = $this->kernel->getCacheDir() . '/nginx/' . $filename;
+        $filename = $this->getPrivateDirectory() . $filename;
         if ($this->filesystem->exists($filename)) {
             return file_get_contents($filename);
         }
         return '';
+    }
+
+    /**
+     * @return string
+     */
+    private function getPrivateDirectory(): string
+    {
+        return rtrim($this->privateDir, '/') . '/' . rtrim($this->subDir, '/') . '/';
     }
 }
