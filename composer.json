@@ -13,6 +13,7 @@
     "ext-SimpleXML": "*",
     "ext-bcmath": "*",
     "ext-json": "*",
+    "adrenalinkin/doctrine-utc-date-time": "^1.1",
     "cpliakas/git-wrapper": "^2.1",
     "doctrine/annotations": "^1.6",
     "doctrine/collections": "^1.5",

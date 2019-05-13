@@ -2,6 +2,7 @@ import '../css/app.scss';
 
 // We need bootstrap collapse
 import collapse from 'bootstrap/js/src/collapse';
+var { DateTime } = require('luxon');
 
 import $ from 'jquery';
 
@@ -18,4 +19,13 @@ $(document).ready(function() {
       $("#main-wrapper").addClass("toggled");
     }
   });
+  convertDates();
 });
+
+function convertDates() {
+  Array.from(document.querySelectorAll('[data-processor="localdate"]')).forEach(function(element) {
+    const value = element.dataset.value;
+
+    element.textContent = DateTime.fromISO(value).toLocaleString(DateTime.DATETIME_FULL);
+  });
+}

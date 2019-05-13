@@ -34,6 +34,9 @@
             <th>Repository URL</th>
             <th>Package Name</th>
             <th>Branch</th>
+            <th>Target Branch Directory</th>
+            <th>Created at</th>
+            <th>Last rendered at</th>
         </tr>
         </thead>
         <tbody>
@@ -43,6 +46,17 @@
                 <td><a href="{{ deployment.repositoryUrl }}">{{ deployment.repositoryUrl }}</a></td>
                 <td>{{ deployment.packageName }}</td>
                 <td>{{ deployment.branch }}</td>
+                <td>{{ deployment.targetBranchDirectory }}</td>
+                <td>
+                    <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
+                        {{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}
+                    </span>
+                </td>
+                <td>
+                    <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
+                        {{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}
+                    </span>
+                </td>
             </tr>
         {% else %}
             <tr>

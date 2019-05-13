@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\DocumentationJarRepository")
+ * @ORM\HasLifecycleCallbacks
  * @codeCoverageIgnore
  */
 class DocumentationJar
@@ -38,6 +39,21 @@ class DocumentationJar
      * @ORM\Column(type="string", length=255)
      */
     private $branch;
+
+    /**
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
+     */
+    private $lastRenderedAt;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $targetBranchDirectory;
 
     public function getId(): ?int
     {
@@ -90,5 +106,58 @@ class DocumentationJar
         $this->branch = $branch;
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getLastRenderedAt(): ?\DateTimeInterface
+    {
+        return $this->lastRenderedAt;
+    }
+
+    public function setLastRenderedAt(\DateTimeInterface $lastRenderedAt): self
+    {
+        $this->lastRenderedAt = $lastRenderedAt;
+
+        return $this;
+    }
+
+    public function getTargetBranchDirectory(): ?string
+    {
+        return $this->targetBranchDirectory;
+    }
+
+    public function setTargetBranchDirectory(string $targetBranchDirectory): self
+    {
+        $this->targetBranchDirectory = $targetBranchDirectory;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function updatedTimestamps(): void
+    {
+        if ($this->getCreatedAt() === null) {
+            $this->setCreatedAt(new \DateTime('now'));
+        }
+        if ($this->getLastRenderedAt() === null) {
+            $this->setLastRenderedAt(new \DateTime('now'));
+        }
+        if ($this->getTargetBranchDirectory() === null) {
+            $this->targetBranchDirectory = $this->getBranch();
+        }
     }
 }
