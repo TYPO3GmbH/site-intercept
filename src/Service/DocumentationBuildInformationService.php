@@ -160,20 +160,28 @@ class DocumentationBuildInformationService
      */
     public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): void
     {
-        // @todo: findBy() and verify there is only ONE record per url/packagename/targetBranch, otherwise we have inconsistent DB!
-        $record = $this->documentationJarRepository->findOneBy([
+        $records = $this->documentationJarRepository->findBy([
             'repositoryUrl' => $deploymentInformation->repositoryUrl,
             'packageName' => $deploymentInformation->packageName,
-            // @todo: Use target branch after it has been added to the model!
-            'branch' => $deploymentInformation->targetBranchDirectory,
+            'targetBranchDirectory' => $deploymentInformation->targetBranchDirectory,
         ]);
+        if (count($records) > 1) {
+            throw new \RuntimeException(
+                'Inconsistent database, there should be only one entry for'
+                . ' repository ' . $deploymentInformation->repositoryUrl
+                . ' package ' . $deploymentInformation->packageName
+                . ' with target directory ' . $deploymentInformation->targetBranchDirectory
+                . ' , but ' . count($records) . ' found.',
+                1557755476
+            );
+        }
+        $record = array_pop($records);
         if ($record instanceof DocumentationJar) {
             // Update source branch if needed. This way, that db entry always hold the latest tag the
             // documentation was rendered from, eg. if first target dir '5.7' was rendered from tag '5.7.1'
             // and later overriden by tag '5.7.2'
             if ($record->getBranch() !== $deploymentInformation->sourceBranch) {
                 $record->setBranch($deploymentInformation->sourceBranch);
-                $this->entityManager->persist($record);
                 $this->entityManager->flush();
             }
         } else {
@@ -181,8 +189,8 @@ class DocumentationBuildInformationService
             $documentationJar = (new DocumentationJar())
                 ->setRepositoryUrl($deploymentInformation->repositoryUrl)
                 ->setPackageName($deploymentInformation->packageName)
-                ->setBranch($deploymentInformation->sourceBranch);
-            // @todo: add target branch!
+                ->setBranch($deploymentInformation->sourceBranch)
+                ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory);
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
         }
