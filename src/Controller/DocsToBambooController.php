@@ -54,7 +54,7 @@ class DocsToBambooController extends AbstractController
             $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
             $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
-            $bambooService->triggerDocumentationPlan($buildInformation);
+            $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
             $logger->info(
                 'Triggered docs build',
                 [
@@ -64,7 +64,8 @@ class DocsToBambooController extends AbstractController
                     'repository' => $buildInformation->repositoryUrl,
                     'package' => $buildInformation->packageName,
                     'sourceBranch' => $buildInformation->sourceBranch,
-                    'targetBranchDirectory' => $buildInformation->targetBranchDirectory,
+                    'targetBranch' => $buildInformation->targetBranchDirectory,
+                    'bambooKey' => $bambooBuildTriggered->buildResultKey,
                 ]
             );
             return Response::create();

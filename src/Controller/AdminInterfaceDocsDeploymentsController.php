@@ -47,12 +47,12 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
     ): Response {
         $this->logger = $logger;
 
-        //$recentLogsMessages = $graylogService->getRecentBambooDocsTriggers();
+        $recentLogsMessages = $graylogService->getRecentBambooDocsActions();
 
         return $this->render(
             'docsDeployments.html.twig',
             [
-                'logMessages' => [],
+                'logMessages' => $recentLogsMessages,
                 'deployments' => $documentationJarRepository->findAll(),
                 'bambooStatus' => $bambooService->getBambooStatus(),
             ]

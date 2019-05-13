@@ -134,9 +134,9 @@ class BambooService
      * Triggers new build in project CORE-DR
      *
      * @param DeploymentInformation $deploymentInformation
-     * @return ResponseInterface
+     * @return BambooBuildTriggered
      */
-    public function triggerDocumentationPlan(DeploymentInformation $deploymentInformation): ResponseInterface
+    public function triggerDocumentationPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
     {
         $uri = 'latest/queue/'
             . 'CORE-DR?'
@@ -146,7 +146,8 @@ class BambooService
                 'os_authType=basic',
                 'bamboo.variable.BUILD_INFORMATION_FILE=' . urlencode($deploymentInformation->relativeDumpFile),
             ]);
-        return $this->sendBamboo('post', $uri);
+        $response = $this->sendBamboo('post', $uri);
+        return new BambooBuildTriggered((string)$response->getBody());
     }
 
     /**

@@ -158,7 +158,7 @@ class DeploymentInformation
             // Rules for extensions - verify structure '8.7.2' or 'v8.7.2'
             if (!preg_match('/^(\d+.\d+.\d+)$/', $result)) {
                 throw new DocsPackageDoNotCareBranch(
-                    'Branch / tag named ' . $branch . ' is ignored, only tags named \'major.minor.patch\' (eg. \'5.7.2\') are considered.',
+                    'Branch / tag named \'' . $branch . '\' is ignored, only tags named \'major.minor.patch\' (eg. \'5.7.2\') are considered.',
                     1557498335
                 );
             }
@@ -170,7 +170,7 @@ class DeploymentInformation
             $result = str_replace('-', '.', $result);
             if (!preg_match('/^(\d+.\d+)$/', $result) && !preg_match('/^(\d+)$/', $result)) {
                 throw new DocsPackageDoNotCareBranch(
-                    'Branch / tag named ' . $branch . ' is ignored, only branches named \'major.minor\' or \'major\' (eg. \'5.7\') are considered.',
+                    'Branch / tag named \'' . $branch . '\' is ignored, only branches named \'major.minor\' or \'major\' (eg. \'5.7\') are considered.',
                     1557503542
                 );
             }
