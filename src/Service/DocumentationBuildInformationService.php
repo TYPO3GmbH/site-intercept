@@ -12,7 +12,7 @@ namespace App\Service;
 
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
-use App\Exception\Composer\DependencyException;
+use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Extractor\ComposerJson;
@@ -60,11 +60,6 @@ class DocumentationBuildInformationService
     private $client;
 
     /**
-     * @var MailService
-     */
-    private $mailService;
-
-    /**
      * Constructor
      *
      * @param string $privateDir
@@ -72,15 +67,13 @@ class DocumentationBuildInformationService
      * @param EntityManagerInterface $entityManager
      * @param Filesystem $fileSystem
      * @param GeneralClient $client
-     * @param MailService $mailService
      */
     public function __construct(
         string $privateDir,
         string $subDir,
         EntityManagerInterface $entityManager,
         Filesystem $fileSystem,
-        GeneralClient $client,
-        MailService $mailService
+        GeneralClient $client
     ) {
         $this->privateDir = $privateDir;
         $this->subDir = $subDir;
@@ -88,7 +81,6 @@ class DocumentationBuildInformationService
         $this->fileSystem = $fileSystem;
         $this->documentationJarRepository = $this->entityManager->getRepository(DocumentationJar::class);
         $this->client = $client;
-        $this->mailService = $mailService;
     }
 
     /**
@@ -113,32 +105,30 @@ class DocumentationBuildInformationService
     }
 
     /**
+     * @param array $composerJson
+     * @return ComposerJson
+     */
+    public function getComposerJsonObject(array $composerJson): ComposerJson
+    {
+        return new ComposerJson($composerJson);
+    }
+
+    /**
      * Create main deployment information from push event. This object will later be sanitized using
      * other methods of that service and dumped to disk for bamboo to fetch it again.
      *
      * @param PushEvent $pushEvent
-     * @param array $composerJson
+     * @param ComposerJson $composerJson
      * @return DeploymentInformation
      * @throws \App\Exception\ComposerJsonInvalidException
      * @throws \App\Exception\DocsPackageDoNotCareBranch
-     * @throws DependencyException
+     * @throws DocsComposerDependencyException
      */
-    public function generateBuildInformation(PushEvent $pushEvent, array $composerJson): DeploymentInformation
+    public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {
-        $composerJsonObject = new ComposerJson($composerJson);
-        try {
-            $this->assertComposerJsonContainsNecessaryData($composerJsonObject);
-        } catch (DependencyException $e) {
-            $author = $composerJsonObject->getFirstAuthor();
-            if (!empty($author['email']) && filter_var($author['email'], FILTER_VALIDATE_EMAIL)) {
-                $this->sendRenderingFailedMail($pushEvent, $composerJsonObject, $e->getMessage());
+        $this->assertComposerJsonContainsNecessaryData($composerJson);
 
-                // Only re-throw exception if a notification mail can be sent
-                throw $e;
-            }
-        }
-
-        return new DeploymentInformation($composerJsonObject, $pushEvent, $this->privateDir, $this->subDir);
+        return new DeploymentInformation($composerJson, $pushEvent, $this->privateDir, $this->subDir);
     }
 
     /**
@@ -216,38 +206,12 @@ class DocumentationBuildInformationService
 
     /**
      * @param ComposerJson $composerJson
-     * @throws DependencyException
+     * @throws DocsComposerDependencyException
      */
     private function assertComposerJsonContainsNecessaryData(ComposerJson $composerJson): void
     {
         if (!$composerJson->requires('typo3/cms-core')) {
-            throw new DependencyException('Dependency typo3/cms-core is missing', 1557310527);
+            throw new DocsComposerDependencyException('Dependency typo3/cms-core is missing', 1557310527);
         }
-    }
-
-    /**
-     * @param PushEvent $pushEvent
-     * @param ComposerJson $composerJson
-     * @param string $exceptionMessage
-     * @return int
-     */
-    private function sendRenderingFailedMail(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
-    {
-        $message = $this->mailService->createMessageWithTemplate(
-            'Documentation rendering failed',
-            'emails/docs/renderingFailed.html.twig',
-            [
-                'author' => $composerJson->getFirstAuthor(),
-                'package' => $composerJson->getName(),
-                'pushEvent' => $pushEvent,
-                'reasonPhrase' => $exceptionMessage,
-            ]
-        );
-        $message
-            ->setFrom('intercept@typo3.com')
-            ->setTo($composerJson->getFirstAuthor()['email'])
-        ;
-
-        return $this->mailService->send($message);
     }
 }

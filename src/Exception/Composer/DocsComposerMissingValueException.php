@@ -11,8 +11,8 @@ declare(strict_types = 1);
 namespace App\Exception\Composer;
 
 /**
- * Abstract exception concerning everything that's composer related
+ * Exception concerning missing values in composer.json
  */
-abstract class AbstractComposerException extends \Exception
+class DocsComposerMissingValueException extends \Exception
 {
 }

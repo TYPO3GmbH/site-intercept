@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Extractor;
 
-use App\Exception\Composer\MissingValueException;
+use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Extractor\ComposerJson;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +50,7 @@ class ComposerJsonTest extends TestCase
      */
     public function emptyNameThrowsException($value): void
     {
-        $this->expectException(MissingValueException::class);
+        $this->expectException(DocsComposerMissingValueException::class);
         $this->expectExceptionCode(1557309364);
 
         $composerJson = new ComposerJson(['name', $value]);
@@ -85,7 +85,7 @@ class ComposerJsonTest extends TestCase
      */
     public function emptyTypeThrowsException($value): void
     {
-        $this->expectException(MissingValueException::class);
+        $this->expectException(DocsComposerMissingValueException::class);
         $this->expectExceptionCode(1557309364);
 
         $composerJson = new ComposerJson(['type', $value]);

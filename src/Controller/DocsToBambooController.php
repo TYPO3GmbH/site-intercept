@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
@@ -17,6 +18,7 @@ use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
+use App\Service\MailService;
 use App\Service\WebHookService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,6 +40,7 @@ class DocsToBambooController extends AbstractController
      * @param WebHookService $webhookService
      * @param DocumentationBuildInformationService $documentationBuildInformationService
      * @param LoggerInterface $logger
+     * @param MailService $mailService
      * @return Response
      */
     public function index(
@@ -45,12 +48,14 @@ class DocsToBambooController extends AbstractController
         BambooService $bambooService,
         WebHookService $webhookService,
         DocumentationBuildInformationService $documentationBuildInformationService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        MailService $mailService
     ): Response {
         try {
             $pushEvent = $webhookService->createPushEvent($request);
             $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
-            $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerJson);
+            $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
+            $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
             $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
             $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
@@ -141,6 +146,22 @@ class DocsToBambooController extends AbstractController
                 ]
             );
             return Response::create('Branch or tag name ignored for decumentation rendering. See https://intercept.typo3.com for more information.', 412);
+        } catch (DocsComposerDependencyException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'coreDependencyNotSet',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $pushEvent->getRepositoryUrl(),
+                    'package' => $buildInformation->packageName,
+                    'sourceBranch' => $pushEvent->getVersionString(),
+                ]
+            );
+
+            $mailService->sendMailToAuthorDueToMissingDependency($pushEvent, $composerAsObject, $e->getMessage());
         }
     }
 }

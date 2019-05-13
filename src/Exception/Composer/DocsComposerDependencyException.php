@@ -13,6 +13,6 @@ namespace App\Exception\Composer;
 /**
  * Exception concerning missing dependencies
  */
-class DependencyException extends AbstractComposerException
+class DocsComposerDependencyException extends \Exception
 {
 }

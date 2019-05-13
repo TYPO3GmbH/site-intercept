@@ -10,6 +10,8 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Extractor\ComposerJson;
+use App\Extractor\PushEvent;
 use Twig\Environment;
 
 class MailService
@@ -31,10 +33,36 @@ class MailService
     }
 
     /**
+     * @param PushEvent $pushEvent
+     * @param ComposerJson $composerJson
+     * @param string $exceptionMessage
+     * @return int
+     */
+    public function sendMailToAuthorDueToMissingDependency(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
+    {
+        $message = $this->createMessageWithTemplate(
+            'Documentation rendering failed',
+            'emails/docs/renderingFailedDueToMissingDependency.html.twig',
+            [
+                'author' => $composerJson->getFirstAuthor(),
+                'package' => $composerJson->getName(),
+                'pushEvent' => $pushEvent,
+                'reasonPhrase' => $exceptionMessage,
+            ]
+        );
+        $message
+            ->setFrom('intercept@typo3.com')
+            ->setTo($composerJson->getFirstAuthor()['email'])
+        ;
+
+        return $this->send($message);
+    }
+
+    /**
      * @param string $subject
      * @return \Swift_Message
      */
-    public function createMessage(string $subject): \Swift_Message
+    private function createMessage(string $subject): \Swift_Message
     {
         return new \Swift_Message($subject);
     }
@@ -45,7 +73,7 @@ class MailService
      * @param array $templateVariables
      * @return \Swift_Message
      */
-    public function createMessageWithTemplate(string $subject, string $templateFile, array $templateVariables): \Swift_Message
+    private function createMessageWithTemplate(string $subject, string $templateFile, array $templateVariables): \Swift_Message
     {
         $message = new \Swift_Message($subject);
         $message->setBody(
@@ -59,7 +87,7 @@ class MailService
      * @param \Swift_Message $message
      * @return int
      */
-    public function send(\Swift_Message $message): int
+    private function send(\Swift_Message $message): int
     {
         return $this->mailer->send($message);
     }
