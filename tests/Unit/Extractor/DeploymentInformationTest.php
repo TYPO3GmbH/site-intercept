@@ -5,30 +5,49 @@ namespace App\Tests\Unit\Extractor;
 
 use App\Exception\Composer\MissingValueException;
 use App\Extractor\ComposerJson;
+use App\Bundle\ClockMockBundle;
+use App\Exception\ComposerJsonInvalidException;
+use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\DeploymentInformation;
+use App\Extractor\PushEvent;
 use PHPUnit\Framework\TestCase;
 
 class DeploymentInformationTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        ClockMockBundle::register(DeploymentInformation::class);
+        ClockMockBundle::withClockMock(155309515.6937);
+    }
+
     /**
      * @test
      */
     public function composerJsonSetsValuesAsExpected(): void
     {
-        $branch = 'master';
+        $pushEvent = new PushEvent(
+            'https://github.com/lolli42/enetcache/',
+            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
+        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
-            'type' => 'typo3-cms-framework',
+            'type' => 'typo3-cms-extension',
         ];
 
-        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
 
-        $this->assertSame('foobar', $subject->getVendor());
-        $this->assertSame('bazfnord', $subject->getName());
-        $this->assertSame('foobar/bazfnord', $subject->getPackageName());
-        $this->assertSame('master', $subject->getBranch());
-        $this->assertSame('c', $subject->getTypeShort());
-        $this->assertSame('core-extension', $subject->getTypeLong());
+        $this->assertSame('https://github.com/lolli42/enetcache/', $subject->repositoryUrl);
+        $this->assertSame('foobar', $subject->vendor);
+        $this->assertSame('bazfnord', $subject->name);
+        $this->assertSame('foobar/bazfnord', $subject->packageName);
+        $this->assertSame('master', $subject->sourceBranch);
+        $this->assertSame('p', $subject->typeShort);
+        $this->assertSame('extension', $subject->typeLong);
+        $this->assertSame('master', $subject->targetBranchDirectory);
+        $this->assertStringContainsString('/tmp/foo/bar/', $subject->absoluteDumpFile);
+        $this->assertStringContainsString('bar/', $subject->relativeDumpFile);
     }
 
     /**
@@ -36,21 +55,28 @@ class DeploymentInformationTest extends TestCase
      */
     public function arrayIsReturnedAsExpected(): void
     {
-        $branch = 'master';
+        $pushEvent = new PushEvent(
+            'https://github.com/lolli42/enetcache/',
+            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
+        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
-            'type' => 'typo3-cms-framework',
+            'type' => 'typo3-cms-extension',
         ];
 
         $expected = [
+            'repository_url' => 'https://github.com/lolli42/enetcache/',
             'vendor' => 'foobar',
             'name' => 'bazfnord',
-            'branch' => $branch,
-            'target_branch_directory' => $branch,
-            'type_long' => 'core-extension',
-            'type_short' => 'c',
+            'package_name' => 'foobar/bazfnord',
+            'source_branch' => 'master',
+            'target_branch_directory' => 'master',
+            'type_long' => 'extension',
+            'type_short' => 'p',
         ];
-        $this->assertSame($expected, (new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch))->toArray());
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $this->assertSame($expected, $subject->toArray());
     }
 
     /**
@@ -76,16 +102,20 @@ class DeploymentInformationTest extends TestCase
      */
     public function packageNamePartsAreCorrectlyResolved(string $packageName, string $expectedVendor, string $expectedName): void
     {
-        $branch = 'master';
+        $pushEvent = new PushEvent(
+            'https://github.com/lolli42/enetcache/',
+            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
+        );
         $composerJsonAsArray = [
             'name' => $packageName,
-            'type' => 'foo',
+            'type' => 'typo3-cms-extension',
         ];
 
-        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
-        $this->assertSame($expectedVendor, $subject->getVendor());
-        $this->assertSame($expectedName, $subject->getName());
-        $this->assertSame($packageName, $subject->getPackageName());
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $this->assertSame($expectedVendor, $subject->vendor);
+        $this->assertSame($expectedName, $subject->name);
+        $this->assertSame($packageName, $subject->packageName);
     }
 
     /**
@@ -94,31 +124,34 @@ class DeploymentInformationTest extends TestCase
     public function invalidPackageNameDataProvider(): array
     {
         return [
-            ['', MissingValueException::class, 1557309364],
-            [null, MissingValueException::class, 1557309364],
-            ['baz', \InvalidArgumentException::class, 1553082490],
-            ['3245345', \InvalidArgumentException::class, 1553082490],
-            ['husel_pusel:foobar', \InvalidArgumentException::class, 1553082490],
+            ['', 1553082362],
+            [null, 1553082362],
+            ['baz', 1553082490],
+            ['3245345', 1553082490],
+            ['husel_pusel:foobar', 1553082490],
         ];
     }
 
     /**
      * @param string $packageName
-     * @param string $expectedException
      * @param int $expectedExceptionCode
      * @dataProvider invalidPackageNameDataProvider
      * @test
      */
-    public function invalidPackageNameThrowException(?string $packageName, string $expectedException, int $expectedExceptionCode): void
+    public function invalidPackageNameThrowException(?string $packageName, int $expectedExceptionCode): void
     {
-        $this->expectException($expectedException);
+        $this->expectException(ComposerJsonInvalidException::class);
         $this->expectExceptionCode($expectedExceptionCode);
-
+        $pushEvent = new PushEvent(
+            'https://github.com/lolli42/enetcache/',
+            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
+        );
         $composerJsonAsArray = [
             'name' => $packageName,
-            'type' => 'foo',
+            'type' => 'typo3-cms-extension',
         ];
-        new DeploymentInformation(new ComposerJson($composerJsonAsArray), 'master');
+        new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
     }
 
     /**
@@ -130,7 +163,6 @@ class DeploymentInformationTest extends TestCase
             'manual' => ['typo3-cms-documentation', 'manual', 'm'],
             'core' => ['typo3-cms-framework', 'core-extension', 'c'],
             'extension' => ['typo3-cms-extension', 'extension', 'p'],
-            'anything else' => ['husel', 'package', 'p'],
         ];
     }
 
@@ -143,15 +175,37 @@ class DeploymentInformationTest extends TestCase
      */
     public function packageTypePartsAreCorrectlyResolved(string $type, string $expectedLong, string $expectedShort): void
     {
-        $branch = 'master';
-        $composerJsonAsArray = ['name' => 'foobar/bazfnord'];
-        if (isset($type)) {
-            $composerJsonAsArray['type'] = $type;
-        }
+        $pushEvent = new PushEvent(
+            'https://github.com/lolli42/enetcache/',
+            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
+        );
+        $composerJsonAsArray = [
+            'name' => 'foobar/bazfnord',
+            'type' => $type,
+        ];
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $this->assertSame($expectedLong, $subject->typeLong);
+        $this->assertSame($expectedShort, $subject->typeShort);
+    }
 
-        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
-        $this->assertSame($expectedLong, $subject->getTypeLong());
-        $this->assertSame($expectedShort, $subject->getTypeShort());
+    /**
+     * @test
+     */
+    public function docsHomeTypeIsDetected()
+    {
+        $pushEvent = new PushEvent(
+            'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
+            'master',
+            'https://something'
+        );
+        $composerJsonAsArray = [
+            'name' => 'foobar/bazfnord',
+            'type' => 'does-not-matter-here',
+        ];
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $this->assertSame('docs-home', $subject->typeLong);
+        $this->assertSame('h', $subject->typeShort);
     }
 
     /**
@@ -160,8 +214,18 @@ class DeploymentInformationTest extends TestCase
     public function invalidPackageTypeDataProvider(): array
     {
         return [
-            'empty string' => [''],
-            'nothing set' => [null],
+            'empty string' => [
+                '',
+                1553081747
+            ],
+            'nothing set' => [
+                null,
+                1553081747
+            ],
+            'something else' => [
+                'something',
+                1557490474
+            ]
         ];
     }
 
@@ -170,17 +234,22 @@ class DeploymentInformationTest extends TestCase
      * @dataProvider invalidPackageTypeDataProvider
      * @test
      */
-    public function invalidPackageTypesThrowException(?string $type): void
+    public function invalidPackageTypesThrowException(?string $type, int $exceptionCode): void
     {
-        $this->expectException(MissingValueException::class);
-        $this->expectExceptionCode(1557309364);
+        $this->expectException(ComposerJsonInvalidException::class);
+        $this->expectExceptionCode($exceptionCode);
 
-        $composerJsonAsArray = ['name' => 'foobar/bazfnord'];
-        if (isset($type)) {
-            $composerJsonAsArray['type'] = $type;
-        }
+        $pushEvent = new PushEvent(
+            'https://github.com/lolli42/enetcache/',
+            'master',
+            'https://something'
+        );
+        $composerJsonAsArray = [
+            'name' => 'foobar/bazfnord',
+            'type' => $type,
+        ];
 
-        new DeploymentInformation(new ComposerJson($composerJsonAsArray), 'master');
+        new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
     }
 
     /**
@@ -189,57 +258,165 @@ class DeploymentInformationTest extends TestCase
     public function validBranchNameDataProvider(): array
     {
         return [
-            ['master', 'master'],
-            ['latest', 'latest'],
-            ['1.2.3', '1.2'],
-            ['v1.5.8', '1.5'],
+            [
+                'typo3-cms-extension',
+                'master',
+                'master',
+            ],
+            [
+                'typo3-cms-extension',
+                'latest',
+                'master',
+            ],
+            [
+                'typo3-cms-extension',
+                'documentation-draft',
+                'draft',
+            ],
+            [
+                'typo3-cms-extension',
+                '1.2.3',
+                '1.2',
+            ],
+            [
+                'typo3-cms-extension',
+                'v1.5.8',
+                '1.5',
+            ],
+            [
+                'typo3-cms-framework',
+                'master',
+                'master',
+            ],
+            [
+                'typo3-cms-framework',
+                'latest',
+                'master',
+            ],
+            [
+                'typo3-cms-framework',
+                'documentation-draft',
+                'draft',
+            ],
+            [
+                'typo3-cms-framework',
+                '1.2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-framework',
+                '1-2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-framework',
+                '1_2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-framework',
+                'v1.2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-framework',
+                'v1-2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-framework',
+                'v1_2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-framework',
+                '1',
+                '1',
+            ],
+            [
+                'typo3-cms-framework',
+                'v1',
+                '1',
+            ],
+            [
+                'typo3-cms-documentation',
+                'master',
+                'master',
+            ],
+            [
+                'typo3-cms-documentation',
+                'latest',
+                'master',
+            ],
+            [
+                'typo3-cms-documentation',
+                'documentation-draft',
+                'draft',
+            ],
+            [
+                'typo3-cms-documentation',
+                '1.2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-documentation',
+                '1-2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-documentation',
+                '1_2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-documentation',
+                'v1.2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-documentation',
+                'v1-2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-documentation',
+                'v1_2',
+                '1.2',
+            ],
+            [
+                'typo3-cms-documentation',
+                '1',
+                '1',
+            ],
+            [
+                'typo3-cms-documentation',
+                'v1',
+                '1',
+            ],
         ];
     }
 
     /**
+     * @param string $type
      * @param string $branch
      * @param string $expectedBranch
      * @dataProvider validBranchNameDataProvider
      * @test
      */
-    public function branchNamesAreNormalized(string $branch, string $expectedBranch): void
+    public function branchNamesAreNormalized(string $type, string $branch, string $expectedBranch): void
     {
+        $pushEvent = new PushEvent(
+            'https://github.com/lolli42/enetcache/',
+            $branch,
+            'https://something'
+        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
-            'type' => 'foo',
+            'type' => $type,
         ];
 
-        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
-        $this->assertSame($expectedBranch, $subject->getBranch());
-    }
-
-    /**
-     * @return array
-     */
-    public function validTargetBranchDirectoryDataProvider(): array
-    {
-        return [
-            ['master', 'master'],
-            ['latest', 'master'],
-            ['1.2.3', '1.2'],
-            ['v1.5.8', '1.5'],
-        ];
-    }
-
-    /**
-     * @param string $branch
-     * @param string $expectedBranch
-     * @dataProvider validTargetBranchDirectoryDataProvider
-     * @test
-     */
-    public function targetBranchDirectoriesNormalized(string $branch, string $expectedBranch): void
-    {
-        $composerJsonAsArray = [
-            'name' => 'foobar/bazfnord',
-            'type' => 'foo',
-        ];
-        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
-        $this->assertSame($expectedBranch, $subject->getTargetBranchDirectory());
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $this->assertSame($expectedBranch, $subject->targetBranchDirectory);
     }
 
     /**
@@ -248,12 +425,61 @@ class DeploymentInformationTest extends TestCase
     public function invalidBranchNameDataProvider(): array
     {
         return [
-            [''],
-            ['1.2.3.4'],
-            ['v1.5.8.3.3'],
-            ['sdfoisdufso8iufd'],
-            ['1.2.3-dev'],
-            ['1.2..3'],
+            [
+                'typo3-cms-extension',
+                '1.2',
+                1557498335
+            ],
+            [
+                'typo3-cms-extension',
+                '',
+                1557498335
+            ],
+            [
+                'typo3-cms-extension',
+                'foo',
+                1557498335
+            ],
+            [
+                'typo3-cms-extension',
+                '1.2-dev',
+                1557498335
+            ],
+            [
+                'typo3-cms-extension',
+                '1..2',
+                1557498335
+            ],
+            [
+                'typo3-cms-extension',
+                '1.2.3.4',
+                1557498335
+            ],
+            [
+                'typo3-cms-extension',
+                'v1.2',
+                1557498335
+            ],
+            [
+                'typo3-cms-framework',
+                '1.2.3',
+                1557503542
+            ],
+            [
+                'typo3-cms-framework',
+                'v1.2.3',
+                1557503542
+            ],
+            [
+                'typo3-cms-documentation',
+                '1.2.3',
+                1557503542
+            ],
+            [
+                'typo3-cms-documentation',
+                '1.2.3',
+                1557503542
+            ],
         ];
     }
 
@@ -262,16 +488,21 @@ class DeploymentInformationTest extends TestCase
      * @dataProvider invalidBranchNameDataProvider
      * @test
      */
-    public function invalidBranchNamesThrowException(string $branch): void
+    public function invalidBranchNamesThrowException(string $type, string $branch, int $exceptionCode): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionCode(1553257961);
+        $this->expectException(DocsPackageDoNotCareBranch::class);
+        $this->expectExceptionCode($exceptionCode);
 
+        $pushEvent = new PushEvent(
+            'https://github.com/lolli42/enetcache/',
+            $branch,
+            'https://something'
+        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
-            'type' => 'foo',
+            'type' => $type,
         ];
 
-        new DeploymentInformation(new ComposerJson($composerJsonAsArray), $branch);
+        new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
     }
 }

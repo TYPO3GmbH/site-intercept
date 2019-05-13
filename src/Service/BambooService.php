@@ -15,7 +15,7 @@ use App\Extractor\BambooBuildStatus;
 use App\Extractor\BambooBuildTriggered;
 use App\Extractor\BambooSlackMessage;
 use App\Extractor\BambooStatus;
-use App\Extractor\DocumentationBuildInformation;
+use App\Extractor\DeploymentInformation;
 use App\Extractor\GerritToBambooCore;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
@@ -133,10 +133,10 @@ class BambooService
     /**
      * Triggers new build in project CORE-DR
      *
-     * @param DocumentationBuildInformation $documentationBuildInformation
+     * @param DeploymentInformation $deploymentInformation
      * @return ResponseInterface
      */
-    public function triggerDocumentationPlan(DocumentationBuildInformation $documentationBuildInformation): ResponseInterface
+    public function triggerDocumentationPlan(DeploymentInformation $deploymentInformation): ResponseInterface
     {
         $uri = 'latest/queue/'
             . 'CORE-DR?'
@@ -144,7 +144,7 @@ class BambooService
                 'stage=',
                 'executeAllStages=',
                 'os_authType=basic',
-                'bamboo.variable.BUILD_INFORMATION_FILE=' . urlencode($documentationBuildInformation->getFilePath()),
+                'bamboo.variable.BUILD_INFORMATION_FILE=' . urlencode($deploymentInformation->relativeDumpFile),
             ]);
         return $this->sendBamboo('post', $uri);
     }

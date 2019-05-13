@@ -15,7 +15,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -65,7 +64,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             'docs-build-information',
             $this->entityManager,
             new Filesystem(),
-            $this->prophesize(LoggerInterface::class)->reveal(),
             $this->getClientProphecy(
                 $pushEvent->getUrlToComposerFile(),
                 200,
@@ -123,7 +121,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             'docs-build-information',
             $this->entityManager,
             new Filesystem(),
-            $this->prophesize(LoggerInterface::class)->reveal(),
             $this->getClientProphecy(
                 $pushEvent->getUrlToComposerFile(),
                 200,
@@ -157,7 +154,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             'docs-build-information',
             $this->entityManager,
             new Filesystem(),
-            $this->prophesize(LoggerInterface::class)->reveal(),
             $this->getClientProphecy(
                 $pushEvent->getUrlToComposerFile(),
                 404,
@@ -174,9 +170,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
      */
     public function fallbackToTypePackageIsLogged(): void
     {
-        $loggerProphecy = $this->prophesize(LoggerInterface::class);
-        $loggerProphecy->info(Argument::any())->shouldBeCalled();
-
         $pushEvent = $this->getPushEvent();
         $subject = new DocumentationBuildInformationService(
             '/tmp/',
@@ -184,7 +177,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             'docs-build-information',
             $this->entityManager,
             new Filesystem(),
-            $loggerProphecy->reveal(),
             $this->getClientProphecy(
                 $pushEvent->getUrlToComposerFile(),
                 200,
@@ -211,9 +203,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
         $this->expectException(DependencyException::class);
         $this->expectExceptionCode(1557310527);
 
-        $loggerProphecy = $this->prophesize(LoggerInterface::class);
-        $loggerProphecy->error(Argument::cetera())->shouldBeCalled();
-
         $message = new \Swift_Message();
 
         $mailServiceProphecy = $this->prophesize(MailService::class);
@@ -227,7 +216,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             'docs-build-information',
             $this->entityManager,
             new Filesystem(),
-            $loggerProphecy->reveal(),
             $this->getClientProphecy(
                 $pushEvent->getUrlToComposerFile(),
                 200,
@@ -250,9 +238,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
      */
     public function missingCoreDependencyDoesNotSendMailIfNotGiven(): void
     {
-        $loggerProphecy = $this->prophesize(LoggerInterface::class);
-        $loggerProphecy->error(Argument::cetera())->shouldBeCalled();
-
         $mailServiceProphecy = $this->prophesize(MailService::class);
         $mailServiceProphecy->createMessageWithTemplate(Argument::cetera())->shouldNotBeCalled();
         $mailServiceProphecy->send(Argument::any())->shouldNotBeCalled();
@@ -264,7 +249,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
             'docs-build-information',
             $this->entityManager,
             new Filesystem(),
-            $loggerProphecy->reveal(),
             $this->getClientProphecy(
                 $pushEvent->getUrlToComposerFile(),
                 200,
@@ -296,7 +280,6 @@ class DocumentationBuildInformationServiceTest extends KernelTestCase
                 'docs-build-information',
                 $this->entityManager,
                 new Filesystem(),
-                $this->prophesize(LoggerInterface::class)->reveal(),
                 $this->getClientProphecy(
                     $pushEvent->getUrlToComposerFile(),
                     200,

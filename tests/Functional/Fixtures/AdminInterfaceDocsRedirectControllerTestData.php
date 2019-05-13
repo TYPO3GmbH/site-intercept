@@ -7,7 +7,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class AdminInterfaceRedirectControllerTestData extends Fixture implements OrderedFixtureInterface
+class AdminInterfaceDocsRedirectControllerTestData extends Fixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager)
     {

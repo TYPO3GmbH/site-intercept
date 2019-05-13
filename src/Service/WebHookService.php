@@ -34,8 +34,7 @@ class WebHookService
         if (in_array($request->headers->get('X-GitHub-Event', ''), ['push', 'release'], true)) {
             return $this->getPushEventFromGithub($request, $request->headers->get('X-GitHub-Event'));
         }
-
-        throw new UnsupportedWebHookRequestException('The given request is not supported and can not be converted into a PushEvent', 1553256930);
+        throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1553256930);
     }
 
     protected function getPushEventFromBitbucket(Request $request): PushEvent
