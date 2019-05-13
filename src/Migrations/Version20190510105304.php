@@ -31,8 +31,8 @@ final class Version20190510105304 extends AbstractMigration
 
         $this->addSql('CREATE TEMPORARY TABLE __temp__documentation_jar AS SELECT id, repository_url, package_name, branch FROM documentation_jar');
         $this->addSql('DROP TABLE documentation_jar');
-        $this->addSql('CREATE TABLE documentation_jar (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, repository_url VARCHAR(255) NOT NULL COLLATE BINARY, package_name VARCHAR(255) NOT NULL COLLATE BINARY, branch VARCHAR(255) NOT NULL COLLATE BINARY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, last_rendered_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL)');
-        $this->addSql('INSERT INTO documentation_jar (id, repository_url, package_name, branch) SELECT id, repository_url, package_name, branch FROM __temp__documentation_jar');
+        $this->addSql('CREATE TABLE documentation_jar (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, repository_url VARCHAR(255) NOT NULL COLLATE BINARY, package_name VARCHAR(255) NOT NULL COLLATE BINARY, branch VARCHAR(255) NOT NULL COLLATE BINARY, target_branch_directory VARCHAR(250) NOT NULL COLLATE BINARY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, last_rendered_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL)');
+        $this->addSql('INSERT INTO documentation_jar (id, repository_url, package_name, branch, target_branch_directory) SELECT id, repository_url, package_name, branch, branch FROM __temp__documentation_jar');
         $this->addSql('DROP TABLE __temp__documentation_jar');
     }
 
