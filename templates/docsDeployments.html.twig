@@ -48,12 +48,12 @@
                 <td>{{ deployment.branch }}</td>
                 <td>{{ deployment.targetBranchDirectory }}</td>
                 <td>
-                    <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}" data-language="en" data-target-format="LLL">
+                    <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
                         {{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}
                     </span>
                 </td>
                 <td>
-                    <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}" data-language="en" data-target-format="LLL">
+                    <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
                         {{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}
                     </span>
                 </td>
