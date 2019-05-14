@@ -60,15 +60,6 @@ class MailService
 
     /**
      * @param string $subject
-     * @return \Swift_Message
-     */
-    private function createMessage(string $subject): \Swift_Message
-    {
-        return new \Swift_Message($subject);
-    }
-
-    /**
-     * @param string $subject
      * @param string $templateFile
      * @param array $templateVariables
      * @return \Swift_Message

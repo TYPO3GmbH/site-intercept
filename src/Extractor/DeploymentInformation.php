@@ -130,30 +130,6 @@ class DeploymentInformation
     }
 
     /**
-     * @return string
-     */
-    public function getVendor(): string
-    {
-        return $this->vendor;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTypeShort(): string
-    {
-        return $this->typeShort;
-    }
-
-    /**
      * Determine the target directory this package with given branch/tag will be deployed to.
      *
      * @param string $branch
@@ -221,10 +197,6 @@ class DeploymentInformation
             return [
                 'h' => 'docs-home',
             ];
-        }
-
-        if (empty($composerJson->getType())) {
-            throw new ComposerJsonInvalidException('No \'type\' defined in composer.json', 1553081747);
         }
 
         if (!array_key_exists($composerJson->getType(), self::$typeMap)) {
