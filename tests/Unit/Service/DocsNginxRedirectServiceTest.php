@@ -65,10 +65,10 @@ class DocsNginxRedirectServiceTest extends TestCase
     /**
      * @test
      */
-    public function getFileContent(): void
+    public function existingConfigurationGetsContent(): void
     {
-        $filename = $this->subject->createRedirectConfigFile();
-        $fileContent = $this->subject->getFileContent(basename($filename));
+        $this->subject->createRedirectConfigFile();
+        $fileContent = $this->subject->findCurrentConfiguration()->getContents();
 
         $this->assertContains('# Rule: 1 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00', $fileContent);
         $this->assertContains('location = /p/vendor/packageOld/1.0/Foo.html {', $fileContent);
