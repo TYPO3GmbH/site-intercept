@@ -161,7 +161,9 @@ class DocsToBambooController extends AbstractController
                 ]
             );
 
-            $mailService->sendMailToAuthorDueToMissingDependency($pushEvent, $composerAsObject, $e->getMessage());
+            if (filter_var($composerAsObject->getFirstAuthor()['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
+                $mailService->sendMailToAuthorDueToMissingDependency($pushEvent, $composerAsObject, $e->getMessage());
+            }
 
             return Response::create('Dependencies are not fulfilled. See https://intercept.typo3.com for more information.', 412);
         }
