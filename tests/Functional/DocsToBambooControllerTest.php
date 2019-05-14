@@ -9,7 +9,6 @@ use App\Client\GeneralClient;
 use App\Extractor\DeploymentInformation;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class DocsToBambooControllerTest extends KernelTestCase
