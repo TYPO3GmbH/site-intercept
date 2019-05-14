@@ -42,7 +42,7 @@ class MailService
     {
         $message = $this->createMessageWithTemplate(
             'Documentation rendering failed',
-            'emails/docs/renderingFailedDueToMissingDependency.html.twig',
+            'email/docs/renderingFailedDueToMissingDependency.html.twig',
             [
                 'author' => $composerJson->getFirstAuthor(),
                 'package' => $composerJson->getName(),

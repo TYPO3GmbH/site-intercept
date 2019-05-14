@@ -145,7 +145,7 @@ class DocsToBambooController extends AbstractController
                     'sourceBranch' => $pushEvent->getVersionString(),
                 ]
             );
-            return Response::create('Branch or tag name ignored for decumentation rendering. See https://intercept.typo3.com for more information.', 412);
+            return Response::create('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', 412);
         } catch (DocsComposerDependencyException $e) {
             $logger->warning(
                 'Can not render documentation: ' . $e->getMessage(),
@@ -156,12 +156,14 @@ class DocsToBambooController extends AbstractController
                     'exceptionCode' => $e->getCode(),
                     'exceptionMessage' => $e->getMessage(),
                     'repository' => $pushEvent->getRepositoryUrl(),
-                    'package' => $buildInformation->packageName,
+                    'package' => $composerAsObject->getName(),
                     'sourceBranch' => $pushEvent->getVersionString(),
                 ]
             );
 
             $mailService->sendMailToAuthorDueToMissingDependency($pushEvent, $composerAsObject, $e->getMessage());
+
+            return Response::create('Dependencies are not fulfilled. See https://intercept.typo3.com for more information.', 412);
         }
     }
 }

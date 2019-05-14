@@ -1,0 +1,12 @@
+{
+    "name": "johndoe/make-good",
+    "type": "typo3-cms-documentation",
+    "description": "Main TYPO3 core documentation",
+    "license": "GPL-1.0",
+    "authors": [
+        {
+            "name": "John Doe",
+            "email": "john.doe@example.com"
+        }
+    ]
+}
