@@ -47,8 +47,7 @@ class DocsToBambooController extends AbstractController
         WebHookService $webhookService,
         DocumentationBuildInformationService $documentationBuildInformationService,
         LoggerInterface $logger
-    ): Response
-    {
+    ): Response {
         try {
             $pushEvent = $webhookService->createPushEvent($request);
             $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
