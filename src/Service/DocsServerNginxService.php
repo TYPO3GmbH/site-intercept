@@ -12,6 +12,8 @@ namespace App\Service;
 
 use App\Repository\DocsServerRedirectRepository;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * This class creates a nginx configuration file which contains all redirects from database.
@@ -89,6 +91,25 @@ location = %s {
             return file_get_contents($filename);
         }
         return '';
+    }
+
+    /**
+     * Finds the latest configuration file being in place
+     *
+     * @return null|\SplFileInfo
+     */
+    public function findCurrentConfiguration(): ?\SplFileInfo
+    {
+        $finder = new Finder();
+        $files = $finder
+            ->in($this->getPrivateDirectory())
+            ->files()
+            ->name('nginx_redirects_*.conf')
+            ->sortByName()
+            ->reverseSorting();
+
+        $asArray = iterator_to_array($files);
+        return current($asArray) ?: null;
     }
 
     /**

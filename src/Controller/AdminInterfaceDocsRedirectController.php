@@ -54,11 +54,16 @@ class AdminInterfaceDocsRedirectController extends AbstractController
      */
     public function index(DocsServerRedirectRepository $redirectRepository): Response
     {
+        $currentConfigurationFile = $this->nginxService->findCurrentConfiguration();
         $this->logger->info('Triggered: ' . __CLASS__ . '::' . __METHOD__, [
             'type' => 'docsRedirectIndex',
             'triggeredBy' => 'interface',
         ]);
-        return $this->render('redirect/index.html.twig', ['redirects' => $redirectRepository->findAll()]);
+
+        return $this->render('redirect/index.html.twig', [
+            'redirects' => $redirectRepository->findAll(),
+            'currentConfiguration' => $currentConfigurationFile,
+        ]);
     }
 
     /**
@@ -165,6 +170,6 @@ class AdminInterfaceDocsRedirectController extends AbstractController
     protected function createRedirectsAndDeploy(): void
     {
         $filename = $this->nginxService->createRedirectConfigFile();
-        $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
+        //$this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
     }
 }
