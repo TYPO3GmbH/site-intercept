@@ -1,79 +1,81 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}{% endblock %}</title>
-        <link rel="shortcut icon" href="{{ asset('build/images/favicon.ico') }}">
-        {{ encore_entry_link_tags('app') }}
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} - TYPO3 Intercept</title>
+    <link rel="shortcut icon" href="{{ asset('build/images/favicon.ico') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600">
+    {{ encore_entry_link_tags('app') }}
+</head>
+<body>
 
-        <div id="top-wrapper">
-            <nav class="navbar navbar-expand navbar-dark">
-                <a href="#menu-toggle" id="menu-toggle" class="navbar-brand">
-                    <span class="navbar-toggler-icon"></span>
-                </a>
+    <div class="page-wrapper">
+        <header class="page-header">
+            <nav class="navbar navbar-mainnavigation navbar-dark bg-darkest navbar-expand-md" role="banner">
+                <div class="container">
+                    <a class="navbar-brand" href="{{ path('admin_index') }}"><i class="fab fa-typo3 text-primary"></i> <strong>Intercept</strong></a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainnavigation" aria-controls="mainnavigation" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="mainnavigation">
+                        {{ knp_menu_render('main-default', {'template':'menu/navbar.html.twig'}) }}
+                        {{ knp_menu_render('main-profile', {'template':'menu/navbar.html.twig'}) }}
+                    </div>
+                </div>
             </nav>
-        </div>
+        </header>
 
-        <div id="main-wrapper" class="toggled">
-            <div id="sidebar-wrapper">
-                <ul id="sidebar-nav">
-                    <li>
-                        <a href="{{ path('admin_index') }}" {% if active == 'home' %}class="active"{% endif %}>Home</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('admin_bamboo_core') }}" {% if active == 'bambooCore' %}class="active"{% endif %}>Bamboo Core</a>
-                    </li>
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <li>
-                            <a href="{{ path('admin_bamboo_core_security') }}" {% if active == 'bambooCoreSecurity' %}class="active"{% endif %}>Bamboo Core Security</a>
-                        </li>
-                    {% endif %}
-                    <li>
-                        <a href="{{ path('admin_split_core') }}" {% if active == 'splitCore' %}class="active"{% endif %}>Split Core</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('admin_docs') }}" {% if active == 'docs' %}class="active"{% endif %}>Documentation</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('admin_docs_deployments') }}" {% if active == 'docsDeployments' %}class="active"{% endif %}>Documentation Deployments</a>
-                    </li>
-                    {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
-                        <li>
-                            <a href="{{ path('admin_redirect_index') }}" {% if active == 'redirects' %}class="active"{% endif %}>Documentation Redirects</a>
-                        </li>
-                    {% endif %}
-                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                        <li><a href="{{ path('logout') }}">Logout <i class="fa fa-lock"></i></a></li>
-                    {% else %}
-                        <li><a href="{{ path('admin_login') }}">Login <i class="fa fa-unlock"></i></a></li>
-                    {% endif %}
-                </ul>
-            </div>
-            <div id="page-content-wrapper">
-                <div class="container-fluid">
-                    {% block headline %}
-                        Default headline
-                    {% endblock %}
-
-                    {% block flashMessages %}
-                        {% for label, messages in app.flashes %}
-                            {% for message in messages %}
-                                <div class="alert alert-{{ label }}">
-                                    {{ message }}
+        {# flash messages on this page are NOT escaped !#}
+        {% if app.request.hasPreviousSession %}
+            {% for key, flashMassages in app.session.flashBag.all %}
+                <div class="content-section content-section-none">
+                    <div class="alert-pagegroup">
+                        {% block flashMessages %}
+                            {% for flashMassage in flashMassages %}
+                                <div class="alert alert-{{ key }} alert-dismissible fade show" role="alert">
+                                    <div class="alert-inner">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        {{ flashMassage | raw }}
+                                    </div>
                                 </div>
                             {% endfor %}
-                        {% endfor %}
-                    {% endblock %}
+                        {% endblock %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
 
-                    {% block content %}
-                        Default content
-                    {% endblock %}
+        <main class="page-main">
+
+            {% if block('headline') is defined %}
+                <div class="content-section content-section-small bg-primary text-white">
+                    <div class="container">
+                        <h1 class="h2">{{ block('headline')|raw }}</h1>
+                    </div>
+                </div>
+            {% endif %}
+            {% block body %}{% endblock %}
+
+        </main>
+
+        <footer class="page-footer">
+            <div class="content-section content-section-smallest bg-darkest text-white">
+                <div class="container">
+                    <div class="page-footer-copyright">
+                        <span>© {{ "now"|date("Y") }} <a href="https://typo3.com" target="_blank">TYPO3 GmbH</a>.</span>
+                    </div>
+                    <div class="page-footer-menu">
+                        {{ knp_menu_render('main-footer', {'template':'menu/navbar.html.twig'}) }}
+                    </div>
                 </div>
             </div>
-        </div>
+        </footer>
+    </div>
 
-        {{ encore_entry_script_tags('app') }}
-    </body>
+    {{ encore_entry_script_tags('app') }}
+</body>
 </html>

@@ -1,31 +1,24 @@
-import '../css/app.scss';
+// Load the CSS stuff
+require('@fortawesome/fontawesome-free/css/fontawesome.min.css');
+require('@fortawesome/fontawesome-free/css/brands.min.css');
+require('@fortawesome/fontawesome-free/css/solid.min.css');
+require('../css/app.scss');
+
+// Load the JS stuff
+let $ = require('jquery');
+require('bootstrap');
+require('./libs/navbar.js');
 
 // We need bootstrap collapse
-import collapse from 'bootstrap/js/src/collapse';
 var { DateTime } = require('luxon');
 
-import $ from 'jquery';
-
-$(document).ready(function() {
-  // hamburger menu toggle foo
-  $("#menu-toggle").click(function(e) {
-      e.preventDefault();
-      $("#main-wrapper").toggleClass("toggled");
-  });
-  $(window).resize(function() {
-    if($(window).width()<=768){
-      $("#main-wrapper").removeClass("toggled");
-    }else{
-      $("#main-wrapper").addClass("toggled");
-    }
-  });
-  convertDates();
+$(document).ready(function () {
+    convertDates();
 });
 
 function convertDates() {
-  Array.from(document.querySelectorAll('[data-processor="localdate"]')).forEach(function(element) {
-    const value = element.dataset.value;
-
-    element.textContent = DateTime.fromISO(value).toLocaleString(DateTime.DATETIME_FULL);
-  });
+    Array.from(document.querySelectorAll('[data-processor="localdate"]')).forEach(function (element) {
+        const value = element.dataset.value;
+        element.textContent = DateTime.fromISO(value).toLocaleString(DateTime.DATETIME_FULL);
+    });
 }

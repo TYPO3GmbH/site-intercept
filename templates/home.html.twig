@@ -1,77 +1,78 @@
 {% extends 'base.html.twig' %}
-
-{% set active = 'home' %}
-
 {% block title %}Home{% endblock %}
+{% block headline %}Intercept web admin interface{% endblock %}
+{% block body %}
 
-{% block headline %}
-    <h1>Intercept web admin interface</h1>
-{% endblock %}
+    <div class="content-section">
+        <div class="container">
 
-{% block content %}
-    <h2>About intercept</h2>
-    <p>
-        Intercept is a middleware in the TYPO3 ecosystem that does coordination
-        and communication jobs between various services used for core development
-        and documentation management. This web interface allows interacting with
-        intercept to show and trigger certain jobs.
-    </p>
-    <p>
-        You can <a href="{{ path('admin_login') }}">login</a> to intercept with your typo3.org account.
-        This enables various interfaces to trigger intercept jobs. Members
-        of the documentation team have additional access right to manage the documentation
-        server deployments.
-    </p>
+            <h2>About intercept</h2>
+            <p>
+                Intercept is a middleware in the TYPO3 ecosystem that does coordination
+                and communication jobs between various services used for core development
+                and documentation management. This web interface allows interacting with
+                intercept to show and trigger certain jobs.
+            </p>
+            <p>
+                You can <a href="{{ path('admin_login') }}">login</a> to intercept with your typo3.org account.
+                This enables various interfaces to trigger intercept jobs. Members
+                of the documentation team have additional access right to manage the documentation
+                server deployments.
+            </p>
 
-    <p>
-        The source code of intercept can be found at
-        <a href="https://bitbucket.typo3.com/projects/INT/repos/intercept/browse">bitbucket.typo3.com</a>.
-    </p>
+            <p>
+                The source code of intercept can be found at
+                <a href="https://bitbucket.typo3.com/projects/INT/repos/intercept/browse">bitbucket.typo3.com</a>.
+            </p>
 
-    <p>
-        The following services are handled:
-    </p>
-    <ul>
-        <li>
-            If a core patch is pushed to the gerrit review system at
-            <a href="https://review.typo3.org/">review.typo3.org</a>,
-            intercept triggers the according "pre-merge" core test suite at
-            <a href="https://bamboo.typo3.com/">bamboo.typo3.com</a> and reports
-            the result back to the review system by voting on the patch. Logged in
-            users can trigger tests manually using this <a href="{{ path('admin_bamboo_core') }}">Bamboo Core</a>.
-        </li>
-        <li>
-            If a pull request is opened on the github main core repository at
-            <a href="https://github.com/typo3/typo3.cms">github/typo3/typo3.cms</a>,
-            intercept creates an issue from that pull request at <a href="https://forge.typo3.org">
-            forge.typo3.org</a>, transfers the pull reqeust to a gerrit review
-            <a href="https://review.typo3.org">review.typo3.org</a> and closes the pull request
-            with a remark that it has been transferred.
-        </li>
-        <li>
-            <a href="https://bamboo.typo3.org">Bamboo</a> executes a nightly test build of
-            all active TYPO3 core development branches. Intercept re-triggers those nightlies
-            once if they failed, and reports a failing nightly build to <a href="https://typo3.slack.com">
-            slack channel #typo3-cms-coredev</a> if it continues to fail. Logged in users can trigger
-            tests manually using this <a href="{{ path('admin_bamboo_core') }}">Bamboo Core</a>.
-        </li>
-        <li>
-            If a TYPO3 core patch is merged in the <a href="https://review.typo3.org">review system</a>,
-            intercept executes the sub tree splitting of the main repository into the single
-            core extensions repositories and pushes them to <a href="https://github.com/typo3-cms">github</a>.
-            Logged in users can trigger this split action manually at <a href="{{ path('admin_split_core') }}">
-            Split Core</a>.
-        </li>
-        <li>
-            When a new TYPO3 core version is tagged an released in the <a href="https://github.com/typo3/typo3.cms">
-            main core repository</a>, intercept creates the needed tags in the <a href="https://github.com/typo3-cms">
-            sub tree repositories</a>. Logged in users can trigger this tagging action manually at <a href="{{ path('admin_split_core') }}">
-            Split Core</a>.
-        </li>
-        <li>
-            [Work-in-progress] Intercept is the endpoint for the <a href="https://docs-hook.typo3.org">documentation hook</a>,
-            triggers documentation rendering in bamboo and deploys it to the <a href="https://docs.typo3.org">documentation server</a>.
-            Members of the documentation team can manage redirects on the documentation server and deployed documentation.
-        </li>
-    </ul>
+            <p>
+                The following services are handled:
+            </p>
+            <ul>
+                <li>
+                    If a core patch is pushed to the gerrit review system at
+                    <a href="https://review.typo3.org/">review.typo3.org</a>,
+                    intercept triggers the according "pre-merge" core test suite at
+                    <a href="https://bamboo.typo3.com/">bamboo.typo3.com</a> and reports
+                    the result back to the review system by voting on the patch. Logged in
+                    users can trigger tests manually using this <a href="{{ path('admin_bamboo_core') }}">Bamboo Core</a>.
+                </li>
+                <li>
+                    If a pull request is opened on the github main core repository at
+                    <a href="https://github.com/typo3/typo3.cms">github/typo3/typo3.cms</a>,
+                    intercept creates an issue from that pull request at <a href="https://forge.typo3.org">
+                    forge.typo3.org</a>, transfers the pull reqeust to a gerrit review
+                    <a href="https://review.typo3.org">review.typo3.org</a> and closes the pull request
+                    with a remark that it has been transferred.
+                </li>
+                <li>
+                    <a href="https://bamboo.typo3.org">Bamboo</a> executes a nightly test build of
+                    all active TYPO3 core development branches. Intercept re-triggers those nightlies
+                    once if they failed, and reports a failing nightly build to <a href="https://typo3.slack.com">
+                    slack channel #typo3-cms-coredev</a> if it continues to fail. Logged in users can trigger
+                    tests manually using this <a href="{{ path('admin_bamboo_core') }}">Bamboo Core</a>.
+                </li>
+                <li>
+                    If a TYPO3 core patch is merged in the <a href="https://review.typo3.org">review system</a>,
+                    intercept executes the sub tree splitting of the main repository into the single
+                    core extensions repositories and pushes them to <a href="https://github.com/typo3-cms">github</a>.
+                    Logged in users can trigger this split action manually at <a href="{{ path('admin_split_core') }}">
+                    Split Core</a>.
+                </li>
+                <li>
+                    When a new TYPO3 core version is tagged an released in the <a href="https://github.com/typo3/typo3.cms">
+                    main core repository</a>, intercept creates the needed tags in the <a href="https://github.com/typo3-cms">
+                    sub tree repositories</a>. Logged in users can trigger this tagging action manually at <a href="{{ path('admin_split_core') }}">
+                    Split Core</a>.
+                </li>
+                <li>
+                    [Work-in-progress] Intercept is the endpoint for the <a href="https://docs-hook.typo3.org">documentation hook</a>,
+                    triggers documentation rendering in bamboo and deploys it to the <a href="https://docs.typo3.org">documentation server</a>.
+                    Members of the documentation team can manage redirects on the documentation server and deployed documentation.
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
 {% endblock %}

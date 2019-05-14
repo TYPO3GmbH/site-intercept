@@ -1,136 +1,136 @@
 {% extends 'base.html.twig' %}
-
-{% set active = 'splitCore' %}
-
 {% block title %}Split Core{% endblock %}
+{% block headline %}Split Core{% endblock %}
+{% block body %}
 
-{% block headline %}
-    <h1>Split Core</h1>
-{% endblock %}
+    <div class="content-section">
+        <div class="container">
 
-{% block content %}
-    <h2>
-        {% if rabbitStatus.isRabbitOnline == true %}
-            <span class="badge badge-success">Rabbit: online</span>
-        {% else %}
-            <span class="badge badge-danger">Rabbit: offline</span>
-        {% endif %}
+            <h2>
+                {% if rabbitStatus.isRabbitOnline == true %}
+                    <span class="badge badge-success">Rabbit: online</span>
+                {% else %}
+                    <span class="badge badge-danger">Rabbit: offline</span>
+                {% endif %}
 
-        {% if rabbitStatus.isWorkerOnline == true and rabbitStatus.isRabbitOnline == true %}
-            <span class="badge badge-success">Worker: online</span>
-        {% elseif rabbitStatus.isRabbitOnline == true %}
-            <span class="badge badge-danger">Worker: offline</span>
-        {% endif %}
+                {% if rabbitStatus.isWorkerOnline == true and rabbitStatus.isRabbitOnline == true %}
+                    <span class="badge badge-success">Worker: online</span>
+                {% elseif rabbitStatus.isRabbitOnline == true %}
+                    <span class="badge badge-danger">Worker: offline</span>
+                {% endif %}
 
-        {% if rabbitStatus.numberOfJobs == 0 and rabbitStatus.isRabbitOnline == true %}
-            <span class="badge badge-success">Jobs: {{ rabbitStatus.numberOfJobs }}</span>
-        {% elseif rabbitStatus.isRabbitOnline == true %}
-            <span class="badge badge-warning">Jobs: {{ rabbitStatus.numberOfJobs }}</span>
-        {% endif %}
-    </h2>
+                {% if rabbitStatus.numberOfJobs == 0 and rabbitStatus.isRabbitOnline == true %}
+                    <span class="badge badge-success">Jobs: {{ rabbitStatus.numberOfJobs }}</span>
+                {% elseif rabbitStatus.isRabbitOnline == true %}
+                    <span class="badge badge-warning">Jobs: {{ rabbitStatus.numberOfJobs }}</span>
+                {% endif %}
+            </h2>
 
-    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-        <h2>
-            Core mono repo splitting and tagging to sub repos
-        </h2>
-        <p>
-            All core extensions are handled in monolithic repository at
-            <a href="https://git.typo3.org/Packages/TYPO3.CMS.git">git.typo3.org</a>, which is mirrored
-            to <a href="https://github.com/TYPO3/TYPO3.CMS">github</a>.
-            To base a project on only a sub set of core extensions, this mono repo is split to single
-            repositories per extension, which are then packaged for use via composer on
-            <a href="https://packagist.org/?query=typo3%2Fcms-">packagist.org</a>.
-        </p>
-        <p>
-            The split and tag actions themselves are performed through a rabbit queue
-            with one worker to have them decoupled from web requests.
-        </p>
-        <p>
-            This split operation can be triggered manually, and pushing tags from
-            the mono repo to the single repos can be triggered, too. Note these
-            steps are usually triggered via hooks on github and don't need to be triggered
-            manually here.
-        </p>
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <h2>
+                    Core mono repo splitting and tagging to sub repos
+                </h2>
+                <p>
+                    All core extensions are handled in monolithic repository at
+                    <a href="https://git.typo3.org/Packages/TYPO3.CMS.git">git.typo3.org</a>, which is mirrored
+                    to <a href="https://github.com/TYPO3/TYPO3.CMS">github</a>.
+                    To base a project on only a sub set of core extensions, this mono repo is split to single
+                    repositories per extension, which are then packaged for use via composer on
+                    <a href="https://packagist.org/?query=typo3%2Fcms-">packagist.org</a>.
+                </p>
+                <p>
+                    The split and tag actions themselves are performed through a rabbit queue
+                    with one worker to have them decoupled from web requests.
+                </p>
+                <p>
+                    This split operation can be triggered manually, and pushing tags from
+                    the mono repo to the single repos can be triggered, too. Note these
+                    steps are usually triggered via hooks on github and don't need to be triggered
+                    manually here.
+                </p>
 
-        <h2>
-            Trigger core split
-        </h2>
-        {{ form_start(splitCoreSplit) }}
-            {{ form_errors(splitCoreSplit) }}
-            {{ form_widget(splitCoreSplit.master) }}
-            {{ form_widget(splitCoreSplit.branch9_5) }}
-            {{ form_widget(splitCoreSplit.branch8_7) }}
-            {{ form_widget(splitCoreSplit._token) }}
-        {{ form_end(splitCoreSplit, {'render_rest': false}) }}
+                <h2>
+                    Trigger core split
+                </h2>
+                {{ form_start(splitCoreSplit) }}
+                    {{ form_errors(splitCoreSplit) }}
+                    {{ form_widget(splitCoreSplit.master) }}
+                    {{ form_widget(splitCoreSplit.branch9_5) }}
+                    {{ form_widget(splitCoreSplit.branch8_7) }}
+                    {{ form_widget(splitCoreSplit._token) }}
+                {{ form_end(splitCoreSplit, {'render_rest': false}) }}
 
-        <h2>
-            Trigger sub repository tagging
-        </h2>
-        {{ form_start(splitCoreTag) }}
-            {{ form_errors(splitCoreTag) }}
-            <div class="form-group row">
-                <div class="col-2">
-                    {{ form_widget(splitCoreTag.tag) }}
-                </div>
-                <div class="col-1">
-                    {{ form_widget(splitCoreTag.doTag) }}
-                </div>
-            </div>
-            {{ form_widget(splitCoreTag._token) }}
-        {{ form_end(splitCoreTag, {'render_rest': false}) }}
-    {% endif %}
-
-    <h2>
-        Recent actions
-    </h2>
-    <div id="accordion">
-        {% for log in logs %}
-            <div class="card">
-                <div class="card-header" id="headingOne">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#uuid{{ log.queueLog.uuid }}" aria-expanded="false" aria-controls="uuid{{ log.queueLog.uuid }}">
-                        <span>{{ log.queueLog.time|date("d.m.Y H:i:s") }} UTC - </span>
-                        {% if log.queueLog.type == 'patch' %}
-                            <span>Split sub tree</span>
-                        {% elseif log.queueLog.type == 'tag' %}
-                            <span>Tag sub tree</span>
-                        {% endif %}
-                        {% if log.finished == true %}
-                            | <span>Finished: {{ log.timeTaken|date("%im %ss") }}</span>
-                        {% else %}
-                            | <span>Finished: No</span>
-                        {% endif %}
-                        {% if log.queueLog.sourceBranch %}
-                            | <span>Source branch: {{ log.queueLog.sourceBranch }}</span>
-                        {% endif %}
-                        {% if log.queueLog.targetBranch %}
-                            | <span>Target branch: {{ log.queueLog.targetBranch }}</span>
-                        {% endif %}
-                        {% if log.queueLog.tag %}
-                            | <span>Tag: {{ log.queueLog.tag }}</span>
-                        {% endif %}
-                        | <span>Job ID: {{ log.queueLog.uuid }}</span>
-                        {% if log.queueLog.triggeredBy == 'api' %}
-                            | <span>Trigger: API</span>
-                        {% elseif log.queueLog.triggeredBy == 'interface' %}
-                            | <span>Trigger: Web</span>
-                        {% endif %}
-                        {% if log.queueLog.userDisplayName %}
-                            | <span>User: {{ log.queueLog.userDisplayName }}</span>
-                        {% endif %}
-                    </button>
-                </div>
-                <div id="uuid{{ log.queueLog.uuid }}" class="collapse" aria-labelledby="uuid{{ log.queueLog.uuid }}" data-parent="#accordion">
-                    <div class="card-body">
-                        {% for detailLog in log.detailLogs %}
-                            <div class="alert graylog-log alert-info">
-                                <span>{{ detailLog.time|date("d.m.Y H:i:s") }} UTC - </span>
-                                <span>Message: {{ detailLog.message }}</span>
-                            </div>
-                        {% endfor %}
+                <h2>
+                    Trigger sub repository tagging
+                </h2>
+                {{ form_start(splitCoreTag) }}
+                    {{ form_errors(splitCoreTag) }}
+                    <div class="form-group row">
+                        <div class="col-2">
+                            {{ form_widget(splitCoreTag.tag) }}
+                        </div>
+                        <div class="col-1">
+                            {{ form_widget(splitCoreTag.doTag) }}
+                        </div>
                     </div>
-                </div>
+                    {{ form_widget(splitCoreTag._token) }}
+                {{ form_end(splitCoreTag, {'render_rest': false}) }}
+            {% endif %}
+
+            <h2>
+                Recent actions
+            </h2>
+            <div id="accordion">
+                {% for log in logs %}
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#uuid{{ log.queueLog.uuid }}" aria-expanded="false" aria-controls="uuid{{ log.queueLog.uuid }}">
+                                <span>{{ log.queueLog.time|date("d.m.Y H:i:s") }} UTC - </span>
+                                {% if log.queueLog.type == 'patch' %}
+                                    <span>Split sub tree</span>
+                                {% elseif log.queueLog.type == 'tag' %}
+                                    <span>Tag sub tree</span>
+                                {% endif %}
+                                {% if log.finished == true %}
+                                    | <span>Finished: {{ log.timeTaken|date("%im %ss") }}</span>
+                                {% else %}
+                                    | <span>Finished: No</span>
+                                {% endif %}
+                                {% if log.queueLog.sourceBranch %}
+                                    | <span>Source branch: {{ log.queueLog.sourceBranch }}</span>
+                                {% endif %}
+                                {% if log.queueLog.targetBranch %}
+                                    | <span>Target branch: {{ log.queueLog.targetBranch }}</span>
+                                {% endif %}
+                                {% if log.queueLog.tag %}
+                                    | <span>Tag: {{ log.queueLog.tag }}</span>
+                                {% endif %}
+                                | <span>Job ID: {{ log.queueLog.uuid }}</span>
+                                {% if log.queueLog.triggeredBy == 'api' %}
+                                    | <span>Trigger: API</span>
+                                {% elseif log.queueLog.triggeredBy == 'interface' %}
+                                    | <span>Trigger: Web</span>
+                                {% endif %}
+                                {% if log.queueLog.userDisplayName %}
+                                    | <span>User: {{ log.queueLog.userDisplayName }}</span>
+                                {% endif %}
+                            </button>
+                        </div>
+                        <div id="uuid{{ log.queueLog.uuid }}" class="collapse" aria-labelledby="uuid{{ log.queueLog.uuid }}" data-parent="#accordion">
+                            <div class="card-body">
+                                {% for detailLog in log.detailLogs %}
+                                    <div class="alert graylog-log alert-info">
+                                        <span>{{ detailLog.time|date("d.m.Y H:i:s") }} UTC - </span>
+                                        <span>Message: {{ detailLog.message }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+
+        </div>
     </div>
 
 {% endblock %}

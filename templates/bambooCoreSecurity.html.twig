@@ -1,177 +1,166 @@
 {% extends 'base.html.twig' %}
-
-{% set active = 'bambooCoreSecurity' %}
-
 {% block title %}Bamboo Core Security{% endblock %}
+{% block headline %}Trigger bamboo security builds{% endblock %}
+{% block body %}
 
-{% block headline %}
-    <h1>Trigger bamboo security builds</h1>
-{% endblock %}
+    <div class="content-section">
+        <div class="container">
 
-{# flash messages on this page are NOT escaped !#}
-{% block flashMessages %}
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }}">
-                {{ message | raw }}
-            </div>
-        {% endfor %}
-    {% endfor %}
-{% endblock %}
+            <h2>
+                {{ include('partials/bambooStatus.html.twig') }}
+            </h2>
 
-{% block content %}
-    <h2>
-        {{ include('partials/bambooStatus.html.twig') }}
-    </h2>
-
-    {% if is_granted('ROLE_ADMIN') %}
-        <div class="alert alert-danger shadow">
-            Do not abuse this interface - triggering many builds can <strong>easily</strong>
-            occupy bamboo for hours.
-        </div>
-        <div class="row mb-4">
-            <div class="col-lg-6 col-md-12 col-sm-12">
-                <div class="card shadow">
-                    <div class="card-header">
-                        <h2>
-                            Bamboo core security tests with specific patch
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <p>
-                            Interface to trigger bamboo pre-merge security builds with specific change and patch
-                            sets. Finished pre-merge builds will vote on gerrit. These patches will be cherry picked on top of the
-                            current clean core master branch.
-                        </p>
-
-                        <h3>
-                            Trigger by change id and patch set
-                        </h3>
-                        {{ form_start(patchForm) }}
-                        {{ form_errors(patchForm) }}
-                        <div class="form-group row">
-                            <div class="col-lg-4 col-md-4 col-sm-6">
-                                {{ form_label(patchForm.change) }}
-                                {{ form_errors(patchForm.change) }}
-                                {{ form_widget(patchForm.change) }}
-                                {{ form_help(patchForm.change) }}
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="alert alert-danger shadow">
+                    Do not abuse this interface - triggering many builds can <strong>easily</strong>
+                    occupy bamboo for hours.
+                </div>
+                <div class="row mb-4">
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="card shadow">
+                            <div class="card-header">
+                                <h2>
+                                    Bamboo core security tests with specific patch
+                                </h2>
                             </div>
-                            <div class="col-lg-2 col-md-4 col-sm-6">
-                                {{ form_label(patchForm.set) }}
-                                {{ form_errors(patchForm.set) }}
-                                {{ form_widget(patchForm.set) }}
-                                {{ form_help(patchForm.set) }}
+                            <div class="card-body">
+                                <p>
+                                    Interface to trigger bamboo pre-merge security builds with specific change and patch
+                                    sets. Finished pre-merge builds will vote on gerrit. These patches will be cherry picked on top of the
+                                    current clean core master branch.
+                                </p>
+
+                                <h3>
+                                    Trigger by change id and patch set
+                                </h3>
+                                {{ form_start(patchForm) }}
+                                {{ form_errors(patchForm) }}
+                                <div class="form-group row">
+                                    <div class="col-lg-4 col-md-4 col-sm-6">
+                                        {{ form_label(patchForm.change) }}
+                                        {{ form_errors(patchForm.change) }}
+                                        {{ form_widget(patchForm.change) }}
+                                        {{ form_help(patchForm.change) }}
+                                    </div>
+                                    <div class="col-lg-2 col-md-4 col-sm-6">
+                                        {{ form_label(patchForm.set) }}
+                                        {{ form_errors(patchForm.set) }}
+                                        {{ form_widget(patchForm.set) }}
+                                        {{ form_help(patchForm.set) }}
+                                    </div>
+                                </div>
+
+                                {{ form_widget(patchForm.master, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                                {{ form_widget(patchForm.branch9_5, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                                {{ form_widget(patchForm.branch8_7, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                                {{ form_widget(patchForm._token, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                                {{ form_end(patchForm, {'render_rest': false}) }}
+                            </div>
+                            <hr/>
+                            <div class="card-body">
+                                {{ form_start(urlForm) }}
+                                <h3>
+                                    Trigger pre merge security testing by url
+                                </h3>
+                                <p>
+                                    Insert a casual review.typo3.org url. If a specific patch set is given, it will be used. If
+                                    not, the latest patch set of the change will be determined. The patch will be automatically rebased
+                                    on top of current head of the core master target branch which may fail if it has merge conflicts.
+                                </p>
+                                {{ form_errors(urlForm) }}
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        {{ form_errors(urlForm.url) }}
+                                        {{ form_widget(urlForm.url) }}
+                                        {{ form_help(urlForm.url) }}
+                                    </div>
+                                </div>
+                                {{ form_widget(urlForm._token) }}
+                                {{ form_widget(urlForm.trigger) }}
+                                {{ form_end(urlForm, {'render_rest': false}) }}
                             </div>
                         </div>
-
-                        {{ form_widget(patchForm.master, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                        {{ form_widget(patchForm.branch9_5, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                        {{ form_widget(patchForm.branch8_7, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                        {{ form_widget(patchForm._token, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                        {{ form_end(patchForm, {'render_rest': false}) }}
                     </div>
-                    <hr/>
-                    <div class="card-body">
-                        {{ form_start(urlForm) }}
-                        <h3>
-                            Trigger pre merge security testing by url
-                        </h3>
-                        <p>
-                            Insert a casual review.typo3.org url. If a specific patch set is given, it will be used. If
-                            not, the latest patch set of the change will be determined. The patch will be automatically rebased
-                            on top of current head of the core master target branch which may fail if it has merge conflicts.
-                        </p>
-                        {{ form_errors(urlForm) }}
-                        <div class="form-group row">
-                            <div class="col-12">
-                                {{ form_errors(urlForm.url) }}
-                                {{ form_widget(urlForm.url) }}
-                                {{ form_help(urlForm.url) }}
-                            </div>
+                </div>
+            {% endif %}
+
+            <div class="row mb-4">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h2>
+                                Recent actions
+                            </h2>
                         </div>
-                        {{ form_widget(urlForm._token) }}
-                        {{ form_widget(urlForm.trigger) }}
-                        {{ form_end(urlForm, {'render_rest': false}) }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-
-    <div class="row mb-4">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-            <div class="card shadow">
-                <div class="card-header">
-                    <h2>
-                        Recent actions
-                    </h2>
-                </div>
-                <div class="card-body">
-                    {% for log in logMessages %}
-                        <div class="
-                                alert graylog-log
-                                {% if log.vote == '-1' or log.type == 'rebuildNightly' %}
-                                    alert-warning
-                                {% elseif log.vote == '+1' %}
-                                    alert-success
-                                {% elseif log.type == 'reportBrokenNightly' %}
-                                    alert-danger
-                                {% else %}
-                                    alert-info
-                                {% endif %}
-                            "
-                        >
-                            <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
-                            {% if log.type == 'voteGerrit' %}
-                                <span>
-                                    <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Voted on gerrit</a>
-                                    by
-                                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">bamboo result</a>
-                                </span>
-                            {% elseif log.type == 'triggerBamboo' and log.bambooKey != '' %}
-                                <span>
-                                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a>
-                                    {% if log.change and log.patch %}
-                                        for <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">gerrit patch</a>
+                        <div class="card-body">
+                            {% for log in logMessages %}
+                                <div class="
+                                        alert graylog-log
+                                        {% if log.vote == '-1' or log.type == 'rebuildNightly' %}
+                                            alert-warning
+                                        {% elseif log.vote == '+1' %}
+                                            alert-success
+                                        {% elseif log.type == 'reportBrokenNightly' %}
+                                            alert-danger
+                                        {% else %}
+                                            alert-info
+                                        {% endif %}
+                                    "
+                                >
+                                    <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
+                                    {% if log.type == 'voteGerrit' %}
+                                        <span>
+                                            <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Voted on gerrit</a>
+                                            by
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">bamboo result</a>
+                                        </span>
+                                    {% elseif log.type == 'triggerBamboo' and log.bambooKey != '' %}
+                                        <span>
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a>
+                                            {% if log.change and log.patch %}
+                                                for <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">gerrit patch</a>
+                                            {% endif %}
+                                        </span>
+                                    {% elseif log.type == 'rebuildNightly' and log.bambooKey != '' %}
+                                        <span>
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Re-triggered failed bamboo nightly</a>
+                                        </span>
+                                    {% elseif log.type == 'reportBrokenNightly' and log.bambooKey != '' %}
+                                        <span>
+                                            Reported <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">broken nightly</a> to slack
+                                        </span>
                                     {% endif %}
-                                </span>
-                            {% elseif log.type == 'rebuildNightly' and log.bambooKey != '' %}
-                                <span>
-                                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Re-triggered failed bamboo nightly</a>
-                                </span>
-                            {% elseif log.type == 'reportBrokenNightly' and log.bambooKey != '' %}
-                                <span>
-                                    Reported <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">broken nightly</a> to slack
-                                </span>
-                            {% endif %}
 
-                            {% if log.vote %}
-                                | <span>Vote: {{ log.vote }}</span>
-                            {% endif %}
-                            {% if log.branch %}
-                                | <span>Branch: {{ log.branch }}</span>
-                            {% endif %}
-                            {% if log.change %}
-                                | <span>Change: {{ log.change }}</span>
-                            {% endif %}
-                            {% if log.patch %}
-                                | <span>Patch: {{ log.patch }}</span>
-                            {% endif %}
-                            {% if log.bambooKey %}
-                                | <span>Bamboo key: {{ log.bambooKey }}</span>
-                            {% endif %}
-                            {% if log.triggeredBy == 'api' %}
-                                | <span>Trigger: API</span>
-                            {% elseif log.triggeredBy == 'interface' %}
-                                | <span>Trigger: Web</span>
-                            {% endif %}
-                            {% if log.userDisplayName %}
-                                | <span>User: {{ log.userDisplayName }}</span>
-                            {% endif %}
+                                    {% if log.vote %}
+                                        | <span>Vote: {{ log.vote }}</span>
+                                    {% endif %}
+                                    {% if log.branch %}
+                                        | <span>Branch: {{ log.branch }}</span>
+                                    {% endif %}
+                                    {% if log.change %}
+                                        | <span>Change: {{ log.change }}</span>
+                                    {% endif %}
+                                    {% if log.patch %}
+                                        | <span>Patch: {{ log.patch }}</span>
+                                    {% endif %}
+                                    {% if log.bambooKey %}
+                                        | <span>Bamboo key: {{ log.bambooKey }}</span>
+                                    {% endif %}
+                                    {% if log.triggeredBy == 'api' %}
+                                        | <span>Trigger: API</span>
+                                    {% elseif log.triggeredBy == 'interface' %}
+                                        | <span>Trigger: Web</span>
+                                    {% endif %}
+                                    {% if log.userDisplayName %}
+                                        | <span>User: {{ log.userDisplayName }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
