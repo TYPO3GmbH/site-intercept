@@ -99,6 +99,10 @@ location = %s {
      */
     public function findCurrentConfiguration(): ?\SplFileInfo
     {
+        if (!is_dir($this->getPrivateDirectory())) {
+            return null;
+        }
+
         $finder = new Finder();
         $files = $finder
             ->in($this->getPrivateDirectory())

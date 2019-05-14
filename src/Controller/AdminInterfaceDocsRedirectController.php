@@ -170,6 +170,6 @@ class AdminInterfaceDocsRedirectController extends AbstractController
     protected function createRedirectsAndDeploy(): void
     {
         $filename = $this->nginxService->createRedirectConfigFile();
-        //$this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
+        $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
     }
 }
