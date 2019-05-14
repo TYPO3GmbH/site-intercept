@@ -80,7 +80,7 @@ class DeploymentInformation
     /**
      * Constructor
      *
-     * @param array $composerJson
+     * @param ComposerJson $composerJson
      * @param PushEvent $pushEvent
      * @param string $privateDir
      * @param string $subDir
@@ -88,7 +88,7 @@ class DeploymentInformation
      * @throws DocsPackageDoNotCareBranch
      * @throws \RuntimeException
      */
-    public function __construct(array $composerJson, PushEvent $pushEvent, string $privateDir, string $subDir)
+    public function __construct(ComposerJson $composerJson, PushEvent $pushEvent, string $privateDir, string $subDir)
     {
         $this->repositoryUrl = $pushEvent->getRepositoryUrl();
         $packageName = $this->determinePackageName($composerJson);
@@ -146,6 +146,7 @@ class DeploymentInformation
         if ($result === 'latest' || $result === 'master') {
             return 'master';
         }
+
         // branch 'documentation-draft' becomes 'draft' (and is not indexed spiders later)
         if ($result === 'documentation-draft') {
             return 'draft';
@@ -164,7 +165,9 @@ class DeploymentInformation
             }
             // Remove patch level, '8.7.2' becomes '8.7'
             return implode('.', array_slice(explode('.', $result), 0, 2));
-        } elseif ($type === 'core-extension' || $type === 'manual') {
+        }
+
+        if ($type === 'core-extension' || $type === 'manual') {
             // Rules for manuals and core extensions - render branches like '8.5' as '8.5' and '8' as '8'
             $result = str_replace('_', '.', $result);
             $result = str_replace('-', '.', $result);
@@ -175,19 +178,19 @@ class DeploymentInformation
                 );
             }
             return $result;
-        } else {
-            // docs-home has only master branch, this is returned above already, safe to not handle this here.
-            throw new \RuntimeException('Unknown package type ' . $type);
         }
+
+        // docs-home has only master branch, this is returned above already, safe to not handle this here.
+        throw new \RuntimeException('Unknown package type ' . $type);
     }
 
     /**
-     * @param array $composerJson
+     * @param ComposerJson $composerJson
      * @param string $repositoryUrl
      * @return array
      * @throws ComposerJsonInvalidException
      */
-    private function determinePackageType(array $composerJson, string $repositoryUrl): array
+    private function determinePackageType(ComposerJson $composerJson, string $repositoryUrl): array
     {
         if ($repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git') {
             // Hard coded final location for the docs homepage repository
@@ -195,29 +198,26 @@ class DeploymentInformation
                 'h' => 'docs-home',
             ];
         }
-        if (empty($composerJson['type'])) {
-            throw new ComposerJsonInvalidException('No \'type\' defined in composer.json', 1553081747);
-        }
-        if (!array_key_exists($composerJson['type'], self::$typeMap)) {
+
+        if (!array_key_exists($composerJson->getType(), self::$typeMap)) {
             throw new ComposerJsonInvalidException('composer.json \'type\' must be set to one of ' . implode(', ', array_keys(self::$typeMap)) . '.', 1557490474);
         }
-        return self::$typeMap[$composerJson['type']];
+
+        return self::$typeMap[$composerJson->getType()];
     }
 
     /**
-     * @param array $composerJson
+     * @param ComposerJson $composerJson
      * @return array
      * @throws ComposerJsonInvalidException
      */
-    private function determinePackageName(array $composerJson): array
+    private function determinePackageName(ComposerJson $composerJson): array
     {
-        if (empty($composerJson['name'])) {
-            throw new ComposerJsonInvalidException('No \'name\' defined in composer.json', 1553082362);
+        if (!preg_match('/^[\w-]+\/[\w-]+$/', $composerJson->getName())) {
+            throw new ComposerJsonInvalidException('composer.json \'name\' must be of form \'vendor/package\', \'' . $composerJson->getName() . '\' given.', 1553082490);
         }
-        if (!preg_match('/^[\w-]+\/[\w-]+$/', $composerJson['name'])) {
-            throw new ComposerJsonInvalidException('composer.json \'name\' must be of form \'vendor/package\', \'' . $composerJson['name'] . '\' given.', 1553082490);
-        }
-        [$vendor, $name] = explode('/', $composerJson['name']);
+
+        [$vendor, $name] = explode('/', $composerJson->getName());
         return [$vendor => $name];
     }
 }

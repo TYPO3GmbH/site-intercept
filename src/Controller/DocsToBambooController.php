@@ -10,13 +10,17 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Exception\Composer\DocsComposerDependencyException;
+use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
+use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
+use App\Service\MailService;
 use App\Service\WebHookService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,6 +42,7 @@ class DocsToBambooController extends AbstractController
      * @param WebHookService $webhookService
      * @param DocumentationBuildInformationService $documentationBuildInformationService
      * @param LoggerInterface $logger
+     * @param MailService $mailService
      * @return Response
      */
     public function index(
@@ -45,12 +50,14 @@ class DocsToBambooController extends AbstractController
         BambooService $bambooService,
         WebHookService $webhookService,
         DocumentationBuildInformationService $documentationBuildInformationService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        MailService $mailService
     ): Response {
         try {
             $pushEvent = $webhookService->createPushEvent($request);
             $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
-            $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerJson);
+            $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
+            $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
             $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
             $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
@@ -69,6 +76,20 @@ class DocsToBambooController extends AbstractController
                 ]
             );
             return Response::create();
+        } catch (GithubHookPingException $e) {
+            // Hook payload is a 'github ping' - log that as "info / success' with the
+            // url that hook came from. This is triggered by github when a new web hook is added,
+            // we want to be nice and make this one succeed.
+            $logger->info(
+                'Docs hook ping from github repository ' . $e->getRespositoryUrl(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'githubPing',
+                    'triggeredBy' => 'api',
+                    'repository' => $e->getRespositoryUrl(),
+                ]
+            );
+            return Response::create('Received github ping. Please push content to the repository to render some documentation. See https://intercept.typo3.com for more information.', 200);
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
             $logger->warning(
@@ -141,7 +162,42 @@ class DocsToBambooController extends AbstractController
                     'sourceBranch' => $pushEvent->getVersionString(),
                 ]
             );
-            return Response::create('Branch or tag name ignored for decumentation rendering. See https://intercept.typo3.com for more information.', 412);
+            return Response::create('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', 412);
+        } catch (DocsComposerMissingValueException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'missingValueInComposerJson',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $pushEvent->getRepositoryUrl(),
+                    'package' => $composerAsObject->getName(),
+                    'sourceBranch' => $pushEvent->getVersionString(),
+                ]
+            );
+            return Response::create('A mandatory value is missing in the composer.json. See https://intercept.typo3.com for more information.', 412);
+        } catch (DocsComposerDependencyException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'coreDependencyNotSet',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $pushEvent->getRepositoryUrl(),
+                    'package' => $composerAsObject->getName(),
+                    'sourceBranch' => $pushEvent->getVersionString(),
+                ]
+            );
+
+            if (filter_var($composerAsObject->getFirstAuthor()['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
+                $mailService->sendMailToAuthorDueToMissingDependency($pushEvent, $composerAsObject, $e->getMessage());
+            }
+
+            return Response::create('Dependencies are not fulfilled. See https://intercept.typo3.com for more information.', 412);
         }
     }
 }

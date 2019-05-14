@@ -8,8 +8,5 @@
             "name": "John Doe",
             "email": "john.doe@example.com"
         }
-    ],
-    "require": {
-        "typo3/cms-core": "^8.7.0 || ^9.5.0"
-    }
+    ]
 }

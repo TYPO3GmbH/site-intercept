@@ -12,8 +12,10 @@ namespace App\Service;
 
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
+use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
+use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
 use App\Repository\DocumentationJarRepository;
@@ -58,6 +60,8 @@ class DocumentationBuildInformationService
     private $client;
 
     /**
+     * Constructor
+     *
      * @param string $privateDir
      * @param string $subDir
      * @param EntityManagerInterface $entityManager
@@ -101,17 +105,29 @@ class DocumentationBuildInformationService
     }
 
     /**
+     * @param array $composerJson
+     * @return ComposerJson
+     */
+    public function getComposerJsonObject(array $composerJson): ComposerJson
+    {
+        return new ComposerJson($composerJson);
+    }
+
+    /**
      * Create main deployment information from push event. This object will later be sanitized using
      * other methods of that service and dumped to disk for bamboo to fetch it again.
      *
      * @param PushEvent $pushEvent
-     * @param array $composerJson
+     * @param ComposerJson $composerJson
      * @return DeploymentInformation
      * @throws \App\Exception\ComposerJsonInvalidException
      * @throws \App\Exception\DocsPackageDoNotCareBranch
+     * @throws DocsComposerDependencyException
      */
-    public function generateBuildInformation(PushEvent $pushEvent, array $composerJson): DeploymentInformation
+    public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {
+        $this->assertComposerJsonContainsNecessaryData($composerJson);
+
         return new DeploymentInformation($composerJson, $pushEvent, $this->privateDir, $this->subDir);
     }
 
@@ -208,6 +224,17 @@ class DocumentationBuildInformationService
                 ->setTypeShort($deploymentInformation->typeShort);
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
+        }
+    }
+
+    /**
+     * @param ComposerJson $composerJson
+     * @throws DocsComposerDependencyException
+     */
+    private function assertComposerJsonContainsNecessaryData(ComposerJson $composerJson): void
+    {
+        if (!$composerJson->requires('typo3/cms-core')) {
+            throw new DocsComposerDependencyException('Dependency typo3/cms-core is missing', 1557310527);
         }
     }
 }

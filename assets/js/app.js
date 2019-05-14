@@ -11,9 +11,11 @@ require('./libs/navbar.js');
 
 // We need bootstrap collapse
 var { DateTime } = require('luxon');
+import hljs from 'highlightjs';
 
 $(document).ready(function () {
     convertDates();
+    hljs.initHighlightingOnLoad();
 });
 
 function convertDates() {

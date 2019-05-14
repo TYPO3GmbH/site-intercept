@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Extractor;
 
+use App\Extractor\ComposerJson;
 use App\Bundle\ClockMockBundle;
-use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 class DeploymentInformationTest extends TestCase
 {
@@ -35,7 +34,7 @@ class DeploymentInformationTest extends TestCase
             'type' => 'typo3-cms-extension',
         ];
 
-        $subject = new DeploymentInformation($composerJsonAsArray, $pushEvent, '/tmp/foo', 'bar');
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
 
         $this->assertSame('https://github.com/lolli42/enetcache/', $subject->repositoryUrl);
         $this->assertSame('foobar', $subject->vendor);
@@ -74,7 +73,7 @@ class DeploymentInformationTest extends TestCase
             'type_long' => 'extension',
             'type_short' => 'p',
         ];
-        $subject = new DeploymentInformation($composerJsonAsArray, $pushEvent, '/tmp/foo', 'bar');
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame($expected, $subject->toArray());
     }
 
@@ -111,7 +110,7 @@ class DeploymentInformationTest extends TestCase
             'type' => 'typo3-cms-extension',
         ];
 
-        $subject = new DeploymentInformation($composerJsonAsArray, $pushEvent, '/tmp/foo', 'bar');
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame($expectedVendor, $subject->vendor);
         $this->assertSame($expectedName, $subject->name);
         $this->assertSame($packageName, $subject->packageName);
@@ -123,8 +122,8 @@ class DeploymentInformationTest extends TestCase
     public function invalidPackageNameDataProvider(): array
     {
         return [
-            ['', 1553082362],
-            [null, 1553082362],
+            ['', 1557309364],
+            [null, 1557309364],
             ['baz', 1553082490],
             ['3245345', 1553082490],
             ['husel_pusel:foobar', 1553082490],
@@ -139,8 +138,8 @@ class DeploymentInformationTest extends TestCase
      */
     public function invalidPackageNameThrowException(?string $packageName, int $expectedExceptionCode): void
     {
-        $this->expectException(ComposerJsonInvalidException::class);
         $this->expectExceptionCode($expectedExceptionCode);
+
         $pushEvent = new PushEvent(
             'https://github.com/lolli42/enetcache/',
             'master',
@@ -150,7 +149,7 @@ class DeploymentInformationTest extends TestCase
             'name' => $packageName,
             'type' => 'typo3-cms-extension',
         ];
-        new DeploymentInformation($composerJsonAsArray, $pushEvent, '/tmp/foo', 'bar');
+        new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
     }
 
     /**
@@ -183,7 +182,7 @@ class DeploymentInformationTest extends TestCase
             'name' => 'foobar/bazfnord',
             'type' => $type,
         ];
-        $subject = new DeploymentInformation($composerJsonAsArray, $pushEvent, '/tmp/foo', 'bar');
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame($expectedLong, $subject->typeLong);
         $this->assertSame($expectedShort, $subject->typeShort);
     }
@@ -191,7 +190,7 @@ class DeploymentInformationTest extends TestCase
     /**
      * @test
      */
-    public function docsHomeTypeIsDetected()
+    public function docsHomeTypeIsDetected(): void
     {
         $pushEvent = new PushEvent(
             'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
@@ -202,7 +201,7 @@ class DeploymentInformationTest extends TestCase
             'name' => 'foobar/bazfnord',
             'type' => 'does-not-matter-here',
         ];
-        $subject = new DeploymentInformation($composerJsonAsArray, $pushEvent, '/tmp/foo', 'bar');
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame('docs-home', $subject->typeLong);
         $this->assertSame('h', $subject->typeShort);
     }
@@ -215,11 +214,11 @@ class DeploymentInformationTest extends TestCase
         return [
             'empty string' => [
                 '',
-                1553081747
+                1557309364
             ],
             'nothing set' => [
                 null,
-                1553081747
+                1557309364
             ],
             'something else' => [
                 'something',
@@ -230,12 +229,12 @@ class DeploymentInformationTest extends TestCase
 
     /**
      * @param string $type
+     * @param int $exceptionCode
      * @dataProvider invalidPackageTypeDataProvider
      * @test
      */
     public function invalidPackageTypesThrowException(?string $type, int $exceptionCode): void
     {
-        $this->expectException(ComposerJsonInvalidException::class);
         $this->expectExceptionCode($exceptionCode);
 
         $pushEvent = new PushEvent(
@@ -248,7 +247,7 @@ class DeploymentInformationTest extends TestCase
             'type' => $type,
         ];
 
-        new DeploymentInformation($composerJsonAsArray, $pushEvent, '/tmp/foo', 'bar');
+        new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
     }
 
     /**
@@ -414,7 +413,7 @@ class DeploymentInformationTest extends TestCase
             'type' => $type,
         ];
 
-        $subject = new DeploymentInformation($composerJsonAsArray, $pushEvent, '/tmp/foo', 'bar');
+        $subject = new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame($expectedBranch, $subject->targetBranchDirectory);
     }
 
@@ -483,7 +482,9 @@ class DeploymentInformationTest extends TestCase
     }
 
     /**
+     * @param string $type
      * @param string $branch
+     * @param int $exceptionCode
      * @dataProvider invalidBranchNameDataProvider
      * @test
      */
@@ -502,6 +503,6 @@ class DeploymentInformationTest extends TestCase
             'type' => $type,
         ];
 
-        $subject = new DeploymentInformation($composerJsonAsArray, $pushEvent, '/tmp/foo', 'bar');
+        new DeploymentInformation(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
     }
 }

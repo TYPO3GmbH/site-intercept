@@ -25,6 +25,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "luxon": "^1.13.2"
+        "luxon": "^1.13.2",
+        "highlightjs": "^9.12.0"
     }
 }
