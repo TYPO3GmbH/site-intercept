@@ -76,7 +76,7 @@ class AdminInterfaceDocsController extends AbstractController
             }
         }
 
-        $recentLogsMessages = $graylogService->getRecentBambooDocsTriggers();
+        $recentLogsMessages = $graylogService->getRecentBambooDocsFluidVhTriggers();
 
         return $this->render(
             'docs.html.twig',

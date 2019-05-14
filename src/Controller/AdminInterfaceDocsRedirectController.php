@@ -54,27 +54,16 @@ class AdminInterfaceDocsRedirectController extends AbstractController
      */
     public function index(DocsServerRedirectRepository $redirectRepository): Response
     {
+        $currentConfigurationFile = $this->nginxService->findCurrentConfiguration();
         $this->logger->info('Triggered: ' . __CLASS__ . '::' . __METHOD__, [
             'type' => 'docsRedirectIndex',
             'triggeredBy' => 'interface',
         ]);
-        return $this->render('redirect/index.html.twig', ['redirects' => $redirectRepository->findAll()]);
-    }
 
-    /**
-     * @Route("/get/{filename}", name="admin_redirect_get", methods={"GET"})
-     * @param string $filename
-     * @return Response
-     * @codeCoverageIgnore the code is tested with service tests
-     */
-    public function get(string $filename): Response
-    {
-        $this->logger->info('Triggered: ' . __CLASS__ . '::' . __METHOD__, [
-            'type' => 'docsRedirectGet',
-            'triggeredBy' => 'interface',
-            'filename' => $filename,
+        return $this->render('redirect/index.html.twig', [
+            'redirects' => $redirectRepository->findAll(),
+            'currentConfiguration' => $currentConfigurationFile,
         ]);
-        return new Response($this->nginxService->getFileContent($filename));
     }
 
     /**

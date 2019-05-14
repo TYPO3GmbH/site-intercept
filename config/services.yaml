@@ -80,6 +80,15 @@ services:
         tags:
             - testDouble
 
+    App\Service\DocsServerNginxService:
+        class: App\Service\DocsServerNginxService
+        public: true
+        arguments:
+            $privateDir: '%kernel.project_dir%/var'
+            $subDir: 'docs-redirects'
+        tags:
+            - testDouble
+
     App\Service\RabbitPublisherService:
         class: App\Service\RabbitPublisherService
         arguments:

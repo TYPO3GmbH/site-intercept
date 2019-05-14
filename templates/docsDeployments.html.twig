@@ -33,8 +33,9 @@
             <th>Id</th>
             <th>Repository URL</th>
             <th>Package Name</th>
+            <th>Type</th>
             <th>Branch</th>
-            <th>Target Branch Directory</th>
+            <th>Target Directory</th>
             <th>Created at</th>
             <th>Last rendered at</th>
         </tr>
@@ -45,8 +46,13 @@
                 <td>{{ deployment.id }}</td>
                 <td><a href="{{ deployment.repositoryUrl }}">{{ deployment.repositoryUrl }}</a></td>
                 <td>{{ deployment.packageName }}</td>
+                <td>{{ deployment.typeLong }}</td>
                 <td>{{ deployment.branch }}</td>
-                <td>{{ deployment.targetBranchDirectory }}</td>
+                <td>
+                    <a href="{{ docsLiveServer }}/{{ deployment.typeShort }}/{{ deployment.packageName }}/{{ deployment.targetBranchDirectory }}">
+                        {{ deployment.targetBranchDirectory }}
+                    </a>
+                </td>
                 <td>
                     <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
                         {{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}
@@ -70,14 +76,44 @@
         Recent actions
     </h2>
     {% for log in logMessages %}
-        <div class="alert graylog-log alert-success">
+        <div class="alert graylog-log
+                alert-success
+                {% if log.level == '6' %}
+                    alert-success
+                {% else %}
+                    alert-warning
+                {% endif %}
+            "
+        >
             <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
             <span>
-                <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo Fluid View Helper rendering</a>
+                {% if log.status == 'triggered' %}
+                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">{{ log.message }}</a>
+                {% else %}
+                    {{ log.message }}
+                {% endif %}
             </span>
 
             {% if log.bambooKey %}
                 | <span>Bamboo key: {{ log.bambooKey }}</span>
+            {% endif %}
+            {% if log.package %}
+                | <span>Package: {{ log.package }}</span>
+            {% endif %}
+            {% if log.sourceBranch %}
+                | <span>Branch: {{ log.sourceBranch }}</span>
+            {% endif %}
+            {% if log.targetBranch %}
+                | <span>Target directory: {{ log.targetBranch }}</span>
+            {% endif %}
+            {% if log.repository %}
+                | <span>Repository: {{ log.repository }}</span>
+            {% endif %}
+            {% if log.composerFile %}
+                | <span>Composer file: {{ log.composerFile }}</span>
+            {% endif %}
+            {% if log.exceptionCode %}
+                | <span>Exception Code: {{ log.exceptionCode }}</span>
             {% endif %}
             {% if log.triggeredBy == 'api' %}
                 | <span>Trigger: API</span>

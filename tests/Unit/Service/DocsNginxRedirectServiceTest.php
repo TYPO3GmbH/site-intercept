@@ -7,7 +7,6 @@ use App\Repository\DocsServerRedirectRepository;
 use App\Service\DocsServerNginxService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class DocsNginxRedirectServiceTest extends TestCase
 {
@@ -36,19 +35,18 @@ class DocsNginxRedirectServiceTest extends TestCase
                 ->setUpdatedAt(new \DateTime('2019-03-20 13:00:00'))
                 ->setStatusCode(301),
         ]);
-        $kernelProphecy = $this->prophesize(KernelInterface::class);
-        $kernelProphecy->getCacheDir()->willReturn('/tmp/');
         $this->subject = new DocsServerNginxService(
             $redirectRepositoryProphecy->reveal(),
-            $kernelProphecy->reveal(),
-            new Filesystem()
+            new Filesystem(),
+            '/tmp/',
+            'docs-redirects'
         );
     }
 
     /**
      * @test
      */
-    public function createRedirectConfigFileCreatesAValidConfigFile()
+    public function createRedirectConfigFileCreatesAValidConfigFile(): void
     {
         $filename = $this->subject->createRedirectConfigFile();
         $fileContent = file_get_contents($filename);
@@ -67,10 +65,10 @@ class DocsNginxRedirectServiceTest extends TestCase
     /**
      * @test
      */
-    public function getFileContent()
+    public function existingConfigurationGetsContent(): void
     {
-        $filename = $this->subject->createRedirectConfigFile();
-        $fileContent = $this->subject->getFileContent(basename($filename));
+        $this->subject->createRedirectConfigFile();
+        $fileContent = $this->subject->findCurrentConfiguration()->getContents();
 
         $this->assertContains('# Rule: 1 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00', $fileContent);
         $this->assertContains('location = /p/vendor/packageOld/1.0/Foo.html {', $fileContent);

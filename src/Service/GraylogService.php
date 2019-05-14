@@ -64,12 +64,27 @@ class GraylogService
     }
 
     /**
-     * Log entries related to documentation tasks. Shown on documentation
-     * site in web interface.
+     * Log entries related to documentation rendering via bamboo to (new)
+     * docs server.
      *
      * @return GraylogLogEntry[]
      */
-    public function getRecentBambooDocsTriggers(): array
+    public function getRecentBambooDocsActions(): array
+    {
+        return $this->getLogs(
+            'application:intercept'
+            . ' AND env:' . getenv('GRAYLOG_ENV')
+            . ' AND (ctxt_type:docsRendering)'
+        );
+    }
+
+    /**
+     * Log entries related to documentation fluid vh rendering tasks.
+     * Shown on documentation site in web interface.
+     *
+     * @return GraylogLogEntry[]
+     */
+    public function getRecentBambooDocsFluidVhTriggers(): array
     {
         return $this->getLogs(
             'application:intercept AND level:6'

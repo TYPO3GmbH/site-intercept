@@ -16,6 +16,7 @@ use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
+use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
@@ -60,7 +61,7 @@ class DocsToBambooController extends AbstractController
             $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
             $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
-            $bambooService->triggerDocumentationPlan($buildInformation);
+            $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
             $logger->info(
                 'Triggered docs build',
                 [
@@ -70,10 +71,25 @@ class DocsToBambooController extends AbstractController
                     'repository' => $buildInformation->repositoryUrl,
                     'package' => $buildInformation->packageName,
                     'sourceBranch' => $buildInformation->sourceBranch,
-                    'targetBranchDirectory' => $buildInformation->targetBranchDirectory,
+                    'targetBranch' => $buildInformation->targetBranchDirectory,
+                    'bambooKey' => $bambooBuildTriggered->buildResultKey,
                 ]
             );
             return Response::create();
+        } catch (GithubHookPingException $e) {
+            // Hook payload is a 'github ping' - log that as "info / success' with the
+            // url that hook came from. This is triggered by github when a new web hook is added,
+            // we want to be nice and make this one succeed.
+            $logger->info(
+                'Docs hook ping from github repository ' . $e->getRespositoryUrl(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'githubPing',
+                    'triggeredBy' => 'api',
+                    'repository' => $e->getRespositoryUrl(),
+                ]
+            );
+            return Response::create('Received github ping. Please push content to the repository to render some documentation. See https://intercept.typo3.com for more information.', 200);
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
             $logger->warning(

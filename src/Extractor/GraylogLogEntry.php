@@ -76,17 +76,17 @@ class GraylogLogEntry
     public $uuid;
 
     /**
-     * @var string Optionally set for core split/tag jobs
+     * @var string Optionally set for core split/tag jobs, also used in docs rendering
      */
     public $status;
 
     /**
-     * @var string Optionally set for core split/tag jobs
+     * @var string Optionally set for core split/tag jobs, also used in docs rendering
      */
     public $sourceBranch;
 
     /**
-     * @var string Optionally set for core split/tag jobs
+     * @var string Optionally set for core split/tag jobs, also used in docs rendering
      */
     public $targetBranch;
 
@@ -104,6 +104,26 @@ class GraylogLogEntry
      * @var string Optional LDAP display name that triggered something
      */
     public $userDisplayName;
+
+    /**
+     * @var string Optional 'exception code', used in docs rendering, timestamp
+     */
+    public $exceptionCode;
+
+    /**
+     * @var string Optional 'repository url', used in docs rendering
+     */
+    public $repository;
+
+    /**
+     * @var string Optional 'composer file url', used in docs rendering
+     */
+    public $composerFile;
+
+    /**
+     * @var string Optional package name, used in docs rendering, eg. 'lolli42/enetcache'
+     */
+    public $package;
 
     /**
      * Extract information from a graylog log entry
@@ -141,5 +161,10 @@ class GraylogLogEntry
 
         $this->username = $entry['username'] ?? '';
         $this->userDisplayName = $entry['userDisplayName'] ?? '';
+
+        $this->exceptionCode = $entry['ctxt_exceptionCode'] ?? '';
+        $this->repository = $entry['ctxt_repository'] ?? '';
+        $this->composerFile = $entry['ctxt_composerFile'] ?? '';
+        $this->package = $entry['ctxt_package'] ?? '';
     }
 }
