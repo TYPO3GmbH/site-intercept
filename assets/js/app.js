@@ -3,6 +3,7 @@ import '../css/app.scss';
 // We need bootstrap collapse
 import collapse from 'bootstrap/js/src/collapse';
 var { DateTime } = require('luxon');
+import hljs from 'highlightjs';
 
 import $ from 'jquery';
 
@@ -20,6 +21,8 @@ $(document).ready(function() {
     }
   });
   convertDates();
+
+  hljs.initHighlightingOnLoad();
 });
 
 function convertDates() {

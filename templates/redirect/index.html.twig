@@ -56,9 +56,7 @@
                 </div>
 
                 <div id="collapse_nginxConfigurationFile_{{ currentConfiguration.ctime }}" class="collapse" aria-labelledby="heading_nginxConfigurationFile_{{ currentConfiguration.ctime }}" data-parent="#nginxConfigurationFiles">
-                    <div class="card-body">
-                        <pre>{{ currentConfiguration.contents }}</pre>
-                    </div>
+                    <pre><code class="nginx">{{ currentConfiguration.contents }}</code></pre>
                 </div>
             </div>
         </div>
