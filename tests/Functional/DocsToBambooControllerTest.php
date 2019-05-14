@@ -61,4 +61,20 @@ class DocsToBambooControllerTest extends KernelTestCase
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
     }
+
+    /**
+     * @test
+     */
+    public function githubPingIsHandled()
+    {
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
+        $request = require __DIR__ . '/Fixtures/DocsToBambooGithubPingRequest.php';
+        $response = $kernel->handle($request);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertStringContainsString('github ping', $response->getContent());
+        $kernel->terminate($request, $response);
+    }
 }

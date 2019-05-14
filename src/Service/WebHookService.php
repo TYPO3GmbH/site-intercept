@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class WebHookService
 {
+    /**
+     * Entry method that creates a push event object from an incoming
+     * github / gitlab / bitbucket repository hook. Used to trigger documentation
+     * rendering.
+     */
     public function createPushEvent(Request $request): PushEvent
     {
         if ($request->headers->get('X-Event-Key', '') === 'repo:push') {
@@ -33,6 +39,10 @@ class WebHookService
         }
         if (in_array($request->headers->get('X-GitHub-Event', ''), ['push', 'release'], true)) {
             return $this->getPushEventFromGithub($request, $request->headers->get('X-GitHub-Event'));
+        }
+        if (in_array($request->headers->get('X-GitHub-Event', ''), ['ping'], true)) {
+            $payload = json_decode($request->getContent());
+            throw new GithubHookPingException('', 1557838026, null, (string)$payload->repository->html_url);
         }
         throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1553256930);
     }
@@ -45,15 +55,15 @@ class WebHookService
         $versionString = (string)$payload->push->changes[0]->new->name;
         $urlToComposerFile = str_replace(
             [
-            '{projectUrl}',
-            '{repoName}',
-            '{versionString}',
-        ],
+                '{projectUrl}',
+                '{repoName}',
+                '{versionString}',
+            ],
             [
-            (string)$payload->repository->project->links->html->href,
-            (string)$payload->repository->name,
-            $versionString
-        ],
+                (string)$payload->repository->project->links->html->href,
+                (string)$payload->repository->name,
+                $versionString
+            ],
             '{projectUrl}/repos/{repoName}/raw/composer.json?at=refs%2Fheads%2F{versionString}'
         );
         return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
@@ -66,13 +76,13 @@ class WebHookService
         $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
         $urlToComposerFile = str_replace(
             [
-            '{webUrl}',
-            '{versionString}',
-        ],
+                '{webUrl}',
+                '{versionString}',
+            ],
             [
-            (string)$payload->project->web_url,
-            $versionString
-        ],
+                (string)$payload->project->web_url,
+                $versionString
+            ],
             '{webUrl}/raw/{versionString}/composer.json'
         );
         return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
@@ -88,13 +98,13 @@ class WebHookService
 
         $urlToComposerFile = str_replace(
             [
-            '{repoFullName}',
-            '{versionString}',
-        ],
+                '{repoFullName}',
+                '{versionString}',
+            ],
             [
-            (string)$payload->repository->full_name,
-            $versionString
-        ],
+                (string)$payload->repository->full_name,
+                $versionString
+            ],
             'https://raw.githubusercontent.com/{repoFullName}/{versionString}/composer.json'
         );
         return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
