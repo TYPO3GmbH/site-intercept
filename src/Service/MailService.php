@@ -67,9 +67,7 @@ class MailService
     private function createMessageWithTemplate(string $subject, string $templateFile, array $templateVariables): \Swift_Message
     {
         $message = new \Swift_Message($subject);
-        $message->setBody(
-            $this->templating->render($templateFile, $templateVariables)
-        );
+        $message->setBody($this->templating->render($templateFile, $templateVariables), 'text/html');
 
         return $message;
     }
