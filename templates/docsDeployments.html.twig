@@ -33,6 +33,7 @@
             <th>Id</th>
             <th>Repository URL</th>
             <th>Package Name</th>
+            <th>Type</th>
             <th>Branch</th>
             <th>Target Directory</th>
             <th>Created at</th>
@@ -45,8 +46,13 @@
                 <td>{{ deployment.id }}</td>
                 <td><a href="{{ deployment.repositoryUrl }}">{{ deployment.repositoryUrl }}</a></td>
                 <td>{{ deployment.packageName }}</td>
+                <td>{{ deployment.typeLong }}</td>
                 <td>{{ deployment.branch }}</td>
-                <td>{{ deployment.targetBranchDirectory }}</td>
+                <td>
+                    <a href="{{ docsLiveServer }}/{{ deployment.typeShort }}/{{ deployment.packageName }}/{{ deployment.targetBranchDirectory }}">
+                        {{ deployment.targetBranchDirectory }}
+                    </a>
+                </td>
                 <td>
                     <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
                         {{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}

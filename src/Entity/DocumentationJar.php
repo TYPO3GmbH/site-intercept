@@ -55,11 +55,63 @@ class DocumentationJar
      */
     private $targetBranchDirectory;
 
+    /**
+     * @ORM\Column(type="string", length=255, options={"default": ""})
+     */
+    private $typeLong;
+
+    /**
+     * @ORM\Column(type="string", length=255, options={"default": ""})
+     */
+    private $typeShort;
+
+    /**
+     * @return mixed
+     */
+    public function getTypeShort(): ?string
+    {
+        return $this->typeShort;
+    }
+
+    /**
+     * @param mixed $typeShort
+     * @return DocumentationJar
+     */
+    public function setTypeShort(string $typeShort): self
+    {
+        $this->typeShort = $typeShort;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTypeLong(): ?string
+    {
+        return $this->typeLong;
+    }
+
+    /**
+     * @param mixed $typeLong
+     * @return DocumentationJar
+     */
+    public function setTypeLong(string $typeLong): self
+    {
+        $this->typeLong = $typeLong;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getRepositoryUrl(): ?string
     {
         return $this->repositoryUrl;

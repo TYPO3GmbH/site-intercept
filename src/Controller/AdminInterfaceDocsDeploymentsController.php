@@ -55,6 +55,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 'logMessages' => $recentLogsMessages,
                 'deployments' => $documentationJarRepository->findAll(),
                 'bambooStatus' => $bambooService->getBambooStatus(),
+                'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),
             ]
         );
     }
