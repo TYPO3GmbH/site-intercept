@@ -170,7 +170,7 @@ class AdminInterfaceSplitCoreControllerTest extends AbstractFunctionalWebTestCas
 
         // The branch is shown
         $this->assertRegExp(
-            '/Triggered split job for core branch &quot;master&quot;/',
+            '/Triggered split job for core branch "master"/',
             $client->getResponse()->getContent()
         );
     }
@@ -213,7 +213,7 @@ class AdminInterfaceSplitCoreControllerTest extends AbstractFunctionalWebTestCas
 
         // The tag is shown
         $this->assertRegExp(
-            '/Triggered tag job with tag &quot;v9.5.1&quot;/',
+            '/Triggered tag job with tag "v9.5.1"/',
             $client->getResponse()->getContent()
         );
     }
