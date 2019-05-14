@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Exception\Composer\DocsComposerDependencyException;
+use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
@@ -146,6 +147,21 @@ class DocsToBambooController extends AbstractController
                 ]
             );
             return Response::create('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', 412);
+        } catch (DocsComposerMissingValueException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'missingValueInComposerJson',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $pushEvent->getRepositoryUrl(),
+                    'package' => $composerAsObject->getName(),
+                    'sourceBranch' => $pushEvent->getVersionString(),
+                ]
+            );
+            return Response::create('A mandatory value is missing in the composer.json. See https://intercept.typo3.com for more information.', 412);
         } catch (DocsComposerDependencyException $e) {
             $logger->warning(
                 'Can not render documentation: ' . $e->getMessage(),
