@@ -13,7 +13,6 @@ namespace App\Service;
 use App\Repository\DocsServerRedirectRepository;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * This class creates a nginx configuration file which contains all redirects from database.
