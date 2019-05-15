@@ -14,6 +14,7 @@ use App\Form\DocsServerRedirectType;
 use App\Repository\DocsServerRedirectRepository;
 use App\Service\BambooService;
 use App\Service\DocsServerNginxService;
+use App\Service\GraylogService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,19 +51,17 @@ class AdminInterfaceDocsRedirectController extends AbstractController
     /**
      * @Route("/", name="admin_redirect_index", methods={"GET"})
      * @param DocsServerRedirectRepository $redirectRepository
+     * @param GraylogService $graylogService
      * @return Response
      */
-    public function index(DocsServerRedirectRepository $redirectRepository): Response
+    public function index(DocsServerRedirectRepository $redirectRepository, GraylogService $graylogService): Response
     {
         $currentConfigurationFile = $this->nginxService->findCurrentConfiguration();
-        $this->logger->info('Triggered: ' . __CLASS__ . '::' . __METHOD__, [
-            'type' => 'docsRedirectIndex',
-            'triggeredBy' => 'interface',
-        ]);
-
+        $recentLogsMessages = $graylogService->getRecentRedirectActions();
         return $this->render('redirect/index.html.twig', [
             'redirects' => $redirectRepository->findAll(),
             'currentConfiguration' => $currentConfigurationFile,
+            'logMessages' => $recentLogsMessages,
         ]);
     }
 
@@ -73,10 +72,6 @@ class AdminInterfaceDocsRedirectController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        $this->logger->info('Triggered: ' . __CLASS__ . '::' . __METHOD__, [
-            'type' => 'docsRedirectNew',
-            'triggeredBy' => 'interface',
-        ]);
         $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $redirect = new DocsServerRedirect();
         $form = $this->createForm(DocsServerRedirectType::class, $redirect);
@@ -87,7 +82,7 @@ class AdminInterfaceDocsRedirectController extends AbstractController
             $entityManager->persist($redirect);
             $entityManager->flush();
 
-            $this->createRedirectsAndDeploy();
+            $this->createRedirectsAndDeploy('new', $redirect);
             return $this->redirectToRoute('admin_redirect_index');
         }
 
@@ -104,11 +99,6 @@ class AdminInterfaceDocsRedirectController extends AbstractController
      */
     public function show(DocsServerRedirect $redirect): Response
     {
-        $this->logger->info('Triggered: ' . __CLASS__ . '::' . __METHOD__, [
-            'type' => 'docsRedirectShow',
-            'triggeredBy' => 'interface',
-            'redirect' => $redirect,
-        ]);
         $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         return $this->render('redirect/show.html.twig', ['redirect' => $redirect]);
     }
@@ -121,11 +111,6 @@ class AdminInterfaceDocsRedirectController extends AbstractController
      */
     public function edit(Request $request, DocsServerRedirect $redirect): Response
     {
-        $this->logger->info('Triggered: ' . __CLASS__ . '::' . __METHOD__, [
-            'type' => 'docsRedirectEdit',
-            'triggeredBy' => 'interface',
-            'redirect' => $redirect,
-        ]);
         $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $form = $this->createForm(DocsServerRedirectType::class, $redirect);
         $form->handleRequest($request);
@@ -133,7 +118,7 @@ class AdminInterfaceDocsRedirectController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            $this->createRedirectsAndDeploy();
+            $this->createRedirectsAndDeploy('edit', $redirect);
             return $this->redirectToRoute('admin_redirect_index', ['id' => $redirect->getId()]);
         }
 
@@ -151,25 +136,36 @@ class AdminInterfaceDocsRedirectController extends AbstractController
      */
     public function delete(Request $request, DocsServerRedirect $redirect): Response
     {
-        $this->logger->info('Triggered: ' . __CLASS__ . '::' . __METHOD__, [
-            'type' => 'docsRedirectDelete',
-            'triggeredBy' => 'interface',
-            'redirect' => $redirect,
-        ]);
         $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         if ($this->isCsrfTokenValid('delete' . $redirect->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($redirect);
             $entityManager->flush();
-            $this->createRedirectsAndDeploy();
+            $this->createRedirectsAndDeploy('delete', $redirect);
         }
 
         return $this->redirectToRoute('admin_redirect_index');
     }
 
-    protected function createRedirectsAndDeploy(): void
+    /**
+     * @param string $triggeredBySubType
+     * @param DocsServerRedirect $redirect
+     */
+    protected function createRedirectsAndDeploy(string $triggeredBySubType, DocsServerRedirect $redirect): void
     {
         $filename = $this->nginxService->createRedirectConfigFile();
-        $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
+        $bambooBuildTriggered = $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
+
+        $this->logger->info(
+            'Triggered redirects deployment',
+            [
+                'type' => 'docsRedirect',
+                'status' => 'triggered',
+                'triggeredBy' => 'interface',
+                'subType' => $triggeredBySubType,
+                'redirect' => $redirect->toArray(),
+                'bambooKey' => $bambooBuildTriggered->buildResultKey,
+            ]
+        );
     }
 }

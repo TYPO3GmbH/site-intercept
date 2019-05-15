@@ -58,6 +58,55 @@
                 </div>
             {% endif %}
 
+            {% if logMessages %}
+                <div class="row mb-4">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="card shadow">
+                            <div class="card-header">
+                                <h2>
+                                    Recent actions
+                                </h2>
+                            </div>
+                            <div class="card-body">
+                                {% for log in logMessages %}
+                                    <div class="alert graylog-log alert-info">
+                                        <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
+                                        <span>
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo Documentation Redirects</a>
+                                        </span>
+
+                                        {% if log.bambooKey %}
+                                            | <span>Bamboo key: {{ log.bambooKey }}</span>
+                                        {% endif %}
+                                        {% if log.triggeredBy == 'api' %}
+                                            | <span>Trigger: API</span>
+                                        {% elseif log.triggeredBy == 'interface' %}
+                                            | <span>Trigger: Web</span>
+                                        {% endif %}
+                                        {% if log.subType %}
+                                            | <span>Action: {{ log.subType }}</span>
+                                        {% endif %}
+                                        {% if log.userDisplayName %}
+                                            | <span>User: {{ log.userDisplayName }}</span>
+                                        {% endif %}
+                                        {% if log.redirect %}
+                                            {% if log.redirect.id %}
+                                                | <span>ID: {{ log.redirect.id }}</span>
+                                            {% endif %}
+                                            {% if log.redirect.source %}
+                                                | <span>Source: {{ log.redirect.source }}</span>
+                                            {% endif %}
+                                            {% if log.redirect.target %}
+                                                | <span>Target: {{ log.redirect.target }}</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 

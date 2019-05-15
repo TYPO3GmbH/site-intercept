@@ -46,6 +46,11 @@ class GraylogLogEntry
     public $triggeredBy;
 
     /**
+     * @var string Optional action that triggered the invocation
+     */
+    public $subType;
+
+    /**
      * @var string Optionally set for specific types
      */
     public $branch;
@@ -126,6 +131,11 @@ class GraylogLogEntry
     public $package;
 
     /**
+     * @var array Optional redirect data
+     */
+    public $redirect;
+
+    /**
      * Extract information from a graylog log entry
      *
      * @param array $entry
@@ -142,6 +152,7 @@ class GraylogLogEntry
             throw new \RuntimeException('ctxt_triggeredBy must be either "api" or "interface", ' . $entry['ctxt_triggeredBy'] . ' given.');
         }
         $this->type = $entry['ctxt_type'];
+        $this->subType = $entry['ctxt_subType'] ?? '';
         $this->time = new \DateTime($entry['timestamp']);
         $this->env = $entry['env'];
         $this->level = (int)$entry['level'];
@@ -166,5 +177,7 @@ class GraylogLogEntry
         $this->repository = $entry['ctxt_repository'] ?? '';
         $this->composerFile = $entry['ctxt_composerFile'] ?? '';
         $this->package = $entry['ctxt_package'] ?? '';
+
+        $this->redirect = json_decode($entry['ctxt_redirect'] ?? '{}', true);
     }
 }

@@ -79,6 +79,21 @@ class GraylogService
     }
 
     /**
+     * Log entries related to documentation redirects via bamboo to (new)
+     * docs server.
+     *
+     * @return GraylogLogEntry[]
+     */
+    public function getRecentRedirectActions(): array
+    {
+        return $this->getLogs(
+            'application:intercept'
+            . ' AND env:' . getenv('GRAYLOG_ENV')
+            . ' AND (ctxt_type:docsRedirect)'
+        );
+    }
+
+    /**
      * Log entries related to documentation fluid vh rendering tasks.
      * Shown on documentation site in web interface.
      *
