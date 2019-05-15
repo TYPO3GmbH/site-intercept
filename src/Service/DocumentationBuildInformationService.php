@@ -132,6 +132,26 @@ class DocumentationBuildInformationService
     }
 
     /**
+     * Create main deployment information from a DocumentationJar instance. This object will later be sanitized using
+     * other methods of that service and dumped to disk for bamboo to fetch it again.
+     *
+     * @param DocumentationJar $documentationJar
+     * @param ComposerJson $composerJson
+     * @return DeploymentInformation
+     * @throws DocsComposerDependencyException
+     * @throws \App\Exception\ComposerJsonInvalidException
+     * @throws \App\Exception\DocsPackageDoNotCareBranch
+     */
+    public function generateBuildInformationFromDocumentationJar(DocumentationJar $documentationJar, ComposerJson $composerJson): DeploymentInformation
+    {
+        $this->assertComposerJsonContainsNecessaryData($composerJson);
+        // @TODO: a push event is not useful here, but required to create an instance of DeploymentInformation
+        // @TODO: this code needs a refactoring and a cleanup of the DeploymentInformation class.
+        $pushEvent = new PushEvent($documentationJar->getRepositoryUrl(), $documentationJar->getBranch(), $documentationJar->getPublicComposerJsonUrl());
+        return new DeploymentInformation($composerJson, $pushEvent, $this->privateDir, $this->subDir);
+    }
+
+    /**
      * Verify the build request for a given vendor/package name and a given repository url is not
      * already registered with a different repository url.
      *
@@ -210,6 +230,18 @@ class DocumentationBuildInformationService
                 $record->setTypeShort($deploymentInformation->typeShort);
                 $needsUpdate = true;
             }
+            if (empty($record->getPublicComposerJsonUrl())) {
+                $record->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl);
+                $needsUpdate = true;
+            }
+            if (empty($record->getVendor())) {
+                $record->setVendor($deploymentInformation->vendor);
+                $needsUpdate = true;
+            }
+            if (empty($record->getName())) {
+                $record->setName($deploymentInformation->name);
+                $needsUpdate = true;
+            }
             if ($needsUpdate) {
                 $this->entityManager->flush();
             }
@@ -217,6 +249,9 @@ class DocumentationBuildInformationService
             // No entry, yet - create one
             $documentationJar = (new DocumentationJar())
                 ->setRepositoryUrl($deploymentInformation->repositoryUrl)
+                ->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl)
+                ->setVendor($deploymentInformation->vendor)
+                ->setName($deploymentInformation->name)
                 ->setPackageName($deploymentInformation->packageName)
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)

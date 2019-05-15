@@ -13,24 +13,25 @@
             <h2>
                 Deployed documentation projects
             </h2>
+
             <div class="card">
                 <div class="datatable">
                     <table class="datatable-table">
                         <thead>
                             <tr>
-                                <th scope="col" data-type="uid">Id</th>
                                 <th scope="col" colspan="2">Package</th>
                                 <th scope="col">Type</th>
                                 <th scope="col">Branch</th>
                                 <th scope="col">Target</th>
-                                <th scope="col">Created</th>
                                 <th scope="col">Last rendered</th>
+                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                <th scope="col">Actions</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
                         {% for deployment in deployments %}
-                            <tr>
-                                <th scope="row" data-type="uid">{{ deployment.id }}</th>
+                            <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('n/d/Y, g:i A', "UTC") }}">
                                 <th data-type="icon">
                                     <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
                                         <i class="fab fa-fw fa-git-alt"></i>
@@ -47,19 +48,27 @@
                                     </a>
                                 </td>
                                 <td data-type="localdate">
-                                    <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
-                                        {{ deployment.createdAt|date('n/d/Y, g:i A', "UTC") }}
-                                    </span>
-                                </td>
-                                <td data-type="localdate">
                                     <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
                                         {{ deployment.lastRenderedAt|date('n/d/Y, g:i A', "UTC") }}
                                     </span>
                                 </td>
+                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                <td>
+                                    {% if deployment.publicComposerJsonUrl %}
+                                        <a href="{{ path('docs_to_bamboo_render', {documentation: deployment.id}) }}" class="btn btn-outline-primary btn-sm">re-render documentation</a>
+                                    {% else %}
+                                        <a href="#" class="btn btn-outline-primary btn-sm disabled">re-render documentation</a>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="5">no records found</td>
+                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                    <td colspan="8">no records found</td>
+                                {% else %}
+                                    <td colspan="7">no records found</td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                         </tbody>

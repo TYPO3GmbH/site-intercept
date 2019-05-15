@@ -68,6 +68,11 @@ class DeploymentInformation
     public $repositoryUrl;
 
     /**
+     * @var string public URL to the composer.json file in the repository
+     */
+    public $publicComposerJsonUrl;
+
+    /**
      * @var string Absolute path to the dump file, eg. '/.../var/docs-build-information/1893678543347'
      */
     public $absoluteDumpFile;
@@ -91,6 +96,7 @@ class DeploymentInformation
     public function __construct(ComposerJson $composerJson, PushEvent $pushEvent, string $privateDir, string $subDir)
     {
         $this->repositoryUrl = $pushEvent->getRepositoryUrl();
+        $this->publicComposerJsonUrl = $pushEvent->getUrlToComposerFile();
         $packageName = $this->determinePackageName($composerJson);
         $packageType = $this->determinePackageType($composerJson, $this->repositoryUrl);
 

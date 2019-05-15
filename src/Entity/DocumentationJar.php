@@ -31,6 +31,21 @@ class DocumentationJar
     private $repositoryUrl;
 
     /**
+     * @ORM\Column(type="string", length=255, options={"default": ""})
+     */
+    private $publicComposerJsonUrl;
+
+    /**
+     * @ORM\Column(type="string", length=255, options={"default": ""})
+     */
+    private $vendor;
+
+    /**
+     * @ORM\Column(type="string", length=255, options={"default": ""})
+     */
+    private $name;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $packageName;
@@ -128,7 +143,67 @@ class DocumentationJar
         return $this;
     }
 
-    public function getPackageName(): ?string
+    /**
+     * @return string|null
+     */
+    public function getPublicComposerJsonUrl(): ?string
+    {
+        return $this->publicComposerJsonUrl;
+    }
+
+    /**
+     * @param string $publicComposerJsonUrl
+     * @return DocumentationJar
+     */
+    public function setPublicComposerJsonUrl(string $publicComposerJsonUrl): self
+    {
+        $this->publicComposerJsonUrl = $publicComposerJsonUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVendor(): string
+    {
+        return $this->vendor;
+    }
+
+    /**
+     * @param mixed $vendor
+     * @return DocumentationJar
+     */
+    public function setVendor(string $vendor): self
+    {
+        $this->vendor = $vendor;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return DocumentationJar
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPackageName(): string
     {
         return $this->packageName;
     }
