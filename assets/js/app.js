@@ -21,6 +21,6 @@ $(document).ready(function () {
 function convertDates() {
     Array.from(document.querySelectorAll('[data-processor="localdate"]')).forEach(function (element) {
         const value = element.dataset.value;
-        element.textContent = DateTime.fromISO(value).toLocaleString(DateTime.DATETIME_FULL);
+        element.textContent = DateTime.fromISO(value).toLocaleString(DateTime.DATETIME_SHORT);
     });
 }

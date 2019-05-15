@@ -7,42 +7,44 @@
     <div class="content-section">
         <div class="container">
 
-            <div class="datatable">
-                <table class="datatable-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Id</th>
-                            <th scope="col">Source</th>
-                            <th scope="col">Target</th>
-                            <th scope="col">StatusCode</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for redirect in redirects %}
-                        <tr>
-                            <th scope="row">{{ redirect.id }}</th>
-                            <td>{{ redirect.source }}</td>
-                            <td>{{ redirect.target }}</td>
-                            <td>{{ redirect.statusCode }}</td>
-                            <td data-type="actions" data-label="Actions">
-                                <a class="datatable-action" href="{{ path('admin_redirect_show', {'id': redirect.id}) }}">
-                                    <span class="datatable-action-icon"><i class="fa fa-eye"></i></span>
-                                    <span class="datatable-action-label datatable-visually-hidden">Show</span>
-                                </a>
-                                <a class="datatable-action" href="{{ path('admin_redirect_edit', {'id': redirect.id}) }}">
-                                    <span class="datatable-action-icon"><i class="fa fa-pencil-alt"></i></span>
-                                    <span class="datatable-action-label datatable-visually-hidden">Edit</span>
-                                </a>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="5">no records found</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+            <div class="card">
+                <div class="datatable">
+                    <table class="datatable-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" data-type="uid">Id</th>
+                                <th scope="col">Source</th>
+                                <th scope="col">Target</th>
+                                <th scope="col">StatusCode</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for redirect in redirects %}
+                            <tr>
+                                <th scope="row" data-type="uid">{{ redirect.id }}</th>
+                                <th>{{ redirect.source }}</th>
+                                <td>{{ redirect.target }}</td>
+                                <td>{{ redirect.statusCode }}</td>
+                                <td data-type="actions" data-label="Actions">
+                                    <a class="datatable-action" href="{{ path('admin_redirect_show', {'id': redirect.id}) }}">
+                                        <span class="datatable-action-icon"><i class="fa fa-eye"></i></span>
+                                        <span class="datatable-action-label datatable-visually-hidden">Show</span>
+                                    </a>
+                                    <a class="datatable-action" href="{{ path('admin_redirect_edit', {'id': redirect.id}) }}">
+                                        <span class="datatable-action-icon"><i class="fa fa-pencil-alt"></i></span>
+                                        <span class="datatable-action-label datatable-visually-hidden">Edit</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5">no records found</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="row mt-4 justify-content-between">

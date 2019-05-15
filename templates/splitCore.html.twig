@@ -65,13 +65,9 @@
                 </h2>
                 {{ form_start(splitCoreTag) }}
                     {{ form_errors(splitCoreTag) }}
-                    <div class="form-group row">
-                        <div class="col-2">
-                            {{ form_widget(splitCoreTag.tag) }}
-                        </div>
-                        <div class="col-1">
-                            {{ form_widget(splitCoreTag.doTag) }}
-                        </div>
+                    <div class="form-group">
+                        {{ form_widget(splitCoreTag.tag) }}
+                        {{ form_widget(splitCoreTag.doTag) }}
                     </div>
                     {{ form_widget(splitCoreTag._token) }}
                 {{ form_end(splitCoreTag, {'render_rest': false}) }}

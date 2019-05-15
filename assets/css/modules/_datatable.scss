@@ -3,9 +3,10 @@
 //
 $table-highlight: theme-color("primary");
 $table-text: #333;
+$table-link-highlight: $link-color;
 $table-row-hover-bg: theme-color("primary");
 $table-row-hover-color: color-yiq(theme-color("primary"));
-$table-padding: 1rem;
+$table-padding: 1.5rem;
 $table-padding-x: $table-padding;
 $table-padding-y: $table-padding / 2;
 $table-cell-padding: $table-padding-y $table-padding-x;
@@ -31,10 +32,20 @@ $table-cell-padding: $table-padding-y $table-padding-x;
     td {
         padding: $table-cell-padding;
         white-space: nowrap;
+        line-height: 1.2rem;
     }
 
-    a {
+    a:not(.datatable-action) {
         color: inherit;
+        border-bottom: 1px solid $link-color;
+        &:hover,
+        &:focus {
+            text-decoration: none;
+        }
+    }
+
+    a.datatable-link-highlight {
+        color: $table-link-highlight;
     }
 
     tbody {
@@ -57,9 +68,21 @@ $table-cell-padding: $table-padding-y $table-padding-x;
                 background-color: $table-row-hover-bg;
                 color: $table-row-hover-color;
 
+                th {
+                    background-color: darken($table-row-hover-bg, 3%);
+                }
+
                 th,
                 td {
                     border-top: 1px solid darken($table-row-hover-bg, 5%);
+                }
+
+                a:not(.datatable-action) {
+                    border-bottom-color: inherit;
+                }
+
+                .datatable-link-highlight {
+                    color: inherit;
                 }
 
                 .datatable-action {
@@ -70,9 +93,18 @@ $table-cell-padding: $table-padding-y $table-padding-x;
         }
     }
 
-    [data-type="icon"] {
-        width: 1.5rem + $table-padding;
+    [data-type="uid"] {
         padding-right: 0 !important;
+    }
+
+    [data-type="icon"] {
+        font-size: 1.25rem;
+        width: 1.25rem + $table-padding;
+        padding-right: 0 !important;
+
+        a {
+            border-bottom: none;
+        }
     }
 
     [data-type="title"] {
@@ -87,6 +119,12 @@ $table-cell-padding: $table-padding-y $table-padding-x;
 
     [data-type="fill"] {
         width: 100%;
+    }
+
+    [data-type="localdate"] {
+        white-space: normal;
+        width: 8rem;
+        min-width: 8rem;
     }
 
     [data-type="actions"] {
@@ -120,6 +158,7 @@ $table-cell-padding: $table-padding-y $table-padding-x;
 }
 
 .datatable-action {
+    color: inherit;
     display: inline-block;
     position: relative;
     overflow: hidden;

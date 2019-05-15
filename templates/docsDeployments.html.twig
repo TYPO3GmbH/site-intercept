@@ -13,50 +13,59 @@
             <h2>
                 Deployed documentation projects
             </h2>
-            <table class="table table-sm table-striped table-bordered">
-                <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Repository URL</th>
-                    <th>Package Name</th>
-                    <th>Type</th>
-                    <th>Branch</th>
-                    <th>Target Directory</th>
-                    <th>Created at</th>
-                    <th>Last rendered at</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for deployment in deployments %}
-                    <tr>
-                        <td>{{ deployment.id }}</td>
-                        <td><a href="{{ deployment.repositoryUrl }}">{{ deployment.repositoryUrl }}</a></td>
-                        <td>{{ deployment.packageName }}</td>
-                        <td>{{ deployment.typeLong }}</td>
-                        <td>{{ deployment.branch }}</td>
-                        <td>
-                            <a href="{{ docsLiveServer }}/{{ deployment.typeShort }}/{{ deployment.packageName }}/{{ deployment.targetBranchDirectory }}">
-                                {{ deployment.targetBranchDirectory }}
-                            </a>
-                        </td>
-                        <td>
-                            <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
-                                {{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}
-                            </span>
-                        </td>
-                        <td>
-                            <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
-                                {{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}
-                            </span>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="5">no records found</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            <div class="card">
+                <div class="datatable">
+                    <table class="datatable-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" data-type="uid">Id</th>
+                                <th scope="col" colspan="2">Package</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Branch</th>
+                                <th scope="col">Target</th>
+                                <th scope="col">Created</th>
+                                <th scope="col">Last rendered</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for deployment in deployments %}
+                            <tr>
+                                <th scope="row" data-type="uid">{{ deployment.id }}</th>
+                                <th data-type="icon">
+                                    <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
+                                        <i class="fab fa-fw fa-git-alt"></i>
+                                    </a>
+                                </th>
+                                <th data-type="title">
+                                    <strong>{{ deployment.packageName }}</strong><br>
+                                </th>
+                                <td>{{ deployment.typeLong }}</td>
+                                <td>{{ deployment.branch }}</td>
+                                <td>
+                                    <a href="{{ docsLiveServer }}/{{ deployment.typeShort }}/{{ deployment.packageName }}/{{ deployment.targetBranchDirectory }}" rel="noopener" target="_blank">
+                                        {{ deployment.targetBranchDirectory }}
+                                    </a>
+                                </td>
+                                <td data-type="localdate">
+                                    <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
+                                        {{ deployment.createdAt|date('n/d/Y, g:i A', "UTC") }}
+                                    </span>
+                                </td>
+                                <td data-type="localdate">
+                                    <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
+                                        {{ deployment.lastRenderedAt|date('n/d/Y, g:i A', "UTC") }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5">no records found</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <h2>
                 Recent actions

@@ -71,12 +71,10 @@
                                     on top of current head of the target branch which may fail if it has merge conflicts.
                                 </p>
                                 {{ form_errors(urlForm) }}
-                                <div class="form-group row">
-                                    <div class="col-12">
-                                        {{ form_errors(urlForm.url) }}
-                                        {{ form_widget(urlForm.url) }}
-                                        {{ form_help(urlForm.url) }}
-                                    </div>
+                                <div class="form-group">
+                                    {{ form_errors(urlForm.url) }}
+                                    {{ form_widget(urlForm.url) }}
+                                    {{ form_help(urlForm.url) }}
                                 </div>
                                 {{ form_widget(urlForm._token) }}
                                 {{ form_widget(urlForm.trigger) }}
