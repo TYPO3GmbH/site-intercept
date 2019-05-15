@@ -49,6 +49,11 @@
                                 {{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}
                             </span>
                         </td>
+                        <td>
+                            <a href="{{ path('admin_docs_deployments_delete_view', {'documentationJarId': deployment.getId()}) }}">
+                                <button class="btn btn-danger">Delete</button>
+                            </a>
+                        </td>
                     </tr>
                 {% else %}
                     <tr>
