@@ -68,7 +68,7 @@ class DocumentationDownloads
         // if now the _buildinfo directory exists, create entry
         $content = '';
         if (is_dir($filePathToDocsEntryPoint . '/' . $currentVersion . '/_buildinfo')) {
-            $content = '<dd class="related-link-buildinfo"><a href="/ ' . implode('/', $entryPoint) . '/' . $currentVersion . '/_buildinfo" target="_blank">BUILDINFO</a></dd>';
+            $content = '<dd class="related-link-buildinfo"><a href="/' . implode('/', $entryPoint) . '/' . $currentVersion . '/_buildinfo" target="_blank">BUILDINFO</a></dd>';
         }
         return new Response(200, [], $content);
     }
