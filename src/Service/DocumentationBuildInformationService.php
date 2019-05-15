@@ -17,6 +17,7 @@ use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
+use App\Extractor\Factory\DeploymentInformationFactory;
 use App\Extractor\PushEvent;
 use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -127,8 +128,9 @@ class DocumentationBuildInformationService
     public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {
         $this->assertComposerJsonContainsNecessaryData($composerJson);
+        $factory = new DeploymentInformationFactory();
 
-        return new DeploymentInformation($composerJson, $pushEvent, $this->privateDir, $this->subDir);
+        return $factory->buildFromComposerJson($composerJson, $pushEvent, $this->privateDir, $this->subDir);
     }
 
     /**
