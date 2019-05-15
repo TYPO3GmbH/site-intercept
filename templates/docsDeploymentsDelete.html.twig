@@ -50,10 +50,10 @@
             </table>
 
             <a href="{{ path('admin_docs_deployments') }}">
-                <button class="btn btn-success">No, take me back</button>
+                <button class="btn btn-success"><i class="fa fa-arrow-circle-left"></i> No, take me back</button>
             </a>
             <a href="{{ path('admin_docs_deployments_delete_action', {'documentationJarId': deployment.getId() }) }}">
-                <button class="btn btn-danger">Yes, delete this entry</button>
+                <button class="btn btn-danger"><i class="fa fa-trash"></i> Yes, delete this entry</button>
             </a>
         </div>
     </div>
