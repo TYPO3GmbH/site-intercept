@@ -21,7 +21,7 @@ class DeploymentInformationFactory
     /**
      * @var array
      */
-    private static $typeMap = [
+    private const TYPEMAP = [
         'typo3-cms-documentation' => ['m' => 'manual'],
         'typo3-cms-framework' => ['c' => 'core-extension'],
         'typo3-cms-extension' => ['p' => 'extension'],
@@ -107,11 +107,11 @@ class DeploymentInformationFactory
             ];
         }
 
-        if (!array_key_exists($composerJson->getType(), self::$typeMap)) {
-            throw new ComposerJsonInvalidException('composer.json \'type\' must be set to one of ' . implode(', ', array_keys(self::$typeMap)) . '.', 1557490474);
+        if (!array_key_exists($composerJson->getType(), self::TYPEMAP)) {
+            throw new ComposerJsonInvalidException('composer.json \'type\' must be set to one of ' . implode(', ', array_keys(self::TYPEMAP)) . '.', 1557490474);
         }
 
-        return self::$typeMap[$composerJson->getType()];
+        return self::TYPEMAP[$composerJson->getType()];
     }
 
     /**
