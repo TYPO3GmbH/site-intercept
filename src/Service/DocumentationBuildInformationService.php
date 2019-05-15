@@ -134,6 +134,21 @@ class DocumentationBuildInformationService
     }
 
     /**
+     * Create main deployment information from DocumentationJar entity. This object will later be sanitized using
+     * other methods of that service and dumped to disk for bamboo to fetch it again.
+     *
+     * @param DocumentationJar $documentationJar
+     * @return DeploymentInformation
+     * @throws \App\Exception\DocsPackageDoNotCareBranch
+     */
+    public function generateBuildInformationFromDocumentationJar(DocumentationJar $documentationJar): DeploymentInformation
+    {
+        $factory = new DeploymentInformationFactory();
+
+        return $factory->buildFromDocumentationJar($documentationJar, $this->privateDir, $this->subDir);
+    }
+
+    /**
      * Verify the build request for a given vendor/package name and a given repository url is not
      * already registered with a different repository url.
      *

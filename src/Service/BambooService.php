@@ -131,6 +131,26 @@ class BambooService
     }
 
     /**
+     * Triggers new build in project ----- for deletion action
+     *
+     * @param DeploymentInformation $deploymentInformation
+     * @return BambooBuildTriggered
+     */
+    public function triggerDocumentationDeletionPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
+    {
+        $uri = 'latest/queue/'
+            . 'TODO DELETED CODE?'
+            . implode('&', [
+                'stage=',
+                'executeAllStages=',
+                'os_authType=basic',
+                'bamboo.variable.BUILD_INFORMATION_FILE=' . urlencode($deploymentInformation->relativeDumpFile),
+            ]);
+        $response = $this->sendBamboo('post', $uri);
+        return new BambooBuildTriggered((string)$response->getBody());
+    }
+
+    /**
      * Triggers new build in project CORE-DR
      *
      * @param DeploymentInformation $deploymentInformation

@@ -12,6 +12,7 @@ namespace App\Controller;
 
 use App\Repository\DocumentationJarRepository;
 use App\Service\BambooService;
+use App\Service\DocumentationBuildInformationService;
 use App\Service\GraylogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -100,22 +101,30 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
      * @param LoggerInterface $logger
      * @param DocumentationJarRepository $documentationJarRepository
      * @param EntityManagerInterface $entityManager
+     * @param DocumentationBuildInformationService $documentationBuildInformationService
+     * @param BambooService $bambooService
      * @return Response
+     * @throws \App\Exception\DocsPackageDoNotCareBranch
      */
     public function delete(
         Request $request,
         int $documentationJarId,
         LoggerInterface $logger,
         DocumentationJarRepository $documentationJarRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        DocumentationBuildInformationService $documentationBuildInformationService,
+        BambooService $bambooService
     ): Response {
         $this->logger = $logger;
 
         $jar = $documentationJarRepository->find($documentationJarId);
 
         if (null !== $jar) {
-            $entityManager->remove($jar);
-            $entityManager->flush();
+            $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($jar);
+            $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
+
+            // ToDo: Trigger Bamboo build with delete command
+            //$bambooService->triggerDocumentationDeletionPlan($informationFile);
 
             $this->logger->info(
                 'Documentation deleted.',
