@@ -1,7 +1,7 @@
 //
 // Buttons
 //
-.btn {
+.btn:not(.btn-link) {
     display: inline-flex;
     letter-spacing: .5px;
     text-transform: uppercase;

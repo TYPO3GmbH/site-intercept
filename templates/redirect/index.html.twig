@@ -24,9 +24,9 @@
                         <td>{{ redirect.target }}</td>
                         <td>{{ redirect.statusCode }}</td>
                         <td>
-                            <div class="btn-group btn-group-sm">
-                                <a href="{{ path('admin_redirect_show', {'id': redirect.id}) }}" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
-                                <a href="{{ path('admin_redirect_edit', {'id': redirect.id}) }}" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i></a>
+                            <div class="btn-group">
+                                <a href="{{ path('admin_redirect_show', {'id': redirect.id}) }}" class="btn btn-primary"><i class="fa fa-eye"></i></a>
+                                <a href="{{ path('admin_redirect_edit', {'id': redirect.id}) }}" class="btn btn-primary"><i class="fa fa-pencil-alt"></i></a>
                             </div>
                         </td>
                     </tr>
@@ -51,9 +51,8 @@
                                 </button>
                             </h2>
                         </div>
-
                         <div id="collapse_nginxConfigurationFile_{{ currentConfiguration.ctime }}" class="collapse" aria-labelledby="heading_nginxConfigurationFile_{{ currentConfiguration.ctime }}" data-parent="#nginxConfigurationFiles">
-                            <pre><code class="nginx">{{ currentConfiguration.contents }}</code></pre>
+                            <pre class="mb-0"><code class="nginx">{{ currentConfiguration.contents }}</code></pre>
                         </div>
                     </div>
                 </div>
