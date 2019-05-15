@@ -131,7 +131,7 @@ class BambooService
     }
 
     /**
-     * Triggers new build in project ----- for deletion action
+     * Triggers new build in project CORE-DDEL for deletion action
      *
      * @param DeploymentInformation $deploymentInformation
      * @return BambooBuildTriggered
@@ -139,7 +139,7 @@ class BambooService
     public function triggerDocumentationDeletionPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
     {
         $uri = 'latest/queue/'
-            . 'TODO DELETED CODE?'
+            . 'CORE-DDEL?'
             . implode('&', [
                 'stage=',
                 'executeAllStages=',
