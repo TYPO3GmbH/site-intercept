@@ -13,6 +13,7 @@ namespace App\Controller;
 use App\Repository\DocumentationJarRepository;
 use App\Service\BambooService;
 use App\Service\GraylogService;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,5 +59,67 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),
             ]
         );
+    }
+
+    /**
+     * @Route("/admin/docs/deployments/delete/{documentationJarId}/confirm", name="admin_docs_deployments_delete_view", requirements={"documentationJarId"="\d+"}, methods={"GET"})
+     *
+     * @param Request $request
+     * @param int $documentationJarId
+     * @param LoggerInterface $logger
+     * @param DocumentationJarRepository $documentationJarRepository
+     * @return Response
+     */
+    public function deleteConfirm(
+        Request $request,
+        int $documentationJarId,
+        LoggerInterface $logger,
+        DocumentationJarRepository $documentationJarRepository
+    ): Response {
+        $this->logger = $logger;
+
+        $jar = $documentationJarRepository->find($documentationJarId);
+        if (null === $jar) {
+            return $this->redirectToRoute('admin_docs_deployments');
+        }
+
+        return $this->render(
+            'docsDeploymentsDelete.html.twig',
+            [
+                'deployment' => $jar,
+                'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),
+            ]
+        );
+    }
+
+    /**
+     * @Route("/admin/docs/deployments/delete/{documentationJarId}", name="admin_docs_deployments_delete_action", requirements={"documentationJarId"="\d+"}, methods={"GET"})
+     *
+     * @param Request $request
+     * @param int $documentationJarId
+     * @param LoggerInterface $logger
+     * @param DocumentationJarRepository $documentationJarRepository
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
+    public function delete(
+        Request $request,
+        int $documentationJarId,
+        LoggerInterface $logger,
+        DocumentationJarRepository $documentationJarRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $this->logger = $logger;
+
+        $jar = $documentationJarRepository->find($documentationJarId);
+
+        if (null !== $jar) {
+            $entityManager->remove($jar);
+            $entityManager->flush();
+
+            $this->logger->info('Documentation ' . $jar->getPackageName() . ' for branch ' . $jar->getBranch() . ' was deleted.');
+        }
+
+        return $this->redirectToRoute('admin_docs_deployments');
     }
 }
