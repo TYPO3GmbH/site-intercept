@@ -12,6 +12,7 @@ namespace App\Service;
 
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
+use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
@@ -238,7 +239,8 @@ class DocumentationBuildInformationService
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
-                ->setTypeShort($deploymentInformation->typeShort);
+                ->setTypeShort($deploymentInformation->typeShort)
+                ->setStatus(DocumentationStatus::STATUS_RENDERING);
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
         }
