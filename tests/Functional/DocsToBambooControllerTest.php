@@ -62,12 +62,11 @@ class DocsToBambooControllerTest extends KernelTestCase
         $kernel->terminate($request, $response);
     }
 
+    /**
+     * @test
+     */
     public function bambooBuildIsNotTriggeredDueToMissingDependency(): void
     {
-        $kernel = new \App\Kernel('test', true);
-        $kernel->boot();
-        DatabasePrimer::prime($kernel);
-
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
         $generalClientProphecy
             ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
@@ -75,10 +74,15 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooBadRequestComposerWithoutDependency.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
         $response = $kernel->handle($request);
         $this->assertSame('Dependencies are not fulfilled. See https://intercept.typo3.com for more information.', $response->getContent());
         $this->assertSame(412, $response->getStatusCode());
+        $kernel->terminate($request, $response);
     }
 
     /**

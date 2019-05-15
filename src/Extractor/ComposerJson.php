@@ -72,7 +72,7 @@ class ComposerJson
         if (empty($this->composerJson[$propertyName])
             || (is_string($this->composerJson[$propertyName]) && trim($this->composerJson[$propertyName]) === '')
         ) {
-            throw new DocsComposerMissingValueException('Property "' . $propertyName . '"" is missing or is empty in composer.json', 1557309364);
+            throw new DocsComposerMissingValueException('Property "' . $propertyName . '" is missing or is empty in composer.json', 1557309364);
         }
     }
 }
