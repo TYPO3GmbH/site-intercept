@@ -117,7 +117,16 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
             $entityManager->remove($jar);
             $entityManager->flush();
 
-            $this->logger->info('Documentation ' . $jar->getPackageName() . ' for branch ' . $jar->getBranch() . ' was deleted.');
+            $this->logger->info(
+                'Documentation deleted.',
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'packageDeleted',
+                    'triggeredBy' => 'interface',
+                    'repository' => $jar->getRepositoryUrl(),
+                    'package' => $jar->getPackageName(),
+                ]
+            );
         }
 
         return $this->redirectToRoute('admin_docs_deployments');
