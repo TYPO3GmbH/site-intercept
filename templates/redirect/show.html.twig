@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
 {% block title %}Redirect{% endblock %}
 {% block headline %}Redirect{% endblock %}
 {% block body %}
@@ -6,40 +7,59 @@
     <div class="content-section">
         <div class="container">
 
-            <table class="table table-sm table-striped table-bordered">
-                <tbody>
-                    <tr>
-                        <th>Id</th>
-                        <td>{{ redirect.id }}</td>
-                    </tr>
-                    <tr>
-                        <th>CreatedAt</th>
-                        <td>{{ redirect.createdAt ? redirect.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                    </tr>
-                    <tr>
-                        <th>UpdatedAt</th>
-                        <td>{{ redirect.updatedAt ? redirect.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Source</th>
-                        <td>{{ redirect.source }}</td>
-                    </tr>
-                    <tr>
-                        <th>Target</th>
-                        <td>{{ redirect.target }}</td>
-                    </tr>
-                    <tr>
-                        <th>StatusCode</th>
-                        <td>{{ redirect.statusCode }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <a href="{{ path('admin_redirect_index') }}" class="btn btn-outline-secondary"><i class="fa fa-arrow-left"></i> back to list</a>
-
-            <a href="{{ path('admin_redirect_edit', {'id': redirect.id}) }}" class="btn btn-primary pull-right"><i class="fa fa-pencil"></i> edit</a>
-
-            {{ include('redirect/_delete_form.html.twig') }}
+            <div class="datatable">
+                <table class="datatable-table">
+                    <tbody>
+                        <tr>
+                            <th>Id</th>
+                            <td>{{ redirect.id }}</td>
+                        </tr>
+                        <tr>
+                            <th>CreatedAt</th>
+                            <td>{{ redirect.createdAt ? redirect.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>UpdatedAt</th>
+                            <td>{{ redirect.updatedAt ? redirect.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Source</th>
+                            <td>{{ redirect.source }}</td>
+                        </tr>
+                        <tr>
+                            <th>Target</th>
+                            <td>{{ redirect.target }}</td>
+                        </tr>
+                        <tr>
+                            <th>StatusCode</th>
+                            <td>{{ redirect.statusCode }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row mt-4 justify-content-between">
+                <div class="col-auto">
+                    {{ 
+                        macros.linkbutton(
+                            path('admin_redirect_index'),
+                            'back to list',
+                            'outline-secondary',
+                            'arrow-left'
+                        )
+                    }}
+                    {{
+                        macros.linkbutton(
+                            path('admin_redirect_edit', {'id': redirect.id}),
+                            'edit',
+                            'primary',
+                            'pencil-alt'
+                        )
+                    }}
+                </div>
+                <div class="col-auto">
+                    {{ include('redirect/_delete_form.html.twig') }}
+                </div>
+            </div>
 
         </div>
     </div>

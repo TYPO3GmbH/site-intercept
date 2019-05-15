@@ -1,6 +1,7 @@
 {{ form_start(form) }}
     {{ form_widget(form) }}
-    <div class="text-right">
-        <button class="btn btn-primary" id="redirectformaction"><i class="fa fa-floppy-o"></i> {{ button_label|default('Save') }}</button>
-    </div>
+    <button class="btn btn-primary" id="redirectformaction">
+        <span class="btn-icon"><i class="fa fa-save"></i></span>
+        <span class="btn-text">{{ button_label|default('Save') }}</span>
+    </button>
 {{ form_end(form) }}

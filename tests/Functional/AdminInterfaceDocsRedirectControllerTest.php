@@ -37,7 +37,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains('<table class="table table-sm table-striped table-bordered">', $content);
+        $this->assertContains('<table class="datatable-table">', $content);
         $this->assertContains('/p/vendor/packageOld/1.0/Foo.html', $content);
         $this->assertContains('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
@@ -50,7 +50,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1');
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains('<table class="table table-sm table-striped table-bordered">', $content);
+        $this->assertContains('<table class="datatable-table">', $content);
         $this->assertContains('/p/vendor/packageOld/1.0/Foo.html', $content);
         $this->assertContains('/p/vendor/packageNew/1.0/Foo.html', $content);
     }

@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
 {% block title %}Redirects{% endblock %}
 {% block headline %}Redirects{% endblock %}
 {% block body %}
@@ -6,41 +7,59 @@
     <div class="content-section">
         <div class="container">
 
-            <table class="table table-sm table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Source</th>
-                        <th>Target</th>
-                        <th>StatusCode</th>
-                        <th>actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for redirect in redirects %}
-                    <tr>
-                        <td>{{ redirect.id }}</td>
-                        <td>{{ redirect.source }}</td>
-                        <td>{{ redirect.target }}</td>
-                        <td>{{ redirect.statusCode }}</td>
-                        <td>
-                            <div class="btn-group">
-                                <a href="{{ path('admin_redirect_show', {'id': redirect.id}) }}" class="btn btn-primary"><i class="fa fa-eye"></i></a>
-                                <a href="{{ path('admin_redirect_edit', {'id': redirect.id}) }}" class="btn btn-primary"><i class="fa fa-pencil-alt"></i></a>
-                            </div>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="5">no records found</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            <div class="datatable">
+                <table class="datatable-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">Source</th>
+                            <th scope="col">Target</th>
+                            <th scope="col">StatusCode</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for redirect in redirects %}
+                        <tr>
+                            <th scope="row">{{ redirect.id }}</th>
+                            <td>{{ redirect.source }}</td>
+                            <td>{{ redirect.target }}</td>
+                            <td>{{ redirect.statusCode }}</td>
+                            <td data-type="actions" data-label="Actions">
+                                <a class="datatable-action" href="{{ path('admin_redirect_show', {'id': redirect.id}) }}">
+                                    <span class="datatable-action-icon"><i class="fa fa-eye"></i></span>
+                                    <span class="datatable-action-label datatable-visually-hidden">Show</span>
+                                </a>
+                                <a class="datatable-action" href="{{ path('admin_redirect_edit', {'id': redirect.id}) }}">
+                                    <span class="datatable-action-icon"><i class="fa fa-pencil-alt"></i></span>
+                                    <span class="datatable-action-label datatable-visually-hidden">Edit</span>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">no records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-            <a href="{{ path('admin_redirect_new') }}" class="btn btn-success"><i class="fa fa-plus"></i> Create new</a>
+            <div class="row mt-4 justify-content-between">
+                <div class="col-auto">
+                    {{ 
+                        macros.linkbutton(
+                            path('admin_redirect_new'),
+                            'Create new',
+                            'primary',
+                            'plus'
+                        )
+                    }}
+                </div>
+            </div>
 
             {% if currentConfiguration %}
+                <div class="content-spacer"></div>
                 <h2>Current active configuration</h2>
                 <div class="accordion" id="nginxConfigurationFiles">
                     <div class="card">
@@ -59,51 +78,47 @@
             {% endif %}
 
             {% if logMessages %}
-                <div class="row mb-4">
-                    <div class="col-lg-12 col-md-12 col-sm-12">
-                        <div class="card shadow">
-                            <div class="card-header">
-                                <h2>
-                                    Recent actions
-                                </h2>
+                <div class="content-spacer"></div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>
+                            Recent actions
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        {% for log in logMessages %}
+                            <div class="alert graylog-log alert-info">
+                                <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
+                                <span>
+                                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo Documentation Redirects</a>
+                                </span>
+                                {% if log.bambooKey %}
+                                    | <span>Bamboo key: {{ log.bambooKey }}</span>
+                                {% endif %}
+                                {% if log.triggeredBy == 'api' %}
+                                    | <span>Trigger: API</span>
+                                {% elseif log.triggeredBy == 'interface' %}
+                                    | <span>Trigger: Web</span>
+                                {% endif %}
+                                {% if log.subType %}
+                                    | <span>Action: {{ log.subType }}</span>
+                                {% endif %}
+                                {% if log.userDisplayName %}
+                                    | <span>User: {{ log.userDisplayName }}</span>
+                                {% endif %}
+                                {% if log.redirect %}
+                                    {% if log.redirect.id %}
+                                        | <span>ID: {{ log.redirect.id }}</span>
+                                    {% endif %}
+                                    {% if log.redirect.source %}
+                                        | <span>Source: {{ log.redirect.source }}</span>
+                                    {% endif %}
+                                    {% if log.redirect.target %}
+                                        | <span>Target: {{ log.redirect.target }}</span>
+                                    {% endif %}
+                                {% endif %}
                             </div>
-                            <div class="card-body">
-                                {% for log in logMessages %}
-                                    <div class="alert graylog-log alert-info">
-                                        <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
-                                        <span>
-                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo Documentation Redirects</a>
-                                        </span>
-
-                                        {% if log.bambooKey %}
-                                            | <span>Bamboo key: {{ log.bambooKey }}</span>
-                                        {% endif %}
-                                        {% if log.triggeredBy == 'api' %}
-                                            | <span>Trigger: API</span>
-                                        {% elseif log.triggeredBy == 'interface' %}
-                                            | <span>Trigger: Web</span>
-                                        {% endif %}
-                                        {% if log.subType %}
-                                            | <span>Action: {{ log.subType }}</span>
-                                        {% endif %}
-                                        {% if log.userDisplayName %}
-                                            | <span>User: {{ log.userDisplayName }}</span>
-                                        {% endif %}
-                                        {% if log.redirect %}
-                                            {% if log.redirect.id %}
-                                                | <span>ID: {{ log.redirect.id }}</span>
-                                            {% endif %}
-                                            {% if log.redirect.source %}
-                                                | <span>Source: {{ log.redirect.source }}</span>
-                                            {% endif %}
-                                            {% if log.redirect.target %}
-                                                | <span>Target: {{ log.redirect.target }}</span>
-                                            {% endif %}
-                                        {% endif %}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             {% endif %}
