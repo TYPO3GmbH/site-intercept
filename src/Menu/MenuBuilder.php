@@ -205,6 +205,20 @@ class MenuBuilder
     public function mainFooter(array $options)
     {
         $menu = $this->factory->createItem('root');
+        $menu->addChild(
+            'privacy',
+            [
+                'label' => 'Privacy Policy',
+                'route' => 'admin_page_privacy',
+            ]
+        );
+        $menu->addChild(
+            'legal',
+            [
+                'label' => 'Legal Information',
+                'route' => 'admin_page_legal',
+            ]
+        );
         return $menu;
     }
 }
