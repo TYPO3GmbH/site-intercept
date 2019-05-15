@@ -1,4 +1,16 @@
-# Legacy Hook for documentation rendering
+# Legacy documentation magic
+
+This is currently deployed to the docs server web document root directory services/.
+It contains some meta scripts to keep compatibility with the old documentation server
+
+## ajaxversions.php
+
+This script is called when clicking the 'Versions' selector in the lower
+left of a rendered documentation. It returns a list of existing "other versions"
+of that documentation. 
+
+
+## Hook for documentation rendering
 
 The old documentation rendering hook is available under https://docs.typo3.org/services/handle_github_post_receive_hook.php
 
