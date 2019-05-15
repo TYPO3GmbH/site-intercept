@@ -63,7 +63,7 @@ class DocumentationVersions
         $filePathToDocsEntryPoint = $documentRoot . '/' . implode('/', $entryPoint);
         if (!is_dir($filePathToDocsEntryPoint)
             || !is_dir($filePathToDocsEntryPoint . '/' . $currentVersion)
-            || !is_file($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . implode('/', $pathAfterEntryPoint))
+            || !file_exists($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . implode('/', $pathAfterEntryPoint))
         ) {
             return new Response(200, [], '');
         }
