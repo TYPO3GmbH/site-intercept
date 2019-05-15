@@ -9,6 +9,7 @@
 
 namespace App\Entity;
 
+use App\Enum\DocumentationStatus;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -64,6 +65,11 @@ class DocumentationJar
      * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private $typeShort;
+
+    /**
+     * @ORM\Column(type="integer", options={"default": 0})
+     */
+    private $status;
 
     /**
      * @return mixed
@@ -194,6 +200,23 @@ class DocumentationJar
         $this->targetBranchDirectory = $targetBranchDirectory;
 
         return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?int $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function isActionable(): bool
+    {
+        return $this->status === DocumentationStatus::STATUS_RENDERED;
     }
 
     /**

@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Controller;
 
+use App\Enum\DocumentationStatus;
 use App\Repository\DocumentationJarRepository;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
@@ -80,7 +81,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         $this->logger = $logger;
 
         $jar = $documentationJarRepository->find($documentationJarId);
-        if (null === $jar) {
+        if (null === $jar || !$jar->isActionable()) {
             return $this->redirectToRoute('admin_docs_deployments');
         }
 
@@ -119,7 +120,10 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
 
         $jar = $documentationJarRepository->find($documentationJarId);
 
-        if (null !== $jar) {
+        if (null !== $jar && $jar->isActionable()) {
+            $jar->setStatus(DocumentationStatus::STATUS_DELETING);
+            $entityManager->persist($jar);
+            $entityManager->flush();
             $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($jar);
             $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
 
