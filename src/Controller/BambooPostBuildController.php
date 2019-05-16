@@ -13,6 +13,7 @@ namespace App\Controller;
 use App\Creator\GerritBuildStatusMessage;
 use App\Creator\SlackCoreNightlyBuildMessage;
 use App\Entity\BambooNightlyBuild;
+use App\Entity\DocumentationJar;
 use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
 use App\Service\GerritService;
@@ -113,6 +114,12 @@ class BambooPostBuildController extends AbstractController
                     'triggeredBy' => 'api',
                 ]
             );
+        } elseif (strpos($buildDetails->buildKey, 'CORE-DDEL-') === 0) {
+            $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
+            $documentationEntry = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
+            $manager = $this->getDoctrine()->getManager();
+            $manager->remove($documentationEntry);
+            $manager->flush();
         }
 
         return Response::create();
