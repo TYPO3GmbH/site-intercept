@@ -86,17 +86,18 @@ class DeploymentInformation
      * Constructor
      *
      * @param ComposerJson $composerJson
-     * @param PushEvent $pushEvent
+     * @param string $repositoryUrl
+     * @param string $publicComposerJsonUrl
+     * @param string $version
      * @param string $privateDir
      * @param string $subDir
      * @throws ComposerJsonInvalidException
      * @throws DocsPackageDoNotCareBranch
-     * @throws \RuntimeException
      */
-    public function __construct(ComposerJson $composerJson, PushEvent $pushEvent, string $privateDir, string $subDir)
+    public function __construct(ComposerJson $composerJson, string $repositoryUrl, string $publicComposerJsonUrl, string $version, string $privateDir, string $subDir)
     {
-        $this->repositoryUrl = $pushEvent->getRepositoryUrl();
-        $this->publicComposerJsonUrl = $pushEvent->getUrlToComposerFile();
+        $this->repositoryUrl = $repositoryUrl;
+        $this->publicComposerJsonUrl = $publicComposerJsonUrl;
         $packageName = $this->determinePackageName($composerJson);
         $packageType = $this->determinePackageType($composerJson, $this->repositoryUrl);
 
@@ -105,7 +106,7 @@ class DeploymentInformation
         $this->packageName = $this->vendor . '/' . $this->name;
         $this->typeLong = current($packageType);
         $this->typeShort = key($packageType);
-        $this->sourceBranch = $pushEvent->getVersionString();
+        $this->sourceBranch = $version;
         $this->targetBranchDirectory = $this->getTargetBranchDirectory($this->sourceBranch, $this->typeLong);
 
         $buildTime = ceil(microtime(true) * 10000);

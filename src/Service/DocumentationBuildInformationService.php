@@ -128,7 +128,7 @@ class DocumentationBuildInformationService
     {
         $this->assertComposerJsonContainsNecessaryData($composerJson);
 
-        return new DeploymentInformation($composerJson, $pushEvent, $this->privateDir, $this->subDir);
+        return new DeploymentInformation($composerJson, $pushEvent->getRepositoryUrl(), $pushEvent->getUrlToComposerFile(), $pushEvent->getVersionString(), $this->privateDir, $this->subDir);
     }
 
     /**
@@ -145,10 +145,7 @@ class DocumentationBuildInformationService
     public function generateBuildInformationFromDocumentationJar(DocumentationJar $documentationJar, ComposerJson $composerJson): DeploymentInformation
     {
         $this->assertComposerJsonContainsNecessaryData($composerJson);
-        // @TODO: a push event is not useful here, but required to create an instance of DeploymentInformation
-        // @TODO: this code needs a refactoring and a cleanup of the DeploymentInformation class.
-        $pushEvent = new PushEvent($documentationJar->getRepositoryUrl(), $documentationJar->getBranch(), $documentationJar->getPublicComposerJsonUrl());
-        return new DeploymentInformation($composerJson, $pushEvent, $this->privateDir, $this->subDir);
+        return new DeploymentInformation($composerJson, $documentationJar->getRepositoryUrl(), $documentationJar->getPublicComposerJsonUrl(), $documentationJar->getBranch(), $this->privateDir, $this->subDir);
     }
 
     /**
