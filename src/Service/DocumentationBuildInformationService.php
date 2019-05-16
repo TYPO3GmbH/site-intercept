@@ -150,6 +150,7 @@ class DocumentationBuildInformationService
     }
 
     /**
+    /**
      * Verify the build request for a given vendor/package name and a given repository url is not
      * already registered with a different repository url.
      *
@@ -228,6 +229,18 @@ class DocumentationBuildInformationService
                 $record->setTypeShort($deploymentInformation->typeShort);
                 $needsUpdate = true;
             }
+            if (empty($record->getPublicComposerJsonUrl())) {
+                $record->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl);
+                $needsUpdate = true;
+            }
+            if (empty($record->getVendor())) {
+                $record->setVendor($deploymentInformation->vendor);
+                $needsUpdate = true;
+            }
+            if (empty($record->getName())) {
+                $record->setName($deploymentInformation->name);
+                $needsUpdate = true;
+            }
             if ($needsUpdate) {
                 $this->entityManager->flush();
             }
@@ -235,6 +248,9 @@ class DocumentationBuildInformationService
             // No entry, yet - create one
             $documentationJar = (new DocumentationJar())
                 ->setRepositoryUrl($deploymentInformation->repositoryUrl)
+                ->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl)
+                ->setVendor($deploymentInformation->vendor)
+                ->setName($deploymentInformation->name)
                 ->setPackageName($deploymentInformation->packageName)
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)

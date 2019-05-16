@@ -13,6 +13,7 @@
             <h2>
                 Deployed documentation projects
             </h2>
+
             <div class="card">
                 <div class="datatable">
                     <table class="datatable-table">
@@ -21,14 +22,15 @@
                                 <th scope="col" colspan="3">Package</th>
                                 <th scope="col">Type</th>
                                 <th scope="col">Branch</th>
-                                <th scope="col">Created</th>
                                 <th scope="col">Last rendered</th>
-                                <th scope="col">Actions</th>
+                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                    <th scope="col">Actions</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
                         {% for deployment in deployments %}
-                            <tr>
+                            <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('n/d/Y, g:i A', "UTC") }}">
                                 <th data-type="icon">
                                     <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
                                         <i class="fab fa-fw fa-git-alt"></i>
@@ -60,27 +62,35 @@
                                     </a>
                                 </td>
                                 <td data-type="localdate">
-                                    <span data-processor="localdate" data-value="{{ deployment.createdAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
-                                        {{ deployment.createdAt|date('n/d/Y, g:i A', "UTC") }}
-                                    </span>
-                                </td>
-                                <td data-type="localdate">
                                     <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
                                         {{ deployment.lastRenderedAt|date('n/d/Y, g:i A', "UTC") }}
                                     </span>
                                 </td>
-                                <td data-type="actions" data-label="Actions">
-                                    {% if deployment.isActionable() %}
-                                        <a class="datatable-action" href="{{ path('admin_docs_deployments_delete_view', {'documentationJarId': deployment.getId()}) }}">
-                                            <span class="datatable-action-icon"><i class="fa fa-trash"></i></span>
-                                            <span class="datatable-action-label datatable-visually-hidden">Delete</span>
-                                        </a>
-                                    {% endif %}
-                                </td>
+                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                    <td data-type="actions" data-label="Actions">
+                                        {% if deployment.publicComposerJsonUrl %}
+                                            <a class="datatable-action" href="{{ path('docs_to_bamboo_render', {documentation: deployment.id}) }}">
+                                                <span class="datatable-action-icon"><i class="fa fa-draw-polygon"></i></span>
+                                                <span class="datatable-action-label datatable-visually-hidden">Re-render documentation</span>
+                                            </a>
+                                        {% endif %}
+
+                                        {% if deployment.isActionable() %}
+                                            <a class="datatable-action" href="{{ path('admin_docs_deployments_delete_view', {'documentationJarId': deployment.getId()}) }}">
+                                                <span class="datatable-action-icon"><i class="fa fa-trash"></i></span>
+                                                <span class="datatable-action-label datatable-visually-hidden">Delete</span>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="9">no records found</td>
+                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                    <td colspan="9">no records found</td>
+                                {% else %}
+                                    <td colspan="8">no records found</td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                         </tbody>

@@ -67,6 +67,11 @@ class DeploymentInformation
     public $repositoryUrl;
 
     /**
+     * @var string public URL to the composer.json file in the repository
+     */
+    public $publicComposerJsonUrl;
+
+    /**
      * @var string Absolute path to the dump file, eg. '/.../var/docs-build-information/1893678543347'
      */
     public $absoluteDumpFile;
@@ -93,6 +98,7 @@ class DeploymentInformation
         $this->repositoryUrl = $repositoryUrl;
         $this->vendor = $vendor;
         $this->name = $name;
+
         $this->packageName = $this->vendor . '/' . $this->name;
         $this->typeLong = $typeLong;
         $this->typeShort = $typeShort;
