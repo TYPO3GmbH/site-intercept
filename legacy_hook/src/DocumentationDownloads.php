@@ -42,7 +42,7 @@ class DocumentationDownloads
         // Remove leading and trailing slashes again
         $urlPath = trim($urlPath, '/');
         $urlPath = explode('/', $urlPath);
-        if (count($urlPath) < 4) {
+        if (count($urlPath) < 5) {
             return new Response(200, [], '');
         }
 
@@ -50,25 +50,27 @@ class DocumentationDownloads
         $entryPoint = array_slice($urlPath, 0, 3);
         // 'current' called version, eg. 'master', or '9.5'
         $currentVersion = array_slice($urlPath, 3, 1)[0];
+        // 'current' called language eg. 'en-us'
+        $currentLanguage = array_slice($urlPath, 4, 1)[0];
 
-        if (empty($currentVersion)) {
+        if (empty($currentVersion) || empty($currentLanguage)) {
             return new Response(200, [], '');
         }
 
-        // verify entry path exists and current version exist
+        // verify entry path exists with current version and language exists
         // this additionally sanitizes the input url
         $documentRoot = $GLOBALS['_SERVER']['DOCUMENT_ROOT'];
         $filePathToDocsEntryPoint = $documentRoot . '/' . implode('/', $entryPoint);
         if (!is_dir($filePathToDocsEntryPoint)
-            || !is_dir($filePathToDocsEntryPoint . '/' . $currentVersion)
+            || !is_dir($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . $currentLanguage)
         ) {
             return new Response(200, [], '');
         }
 
         // if now the _buildinfo directory exists, create entry
         $content = '';
-        if (is_dir($filePathToDocsEntryPoint . '/' . $currentVersion . '/_buildinfo')) {
-            $content = '<dd class="related-link-buildinfo"><a href="/' . implode('/', $entryPoint) . '/' . $currentVersion . '/_buildinfo" target="_blank">BUILDINFO</a></dd>';
+        if (is_dir($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . $currentLanguage . '/_buildinfo')) {
+            $content = '<dd class="related-link-buildinfo"><a href="/' . implode('/', $entryPoint) . '/' . $currentVersion . '/' . $currentLanguage . '/_buildinfo" target="_blank">BUILDINFO</a></dd>';
         }
         return new Response(200, [], $content);
     }

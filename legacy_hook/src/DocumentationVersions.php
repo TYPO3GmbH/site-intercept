@@ -42,7 +42,7 @@ class DocumentationVersions
         // Remove leading and trailing slashes again
         $urlPath = trim($urlPath, '/');
         $urlPath = explode('/', $urlPath);
-        if (count($urlPath) < 4) {
+        if (count($urlPath) < 5) {
             return new Response(200, [], '');
         }
 
@@ -50,10 +50,12 @@ class DocumentationVersions
         $entryPoint = array_slice($urlPath, 0, 3);
         // 'current' called version, eg. 'master', or '9.5'
         $currentVersion = array_slice($urlPath, 3, 1)[0];
+        // 'current' called language eg. 'en-us'
+        $currentLanguage = array_slice($urlPath, 4, 1)[0];
         // further path to currently viewed sub file, eg. '[subPage, Index.html]'
-        $pathAfterEntryPoint = array_slice($urlPath, 4, 99);
+        $pathAfterEntryPoint = array_slice($urlPath, 5, 99);
 
-        if (empty($currentVersion)) {
+        if (empty($currentVersion) || empty($currentLanguage)) {
             return new Response(200, [], '');
         }
 
@@ -62,45 +64,54 @@ class DocumentationVersions
         $documentRoot = $GLOBALS['_SERVER']['DOCUMENT_ROOT'];
         $filePathToDocsEntryPoint = $documentRoot . '/' . implode('/', $entryPoint);
         if (!is_dir($filePathToDocsEntryPoint)
-            || !is_dir($filePathToDocsEntryPoint . '/' . $currentVersion)
-            || !file_exists($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . implode('/', $pathAfterEntryPoint))
+            || !is_dir($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . $currentLanguage)
+            || !file_exists($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . $currentLanguage . '/' . implode('/', $pathAfterEntryPoint))
         ) {
             return new Response(200, [], '');
         }
 
-        // find versions of this project
+        // find versions and language variants of this project
         $versions = scandir($filePathToDocsEntryPoint);
         $validatedVersions = [];
         foreach ($versions as $version) {
             if ($version === '.' || $version === '..' || !is_dir($filePathToDocsEntryPoint . '/' . $version)) {
                 continue;
             }
-            $validatedVersions[] = $version;
+            $languages = scandir($filePathToDocsEntryPoint . '/' . $version);
+            foreach ($languages as $language) {
+                if ($language === '.' || $language === '..' || !is_dir($filePathToDocsEntryPoint . '/' . $version . '/' . $language)) {
+                    continue;
+                }
+                $validatedVersions[] = [
+                    'version' => $version,
+                    'language' => $language
+                ];
+            }
         }
 
         // final version entries
         $entries = [];
         // One entry per version that is deployed
         foreach ($validatedVersions as $version) {
-            $entry = $filePathToDocsEntryPoint . '/' . $version . '/';
+            $entry = $filePathToDocsEntryPoint . '/' . $version['version'] . '/' . $version['language'] . '/';
             $checkSubPaths = $pathAfterEntryPoint;
             $subPathCount = count($checkSubPaths);
             for ($i = 0; $i < $subPathCount; $i++) {
                 // Traverse sub path segments up until one has been found in filesystem, to find the
                 // "nearest" matching version of currently viewed file
-                $pathToCheck = $filePathToDocsEntryPoint . '/' . $version . '/' . implode('/', $checkSubPaths);
+                $pathToCheck = $filePathToDocsEntryPoint . '/' . $version['version'] . '/' . $version['language'] . '/' . implode('/', $checkSubPaths);
                 if (is_file($pathToCheck) || is_dir($pathToCheck)) {
-                    $entry = $pathToCheck;
+                    $version['path'] = $pathToCheck;
                     break;
                 }
                 array_pop($checkSubPaths);
             }
-            $entries[$version] = $entry;
+            $entries[] = $version;
         }
 
         $finalEntries = [];
-        foreach ($entries as $version => $entry) {
-            $finalEntries[] = '<dd><a href="' . str_replace($documentRoot, '', $entry) . '">' . $version . '</a></dd>';
+        foreach ($entries as $entry) {
+            $finalEntries[] = '<dd><a href="' . str_replace($documentRoot, '', $entry['path']) . '">' . $entry['version'] . ' ' . $entry['language'] . '</a></dd>';
         }
 
         return new Response(200, [], implode(chr(10), $finalEntries));
