@@ -82,8 +82,10 @@ class DeploymentInformation
     public $relativeDumpFile;
 
     /**
-     * DeploymentInformation constructor.
+     * Constructor
+     *
      * @param string $repositoryUrl
+     * @param string $publicComposerJsonUrl
      * @param string $vendor
      * @param string $name
      * @param string $typeLong
@@ -93,9 +95,10 @@ class DeploymentInformation
      * @param string $subDir
      * @throws DocsPackageDoNotCareBranch
      */
-    public function __construct(string $repositoryUrl, string $vendor, string $name, string $typeLong, string $typeShort, string $sourceBranch, string $privateDir, string $subDir)
+    public function __construct(string $repositoryUrl, string $publicComposerJsonUrl, string $vendor, string $name, string $typeLong, string $typeShort, string $sourceBranch, string $privateDir, string $subDir)
     {
         $this->repositoryUrl = $repositoryUrl;
+        $this->publicComposerJsonUrl = $publicComposerJsonUrl;
         $this->vendor = $vendor;
         $this->name = $name;
 
@@ -122,6 +125,7 @@ class DeploymentInformation
     {
         return [
             'repository_url' => $this->repositoryUrl,
+            'public_composer_json_url' => $this->publicComposerJsonUrl,
             'vendor' => $this->vendor,
             'name' => $this->name,
             'package_name' => $this->packageName,

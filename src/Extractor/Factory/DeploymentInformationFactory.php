@@ -37,11 +37,12 @@ class DeploymentInformationFactory
      * @throws ComposerJsonInvalidException
      * @throws DocsPackageDoNotCareBranch
      */
-    public function buildFromComposerJson(ComposerJson $composerJson, PushEvent $pushEvent, string $privateDir, string $subDir): DeploymentInformation
+    public static function buildFromComposerJson(ComposerJson $composerJson, PushEvent $pushEvent, string $privateDir, string $subDir): DeploymentInformation
     {
         $repositoryUrl = $pushEvent->getRepositoryUrl();
-        $packageName = $this->determinePackageName($composerJson);
-        $packageType = $this->determinePackageType($composerJson, $repositoryUrl);
+        $publicComposerJsonUrl = $pushEvent->getUrlToComposerFile();
+        $packageName = self::determinePackageName($composerJson);
+        $packageType = self::determinePackageType($composerJson, $repositoryUrl);
 
         $vendor = key($packageName);
         $name = current($packageName);
@@ -51,6 +52,7 @@ class DeploymentInformationFactory
 
         return new DeploymentInformation(
             $repositoryUrl,
+            $publicComposerJsonUrl,
             $vendor,
             $name,
             $typeLong,
@@ -68,20 +70,21 @@ class DeploymentInformationFactory
      * @return DeploymentInformation
      * @throws DocsPackageDoNotCareBranch
      */
-    public function buildFromDocumentationJar(DocumentationJar $documentationJar, string $privateDir, string $subDir): DeploymentInformation
+    public static function buildFromDocumentationJar(DocumentationJar $documentationJar, string $privateDir, string $subDir): DeploymentInformation
     {
         $repositoryUrl = $documentationJar->getRepositoryUrl();
+        $publicComposerJsonUrl = $documentationJar->getPublicComposerJsonUrl();
         $packageName = $documentationJar->getPackageName();
 
         $packageDetails = explode('/', $packageName);
-        $vendor = $packageDetails[0];
-        $name = $packageDetails[1];
+        [$vendor, $name] = $packageDetails;
         $typeLong = $documentationJar->getTypeLong();
         $typeShort = $documentationJar->getTypeShort();
         $sourceBranch = $documentationJar->getBranch();
 
         return new DeploymentInformation(
             $repositoryUrl,
+            $publicComposerJsonUrl,
             $vendor,
             $name,
             $typeLong,
@@ -98,7 +101,7 @@ class DeploymentInformationFactory
      * @return array
      * @throws ComposerJsonInvalidException
      */
-    private function determinePackageType(ComposerJson $composerJson, string $repositoryUrl): array
+    private static function determinePackageType(ComposerJson $composerJson, string $repositoryUrl): array
     {
         if ($repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git') {
             // Hard coded final location for the docs homepage repository
@@ -119,7 +122,7 @@ class DeploymentInformationFactory
      * @return array
      * @throws ComposerJsonInvalidException
      */
-    private function determinePackageName(ComposerJson $composerJson): array
+    private static function determinePackageName(ComposerJson $composerJson): array
     {
         if (!preg_match('/^[\w-]+\/[\w-]+$/', $composerJson->getName())) {
             throw new ComposerJsonInvalidException('composer.json \'name\' must be of form \'vendor/package\', \'' . $composerJson->getName() . '\' given.', 1553082490);

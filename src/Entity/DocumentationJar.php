@@ -87,6 +87,11 @@ class DocumentationJar
     private $status;
 
     /**
+     * @ORM\Column(type="string", length=255, options={"default": ""})
+     */
+    private $buildKey;
+
+    /**
      * @return mixed
      */
     public function getTypeShort(): ?string
@@ -289,7 +294,31 @@ class DocumentationJar
         return $this;
     }
 
-    public function isActionable(): bool
+    /**
+     * @return string|null
+     */
+    public function getBuildKey(): ?string
+    {
+        return $this->buildKey;
+    }
+
+    /**
+     * @param string $buildKey
+     * @return self
+     */
+    public function setBuildKey(string $buildKey): self
+    {
+        $this->buildKey = $buildKey;
+
+        return $this;
+    }
+
+    public function isRenderable(): bool
+    {
+        return !empty($this->publicComposerJsonUrl) && in_array($this->status, [DocumentationStatus::STATUS_RENDERED, DocumentationStatus::STATUS_FAILED], true);
+    }
+
+    public function isDeletable(): bool
     {
         return $this->status === DocumentationStatus::STATUS_RENDERED;
     }

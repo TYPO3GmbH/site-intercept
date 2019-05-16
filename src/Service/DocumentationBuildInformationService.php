@@ -129,9 +129,7 @@ class DocumentationBuildInformationService
     public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {
         $this->assertComposerJsonContainsNecessaryData($composerJson);
-        $factory = new DeploymentInformationFactory();
-
-        return $factory->buildFromComposerJson($composerJson, $pushEvent, $this->privateDir, $this->subDir);
+        return DeploymentInformationFactory::buildFromComposerJson($composerJson, $pushEvent, $this->privateDir, $this->subDir);
     }
 
     /**
@@ -144,9 +142,7 @@ class DocumentationBuildInformationService
      */
     public function generateBuildInformationFromDocumentationJar(DocumentationJar $documentationJar): DeploymentInformation
     {
-        $factory = new DeploymentInformationFactory();
-
-        return $factory->buildFromDocumentationJar($documentationJar, $this->privateDir, $this->subDir);
+        return DeploymentInformationFactory::buildFromDocumentationJar($documentationJar, $this->privateDir, $this->subDir);
     }
 
     /**
@@ -192,8 +188,9 @@ class DocumentationBuildInformationService
      * Add / update a db entry for this docs deployment
      *
      * @param DeploymentInformation $deploymentInformation
+     * @return DocumentationJar
      */
-    public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): void
+    public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): DocumentationJar
     {
         $records = $this->documentationJarRepository->findBy([
             'repositoryUrl' => $deploymentInformation->repositoryUrl,
@@ -256,10 +253,26 @@ class DocumentationBuildInformationService
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
                 ->setTypeShort($deploymentInformation->typeShort)
-                ->setStatus(DocumentationStatus::STATUS_RENDERING);
+                ->setStatus(DocumentationStatus::STATUS_RENDERING)
+                ->setBuildKey('');
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
+
+            $record = $documentationJar;
         }
+
+        return $record;
+    }
+
+    /**
+     * @param DocumentationJar $documentationJar
+     * @param string $buildKey
+     */
+    public function updateBuildKey(DocumentationJar $documentationJar, string $buildKey): void
+    {
+        $documentationJar->setBuildKey($buildKey);
+        $this->entityManager->persist($documentationJar);
+        $this->entityManager->flush();
     }
 
     /**

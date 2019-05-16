@@ -35,10 +35,10 @@ class DeploymentInformationTest extends TestCase
             'type' => 'typo3-cms-extension',
         ];
 
-        $factory = new DeploymentInformationFactory();
-        $subject = $factory->buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
 
         $this->assertSame('https://github.com/lolli42/enetcache/', $subject->repositoryUrl);
+        $this->assertSame('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json', $subject->publicComposerJsonUrl);
         $this->assertSame('foobar', $subject->vendor);
         $this->assertSame('bazfnord', $subject->name);
         $this->assertSame('foobar/bazfnord', $subject->packageName);
@@ -67,6 +67,7 @@ class DeploymentInformationTest extends TestCase
 
         $expected = [
             'repository_url' => 'https://github.com/lolli42/enetcache/',
+            'public_composer_json_url' => 'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'vendor' => 'foobar',
             'name' => 'bazfnord',
             'package_name' => 'foobar/bazfnord',
@@ -75,8 +76,7 @@ class DeploymentInformationTest extends TestCase
             'type_long' => 'extension',
             'type_short' => 'p',
         ];
-        $factory = new DeploymentInformationFactory();
-        $subject = $factory->buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame($expected, $subject->toArray());
     }
 
@@ -113,8 +113,7 @@ class DeploymentInformationTest extends TestCase
             'type' => 'typo3-cms-extension',
         ];
 
-        $factory = new DeploymentInformationFactory();
-        $subject = $factory->buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame($expectedVendor, $subject->vendor);
         $this->assertSame($expectedName, $subject->name);
         $this->assertSame($packageName, $subject->packageName);
@@ -153,8 +152,7 @@ class DeploymentInformationTest extends TestCase
             'name' => $packageName,
             'type' => 'typo3-cms-extension',
         ];
-        $factory = new DeploymentInformationFactory();
-        $factory->buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
     }
 
     /**
@@ -187,8 +185,7 @@ class DeploymentInformationTest extends TestCase
             'name' => 'foobar/bazfnord',
             'type' => $type,
         ];
-        $factory = new DeploymentInformationFactory();
-        $subject = $factory->buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame($expectedLong, $subject->typeLong);
         $this->assertSame($expectedShort, $subject->typeShort);
     }
@@ -207,8 +204,7 @@ class DeploymentInformationTest extends TestCase
             'name' => 'foobar/bazfnord',
             'type' => 'does-not-matter-here',
         ];
-        $factory = new DeploymentInformationFactory();
-        $subject = $factory->buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame('docs-home', $subject->typeLong);
         $this->assertSame('h', $subject->typeShort);
     }
@@ -254,8 +250,7 @@ class DeploymentInformationTest extends TestCase
             'type' => $type,
         ];
 
-        $factory = new DeploymentInformationFactory();
-        $factory->buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
     }
 
     /**
@@ -421,8 +416,7 @@ class DeploymentInformationTest extends TestCase
             'type' => $type,
         ];
 
-        $factory = new DeploymentInformationFactory();
-        $subject = $factory->buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame($expectedBranch, $subject->targetBranchDirectory);
     }
 
@@ -512,7 +506,6 @@ class DeploymentInformationTest extends TestCase
             'type' => $type,
         ];
 
-        $factory = new DeploymentInformationFactory();
-        $factory->buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
     }
 }

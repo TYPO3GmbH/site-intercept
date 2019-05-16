@@ -18,7 +18,6 @@ use App\Service\GraylogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -28,28 +27,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminInterfaceDocsDeploymentsController extends AbstractController
 {
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @Route("/admin/docs/deployments", name="admin_docs_deployments")
      *
-     * @param Request $request
-     * @param LoggerInterface $logger
      * @param BambooService $bambooService
      * @param GraylogService $graylogService
+     * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
      */
-    public function index(
-        Request $request,
-        LoggerInterface $logger,
-        BambooService $bambooService,
-        GraylogService $graylogService,
-        DocumentationJarRepository $documentationJarRepository
-    ): Response {
-        $this->logger = $logger;
-
+    public function index(BambooService $bambooService, GraylogService $graylogService, DocumentationJarRepository $documentationJarRepository): Response
+    {
         $recentLogsMessages = $graylogService->getRecentBambooDocsActions();
         $deployments = $documentationJarRepository->findAll();
 
@@ -67,22 +53,16 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
     /**
      * @Route("/admin/docs/deployments/delete/{documentationJarId}/confirm", name="admin_docs_deployments_delete_view", requirements={"documentationJarId"="\d+"}, methods={"GET"})
      *
-     * @param Request $request
      * @param int $documentationJarId
-     * @param LoggerInterface $logger
      * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
      */
-    public function deleteConfirm(
-        Request $request,
-        int $documentationJarId,
-        LoggerInterface $logger,
-        DocumentationJarRepository $documentationJarRepository
-    ): Response {
-        $this->logger = $logger;
+    public function deleteConfirm(int $documentationJarId, DocumentationJarRepository $documentationJarRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
 
         $jar = $documentationJarRepository->find($documentationJarId);
-        if (null === $jar || !$jar->isActionable()) {
+        if (null === $jar || !$jar->isDeletable()) {
             return $this->redirectToRoute('admin_docs_deployments');
         }
 
@@ -96,9 +76,8 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
     }
 
     /**
-     * @Route("/admin/docs/deployments/delete/{documentationJarId}", name="admin_docs_deployments_delete_action", requirements={"documentationJarId"="\d+"}, methods={"GET"})
+     * @Route("/admin/docs/deployments/delete/{documentationJarId}", name="admin_docs_deployments_delete_action", requirements={"documentationJarId"="\d+"}, methods={"DELETE"})
      *
-     * @param Request $request
      * @param int $documentationJarId
      * @param LoggerInterface $logger
      * @param DocumentationJarRepository $documentationJarRepository
@@ -109,7 +88,6 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
      * @throws \App\Exception\DocsPackageDoNotCareBranch
      */
     public function delete(
-        Request $request,
         int $documentationJarId,
         LoggerInterface $logger,
         DocumentationJarRepository $documentationJarRepository,
@@ -117,21 +95,22 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         DocumentationBuildInformationService $documentationBuildInformationService,
         BambooService $bambooService
     ): Response {
-        $this->logger = $logger;
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
 
         $jar = $documentationJarRepository->find($documentationJarId);
 
-        if (null !== $jar && $jar->isActionable()) {
-            $jar->setStatus(DocumentationStatus::STATUS_DELETING);
-            $entityManager->persist($jar);
-            $entityManager->flush();
+        if (null !== $jar && $jar->isDeletable()) {
             $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($jar);
             $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
+            $bambooBuildTriggered = $bambooService->triggerDocumentationDeletionPlan($informationFile);
 
-            // ToDo: Trigger Bamboo build with delete command
-            //$bambooService->triggerDocumentationDeletionPlan($informationFile);
+            $jar
+                ->setBuildKey($bambooBuildTriggered->buildResultKey)
+                ->setStatus(DocumentationStatus::STATUS_DELETING);
+            $entityManager->persist($jar);
+            $entityManager->flush();
 
-            $this->logger->info(
+            $logger->info(
                 'Documentation deleted.',
                 [
                     'type' => 'docsRendering',
@@ -139,6 +118,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                     'triggeredBy' => 'interface',
                     'repository' => $jar->getRepositoryUrl(),
                     'package' => $jar->getPackageName(),
+                    'bambooKey' => $bambooBuildTriggered->buildResultKey,
                 ]
             );
         }
