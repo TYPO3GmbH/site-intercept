@@ -69,14 +69,14 @@
                                 {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                                     <td data-type="actions" data-label="Actions">
                                         {% if deployment.publicComposerJsonUrl %}
-                                            <a class="datatable-action" href="{{ path('docs_to_bamboo_render', {documentation: deployment.id}) }}">
+                                            <a class="datatable-action" title="Re-render documentation" href="{{ path('docs_to_bamboo_render', {documentation: deployment.id}) }}">
                                                 <span class="datatable-action-icon"><i class="fa fa-draw-polygon"></i></span>
                                                 <span class="datatable-action-label datatable-visually-hidden">Re-render documentation</span>
                                             </a>
                                         {% endif %}
 
                                         {% if deployment.isActionable() %}
-                                            <a class="datatable-action" href="{{ path('admin_docs_deployments_delete_view', {'documentationJarId': deployment.getId()}) }}">
+                                            <a class="datatable-action" title="Delete" href="{{ path('admin_docs_deployments_delete_view', {'documentationJarId': deployment.getId()}) }}">
                                                 <span class="datatable-action-icon"><i class="fa fa-trash"></i></span>
                                                 <span class="datatable-action-label datatable-visually-hidden">Delete</span>
                                             </a>
