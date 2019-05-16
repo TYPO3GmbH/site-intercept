@@ -100,7 +100,7 @@ class DocumentationVersions
 
         $finalEntries = [];
         foreach ($entries as $version => $entry) {
-            $finalEntries[] = '<dd><a href="/' . str_replace($documentRoot, '', $entry) . '">' . $version . '</a></dd>';
+            $finalEntries[] = '<dd><a href="' . str_replace($documentRoot, '', $entry) . '">' . $version . '</a></dd>';
         }
 
         return new Response(200, [], implode(chr(10), $finalEntries));
