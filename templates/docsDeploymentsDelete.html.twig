@@ -41,6 +41,8 @@
                                         <span class="badge badge-warning">Deleting</span>
                                     {% elseif deployment.status == "3" %}
                                         <span class="badge badge-danger">Failed</span>
+                                    {% elseif deployment.status == "4" %}
+                                        <span class="badge badge-info">New</span>
                                     {% else %}
                                         <span class="badge badge-secondary">Unknown</span>
                                     {% endif %}

@@ -40,8 +40,8 @@ class WebHookService
         if (in_array($request->headers->get('X-GitHub-Event', ''), ['push', 'release'], true)) {
             return $this->getPushEventFromGithub($request, $request->headers->get('X-GitHub-Event'));
         }
-        if (in_array($request->headers->get('X-GitHub-Event', ''), ['ping'], true)) {
-            $payload = json_decode($request->getContent());
+        if ($request->headers->get('X-GitHub-Event', '') === 'ping') {
+            $payload = json_decode($request->getContent(), false);
             throw new GithubHookPingException('', 1557838026, null, (string)$payload->repository->html_url);
         }
         throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1553256930);
@@ -49,64 +49,37 @@ class WebHookService
 
     protected function getPushEventFromBitbucket(Request $request): PushEvent
     {
-        $payload = json_decode($request->getContent());
+        $payload = json_decode($request->getContent(), false);
         $repositoryUrl = (string)$payload->push->changes[0]->new->target->links->html->href;
         $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
         $versionString = (string)$payload->push->changes[0]->new->name;
-        $urlToComposerFile = str_replace(
-            [
-                '{projectUrl}',
-                '{repoName}',
-                '{versionString}',
-            ],
-            [
-                (string)$payload->repository->project->links->html->href,
-                (string)$payload->repository->name,
-                $versionString
-            ],
-            '{projectUrl}/repos/{repoName}/raw/composer.json?at=refs%2Fheads%2F{versionString}'
-        );
+        $urlToComposerFile = (new GitRepositoryService())
+            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET);
+
         return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
     }
 
     protected function getPushEventFromGitlab(Request $request): PushEvent
     {
-        $payload = json_decode($request->getContent());
+        $payload = json_decode($request->getContent(), false);
         $repositoryUrl = (string)$payload->repository->git_http_url;
         $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
-        $urlToComposerFile = str_replace(
-            [
-                '{webUrl}',
-                '{versionString}',
-            ],
-            [
-                (string)$payload->project->web_url,
-                $versionString
-            ],
-            '{webUrl}/raw/{versionString}/composer.json'
-        );
+        $urlToComposerFile = (new GitRepositoryService())
+            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITLAB);
+
         return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
     }
 
     protected function getPushEventFromGithub(Request $request, string $eventType): PushEvent
     {
-        $payload = json_decode($request->getContent());
+        $payload = json_decode($request->getContent(), false);
         $repositoryUrl = (string)$payload->repository->clone_url;
         $versionString = ($eventType === 'release')
             ? (string)$payload->release->tag_name
             : str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
+        $urlToComposerFile = (new GitRepositoryService())
+            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITHUB, $eventType);
 
-        $urlToComposerFile = str_replace(
-            [
-                '{repoFullName}',
-                '{versionString}',
-            ],
-            [
-                (string)$payload->repository->full_name,
-                $versionString
-            ],
-            'https://raw.githubusercontent.com/{repoFullName}/{versionString}/composer.json'
-        );
         return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
     }
 }
