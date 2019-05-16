@@ -9,6 +9,11 @@ This script is called when clicking the 'Versions' selector in the lower
 left of a rendered documentation. It returns a list of existing "other versions"
 of that documentation. 
 
+## ajaxdownloads.php
+
+Similar to ajaxversions.php. This script outputs links to _buildinfo directory
+of the given rendered repository.
+
 
 ## Hook for documentation rendering
 

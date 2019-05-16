@@ -11,13 +11,13 @@
             </h2>
 
             {% if is_granted('ROLE_ADMIN') %}
-                <div class="alert alert-danger shadow">
+                <div class="alert alert-danger">
                     Do not abuse this interface - triggering many builds can <strong>easily</strong>
                     occupy bamboo for hours.
                 </div>
                 <div class="row mb-4">
                     <div class="col-lg-6 col-md-12 col-sm-12">
-                        <div class="card shadow">
+                        <div class="card">
                             <div class="card-header">
                                 <h2>
                                     Bamboo core security tests with specific patch
@@ -56,7 +56,6 @@
                                 {{ form_widget(patchForm._token, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
                                 {{ form_end(patchForm, {'render_rest': false}) }}
                             </div>
-                            <hr/>
                             <div class="card-body">
                                 {{ form_start(urlForm) }}
                                 <h3>
@@ -68,12 +67,10 @@
                                     on top of current head of the core master target branch which may fail if it has merge conflicts.
                                 </p>
                                 {{ form_errors(urlForm) }}
-                                <div class="form-group row">
-                                    <div class="col-12">
-                                        {{ form_errors(urlForm.url) }}
-                                        {{ form_widget(urlForm.url) }}
-                                        {{ form_help(urlForm.url) }}
-                                    </div>
+                                <div class="form-group">
+                                    {{ form_errors(urlForm.url) }}
+                                    {{ form_widget(urlForm.url) }}
+                                    {{ form_help(urlForm.url) }}
                                 </div>
                                 {{ form_widget(urlForm._token) }}
                                 {{ form_widget(urlForm.trigger) }}
@@ -86,7 +83,7 @@
 
             <div class="row mb-4">
                 <div class="col-lg-12 col-md-12 col-sm-12">
-                    <div class="card shadow">
+                    <div class="card">
                         <div class="card-header">
                             <h2>
                                 Recent actions

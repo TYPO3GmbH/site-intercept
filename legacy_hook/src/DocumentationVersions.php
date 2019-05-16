@@ -63,7 +63,7 @@ class DocumentationVersions
         $filePathToDocsEntryPoint = $documentRoot . '/' . implode('/', $entryPoint);
         if (!is_dir($filePathToDocsEntryPoint)
             || !is_dir($filePathToDocsEntryPoint . '/' . $currentVersion)
-            || !is_file($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . implode('/', $pathAfterEntryPoint))
+            || !file_exists($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . implode('/', $pathAfterEntryPoint))
         ) {
             return new Response(200, [], '');
         }
@@ -100,7 +100,7 @@ class DocumentationVersions
 
         $finalEntries = [];
         foreach ($entries as $version => $entry) {
-            $finalEntries[] = '<dd><a href="https://stage.docs.typo3.com/' . str_replace($documentRoot, '', $entry) . '">' . $version . '</a></dd>';
+            $finalEntries[] = '<dd><a href="/' . str_replace($documentRoot, '', $entry) . '">' . $version . '</a></dd>';
         }
 
         return new Response(200, [], implode(chr(10), $finalEntries));
