@@ -51,12 +51,13 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         $this->logger = $logger;
 
         $recentLogsMessages = $graylogService->getRecentBambooDocsActions();
+        $deployments = $documentationJarRepository->findAll();
 
         return $this->render(
             'docsDeployments.html.twig',
             [
                 'logMessages' => $recentLogsMessages,
-                'deployments' => $documentationJarRepository->findAll(),
+                'deployments' => $deployments,
                 'bambooStatus' => $bambooService->getBambooStatus(),
                 'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),
             ]

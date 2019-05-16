@@ -18,11 +18,9 @@
                     <table class="datatable-table">
                         <thead>
                             <tr>
-                                <th scope="col" data-type="uid">Id</th>
-                                <th scope="col" colspan="2">Package</th>
+                                <th scope="col" colspan="3">Package</th>
                                 <th scope="col">Type</th>
                                 <th scope="col">Branch</th>
-                                <th scope="col">Target</th>
                                 <th scope="col">Created</th>
                                 <th scope="col">Last rendered</th>
                                 <th scope="col">Actions</th>
@@ -31,7 +29,6 @@
                         <tbody>
                         {% for deployment in deployments %}
                             <tr>
-                                <th scope="row" data-type="uid">{{ deployment.id }}</th>
                                 <th data-type="icon">
                                     <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
                                         <i class="fab fa-fw fa-git-alt"></i>
@@ -40,9 +37,24 @@
                                 <th data-type="title">
                                     <strong>{{ deployment.packageName }}</strong><br>
                                 </th>
+                                <th>
+                                    {% if deployment.status == "0" %}
+                                        <span class="badge badge-info">Rendering</span>
+                                    {% elseif deployment.status == "1" %}
+                                        <span class="badge badge-success">Rendered</span>
+                                    {% elseif deployment.status == "2" %}
+                                        <span class="badge badge-warning">Deleting</span>
+                                    {% elseif deployment.status == "3" %}
+                                        <span class="badge badge-danger">Failed</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Unknown</span>
+                                    {% endif %}
+                                </th>
                                 <td>{{ deployment.typeLong }}</td>
-                                <td>{{ deployment.branch }}</td>
                                 <td>
+                                    {% if deployment.branch != deployment.targetBranchDirectory %}
+                                        {{ deployment.branch }} &raquo;
+                                    {% endif %}
                                     <a href="{{ docsLiveServer }}/{{ deployment.typeShort }}/{{ deployment.packageName }}/{{ deployment.targetBranchDirectory }}" rel="noopener" target="_blank">
                                         {{ deployment.targetBranchDirectory }}
                                     </a>
