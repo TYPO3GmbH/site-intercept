@@ -95,15 +95,20 @@ class DocumentationVersions
         foreach ($validatedVersions as $version) {
             $checkSubPaths = $pathAfterEntryPoint;
             $subPathCount = count($checkSubPaths);
+            $found = false;
             for ($i = 0; $i < $subPathCount; $i++) {
                 // Traverse sub path segments up until one has been found in filesystem, to find the
                 // "nearest" matching version of currently viewed file
                 $pathToCheck = $filePathToDocsEntryPoint . '/' . $version['version'] . '/' . $version['language'] . '/' . implode('/', $checkSubPaths);
                 if (is_file($pathToCheck) || is_dir($pathToCheck)) {
                     $version['path'] = $pathToCheck;
+                    $found = true;
                     break;
                 }
                 array_pop($checkSubPaths);
+            }
+            if (!$found) {
+               $version['path'] = $filePathToDocsEntryPoint . '/' . $version['version'] . '/' . $version['language'] . '/';
             }
             $entries[] = $version;
         }
