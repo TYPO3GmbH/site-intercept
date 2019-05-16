@@ -34,8 +34,11 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
      * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
      */
-    public function index(BambooService $bambooService, GraylogService $graylogService, DocumentationJarRepository $documentationJarRepository): Response
-    {
+    public function index(
+        BambooService $bambooService,
+        GraylogService $graylogService,
+        DocumentationJarRepository $documentationJarRepository
+    ): Response {
         $recentLogsMessages = $graylogService->getRecentBambooDocsActions();
         $deployments = $documentationJarRepository->findAll();
 

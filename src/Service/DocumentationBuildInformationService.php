@@ -18,7 +18,6 @@ use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
-use App\Extractor\Factory\DeploymentInformationFactory;
 use App\Extractor\PushEvent;
 use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -89,7 +88,7 @@ class DocumentationBuildInformationService
      * Fetch composer.json from a remote repository to get more package information.
      *
      * @param string $path
-     * @return string
+     * @return array
      * @throws ComposerJsonNotFoundException
      */
     public function fetchRemoteComposerJson(string $path): array
@@ -129,7 +128,15 @@ class DocumentationBuildInformationService
     public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {
         $this->assertComposerJsonContainsNecessaryData($composerJson);
-        return DeploymentInformationFactory::buildFromComposerJson($composerJson, $pushEvent->getRepositoryUrl(), $pushEvent->getUrlToComposerFile(), $pushEvent->getVersionString(), $this->privateDir, $this->subDir);
+        return new DeploymentInformation(
+            $composerJson->getName(),
+            $composerJson->getType(),
+            $pushEvent->getRepositoryUrl(),
+            $pushEvent->getUrlToComposerFile(),
+            $pushEvent->getVersionString(),
+            $this->privateDir,
+            $this->subDir
+        );
     }
 
     /**
@@ -142,7 +149,15 @@ class DocumentationBuildInformationService
      */
     public function generateBuildInformationFromDocumentationJar(DocumentationJar $documentationJar): DeploymentInformation
     {
-        return DeploymentInformationFactory::buildFromDocumentationJar($documentationJar, $this->privateDir, $this->subDir);
+        return new DeploymentInformation(
+            $documentationJar->getPackageName(),
+            $documentationJar->getPackageType(),
+            $documentationJar->getRepositoryUrl(),
+            $documentationJar->getPublicComposerJsonUrl(),
+            $documentationJar->getBranch(),
+            $this->privateDir,
+            $this->subDir
+        );
     }
 
     /**
@@ -249,6 +264,7 @@ class DocumentationBuildInformationService
                 ->setVendor($deploymentInformation->vendor)
                 ->setName($deploymentInformation->name)
                 ->setPackageName($deploymentInformation->packageName)
+                ->setPackageType($deploymentInformation->packageType)
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)

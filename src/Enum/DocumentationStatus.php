@@ -14,5 +14,5 @@ final class DocumentationStatus
     public const STATUS_RENDERING = 0;
     public const STATUS_RENDERED = 1;
     public const STATUS_DELETING = 2;
-    public const STATUS_FAILED = 3;
+    public const STATUS_RENDERING_FAILED = 3;
 }

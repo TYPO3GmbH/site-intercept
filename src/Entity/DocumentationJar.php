@@ -54,6 +54,11 @@ class DocumentationJar
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $packageType;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $branch;
 
     /**
@@ -230,6 +235,24 @@ class DocumentationJar
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getPackageType(): string
+    {
+        return $this->packageType;
+    }
+
+    /**
+     * @param mixed $packageType
+     * @return DocumentationJar
+     */
+    public function setPackageType(string $packageType): self
+    {
+        $this->packageType = $packageType;
+        return $this;
+    }
+
     public function getBranch(): ?string
     {
         return $this->branch;
@@ -315,7 +338,7 @@ class DocumentationJar
 
     public function isRenderable(): bool
     {
-        return !empty($this->publicComposerJsonUrl) && in_array($this->status, [DocumentationStatus::STATUS_RENDERED, DocumentationStatus::STATUS_FAILED], true);
+        return !empty($this->publicComposerJsonUrl) && in_array($this->status, [DocumentationStatus::STATUS_RENDERED, DocumentationStatus::STATUS_RENDERING_FAILED], true);
     }
 
     public function isDeletable(): bool

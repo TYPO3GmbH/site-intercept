@@ -45,9 +45,9 @@ return new Response(
             "start-index": 0,
             "max-result": 1
         },
-        "buildTestSummary": "2 passed",
-        "successfulTestCount": 2,
-        "failedTestCount": 0,
+        "buildTestSummary": "0 passed",
+        "successfulTestCount": 0,
+        "failedTestCount": 2,
         "quarantinedTestCount": 0,
         "skippedTestCount": 0,
         "continuable": false,
@@ -55,7 +55,7 @@ return new Response(
         "restartable": false,
         "notRunYet": false,
         "finished": true,
-        "successful": true,
+        "successful": false,
         "buildReason": "Manual run by <a href=\"https://bamboo.typo3.com/browse/user/wb\">Wallboard User</a>",
         "reasonSummary": "Manual run by <a href=\"https://bamboo.typo3.com/browse/user/wb\">Wallboard User</a>",
         "artifacts": {

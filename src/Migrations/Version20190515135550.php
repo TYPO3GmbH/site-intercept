@@ -19,7 +19,7 @@ use Doctrine\Migrations\AbstractMigration;
  * Auto-generated Migration: Please modify to your needs!
  * @codeCoverageIgnore
  */
-final class Version20190515163123 extends AbstractMigration
+final class Version20190515135550 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -33,6 +33,7 @@ final class Version20190515163123 extends AbstractMigration
 
         $this->addSql('ALTER TABLE documentation_jar ADD COLUMN status VARCHAR(255) DEFAULT \'\' NOT NULL');
         $this->addSql('ALTER TABLE documentation_jar ADD COLUMN build_key INTEGER DEFAULT ' . DocumentationStatus::STATUS_RENDERING . ' NOT NULL');
+        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN package_type VARCHAR(255) DEFAULT \'\' NOT NULL');
         $this->addSql('UPDATE documentation_jar SET status = ' . DocumentationStatus::STATUS_RENDERED);
     }
 

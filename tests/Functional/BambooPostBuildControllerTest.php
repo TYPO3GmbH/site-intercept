@@ -164,8 +164,9 @@ class BambooPostBuildControllerTest extends TestCase
             ->setVendor('foobar')
             ->setName('bazfnord')
             ->setPackageName('foobar/bazfnord')
+            ->setPackageType('typo3-cms-extension')
             ->setTypeShort('c')
-            ->setTypeLong('typo3-cms-extension')
+            ->setTypeLong('core-extension')
             ->setRepositoryUrl('https://github.com/lolli42/enetcache/')
             ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json')
             ->setBranch('master')
@@ -185,5 +186,55 @@ class BambooPostBuildControllerTest extends TestCase
         ]);
 
         $this->assertCount(0, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function triggeredDeletionFailsAndResetsStatus(): void
+    {
+        $bambooBuildKey = 'CORE-DDEL-4711';
+
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy
+            ->get(
+                'latest/result/' . $bambooBuildKey . '?os_authType=basic&expand=labels',
+                Argument::cetera()
+            )->shouldBeCalled()
+            ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildBadBambooDetailsDocsDeletionFailedResponse.php');
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $documentationJar = (new DocumentationJar())
+            ->setVendor('foobar')
+            ->setName('bazfnord')
+            ->setPackageName('foobar/bazfnord')
+            ->setPackageType('typo3-cms-extension')
+            ->setTypeShort('c')
+            ->setTypeLong('core-extension')
+            ->setRepositoryUrl('https://github.com/lolli42/enetcache/')
+            ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json')
+            ->setBranch('master')
+            ->setTargetBranchDirectory('master')
+            ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setBuildKey($bambooBuildKey);
+        $entityManager->persist($documentationJar);
+        $entityManager->flush();
+
+        $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodDocsDeletionRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+
+        $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
+        $result = $documentationJarRepository->findBy([
+            'buildKey' => $bambooBuildKey,
+        ]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame(DocumentationStatus::STATUS_RENDERED, current($result)->getStatus());
     }
 }

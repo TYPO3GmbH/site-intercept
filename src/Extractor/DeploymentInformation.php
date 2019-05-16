@@ -9,6 +9,7 @@
 
 namespace App\Extractor;
 
+use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 
 /**
@@ -40,6 +41,11 @@ class DeploymentInformation
      * @var string Full package name, eg. 'georgringer/news'
      */
     public $packageName;
+
+    /**
+     * @var string Full package type, eg. 'typo3-cms-extension'
+     */
+    public $packageType;
 
     /**
      * @var string The (not changed) source branch or tag of the repository supposed to be checked out, eg. '1.2.3', '1.2', 'master', 'latest'
@@ -84,28 +90,35 @@ class DeploymentInformation
     /**
      * Constructor
      *
+     * @param string $composerPackageName
+     * @param string $composerPackageType
      * @param string $repositoryUrl
      * @param string $publicComposerJsonUrl
-     * @param string $vendor
-     * @param string $name
-     * @param string $typeLong
-     * @param string $typeShort
-     * @param string $sourceBranch
+     * @param string $version
      * @param string $privateDir
      * @param string $subDir
      * @throws DocsPackageDoNotCareBranch
      */
-    public function __construct(string $repositoryUrl, string $publicComposerJsonUrl, string $vendor, string $name, string $typeLong, string $typeShort, string $sourceBranch, string $privateDir, string $subDir)
-    {
+    public function __construct(
+        string $composerPackageName,
+        string $composerPackageType,
+        string $repositoryUrl,
+        string $publicComposerJsonUrl,
+        string $version,
+        string $privateDir,
+        string $subDir
+    ) {
         $this->repositoryUrl = $repositoryUrl;
         $this->publicComposerJsonUrl = $publicComposerJsonUrl;
-        $this->vendor = $vendor;
-        $this->name = $name;
-
+        $this->packageType = $composerPackageType;
+        $packageName = $this->determinePackageName($composerPackageName);
+        $packageType = $this->determinePackageType($composerPackageType, $this->repositoryUrl);
+        $this->vendor = key($packageName);
+        $this->name = current($packageName);
         $this->packageName = $this->vendor . '/' . $this->name;
-        $this->typeLong = $typeLong;
-        $this->typeShort = $typeShort;
-        $this->sourceBranch = $sourceBranch;
+        $this->typeLong = current($packageType);
+        $this->typeShort = key($packageType);
+        $this->sourceBranch = $version;
 
         $this->targetBranchDirectory = $this->getTargetBranchDirectory($this->sourceBranch, $this->typeLong);
 
@@ -129,6 +142,7 @@ class DeploymentInformation
             'vendor' => $this->vendor,
             'name' => $this->name,
             'package_name' => $this->packageName,
+            'package_type' => $this->packageType,
             'source_branch' => $this->sourceBranch,
             'target_branch_directory' => $this->targetBranchDirectory,
             'type_long' => $this->typeLong,
@@ -190,5 +204,51 @@ class DeploymentInformation
 
         // docs-home has only master branch, this is returned above already, safe to not handle this here.
         throw new \RuntimeException('Unknown package type ' . $type);
+    }
+
+    /**
+     * @param string $packageType
+     * @param string $repositoryUrl
+     * @return array
+     * @throws ComposerJsonInvalidException
+     */
+    private function determinePackageType(string $packageType, string $repositoryUrl): array
+    {
+        if ($repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git') {
+            // Hard coded final location for the docs homepage repository
+            return [
+                'h' => 'docs-home',
+            ];
+        }
+
+        if ($packageType === '') {
+            throw new ComposerJsonInvalidException('composer.json \'type\' must be given', 1558019479);
+        }
+
+        if (!array_key_exists($packageType, self::$typeMap)) {
+            throw new ComposerJsonInvalidException('composer.json \'type\' must be set to one of ' . implode(', ', array_keys(self::$typeMap)) . ', ' . $packageType . ' given', 1557490474);
+        }
+
+        return self::$typeMap[$packageType];
+    }
+
+    /**
+     * @param string $packageName
+     * @return array
+     * @throws ComposerJsonInvalidException
+     */
+    private function determinePackageName(string $packageName): array
+    {
+        $packageName = trim($packageName);
+        if ($packageName === '') {
+            throw new ComposerJsonInvalidException('composer.json \'name\' must be given', 1558019290);
+        }
+
+        if (!preg_match('/^[\w-]+\/[\w-]+$/', $packageName)) {
+            throw new ComposerJsonInvalidException('composer.json \'name\' must be of form \'vendor/package\', \'' . $packageName . '\' given.', 1553082490);
+        }
+
+        [$vendor, $name] = explode('/', $packageName);
+        return [$vendor => $name];
     }
 }
