@@ -93,7 +93,6 @@ class DocumentationVersions
         $entries = [];
         // One entry per version that is deployed
         foreach ($validatedVersions as $version) {
-            $entry = $filePathToDocsEntryPoint . '/' . $version['version'] . '/' . $version['language'] . '/';
             $checkSubPaths = $pathAfterEntryPoint;
             $subPathCount = count($checkSubPaths);
             for ($i = 0; $i < $subPathCount; $i++) {
