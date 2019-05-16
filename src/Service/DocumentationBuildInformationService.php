@@ -129,7 +129,7 @@ class DocumentationBuildInformationService
     public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {
         $this->assertComposerJsonContainsNecessaryData($composerJson);
-        return DeploymentInformationFactory::buildFromComposerJson($composerJson, $pushEvent, $this->privateDir, $this->subDir);
+        return DeploymentInformationFactory::buildFromComposerJson($composerJson, $pushEvent->getRepositoryUrl(), $pushEvent->getUrlToComposerFile(), $pushEvent->getVersionString(), $this->privateDir, $this->subDir);
     }
 
     /**

@@ -8,7 +8,6 @@ use App\Bundle\ClockMockBundle;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\Factory\DeploymentInformationFactory;
-use App\Extractor\PushEvent;
 use PHPUnit\Framework\TestCase;
 
 class DeploymentInformationTest extends TestCase
@@ -25,17 +24,19 @@ class DeploymentInformationTest extends TestCase
      */
     public function composerJsonSetsValuesAsExpected(): void
     {
-        $pushEvent = new PushEvent(
-            'https://github.com/lolli42/enetcache/',
-            'master',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
-        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => 'typo3-cms-extension',
         ];
 
-        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(
+            new ComposerJson($composerJsonAsArray),
+            'https://github.com/lolli42/enetcache/',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
+            'master',
+            '/tmp/foo',
+            'bar'
+        );
 
         $this->assertSame('https://github.com/lolli42/enetcache/', $subject->repositoryUrl);
         $this->assertSame('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json', $subject->publicComposerJsonUrl);
@@ -55,11 +56,6 @@ class DeploymentInformationTest extends TestCase
      */
     public function arrayIsReturnedAsExpected(): void
     {
-        $pushEvent = new PushEvent(
-            'https://github.com/lolli42/enetcache/',
-            'master',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
-        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => 'typo3-cms-extension',
@@ -76,7 +72,14 @@ class DeploymentInformationTest extends TestCase
             'type_long' => 'extension',
             'type_short' => 'p',
         ];
-        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(
+            new ComposerJson($composerJsonAsArray),
+            'https://github.com/lolli42/enetcache/',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
+            'master',
+            '/tmp/foo',
+            'bar'
+        );
         $this->assertSame($expected, $subject->toArray());
     }
 
@@ -103,17 +106,19 @@ class DeploymentInformationTest extends TestCase
      */
     public function packageNamePartsAreCorrectlyResolved(string $packageName, string $expectedVendor, string $expectedName): void
     {
-        $pushEvent = new PushEvent(
-            'https://github.com/lolli42/enetcache/',
-            'master',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
-        );
         $composerJsonAsArray = [
             'name' => $packageName,
             'type' => 'typo3-cms-extension',
         ];
 
-        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(
+            new ComposerJson($composerJsonAsArray),
+            'https://github.com/lolli42/enetcache/',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
+            'master',
+            '/tmp/foo',
+            'bar'
+        );
         $this->assertSame($expectedVendor, $subject->vendor);
         $this->assertSame($expectedName, $subject->name);
         $this->assertSame($packageName, $subject->packageName);
@@ -143,16 +148,18 @@ class DeploymentInformationTest extends TestCase
     {
         $this->expectExceptionCode($expectedExceptionCode);
 
-        $pushEvent = new PushEvent(
-            'https://github.com/lolli42/enetcache/',
-            'master',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
-        );
         $composerJsonAsArray = [
             'name' => $packageName,
             'type' => 'typo3-cms-extension',
         ];
-        DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        DeploymentInformationFactory::buildFromComposerJson(
+            new ComposerJson($composerJsonAsArray),
+            'https://github.com/lolli42/enetcache/',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
+            'master',
+            '/tmp/foo',
+            'bar'
+        );
     }
 
     /**
@@ -176,16 +183,19 @@ class DeploymentInformationTest extends TestCase
      */
     public function packageTypePartsAreCorrectlyResolved(string $type, string $expectedLong, string $expectedShort): void
     {
-        $pushEvent = new PushEvent(
-            'https://github.com/lolli42/enetcache/',
-            'master',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json'
-        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => $type,
         ];
-        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(
+            new ComposerJson($composerJsonAsArray),
+            'https://github.com/lolli42/enetcache/',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
+            'master',
+            '/tmp/foo',
+            'bar'
+        );
+
         $this->assertSame($expectedLong, $subject->typeLong);
         $this->assertSame($expectedShort, $subject->typeShort);
     }
@@ -195,16 +205,19 @@ class DeploymentInformationTest extends TestCase
      */
     public function docsHomeTypeIsDetected(): void
     {
-        $pushEvent = new PushEvent(
-            'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
-            'master',
-            'https://something'
-        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => 'does-not-matter-here',
         ];
-        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        $subject = DeploymentInformationFactory::buildFromComposerJson(
+            new ComposerJson($composerJsonAsArray),
+            'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
+            'https://something',
+            'master',
+            '/tmp/foo',
+            'bar'
+        );
+
         $this->assertSame('docs-home', $subject->typeLong);
         $this->assertSame('h', $subject->typeShort);
     }
@@ -240,17 +253,19 @@ class DeploymentInformationTest extends TestCase
     {
         $this->expectExceptionCode($exceptionCode);
 
-        $pushEvent = new PushEvent(
-            'https://github.com/lolli42/enetcache/',
-            'master',
-            'https://something'
-        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => $type,
         ];
 
-        DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        DeploymentInformationFactory::buildFromComposerJson(
+            new ComposerJson($composerJsonAsArray),
+            'https://github.com/lolli42/enetcache/',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
+            'master',
+            '/tmp/foo',
+            'bar'
+        );
     }
 
     /**
@@ -406,17 +421,19 @@ class DeploymentInformationTest extends TestCase
      */
     public function branchNamesAreNormalized(string $type, string $branch, string $expectedBranch): void
     {
-        $pushEvent = new PushEvent(
-            'https://github.com/lolli42/enetcache/',
-            $branch,
-            'https://something'
-        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => $type,
         ];
+        $subject = DeploymentInformationFactory::buildFromComposerJson(
+            new ComposerJson($composerJsonAsArray),
+            'https://github.com/lolli42/enetcache/',
+            'https://something',
+            $branch,
+            '/tmp/foo',
+            'bar'
+        );
 
-        $subject = DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
         $this->assertSame($expectedBranch, $subject->targetBranchDirectory);
     }
 
@@ -496,16 +513,17 @@ class DeploymentInformationTest extends TestCase
         $this->expectException(DocsPackageDoNotCareBranch::class);
         $this->expectExceptionCode($exceptionCode);
 
-        $pushEvent = new PushEvent(
-            'https://github.com/lolli42/enetcache/',
-            $branch,
-            'https://something'
-        );
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => $type,
         ];
-
-        DeploymentInformationFactory::buildFromComposerJson(new ComposerJson($composerJsonAsArray), $pushEvent, '/tmp/foo', 'bar');
+        DeploymentInformationFactory::buildFromComposerJson(
+            new ComposerJson($composerJsonAsArray),
+            'https://github.com/lolli42/enetcache/',
+            'https://something',
+            $branch,
+            '/tmp/foo',
+            'bar'
+        );
     }
 }

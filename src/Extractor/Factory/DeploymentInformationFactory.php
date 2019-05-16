@@ -14,7 +14,6 @@ use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
-use App\Extractor\PushEvent;
 
 class DeploymentInformationFactory
 {
@@ -30,17 +29,17 @@ class DeploymentInformationFactory
 
     /**
      * @param ComposerJson $composerJson
-     * @param PushEvent $pushEvent
+     * @param string $repositoryUrl
+     * @param string $publicComposerJsonUrl
+     * @param string $sourceBranch
      * @param string $privateDir
      * @param string $subDir
      * @return DeploymentInformation
      * @throws ComposerJsonInvalidException
      * @throws DocsPackageDoNotCareBranch
      */
-    public static function buildFromComposerJson(ComposerJson $composerJson, PushEvent $pushEvent, string $privateDir, string $subDir): DeploymentInformation
+    public static function buildFromComposerJson(ComposerJson $composerJson, string $repositoryUrl, string $publicComposerJsonUrl, string $sourceBranch, string $privateDir, string $subDir): DeploymentInformation
     {
-        $repositoryUrl = $pushEvent->getRepositoryUrl();
-        $publicComposerJsonUrl = $pushEvent->getUrlToComposerFile();
         $packageName = self::determinePackageName($composerJson);
         $packageType = self::determinePackageType($composerJson, $repositoryUrl);
 
@@ -48,7 +47,6 @@ class DeploymentInformationFactory
         $name = current($packageName);
         $typeLong = current($packageType);
         $typeShort = key($packageType);
-        $sourceBranch = $pushEvent->getVersionString();
 
         return new DeploymentInformation(
             $repositoryUrl,
