@@ -14,7 +14,6 @@ use Doctrine\ORM\Tools\SchemaTool;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Component\HttpFoundation\Request;
 
 class BambooPostBuildControllerTest extends TestCase
 {
