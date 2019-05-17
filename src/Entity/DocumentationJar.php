@@ -9,6 +9,7 @@
 
 namespace App\Entity;
 
+use App\Enum\DocumentationStatus;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -53,6 +54,11 @@ class DocumentationJar
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $packageType;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $branch;
 
     /**
@@ -86,9 +92,17 @@ class DocumentationJar
     private $minimumTypoVersion;
 
     /**
+     * @ORM\Column(type="integer", options={"default": 0})
+     */
+    private $status;
+
+    /**
      * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private $maximumTypoVersion;
+
+    private $buildKey;
+
 
     /**
      * @return mixed
@@ -229,6 +243,24 @@ class DocumentationJar
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getPackageType(): string
+    {
+        return $this->packageType;
+    }
+
+    /**
+     * @param mixed $packageType
+     * @return DocumentationJar
+     */
+    public function setPackageType(string $packageType): self
+    {
+        $this->packageType = $packageType;
+        return $this;
+    }
+
     public function getBranch(): ?string
     {
         return $this->branch;
@@ -289,6 +321,18 @@ class DocumentationJar
     public function setMinimumTypoVersion(string $minimumTypoVersion): self
     {
         $this->minimumTypoVersion = $minimumTypoVersion;
+      
+        return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?int $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }
@@ -303,6 +347,35 @@ class DocumentationJar
         $this->maximumTypoVersion = $maximumTypoVersion;
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBuildKey(): ?string
+    {
+        return $this->buildKey;
+    }
+
+    /**
+     * @param string $buildKey
+     * @return self
+     */
+    public function setBuildKey(string $buildKey): self
+    {
+        $this->buildKey = $buildKey;
+
+        return $this;
+    }
+
+    public function isRenderable(): bool
+    {
+        return !empty($this->publicComposerJsonUrl) && in_array($this->status, [DocumentationStatus::STATUS_RENDERED, DocumentationStatus::STATUS_RENDERING_FAILED], true);
+    }
+
+    public function isDeletable(): bool
+    {
+        return $this->status === DocumentationStatus::STATUS_RENDERED;
     }
 
     /**

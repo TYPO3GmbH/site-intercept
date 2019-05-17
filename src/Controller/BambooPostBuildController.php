@@ -13,6 +13,8 @@ namespace App\Controller;
 use App\Creator\GerritBuildStatusMessage;
 use App\Creator\SlackCoreNightlyBuildMessage;
 use App\Entity\BambooNightlyBuild;
+use App\Entity\DocumentationJar;
+use App\Enum\DocumentationStatus;
 use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
 use App\Service\GerritService;
@@ -113,6 +115,52 @@ class BambooPostBuildController extends AbstractController
                     'triggeredBy' => 'api',
                 ]
             );
+        } elseif (strpos($buildDetails->buildKey, 'CORE-DDEL-') === 0) {
+            // This is a back-channel triggered by Bamboo after a "documentation deletion" build is done
+            $manager = $this->getDoctrine()->getManager();
+            $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
+
+            /** @var DocumentationJar $documentationEntry */
+            $documentationEntry = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
+
+            if ($buildDetails->success) {
+                // Build was successful, delete documentation from database
+                $manager->remove($documentationEntry);
+                $manager->flush();
+
+                $logger->info(
+                    'Deleted documentation'
+                    . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                    [
+                        'type' => 'docsRendering',
+                        'status' => 'documentationDeleted',
+                        'triggeredBy' => 'api',
+                        'repository' => $documentationEntry->getRepositoryUrl(),
+                        'package' => $documentationEntry->getPackageName(),
+                        'bambooKey' => $buildDetails->buildKey,
+                    ]
+                );
+            } else {
+                // Build failed, revert status of documentation to "rendered"
+                $documentationEntry
+                    ->setStatus(DocumentationStatus::STATUS_RENDERED)
+                    ->setBuildKey('');
+                $manager->persist($documentationEntry);
+                $manager->flush();
+
+                $logger->warning(
+                    'Failed to delete documentation'
+                    . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                    [
+                        'type' => 'docsRendering',
+                        'status' => 'documentationDeleteFailed',
+                        'triggeredBy' => 'api',
+                        'repository' => $documentationEntry->getRepositoryUrl(),
+                        'package' => $documentationEntry->getPackageName(),
+                        'bambooKey' => $buildDetails->buildKey,
+                    ]
+                );
+            }
         }
 
         return Response::create();

@@ -6,7 +6,10 @@ use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
 use App\Client\GerritClient;
 use App\Client\SlackClient;
+use App\Entity\DocumentationJar;
+use App\Enum\DocumentationStatus;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +25,7 @@ class BambooPostBuildControllerTest extends TestCase
     /**
      * Ensure db is properly set up (once for all tests in this test case)
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
         $kernel = new \App\Kernel('test', true);
@@ -38,13 +41,13 @@ class BambooPostBuildControllerTest extends TestCase
     /**
      * Delete all tables from database again
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
         static::dropAllTables();
     }
 
-    private static function dropAllTables()
+    private static function dropAllTables(): void
     {
         foreach(static::$dbConnection->getSchemaManager()->listTableNames() as $tableName) {
             static::$dbConnection->exec('DELETE FROM ' . $tableName);
@@ -54,7 +57,7 @@ class BambooPostBuildControllerTest extends TestCase
     /**
      * @test
      */
-    public function gerritVoteIsCalled()
+    public function gerritVoteIsCalled(): void
     {
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
@@ -63,7 +66,7 @@ class BambooPostBuildControllerTest extends TestCase
                 require __DIR__ . '/Fixtures/BambooPostBuildGoodBambooDetailsHeader.php'
             )->shouldBeCalled()
             ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildGoodBambooDetailsResponse.php');
-        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
         $gerritClientProphecy = $this->prophesize(GerritClient::class);
         $gerritClientProphecy
@@ -85,7 +88,7 @@ class BambooPostBuildControllerTest extends TestCase
     /**
      * @test
      */
-    public function buildForFailedNightlyIsReTriggered()
+    public function buildForFailedNightlyIsReTriggered(): void
     {
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
@@ -101,7 +104,7 @@ class BambooPostBuildControllerTest extends TestCase
                 Argument::cetera()
             )->shouldBeCalled()
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
@@ -114,7 +117,7 @@ class BambooPostBuildControllerTest extends TestCase
      * @test
      * @depends buildForFailedNightlyIsReTriggered
      */
-    public function slackMessageForFailedNightlyIsSendForSecondFail()
+    public function slackMessageForFailedNightlyIsSendForSecondFail(): void
     {
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
@@ -123,7 +126,7 @@ class BambooPostBuildControllerTest extends TestCase
                 Argument::cetera()
             )->shouldBeCalled()
             ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildFailedNightlyBambooDetailsResponse.php');
-        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
         $slackClientProphecy = $this->prophesize(SlackClient::class);
         $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response());
@@ -134,5 +137,102 @@ class BambooPostBuildControllerTest extends TestCase
         $request = require __DIR__ . '/Fixtures/BambooPostBuildFailedNightlyBuildRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
+    }
+
+    /**
+     * @test
+     */
+    public function triggeredDeletionRemovesDatabaseRow(): void
+    {
+        $bambooBuildKey = 'CORE-DDEL-4711';
+
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy
+            ->get(
+                'latest/result/' . $bambooBuildKey . '?os_authType=basic&expand=labels',
+                Argument::cetera()
+            )->shouldBeCalled()
+            ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildGoodBambooDetailsDocsDeletionResponse.php');
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $documentationJar = (new DocumentationJar())
+            ->setVendor('foobar')
+            ->setName('bazfnord')
+            ->setPackageName('foobar/bazfnord')
+            ->setPackageType('typo3-cms-extension')
+            ->setTypeShort('c')
+            ->setTypeLong('core-extension')
+            ->setRepositoryUrl('https://github.com/lolli42/enetcache/')
+            ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json')
+            ->setBranch('master')
+            ->setTargetBranchDirectory('master')
+            ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setBuildKey($bambooBuildKey);
+        $entityManager->persist($documentationJar);
+        $entityManager->flush();
+
+        $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodDocsDeletionRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+
+        $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
+        $result = $documentationJarRepository->findBy([
+            'buildKey' => $bambooBuildKey,
+        ]);
+
+        $this->assertCount(0, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function triggeredDeletionFailsAndResetsStatus(): void
+    {
+        $bambooBuildKey = 'CORE-DDEL-4711';
+
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy
+            ->get(
+                'latest/result/' . $bambooBuildKey . '?os_authType=basic&expand=labels',
+                Argument::cetera()
+            )->shouldBeCalled()
+            ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildBadBambooDetailsDocsDeletionFailedResponse.php');
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $documentationJar = (new DocumentationJar())
+            ->setVendor('foobar')
+            ->setName('bazfnord')
+            ->setPackageName('foobar/bazfnord')
+            ->setPackageType('typo3-cms-extension')
+            ->setTypeShort('c')
+            ->setTypeLong('core-extension')
+            ->setRepositoryUrl('https://github.com/lolli42/enetcache/')
+            ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json')
+            ->setBranch('master')
+            ->setTargetBranchDirectory('master')
+            ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setBuildKey($bambooBuildKey);
+        $entityManager->persist($documentationJar);
+        $entityManager->flush();
+
+        $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodDocsDeletionRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+
+        $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
+        $result = $documentationJarRepository->findAll();
+
+        $this->assertCount(1, $result);
+        $this->assertSame(DocumentationStatus::STATUS_RENDERED, current($result)->getStatus());
     }
 }

@@ -12,7 +12,9 @@ namespace App\Service;
 
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
+use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
+use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Extractor\ComposerJson;
@@ -87,8 +89,9 @@ class DocumentationBuildInformationService
      * Fetch composer.json from a remote repository to get more package information.
      *
      * @param string $path
-     * @return string
+     * @return array
      * @throws ComposerJsonNotFoundException
+     * @throws ComposerJsonInvalidException
      */
     public function fetchRemoteComposerJson(string $path): array
     {
@@ -101,7 +104,11 @@ class DocumentationBuildInformationService
         if ($statusCode !== 200) {
             throw new ComposerJsonNotFoundException('Fetching composer.json did not return HTTP 200', 1557489013);
         }
-        return json_decode($response->getBody()->getContents(), true);
+        $json = json_decode($response->getBody()->getContents(), true);
+        if (!is_array($json)) {
+            throw new ComposerJsonInvalidException('Decoding composer.json did not return an object. Invalid json syntax?', 1558022442);
+        }
+        return $json;
     }
 
     /**
@@ -127,27 +134,39 @@ class DocumentationBuildInformationService
     public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {
         $this->assertComposerJsonContainsNecessaryData($composerJson);
-
-        return new DeploymentInformation($composerJson, $pushEvent->getRepositoryUrl(), $pushEvent->getUrlToComposerFile(), $pushEvent->getVersionString(), $this->privateDir, $this->subDir);
+        return new DeploymentInformation(
+            $composerJson->getName(),
+            $composerJson->getType(),
+            $pushEvent->getRepositoryUrl(),
+            $pushEvent->getUrlToComposerFile(),
+            $pushEvent->getVersionString(),
+            $this->privateDir,
+            $this->subDir
+        );
     }
 
     /**
-     * Create main deployment information from a DocumentationJar instance. This object will later be sanitized using
+     * Create main deployment information from DocumentationJar entity. This object will later be sanitized using
      * other methods of that service and dumped to disk for bamboo to fetch it again.
      *
      * @param DocumentationJar $documentationJar
-     * @param ComposerJson $composerJson
      * @return DeploymentInformation
-     * @throws DocsComposerDependencyException
-     * @throws \App\Exception\ComposerJsonInvalidException
      * @throws \App\Exception\DocsPackageDoNotCareBranch
      */
-    public function generateBuildInformationFromDocumentationJar(DocumentationJar $documentationJar, ComposerJson $composerJson): DeploymentInformation
+    public function generateBuildInformationFromDocumentationJar(DocumentationJar $documentationJar): DeploymentInformation
     {
-        $this->assertComposerJsonContainsNecessaryData($composerJson);
-        return new DeploymentInformation($composerJson, $documentationJar->getRepositoryUrl(), $documentationJar->getPublicComposerJsonUrl(), $documentationJar->getBranch(), $this->privateDir, $this->subDir);
+        return new DeploymentInformation(
+            $documentationJar->getPackageName(),
+            $documentationJar->getPackageType(),
+            $documentationJar->getRepositoryUrl(),
+            $documentationJar->getPublicComposerJsonUrl(),
+            $documentationJar->getBranch(),
+            $this->privateDir,
+            $this->subDir
+        );
     }
 
+    /**
     /**
      * Verify the build request for a given vendor/package name and a given repository url is not
      * already registered with a different repository url.
@@ -190,8 +209,9 @@ class DocumentationBuildInformationService
      * Add / update a db entry for this docs deployment
      *
      * @param DeploymentInformation $deploymentInformation
+     * @return DocumentationJar
      */
-    public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): void
+    public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): DocumentationJar
     {
         $records = $this->documentationJarRepository->findBy([
             'repositoryUrl' => $deploymentInformation->repositoryUrl,
@@ -258,15 +278,33 @@ class DocumentationBuildInformationService
                 ->setVendor($deploymentInformation->vendor)
                 ->setName($deploymentInformation->name)
                 ->setPackageName($deploymentInformation->packageName)
+                ->setPackageType($deploymentInformation->packageType)
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
                 ->setTypeShort($deploymentInformation->typeShort)
                 ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
                 ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
+                ->setStatus(DocumentationStatus::STATUS_RENDERING)
+                ->setBuildKey('');
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
+
+            $record = $documentationJar;
         }
+
+        return $record;
+    }
+
+    /**
+     * @param DocumentationJar $documentationJar
+     * @param string $buildKey
+     */
+    public function updateBuildKey(DocumentationJar $documentationJar, string $buildKey): void
+    {
+        $documentationJar->setBuildKey($buildKey);
+        $this->entityManager->persist($documentationJar);
+        $this->entityManager->flush();
     }
 
     /**

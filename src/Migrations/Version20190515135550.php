@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use App\Enum\DocumentationStatus;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -18,7 +19,7 @@ use Doctrine\Migrations\AbstractMigration;
  * Auto-generated Migration: Please modify to your needs!
  * @codeCoverageIgnore
  */
-final class Version20190515140702 extends AbstractMigration
+final class Version20190515135550 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -30,9 +31,13 @@ final class Version20190515140702 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'sqlite', 'Migration can only be executed safely on \'sqlite\'.');
 
-        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN public_composer_json_url VARCHAR(255) DEFAULT \'\' NOT NULL');
-        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN vendor VARCHAR(255) DEFAULT \'\' NOT NULL');
-        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN name VARCHAR(255) DEFAULT \'\' NOT NULL');
+        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN status VARCHAR(255) DEFAULT \'\' NOT NULL');
+        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN build_key INTEGER DEFAULT ' . DocumentationStatus::STATUS_RENDERING . ' NOT NULL');
+        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN package_type VARCHAR(255) DEFAULT \'\' NOT NULL');
+        $this->addSql('UPDATE documentation_jar SET status = ' . DocumentationStatus::STATUS_RENDERED);
+        $this->addSql('UPDATE documentation_jar SET package_type = \'typo3-cms-documentation\' WHERE type_long = \'manual\' OR type_long = \'docs-home\'');
+        $this->addSql('UPDATE documentation_jar SET package_type = \'typo3-cms-framework\' WHERE type_long = \'core-extension\'');
+        $this->addSql('UPDATE documentation_jar SET package_type = \'typo3-cms-extension\' WHERE type_long = \'extension\'');
     }
 
     public function down(Schema $schema) : void

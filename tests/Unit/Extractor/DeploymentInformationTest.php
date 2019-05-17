@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Extractor;
 
-use App\Extractor\ComposerJson;
 use App\Bundle\ClockMockBundle;
+use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\DeploymentInformation;
-use App\Extractor\PushEvent;
 use PHPUnit\Framework\TestCase;
 
 class DeploymentInformationTest extends TestCase
@@ -31,7 +30,8 @@ class DeploymentInformationTest extends TestCase
         ];
 
         $subject = new DeploymentInformation(
-            new ComposerJson($composerJsonAsArray),
+            $composerJsonAsArray['name'],
+            $composerJsonAsArray['type'],
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
@@ -40,6 +40,7 @@ class DeploymentInformationTest extends TestCase
         );
 
         $this->assertSame('https://github.com/lolli42/enetcache/', $subject->repositoryUrl);
+        $this->assertSame('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json', $subject->publicComposerJsonUrl);
         $this->assertSame('foobar', $subject->vendor);
         $this->assertSame('bazfnord', $subject->name);
         $this->assertSame('foobar/bazfnord', $subject->packageName);
@@ -64,23 +65,25 @@ class DeploymentInformationTest extends TestCase
 
         $expected = [
             'repository_url' => 'https://github.com/lolli42/enetcache/',
+            'public_composer_json_url' => 'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'vendor' => 'foobar',
             'name' => 'bazfnord',
             'package_name' => 'foobar/bazfnord',
+            'package_type' => 'typo3-cms-extension',
             'source_branch' => 'master',
             'target_branch_directory' => 'master',
             'type_long' => 'extension',
             'type_short' => 'p',
         ];
         $subject = new DeploymentInformation(
-            new ComposerJson($composerJsonAsArray),
+            $composerJsonAsArray['name'],
+            $composerJsonAsArray['type'],
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
             '/tmp/foo',
             'bar'
         );
-
         $this->assertSame($expected, $subject->toArray());
     }
 
@@ -114,14 +117,14 @@ class DeploymentInformationTest extends TestCase
         ];
 
         $subject = new DeploymentInformation(
-            new ComposerJson($composerJsonAsArray),
+            $composerJsonAsArray['name'],
+            $composerJsonAsArray['type'],
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
             '/tmp/foo',
             'bar'
         );
-
         $this->assertSame($expectedVendor, $subject->vendor);
         $this->assertSame($expectedName, $subject->name);
         $this->assertSame($packageName, $subject->packageName);
@@ -133,8 +136,7 @@ class DeploymentInformationTest extends TestCase
     public function invalidPackageNameDataProvider(): array
     {
         return [
-            ['', 1557309364],
-            [null, 1557309364],
+            ['', 1558019290],
             ['baz', 1553082490],
             ['3245345', 1553082490],
             ['husel_pusel:foobar', 1553082490],
@@ -149,6 +151,7 @@ class DeploymentInformationTest extends TestCase
      */
     public function invalidPackageNameThrowException(?string $packageName, int $expectedExceptionCode): void
     {
+        $this->expectException(ComposerJsonInvalidException::class);
         $this->expectExceptionCode($expectedExceptionCode);
 
         $composerJsonAsArray = [
@@ -156,7 +159,8 @@ class DeploymentInformationTest extends TestCase
             'type' => 'typo3-cms-extension',
         ];
         new DeploymentInformation(
-            new ComposerJson($composerJsonAsArray),
+            $composerJsonAsArray['name'],
+            $composerJsonAsArray['type'],
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
@@ -192,7 +196,8 @@ class DeploymentInformationTest extends TestCase
             'require' => ['typo3/cms-core' => '^9.5'],
         ];
         $subject = new DeploymentInformation(
-            new ComposerJson($composerJsonAsArray),
+            $composerJsonAsArray['name'],
+            $composerJsonAsArray['type'],
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
@@ -214,7 +219,8 @@ class DeploymentInformationTest extends TestCase
             'type' => 'does-not-matter-here',
         ];
         $subject = new DeploymentInformation(
-            new ComposerJson($composerJsonAsArray),
+            $composerJsonAsArray['name'],
+            $composerJsonAsArray['type'],
             'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
             'https://something',
             'master',
@@ -234,11 +240,7 @@ class DeploymentInformationTest extends TestCase
         return [
             'empty string' => [
                 '',
-                1557309364
-            ],
-            'nothing set' => [
-                null,
-                1557309364
+                1558019479
             ],
             'something else' => [
                 'something',
@@ -255,6 +257,7 @@ class DeploymentInformationTest extends TestCase
      */
     public function invalidPackageTypesThrowException(?string $type, int $exceptionCode): void
     {
+        $this->expectException(ComposerJsonInvalidException::class);
         $this->expectExceptionCode($exceptionCode);
 
         $composerJsonAsArray = [
@@ -263,9 +266,10 @@ class DeploymentInformationTest extends TestCase
         ];
 
         new DeploymentInformation(
-            new ComposerJson($composerJsonAsArray),
+            $composerJsonAsArray['name'],
+            $composerJsonAsArray['type'],
             'https://github.com/lolli42/enetcache/',
-            'https://something',
+            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
             '/tmp/foo',
             'bar'
@@ -430,15 +434,16 @@ class DeploymentInformationTest extends TestCase
             'type' => $type,
             'require' => ['typo3/cms-core' => '^9.5'],
         ];
-
         $subject = new DeploymentInformation(
-            new ComposerJson($composerJsonAsArray),
+            $composerJsonAsArray['name'],
+            $composerJsonAsArray['type'],
             'https://github.com/lolli42/enetcache/',
             'https://something',
             $branch,
             '/tmp/foo',
             'bar'
         );
+
         $this->assertSame($expectedBranch, $subject->targetBranchDirectory);
     }
 
@@ -522,9 +527,9 @@ class DeploymentInformationTest extends TestCase
             'name' => 'foobar/bazfnord',
             'type' => $type,
         ];
-
         new DeploymentInformation(
-            new ComposerJson($composerJsonAsArray),
+            $composerJsonAsArray['name'],
+            $composerJsonAsArray['type'],
             'https://github.com/lolli42/enetcache/',
             'https://something',
             $branch,

@@ -43,6 +43,11 @@ class DeploymentInformation
     public $packageName;
 
     /**
+     * @var string Full package type, eg. 'typo3-cms-extension'
+     */
+    public $packageType;
+
+    /**
      * @var string The (not changed) source branch or tag of the repository supposed to be checked out, eg. '1.2.3', '1.2', 'master', 'latest'
      */
     public $sourceBranch;
@@ -95,28 +100,36 @@ class DeploymentInformation
     /**
      * Constructor
      *
-     * @param ComposerJson $composerJson
+     * @param string $composerPackageName
+     * @param string $composerPackageType
      * @param string $repositoryUrl
      * @param string $publicComposerJsonUrl
      * @param string $version
      * @param string $privateDir
      * @param string $subDir
-     * @throws ComposerJsonInvalidException
      * @throws DocsPackageDoNotCareBranch
      */
-    public function __construct(ComposerJson $composerJson, string $repositoryUrl, string $publicComposerJsonUrl, string $version, string $privateDir, string $subDir)
-    {
+    public function __construct(
+        string $composerPackageName,
+        string $composerPackageType,
+        string $repositoryUrl,
+        string $publicComposerJsonUrl,
+        string $version,
+        string $privateDir,
+        string $subDir
+    ) {
         $this->repositoryUrl = $repositoryUrl;
         $this->publicComposerJsonUrl = $publicComposerJsonUrl;
-        $packageName = $this->determinePackageName($composerJson);
-        $packageType = $this->determinePackageType($composerJson, $this->repositoryUrl);
-
+        $this->packageType = $composerPackageType;
+        $packageName = $this->determinePackageName($composerPackageName);
+        $packageType = $this->determinePackageType($composerPackageType, $this->repositoryUrl);
         $this->vendor = key($packageName);
         $this->name = current($packageName);
         $this->packageName = $this->vendor . '/' . $this->name;
         $this->typeLong = current($packageType);
         $this->typeShort = key($packageType);
         $this->sourceBranch = $version;
+
         $this->targetBranchDirectory = $this->getTargetBranchDirectory($this->sourceBranch, $this->typeLong);
         $this->minimumTypoVersion = $composerJson->getMinimumTypoVersion();
         $this->maximumTypoVersion = $composerJson->getMaximumTypoVersion();
@@ -137,9 +150,11 @@ class DeploymentInformation
     {
         return [
             'repository_url' => $this->repositoryUrl,
+            'public_composer_json_url' => $this->publicComposerJsonUrl,
             'vendor' => $this->vendor,
             'name' => $this->name,
             'package_name' => $this->packageName,
+            'package_type' => $this->packageType,
             'source_branch' => $this->sourceBranch,
             'target_branch_directory' => $this->targetBranchDirectory,
             'type_long' => $this->typeLong,
@@ -204,12 +219,12 @@ class DeploymentInformation
     }
 
     /**
-     * @param ComposerJson $composerJson
+     * @param string $packageType
      * @param string $repositoryUrl
      * @return array
      * @throws ComposerJsonInvalidException
      */
-    private function determinePackageType(ComposerJson $composerJson, string $repositoryUrl): array
+    private function determinePackageType(string $packageType, string $repositoryUrl): array
     {
         if ($repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git') {
             // Hard coded final location for the docs homepage repository
@@ -218,25 +233,34 @@ class DeploymentInformation
             ];
         }
 
-        if (!array_key_exists($composerJson->getType(), self::$typeMap)) {
-            throw new ComposerJsonInvalidException('composer.json \'type\' must be set to one of ' . implode(', ', array_keys(self::$typeMap)) . '.', 1557490474);
+        if ($packageType === '') {
+            throw new ComposerJsonInvalidException('composer.json \'type\' must be given', 1558019479);
         }
 
-        return self::$typeMap[$composerJson->getType()];
+        if (!array_key_exists($packageType, self::$typeMap)) {
+            throw new ComposerJsonInvalidException('composer.json \'type\' must be set to one of ' . implode(', ', array_keys(self::$typeMap)) . ', ' . $packageType . ' given', 1557490474);
+        }
+
+        return self::$typeMap[$packageType];
     }
 
     /**
-     * @param ComposerJson $composerJson
+     * @param string $packageName
      * @return array
      * @throws ComposerJsonInvalidException
      */
-    private function determinePackageName(ComposerJson $composerJson): array
+    private function determinePackageName(string $packageName): array
     {
-        if (!preg_match('/^[\w-]+\/[\w-]+$/', $composerJson->getName())) {
-            throw new ComposerJsonInvalidException('composer.json \'name\' must be of form \'vendor/package\', \'' . $composerJson->getName() . '\' given.', 1553082490);
+        $packageName = trim($packageName);
+        if ($packageName === '') {
+            throw new ComposerJsonInvalidException('composer.json \'name\' must be given', 1558019290);
         }
 
-        [$vendor, $name] = explode('/', $composerJson->getName());
+        if (!preg_match('/^[\w-]+\/[\w-]+$/', $packageName)) {
+            throw new ComposerJsonInvalidException('composer.json \'name\' must be of form \'vendor/package\', \'' . $packageName . '\' given.', 1553082490);
+        }
+
+        [$vendor, $name] = explode('/', $packageName);
         return [$vendor => $name];
     }
 }

@@ -61,8 +61,9 @@ class DocsToBambooController extends AbstractController
             $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
             $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
-            $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
+            $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
             $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
+            $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
             $logger->info(
                 'Triggered docs build',
                 [
@@ -231,8 +232,9 @@ class DocsToBambooController extends AbstractController
             $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
             $buildInformation = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar, $composerAsObject);
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
-            $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
+            $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
             $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
+            $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
             $logger->info(
                 'Triggered docs build',
                 [
