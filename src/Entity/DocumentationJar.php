@@ -81,6 +81,16 @@ class DocumentationJar
     private $typeShort;
 
     /**
+     * @ORM\Column(type="string", length=255, options={"default": ""})
+     */
+    private $minimumTypoVersion;
+
+    /**
+     * @ORM\Column(type="string", length=255, options={"default": ""})
+     */
+    private $maximumTypoVersion;
+
+    /**
      * @return mixed
      */
     public function getTypeShort(): ?string
@@ -267,6 +277,30 @@ class DocumentationJar
     public function setTargetBranchDirectory(string $targetBranchDirectory): self
     {
         $this->targetBranchDirectory = $targetBranchDirectory;
+
+        return $this;
+    }
+
+    public function getMinimumTypoVersion(): ?string
+    {
+        return $this->minimumTypoVersion;
+    }
+
+    public function setMinimumTypoVersion(string $minimumTypoVersion): self
+    {
+        $this->minimumTypoVersion = $minimumTypoVersion;
+
+        return $this;
+    }
+
+    public function getMaximumTypoVersion(): ?string
+    {
+        return $this->maximumTypoVersion;
+    }
+
+    public function setMaximumTypoVersion(string $maximumTypoVersion): self
+    {
+        $this->maximumTypoVersion = $maximumTypoVersion;
 
         return $this;
     }
