@@ -171,7 +171,9 @@ class BambooPostBuildController extends AbstractController
 
             if ($buildDetails->success) {
                 // Build was successful, set status to "rendered"
-                $documentationEntry->setStatus(DocumentationStatus::STATUS_RENDERED);
+                $documentationEntry
+                    ->setLastRenderedAt(new \DateTime('now'))
+                    ->setStatus(DocumentationStatus::STATUS_RENDERED);
 
                 $logger->info(
                     'Documentation rendered'
