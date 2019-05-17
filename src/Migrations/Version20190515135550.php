@@ -35,6 +35,9 @@ final class Version20190515135550 extends AbstractMigration
         $this->addSql('ALTER TABLE documentation_jar ADD COLUMN build_key INTEGER DEFAULT ' . DocumentationStatus::STATUS_RENDERING . ' NOT NULL');
         $this->addSql('ALTER TABLE documentation_jar ADD COLUMN package_type VARCHAR(255) DEFAULT \'\' NOT NULL');
         $this->addSql('UPDATE documentation_jar SET status = ' . DocumentationStatus::STATUS_RENDERED);
+        $this->addSql('UPDATE documentation_jar SET package_type = \'typo3-cms-documentation\' WHERE type_long = \'manual\' OR type_long = \'docs-home\'');
+        $this->addSql('UPDATE documentation_jar SET package_type = \'typo3-cms-framework\' WHERE type_long = \'core-extension\'');
+        $this->addSql('UPDATE documentation_jar SET package_type = \'typo3-cms-extension\' WHERE type_long = \'extension\'');
     }
 
     public function down(Schema $schema) : void
