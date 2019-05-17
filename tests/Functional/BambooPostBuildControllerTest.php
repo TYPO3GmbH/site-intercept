@@ -172,6 +172,8 @@ class BambooPostBuildControllerTest extends TestCase
             ->setBranch('master')
             ->setTargetBranchDirectory('master')
             ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5')
             ->setBuildKey($bambooBuildKey);
         $entityManager->persist($documentationJar);
         $entityManager->flush();
@@ -221,6 +223,8 @@ class BambooPostBuildControllerTest extends TestCase
             ->setBranch('master')
             ->setTargetBranchDirectory('master')
             ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5')
             ->setBuildKey($bambooBuildKey);
         $entityManager->persist($documentationJar);
         $entityManager->flush();
