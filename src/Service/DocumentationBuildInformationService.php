@@ -288,7 +288,7 @@ class DocumentationBuildInformationService
                 ->setTypeLong($deploymentInformation->typeLong)
                 ->setTypeShort($deploymentInformation->typeShort)
                 ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
-                ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
+                ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion)
                 ->setStatus(DocumentationStatus::STATUS_RENDERING)
                 ->setBuildKey('');
             $this->entityManager->persist($documentationJar);
