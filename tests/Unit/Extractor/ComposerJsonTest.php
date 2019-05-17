@@ -158,7 +158,7 @@ class ComposerJsonTest extends TestCase
     /**
      * @test
      */
-    public function maximumCmsCoreVersionIsReturnedAsExpected(): void
+    public function maximumCmsCoreVersionIsReturnedAsExpectedWithOneVersion(): void
     {
         $composerJson = new ComposerJson([
             'name' => 'foobar/baz',
@@ -168,7 +168,13 @@ class ComposerJsonTest extends TestCase
         ]);
 
         $this->assertEquals('9.5', $composerJson->getMaximumTypoVersion());
+    }
 
+    /**
+     * @test
+     */
+    public function maximumCmsCoreVersionIsReturnedAsExpectedWithTwoVersions(): void
+    {
         $composerJson = new ComposerJson([
             'name' => 'foobar/baz',
             'type' => 'typo3-cms-extension',
@@ -182,7 +188,7 @@ class ComposerJsonTest extends TestCase
     /**
      * @test
      */
-    public function minimumCmsCoreVersionIsReturnedAsExpected(): void
+    public function minimumCmsCoreVersionIsReturnedAsExpectedWithOneVersion(): void
     {
         $composerJson = new ComposerJson([
             'name' => 'foobar/baz',
@@ -192,7 +198,13 @@ class ComposerJsonTest extends TestCase
         ]);
 
         $this->assertEquals('9.5', $composerJson->getMinimumTypoVersion());
+    }
 
+    /**
+     * @test
+     */
+    public function minimumCmsCoreVersionIsReturnedAsExpectedWithTwoVersions(): void
+    {
         $composerJson = new ComposerJson([
             'name' => 'foobar/baz',
             'type' => 'typo3-cms-extension',
