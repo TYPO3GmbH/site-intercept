@@ -356,7 +356,9 @@ class DocumentationJar
         if ($this->getCreatedAt() === null) {
             $this->setCreatedAt(new \DateTime('now'));
         }
-        // Update last rendered each time record is updated
-        $this->setLastRenderedAt(new \DateTime('now'));
+        // Update last rendered if record is first persisted
+        if ($this->getLastRenderedAt() === null) {
+            $this->setLastRenderedAt(new \DateTime('now'));
+        }
     }
 }
