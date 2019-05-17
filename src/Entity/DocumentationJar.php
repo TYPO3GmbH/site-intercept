@@ -108,7 +108,7 @@ class DocumentationJar
     private $maximumTypoVersion;
 
     /**
-     * @ORM\Column(type="integer", options={"default": 0})
+     * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private $buildKey;
 
