@@ -11,7 +11,6 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\Composer\DocsComposerMissingValueException;
-use App\Exception\ComposerJsonInvalidException;
 
 /**
  * Contains contents of the composer.json
@@ -66,14 +65,14 @@ class ComposerJson
 
     /**
      * @return string
-     * @throws ComposerJsonInvalidException
+     * @throws DocsComposerMissingValueException
      */
     public function getMinimumTypoVersion(): string
     {
         $typoVersion = $this->extractTypoVersion();
 
         if (!preg_match('/\d\.\d/', $typoVersion) && $this->getType() === 'typo3-cms-extension') {
-            throw new ComposerJsonInvalidException();
+            throw new DocsComposerMissingValueException('typo3/cms-core is not required in the composer json', 1558084137);
         }
 
         return $typoVersion;
@@ -81,14 +80,14 @@ class ComposerJson
 
     /**
      * @return string
-     * @throws ComposerJsonInvalidException
+     * @throws DocsComposerMissingValueException
      */
     public function getMaximumTypoVersion(): string
     {
         $typoVersion = $this->extractTypoVersion(true);
 
         if (!preg_match('/\d\.\d/', $typoVersion) && $this->getType() === 'typo3-cms-extension') {
-            throw new ComposerJsonInvalidException();
+            throw new DocsComposerMissingValueException('typo3/cms-core is not required in the composer json', 1558084146);
         }
 
         return $typoVersion;
