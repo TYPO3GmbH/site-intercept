@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Extractor;
 
 use App\Exception\Composer\DocsComposerMissingValueException;
+use App\Exception\ComposerJsonInvalidException;
 use App\Extractor\ComposerJson;
 use PHPUnit\Framework\TestCase;
 
@@ -118,5 +119,87 @@ class ComposerJsonTest extends TestCase
     {
         $composerJson = new ComposerJson([]);
         $this->assertFalse($composerJson->requires('idonot/exist'));
+    }
+
+    /**
+     * @test
+     */
+    public function emptyMinimumCmsCoreRequireThrowsException(): void
+    {
+        $composerJson = new ComposerJson([
+            'name' => 'foobar/baz',
+            'type' => 'typo3-cms-extension',
+            'require' => ['foobar/bark' => '^4.2'],
+            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
+        ]);
+
+        $this->expectException(DocsComposerMissingValueException::class);
+        $this->expectExceptionCode(1558084137);
+        $composerJson->getMinimumTypoVersion();
+    }
+
+    /**
+     * @test
+     */
+    public function emptyMaximumCmsCoreRequireThrowsException(): void
+    {
+        $composerJson = new ComposerJson([
+            'name' => 'foobar/baz',
+            'type' => 'typo3-cms-extension',
+            'require' => ['foobar/bark' => '^4.2'],
+            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
+        ]);
+
+        $this->expectException(DocsComposerMissingValueException::class);
+        $this->expectExceptionCode(1558084146);
+        $composerJson->getMaximumTypoVersion();
+    }
+
+    /**
+     * @test
+     */
+    public function maximumCmsCoreVersionIsReturnedAsExpected(): void
+    {
+        $composerJson = new ComposerJson([
+            'name' => 'foobar/baz',
+            'type' => 'typo3-cms-extension',
+            'require' => ['foobar/bark' => '^4.2', 'typo3/cms-core' => '^9.5'],
+            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
+        ]);
+
+        $this->assertEquals('9.5', $composerJson->getMaximumTypoVersion());
+
+        $composerJson = new ComposerJson([
+            'name' => 'foobar/baz',
+            'type' => 'typo3-cms-extension',
+            'require' => ['foobar/bark' => '^4.2', 'typo3/cms-core' => '8.7.*, <= 9.5.*'],
+            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
+        ]);
+
+        $this->assertEquals('9.5', $composerJson->getMaximumTypoVersion());
+    }
+
+    /**
+     * @test
+     */
+    public function minimumCmsCoreVersionIsReturnedAsExpected(): void
+    {
+        $composerJson = new ComposerJson([
+            'name' => 'foobar/baz',
+            'type' => 'typo3-cms-extension',
+            'require' => ['foobar/bark' => '^4.2', 'typo3/cms-core' => '^9.5'],
+            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
+        ]);
+
+        $this->assertEquals('9.5', $composerJson->getMinimumTypoVersion());
+
+        $composerJson = new ComposerJson([
+            'name' => 'foobar/baz',
+            'type' => 'typo3-cms-extension',
+            'require' => ['foobar/bark' => '^4.2', 'typo3/cms-core' => '8.7.*, <= 9.5.*'],
+            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
+        ]);
+
+        $this->assertEquals('8.7', $composerJson->getMinimumTypoVersion());
     }
 }
