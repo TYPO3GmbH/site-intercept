@@ -11,7 +11,6 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\Composer\DocsComposerMissingValueException;
-use App\Exception\ComposerJsonInvalidException;
 
 /**
  * Contains contents of the composer.json
@@ -65,22 +64,61 @@ class ComposerJson
     }
 
     /**
-     * @return string|null
-     * @throws ComposerJsonInvalidException
+     * @return string
+     * @throws DocsComposerMissingValueException
      */
-    public function getTypoVersion(): string
+    public function getMinimumTypoVersion(): string
+    {
+        $typoVersion = $this->extractTypoVersion();
+
+        if (empty($typoVersion) && $this->getType() === 'typo3-cms-extension') {
+            throw new DocsComposerMissingValueException('typo3/cms-core is not required in the composer json', 1558084137);
+        }
+
+        return $typoVersion;
+    }
+
+    /**
+     * @return string
+     * @throws DocsComposerMissingValueException
+     */
+    public function getMaximumTypoVersion(): string
+    {
+        $typoVersion = $this->extractTypoVersion(true);
+
+        if (empty($typoVersion) && $this->getType() === 'typo3-cms-extension') {
+            throw new DocsComposerMissingValueException('typo3/cms-core is not required in the composer json', 1558084146);
+        }
+
+        return $typoVersion;
+    }
+
+    /**
+     * @param bool $getMaximum
+     * @return string
+     */
+    private function extractTypoVersion(bool $getMaximum = false): string
     {
         $typoVersion = '';
 
         if (isset($this->composerJson['require']['typo3/cms-core'])) {
-            $typoVersion = str_replace(['^', '~'], '', $this->composerJson['require']['typo3/cms-core']);
+            $typoVersion = $this->composerJson['require']['typo3/cms-core'];
+            if (strpos($typoVersion, ',') !== false) {
+                $typoVersion = explode(',', $typoVersion);
+            } elseif (strpos($typoVersion, '||') !== false) {
+                $typoVersion = explode('||', $typoVersion);
+            }
+            if (is_array($typoVersion)) {
+                $getMaximum ? $typoVersion = array_pop($typoVersion) : $typoVersion = $typoVersion[0];
+            }
+            $numbers = explode('.', $typoVersion);
+            if (count($numbers) > 2) {
+                $typoVersion = $numbers[0] . '.' . $numbers[1];
+            }
+            $typoVersion = str_replace(['^', '~', '.*', '>=', '<='], '', $typoVersion);
         }
 
-        if (!preg_match('/\d\.\d/', $typoVersion)) {
-            throw new ComposerJsonInvalidException();
-        }
-
-        return $typoVersion;
+        return trim($typoVersion);
     }
 
     /**

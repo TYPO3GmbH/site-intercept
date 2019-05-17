@@ -93,14 +93,14 @@ class DocumentationJar
     private $typeShort;
 
     /**
-     * @ORM\Column(type="integer", options={"default": 0})
-     */
-    private $status;
-
-    /**
      * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private $minimumTypoVersion;
+
+    /**
+     * @ORM\Column(type="integer", options={"default": 0})
+     */
+    private $status;
 
     /**
      * @ORM\Column(type="string", length=255, options={"default": ""})
@@ -318,6 +318,18 @@ class DocumentationJar
         return $this;
     }
 
+    public function getMinimumTypoVersion(): ?string
+    {
+        return $this->minimumTypoVersion;
+    }
+
+    public function setMinimumTypoVersion(string $minimumTypoVersion): self
+    {
+        $this->minimumTypoVersion = $minimumTypoVersion;
+
+        return $this;
+    }
+
     public function getStatus(): ?int
     {
         return $this->status;
@@ -330,14 +342,14 @@ class DocumentationJar
         return $this;
     }
 
-    public function getMinimumTypoVersion(): ?string
+    public function getMaximumTypoVersion(): ?string
     {
-        return $this->minimumTypoVersion;
+        return $this->maximumTypoVersion;
     }
 
-    public function setMinimumTypoVersion(string $minimumTypoVersion): self
+    public function setMaximumTypoVersion(string $maximumTypoVersion): self
     {
-        $this->minimumTypoVersion = $minimumTypoVersion;
+        $this->maximumTypoVersion = $maximumTypoVersion;
 
         return $this;
     }
@@ -357,18 +369,6 @@ class DocumentationJar
     public function setBuildKey(string $buildKey): self
     {
         $this->buildKey = $buildKey;
-
-        return $this;
-    }
-
-    public function getMaximumTypoVersion(): ?string
-    {
-        return $this->maximumTypoVersion;
-    }
-
-    public function setMaximumTypoVersion(string $maximumTypoVersion): self
-    {
-        $this->maximumTypoVersion = $maximumTypoVersion;
 
         return $this;
     }

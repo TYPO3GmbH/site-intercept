@@ -140,6 +140,8 @@ class DocumentationBuildInformationService
             $pushEvent->getRepositoryUrl(),
             $pushEvent->getUrlToComposerFile(),
             $pushEvent->getVersionString(),
+            $composerJson->getMinimumTypoVersion(),
+            $composerJson->getMaximumTypoVersion(),
             $this->privateDir,
             $this->subDir
         );
@@ -161,6 +163,8 @@ class DocumentationBuildInformationService
             $documentationJar->getRepositoryUrl(),
             $documentationJar->getPublicComposerJsonUrl(),
             $documentationJar->getBranch(),
+            $documentationJar->getMinimumTypoVersion(),
+            $documentationJar->getMaximumTypoVersion(),
             $this->privateDir,
             $this->subDir
         );
@@ -252,6 +256,12 @@ class DocumentationBuildInformationService
             if (empty($record->getName())) {
                 $record->setName($deploymentInformation->name);
             }
+            if (empty($record->getMinimumTypoVersion())) {
+                $record->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion);
+            }
+            if (empty($record->getMaximumTypoVersion())) {
+                $record->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
+            }
             $record->setStatus(DocumentationStatus::STATUS_RENDERING);
             $this->entityManager->flush();
         } else {
@@ -267,6 +277,8 @@ class DocumentationBuildInformationService
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
                 ->setTypeShort($deploymentInformation->typeShort)
+                ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
+                ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion)
                 ->setStatus(DocumentationStatus::STATUS_RENDERING)
                 ->setBuildKey('');
             $this->entityManager->persist($documentationJar);

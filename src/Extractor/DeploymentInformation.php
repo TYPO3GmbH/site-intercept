@@ -88,9 +88,14 @@ class DeploymentInformation
     public $relativeDumpFile;
 
     /**
-     * @var string TYPO3 version the package is compatible with
+     * @var string TYPO3 version the package is compatible with (minimum)
      */
-    public $typoVersion;
+    public $minimumTypoVersion;
+
+    /**
+     * @var string TYPO3 version the package is compatible with (maximum)
+     */
+    public $maximumTypoVersion;
 
     /**
      * Constructor
@@ -110,6 +115,8 @@ class DeploymentInformation
         string $repositoryUrl,
         string $publicComposerJsonUrl,
         string $version,
+        string $minimumTypoVersion,
+        string $maximumTypoVersion,
         string $privateDir,
         string $subDir
     ) {
@@ -126,7 +133,8 @@ class DeploymentInformation
         $this->sourceBranch = $version;
 
         $this->targetBranchDirectory = $this->getTargetBranchDirectory($this->sourceBranch, $this->typeLong);
-        $this->typoVersion = $composerJson->getTypoVersion();
+        $this->minimumTypoVersion = $minimumTypoVersion;
+        $this->maximumTypoVersion = $maximumTypoVersion;
 
         $buildTime = ceil(microtime(true) * 10000);
         $this->absoluteDumpFile = implode('/', [
