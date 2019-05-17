@@ -15,9 +15,11 @@
             </h2>
 
             <div class="card">
+                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                 <div class="card-header text-right">
                     <a href="{{ path('admin_docs_deployments_add') }}" class="btn btn-outline-success">Add configuration</a>
                 </div>
+                {% endif %}
 
                 <div class="datatable">
                     <table class="datatable-table">
@@ -53,8 +55,6 @@
                                         <span class="badge badge-warning">Deleting</span>
                                     {% elseif deployment.status == "3" %}
                                         <span class="badge badge-danger">Failed</span>
-                                    {% elseif deployment.status == "4" %}
-                                        <span class="badge badge-info">New</span>
                                     {% else %}
                                         <span class="badge badge-secondary">Unknown</span>
                                     {% endif %}

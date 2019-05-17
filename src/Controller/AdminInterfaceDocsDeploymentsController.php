@@ -97,7 +97,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
      * @param DocumentationBuildInformationService $documentationBuildInformationService
      * @param BambooService $bambooService
      * @return Response
-     * @throws \App\Exception\DocsPackageDoNotCareBranch
+     * @throws DocsPackageDoNotCareBranch
      */
     public function delete(
         int $documentationJarId,
@@ -146,6 +146,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
      */
     public function addConfiguration(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $documentationJar = new DocumentationJar();
         $repositoryUrl = $request->get('documentation_deployment')['repositoryUrl'] ?? '';
         $documentationJar->setRepositoryUrl($repositoryUrl);
@@ -171,6 +172,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
      */
     public function addConfigurationStep2(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $documentationJar = new DocumentationJar();
 
         $repositoryUrl = $request->get('documentation_deployment')['repositoryUrl'] ?? '';
@@ -195,10 +197,14 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
      * @Route("/admin/docs/deployments/add/step3", name="admin_docs_deployments_add_step3")
      *
      * @param Request $request
+     * @param DocumentationBuildInformationService $documentationBuildInformationService
+     * @param BambooService $bambooService
      * @return Response
+     * @throws DocsPackageDoNotCareBranch
      */
-    public function addConfigurationStep3(Request $request, DocumentationBuildInformationService $documentationBuildInformationService): Response
+    public function addConfigurationStep3(Request $request, DocumentationBuildInformationService $documentationBuildInformationService, BambooService $bambooService): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $documentationJar = new DocumentationJar();
         $repositoryUrl = $request->get('documentation_deployment')['repositoryUrl'] ?? '';
         $documentationJar->setRepositoryUrl($repositoryUrl);
@@ -235,7 +241,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         $form->handleRequest($request);
         if ($deploymentInformation !== null && $form->isValid()) {
             $documentationJar->setRepositoryUrl($deploymentInformation->repositoryUrl)
-                ->setStatus(DocumentationStatus::STATUS_NEW)
+                ->setStatus(DocumentationStatus::STATUS_RENDERING)
                 ->setBuildKey('')
                 ->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl)
                 ->setVendor($deploymentInformation->vendor)
@@ -245,6 +251,11 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
                 ->setTypeShort($deploymentInformation->typeShort);
+
+            $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
+            $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
+            $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($informationFile);
+            $documentationJar->setBuildKey($bambooBuildTriggered->buildResultKey);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($documentationJar);
             $entityManager->flush();

@@ -344,7 +344,11 @@ class DocumentationJar
 
     public function isRenderable(): bool
     {
-        return !empty($this->publicComposerJsonUrl) && in_array($this->status, [DocumentationStatus::STATUS_RENDERED, DocumentationStatus::STATUS_RENDERING_FAILED], true);
+        return !empty($this->publicComposerJsonUrl)
+            && in_array($this->status, [
+                DocumentationStatus::STATUS_RENDERED,
+                DocumentationStatus::STATUS_RENDERING_FAILED
+            ], true);
     }
 
     public function isDeletable(): bool
