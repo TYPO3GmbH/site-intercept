@@ -140,6 +140,8 @@ class DocumentationBuildInformationService
             $pushEvent->getRepositoryUrl(),
             $pushEvent->getUrlToComposerFile(),
             $pushEvent->getVersionString(),
+            $composerJson->getMinimumTypoVersion(),
+            $composerJson->getMaximumTypoVersion(),
             $this->privateDir,
             $this->subDir
         );
@@ -161,6 +163,8 @@ class DocumentationBuildInformationService
             $documentationJar->getRepositoryUrl(),
             $documentationJar->getPublicComposerJsonUrl(),
             $documentationJar->getBranch(),
+            $documentationJar->getMinimumTypoVersion(),
+            $documentationJar->getMaximumTypoVersion(),
             $this->privateDir,
             $this->subDir
         );

@@ -35,6 +35,8 @@ class DeploymentInformationTest extends TestCase
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '8.7',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -81,6 +83,8 @@ class DeploymentInformationTest extends TestCase
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '8.7',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -122,6 +126,8 @@ class DeploymentInformationTest extends TestCase
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '8.7',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -164,6 +170,8 @@ class DeploymentInformationTest extends TestCase
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '8.7',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -201,6 +209,8 @@ class DeploymentInformationTest extends TestCase
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '8.7',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -224,6 +234,8 @@ class DeploymentInformationTest extends TestCase
             'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
             'https://something',
             'master',
+            '8.7',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -271,6 +283,8 @@ class DeploymentInformationTest extends TestCase
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '8.7',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -440,6 +454,8 @@ class DeploymentInformationTest extends TestCase
             'https://github.com/lolli42/enetcache/',
             'https://something',
             $branch,
+            '8.7',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -533,6 +549,8 @@ class DeploymentInformationTest extends TestCase
             'https://github.com/lolli42/enetcache/',
             'https://something',
             $branch,
+            '8.7',
+            '9.5',
             '/tmp/foo',
             'bar'
         );

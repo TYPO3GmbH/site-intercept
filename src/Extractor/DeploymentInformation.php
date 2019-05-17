@@ -115,6 +115,8 @@ class DeploymentInformation
         string $repositoryUrl,
         string $publicComposerJsonUrl,
         string $version,
+        string $minimumTypoVersion,
+        string $maximumTypoVersion,
         string $privateDir,
         string $subDir
     ) {
@@ -131,8 +133,8 @@ class DeploymentInformation
         $this->sourceBranch = $version;
 
         $this->targetBranchDirectory = $this->getTargetBranchDirectory($this->sourceBranch, $this->typeLong);
-        $this->minimumTypoVersion = $composerJson->getMinimumTypoVersion();
-        $this->maximumTypoVersion = $composerJson->getMaximumTypoVersion();
+        $this->minimumTypoVersion = $minimumTypoVersion;
+        $this->maximumTypoVersion = $maximumTypoVersion;
 
         $buildTime = ceil(microtime(true) * 10000);
         $this->absoluteDumpFile = implode('/', [

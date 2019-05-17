@@ -103,7 +103,6 @@ class DocumentationJar
 
     private $buildKey;
 
-
     /**
      * @return mixed
      */
@@ -321,7 +320,7 @@ class DocumentationJar
     public function setMinimumTypoVersion(string $minimumTypoVersion): self
     {
         $this->minimumTypoVersion = $minimumTypoVersion;
-      
+
         return $this;
     }
 
