@@ -100,6 +100,13 @@ class DocumentationJar
     /**
      * @ORM\Column(type="string", length=255, options={"default": ""})
      */
+    private $minimumTypoVersion;
+
+    /**
+     * @ORM\Column(type="string", length=255, options={"default": ""})
+     */
+    private $maximumTypoVersion;
+
     private $buildKey;
 
     /**
@@ -323,6 +330,18 @@ class DocumentationJar
         return $this;
     }
 
+    public function getMinimumTypoVersion(): ?string
+    {
+        return $this->minimumTypoVersion;
+    }
+
+    public function setMinimumTypoVersion(string $minimumTypoVersion): self
+    {
+        $this->minimumTypoVersion = $minimumTypoVersion;
+
+        return $this;
+    }
+
     /**
      * @return string|null
      */
@@ -338,6 +357,18 @@ class DocumentationJar
     public function setBuildKey(string $buildKey): self
     {
         $this->buildKey = $buildKey;
+
+        return $this;
+    }
+
+    public function getMaximumTypoVersion(): ?string
+    {
+        return $this->maximumTypoVersion;
+    }
+
+    public function setMaximumTypoVersion(string $maximumTypoVersion): self
+    {
+        $this->maximumTypoVersion = $maximumTypoVersion;
 
         return $this;
     }
