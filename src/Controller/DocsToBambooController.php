@@ -230,7 +230,7 @@ class DocsToBambooController extends AbstractController
 
             $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($documentationJar->getPublicComposerJsonUrl());
             $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
-            $buildInformation = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar, $composerAsObject);
+            $buildInformation = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
             $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
             $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);

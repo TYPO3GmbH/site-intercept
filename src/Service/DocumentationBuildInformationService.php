@@ -233,35 +233,28 @@ class DocumentationBuildInformationService
             // Update source branch if needed. This way, that db entry always hold the latest tag the
             // documentation was rendered from, eg. if first target dir '5.7' was rendered from tag '5.7.1'
             // and later overriden by tag '5.7.2'
-            $needsUpdate = false;
             if ($record->getBranch() !== $deploymentInformation->sourceBranch) {
                 $record->setBranch($deploymentInformation->sourceBranch);
-                $needsUpdate = true;
             }
             // Update typeLong and typeShort if these are empty (mostly migration purposes when this fields were added)
             if (empty($record->getTypeLong())) {
                 $record->setTypeLong($deploymentInformation->typeLong);
-                $needsUpdate = true;
             }
             if (empty($record->getTypeShort())) {
                 $record->setTypeShort($deploymentInformation->typeShort);
-                $needsUpdate = true;
             }
             if (empty($record->getPublicComposerJsonUrl())) {
                 $record->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl);
-                $needsUpdate = true;
             }
             if (empty($record->getVendor())) {
                 $record->setVendor($deploymentInformation->vendor);
-                $needsUpdate = true;
             }
             if (empty($record->getName())) {
                 $record->setName($deploymentInformation->name);
-                $needsUpdate = true;
             }
-            if ($needsUpdate) {
-                $this->entityManager->flush();
-            }
+            $record->setStatus(DocumentationStatus::STATUS_RENDERING);
+            $this->entityManager->persist($record);
+            $this->entityManager->flush();
         } else {
             // No entry, yet - create one
             $documentationJar = (new DocumentationJar())
