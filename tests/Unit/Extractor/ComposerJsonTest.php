@@ -202,4 +202,20 @@ class ComposerJsonTest extends TestCase
 
         $this->assertEquals('8.7', $composerJson->getMinimumTypoVersion());
     }
+
+    /**
+     * @test
+     */
+    public function exceptionIsNotThrownWhenCmsCoreVersionNotPresentInNonExtensionPackage(): void
+    {
+        $composerJson = new ComposerJson([
+            'name' => 'foobar/baz',
+            'type' => 'not-a-typo3-cms-extension',
+            'require' => ['foobar/bark' => '^4.2'],
+            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
+        ]);
+
+        $this->assertEquals('', $composerJson->getMinimumTypoVersion());
+        $this->assertEquals('', $composerJson->getMaximumTypoVersion());
+    }
 }
