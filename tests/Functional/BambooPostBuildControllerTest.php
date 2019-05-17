@@ -162,8 +162,6 @@ class BambooPostBuildControllerTest extends TestCase
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
         $documentationJar = $this->generateRandomJar()
             ->setStatus(DocumentationStatus::STATUS_DELETING)
-            ->setMinimumTypoVersion('9.5')
-            ->setMaximumTypoVersion('9.5')
             ->setBuildKey($bambooBuildKey);
         $entityManager->persist($documentationJar);
         $entityManager->flush();
@@ -203,8 +201,6 @@ class BambooPostBuildControllerTest extends TestCase
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
         $documentationJar = $this->generateRandomJar()
             ->setStatus(DocumentationStatus::STATUS_DELETING)
-            ->setMinimumTypoVersion('9.5')
-            ->setMaximumTypoVersion('9.5')
             ->setBuildKey($bambooBuildKey);
         $entityManager->persist($documentationJar);
         $entityManager->flush();
@@ -248,8 +244,6 @@ class BambooPostBuildControllerTest extends TestCase
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
         $documentationJar = $this->generateRandomJar()
             ->setStatus(DocumentationStatus::STATUS_RENDERING)
-            ->setMinimumTypoVersion('9.5')
-            ->setMaximumTypoVersion('9.5')
             ->setBuildKey($bambooBuildKey);
         $entityManager->persist($documentationJar);
         $entityManager->flush();
@@ -292,8 +286,6 @@ class BambooPostBuildControllerTest extends TestCase
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
         $documentationJar = $this->generateRandomJar()
             ->setStatus(DocumentationStatus::STATUS_DELETING)
-            ->setMinimumTypoVersion('9.5')
-            ->setMaximumTypoVersion('9.5')
             ->setBuildKey($bambooBuildKey);
         $entityManager->persist($documentationJar);
         $entityManager->flush();
@@ -331,7 +323,9 @@ class BambooPostBuildControllerTest extends TestCase
             ->setRepositoryUrl('https://github.com/' . $packageName . '/')
             ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/' . $packageName . '/' . $branch . '/composer.json')
             ->setBranch($branch)
-            ->setTargetBranchDirectory($branch);
+            ->setTargetBranchDirectory($branch)
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5');
 
         return $documentationJar;
     }
