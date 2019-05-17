@@ -156,16 +156,25 @@ class ComposerJsonTest extends TestCase
     }
 
     /**
+     * @param string $cmsCoreVersionString
+     * @return array
+     */
+    public function cmsCoreConstraintTestDataProvider(string $cmsCoreVersionString): array
+    {
+        return [
+            'name' => 'foobar/baz',
+            'type' => 'typo3-cms-extension',
+            'require' => ['foobar/bark' => '^4.2', 'typo3/cms-core' => $cmsCoreVersionString],
+            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
+        ];
+    }
+
+    /**
      * @test
      */
     public function maximumCmsCoreVersionIsReturnedAsExpectedWithOneVersion(): void
     {
-        $composerJson = new ComposerJson([
-            'name' => 'foobar/baz',
-            'type' => 'typo3-cms-extension',
-            'require' => ['foobar/bark' => '^4.2', 'typo3/cms-core' => '^9.5'],
-            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
-        ]);
+        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^9.5'));
 
         $this->assertEquals('9.5', $composerJson->getMaximumTypoVersion());
     }
@@ -175,12 +184,7 @@ class ComposerJsonTest extends TestCase
      */
     public function maximumCmsCoreVersionIsReturnedAsExpectedWithTwoVersions(): void
     {
-        $composerJson = new ComposerJson([
-            'name' => 'foobar/baz',
-            'type' => 'typo3-cms-extension',
-            'require' => ['foobar/bark' => '^4.2', 'typo3/cms-core' => '8.7.*, <= 9.5.*'],
-            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
-        ]);
+        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('8.7.*, <= 9.5.*'));
 
         $this->assertEquals('9.5', $composerJson->getMaximumTypoVersion());
     }
@@ -188,14 +192,29 @@ class ComposerJsonTest extends TestCase
     /**
      * @test
      */
+    public function maximumCmsCoreVersionIsReturnedAsExpectedWithSmallRange(): void
+    {
+        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^7.5.6 || ^8'));
+
+        $this->assertEquals('8', $composerJson->getMaximumTypoVersion());
+    }
+
+    /**
+     * @test
+     */
+    public function maximumCmsCoreVersionIsReturnedAsExpectedWithBigRange(): void
+    {
+        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('2.7.44 || 2.8.37 || 3.4.7 || 4.0.7'));
+
+        $this->assertEquals('4.0', $composerJson->getMaximumTypoVersion());
+    }
+
+    /**
+     * @test
+     */
     public function minimumCmsCoreVersionIsReturnedAsExpectedWithOneVersion(): void
     {
-        $composerJson = new ComposerJson([
-            'name' => 'foobar/baz',
-            'type' => 'typo3-cms-extension',
-            'require' => ['foobar/bark' => '^4.2', 'typo3/cms-core' => '^9.5'],
-            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
-        ]);
+        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^9.5'));
 
         $this->assertEquals('9.5', $composerJson->getMinimumTypoVersion());
     }
@@ -205,14 +224,29 @@ class ComposerJsonTest extends TestCase
      */
     public function minimumCmsCoreVersionIsReturnedAsExpectedWithTwoVersions(): void
     {
-        $composerJson = new ComposerJson([
-            'name' => 'foobar/baz',
-            'type' => 'typo3-cms-extension',
-            'require' => ['foobar/bark' => '^4.2', 'typo3/cms-core' => '8.7.*, <= 9.5.*'],
-            'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
-        ]);
+        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('8.7.*, <= 9.5.*'));
 
         $this->assertEquals('8.7', $composerJson->getMinimumTypoVersion());
+    }
+
+    /**
+     * @test
+     */
+    public function minimumCmsCoreVersionIsReturnedAsExpectedWithSmallRange(): void
+    {
+        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^7.5.6 || ^8'));
+
+        $this->assertEquals('7.5', $composerJson->getMinimumTypoVersion());
+    }
+
+    /**
+     * @test
+     */
+    public function minimumCmsCoreVersionIsReturnedAsExpectedWithBigRange(): void
+    {
+        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('2.7.44 || 2.8.37 || 3.4.7 || 4.0.7'));
+
+        $this->assertEquals('2.7', $composerJson->getMinimumTypoVersion());
     }
 
     /**
