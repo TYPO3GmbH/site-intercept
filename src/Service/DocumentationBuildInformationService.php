@@ -14,6 +14,7 @@ use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
+use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Extractor\ComposerJson;
@@ -90,6 +91,7 @@ class DocumentationBuildInformationService
      * @param string $path
      * @return array
      * @throws ComposerJsonNotFoundException
+     * @throws ComposerJsonInvalidException
      */
     public function fetchRemoteComposerJson(string $path): array
     {
@@ -102,7 +104,11 @@ class DocumentationBuildInformationService
         if ($statusCode !== 200) {
             throw new ComposerJsonNotFoundException('Fetching composer.json did not return HTTP 200', 1557489013);
         }
-        return json_decode($response->getBody()->getContents(), true);
+        $json = json_decode($response->getBody()->getContents(), true);
+        if (!is_array($json)) {
+            throw new ComposerJsonInvalidException('Decoding composer.json did not return an object. Invalid json syntax?', 1558022442);
+        }
+        return $json;
     }
 
     /**
