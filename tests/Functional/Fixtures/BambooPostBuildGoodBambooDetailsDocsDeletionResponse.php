@@ -11,7 +11,7 @@ return new Response(
             "rel": "self"
         },
         "plan": {
-            "shortName": "Core master pre-merge",
+            "shortName": "Documentation deletion",
             "shortKey": "DDEL",
             "type": "chain",
             "enabled": true,
@@ -20,12 +20,12 @@ return new Response(
                 "rel": "self"
             },
             "key": "CORE-DDEL",
-            "name": "Core - Core master pre-merge",
+            "name": "Core - Documentation deletion",
             "planKey": {
                 "key": "CORE-DDEL"
             }
         },
-        "planName": "Core master pre-merge",
+        "planName": "Documentation deletion",
         "projectName": "Core",
         "buildResultKey": "CORE-DDEL-4711",
         "lifeCycleState": "Finished",
