@@ -71,7 +71,7 @@ class ComposerJson
     {
         $typoVersion = $this->extractTypoVersion();
 
-        if (!preg_match('/\d\.\d/', $typoVersion) && $this->getType() === 'typo3-cms-extension') {
+        if (empty($typoVersion) && $this->getType() === 'typo3-cms-extension') {
             throw new DocsComposerMissingValueException('typo3/cms-core is not required in the composer json', 1558084137);
         }
 
@@ -86,7 +86,7 @@ class ComposerJson
     {
         $typoVersion = $this->extractTypoVersion(true);
 
-        if (!preg_match('/\d\.\d/', $typoVersion) && $this->getType() === 'typo3-cms-extension') {
+        if (empty($typoVersion) && $this->getType() === 'typo3-cms-extension') {
             throw new DocsComposerMissingValueException('typo3/cms-core is not required in the composer json', 1558084146);
         }
 
@@ -104,7 +104,16 @@ class ComposerJson
         if (isset($this->composerJson['require']['typo3/cms-core'])) {
             $typoVersion = $this->composerJson['require']['typo3/cms-core'];
             if (strpos($typoVersion, ',') !== false) {
-                $typoVersion = explode(',', $typoVersion)[(int)$getMaximum];
+                $typoVersion = explode(',', $typoVersion);
+            } elseif (strpos($typoVersion, '||') !== false) {
+                $typoVersion = explode('||', $typoVersion);
+            }
+            if (is_array($typoVersion)) {
+                $getMaximum ? $typoVersion = array_pop($typoVersion) : $typoVersion = $typoVersion[0];
+            }
+            $numbers = explode('.', $typoVersion);
+            if (count($numbers) > 2) {
+                $typoVersion = $numbers[0] . '.' . $numbers[1];
             }
             $typoVersion = str_replace(['^', '~', '.*', '>=', '<='], '', $typoVersion);
         }
