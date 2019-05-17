@@ -161,6 +161,52 @@ class BambooPostBuildController extends AbstractController
                     ]
                 );
             }
+        } elseif (strpos($buildDetails->buildKey, 'CORE-DR-') === 0) {
+            // This is a back-channel triggered by Bamboo after a "documentation rendering" build is done
+            $manager = $this->getDoctrine()->getManager();
+            $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
+
+            /** @var DocumentationJar $documentationEntry */
+            $documentationEntry = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
+
+            if ($buildDetails->success) {
+                // Build was successful, set status to "rendered"
+                $documentationEntry->setStatus(DocumentationStatus::STATUS_RENDERED);
+
+                $logger->info(
+                    'Documentation rendered'
+                    . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                    [
+                        'type' => 'docsRendering',
+                        'status' => 'documentationRendered',
+                        'triggeredBy' => 'api',
+                        'repository' => $documentationEntry->getRepositoryUrl(),
+                        'package' => $documentationEntry->getPackageName(),
+                        'bambooKey' => $buildDetails->buildKey,
+                    ]
+                );
+            } else {
+                // Build failed, set status of documentation to "rendering failed"
+                $documentationEntry->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED);
+
+                $logger->warning(
+                    'Failed to render documentation'
+                    . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                    [
+                        'type' => 'docsRendering',
+                        'status' => 'documentationRenderingFailed',
+                        'triggeredBy' => 'api',
+                        'repository' => $documentationEntry->getRepositoryUrl(),
+                        'package' => $documentationEntry->getPackageName(),
+                        'bambooKey' => $buildDetails->buildKey,
+                    ]
+                );
+            }
+
+            // Build is done, remove build key
+            $documentationEntry->setBuildKey('');
+            $manager->persist($documentationEntry);
+            $manager->flush();
         }
 
         return Response::create();
