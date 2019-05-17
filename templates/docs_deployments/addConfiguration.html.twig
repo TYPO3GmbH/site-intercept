@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+{% block title %}Documentation deployments{% endblock %}
+{% block headline %}Deployed documentation{% endblock %}
+{% block body %}
+
+    <div class="content-section">
+        <div class="container">
+            <h2>
+                Add Deployed documentation projects
+            </h2>
+
+            <div class="card">
+                <div class="card-body">
+                    {{ include('docs_deployments/_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

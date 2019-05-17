@@ -15,6 +15,12 @@
             </h2>
 
             <div class="card">
+                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                <div class="card-header text-right">
+                    <a href="{{ path('admin_docs_deployments_add') }}" class="btn btn-outline-success">Add configuration</a>
+                </div>
+                {% endif %}
+
                 <div class="datatable">
                     <table class="datatable-table">
                         <thead>

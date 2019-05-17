@@ -7,27 +7,27 @@ return new Response(
     '{
         "expand": "changes,metadata,plan,vcsRevisions,artifacts,comments,labels,jiraIssues,stages",
         "link": {
-            "href": "https://bamboo.typo3.com/rest/api/latest/result/CORE-DDEL-4711",
+            "href": "https://bamboo.typo3.com/rest/api/latest/result/CORE-DR-42",
             "rel": "self"
         },
         "plan": {
-            "shortName": "Documentation deletion",
-            "shortKey": "DDEL",
+            "shortName": "Documentation rendering",
+            "shortKey": "DR",
             "type": "chain",
             "enabled": true,
             "link": {
-                "href": "https://bamboo.typo3.com/rest/api/latest/plan/CORE-DDEL",
+                "href": "https://bamboo.typo3.com/rest/api/latest/plan/CORE-DR",
                 "rel": "self"
             },
-            "key": "CORE-DDEL",
-            "name": "Core - Documentation deletion",
+            "key": "CORE-DR",
+            "name": "Core - Documentation rendering",
             "planKey": {
-                "key": "CORE-DDEL"
+                "key": "CORE-DR"
             }
         },
-        "planName": "Documentation deletion",
+        "planName": "Documentation rendering",
         "projectName": "Core",
-        "buildResultKey": "CORE-DDEL-4711",
+        "buildResultKey": "CORE-DR-42",
         "lifeCycleState": "Finished",
         "id": 104342325,
         "buildStartedTime": "2018-11-24T17:43:15.141+01:00",
@@ -98,17 +98,17 @@ return new Response(
             "start-index": 0,
             "max-result": 2
         },
-        "key": "CORE-DDEL-4711",
+        "key": "CORE-DR-42",
         "planResultKey": {
-            "key": "CORE-DDEL-4711",
+            "key": "CORE-DR-42",
             "entityKey": {
-                "key": "CORE-DDEL"
+                "key": "CORE-DR"
             },
-            "resultNumber": 4711
+            "resultNumber": 42
         },
         "state": "Successful",
         "buildState": "Successful",
-        "number": 4711,
-        "buildNumber": 4711
+        "number": 42,
+        "buildNumber": 42
     }'
 );

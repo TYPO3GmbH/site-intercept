@@ -160,17 +160,7 @@ class BambooPostBuildControllerTest extends TestCase
 
         /** @var EntityManager $entityManager */
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
-        $documentationJar = (new DocumentationJar())
-            ->setVendor('foobar')
-            ->setName('bazfnord')
-            ->setPackageName('foobar/bazfnord')
-            ->setPackageType('typo3-cms-extension')
-            ->setTypeShort('c')
-            ->setTypeLong('core-extension')
-            ->setRepositoryUrl('https://github.com/lolli42/enetcache/')
-            ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json')
-            ->setBranch('master')
-            ->setTargetBranchDirectory('master')
+        $documentationJar = $this->generateRandomJar()
             ->setStatus(DocumentationStatus::STATUS_DELETING)
             ->setMinimumTypoVersion('9.5')
             ->setMaximumTypoVersion('9.5')
@@ -211,17 +201,7 @@ class BambooPostBuildControllerTest extends TestCase
 
         /** @var EntityManager $entityManager */
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
-        $documentationJar = (new DocumentationJar())
-            ->setVendor('foobar')
-            ->setName('bazfnord')
-            ->setPackageName('foobar/bazfnord')
-            ->setPackageType('typo3-cms-extension')
-            ->setTypeShort('c')
-            ->setTypeLong('core-extension')
-            ->setRepositoryUrl('https://github.com/lolli42/enetcache/')
-            ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json')
-            ->setBranch('master')
-            ->setTargetBranchDirectory('master')
+        $documentationJar = $this->generateRandomJar()
             ->setStatus(DocumentationStatus::STATUS_DELETING)
             ->setMinimumTypoVersion('9.5')
             ->setMaximumTypoVersion('9.5')
@@ -234,9 +214,121 @@ class BambooPostBuildControllerTest extends TestCase
         $kernel->terminate($request, $response);
 
         $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
-        $result = $documentationJarRepository->findAll();
+        $result = $documentationJarRepository->findBy([
+            'packageName' => $documentationJar->getPackageName(),
+            'packageType' => $documentationJar->getPackageType(),
+            'branch' => $documentationJar->getBranch(),
+            'status' => DocumentationStatus::STATUS_RENDERED
+        ]);
 
         $this->assertCount(1, $result);
         $this->assertSame(DocumentationStatus::STATUS_RENDERED, current($result)->getStatus());
+    }
+
+    /**
+     * @test
+     */
+    public function successfulRenderingSetsStatusToRendered(): void
+    {
+        $bambooBuildKey = 'CORE-DR-42';
+
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy
+            ->get(
+                'latest/result/' . $bambooBuildKey . '?os_authType=basic&expand=labels',
+                Argument::cetera()
+            )->shouldBeCalled()
+            ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildGoodBambooDetailsDocsRenderingResponse.php');
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $documentationJar = $this->generateRandomJar()
+            ->setStatus(DocumentationStatus::STATUS_RENDERING)
+            ->setBuildKey($bambooBuildKey);
+        $entityManager->persist($documentationJar);
+        $entityManager->flush();
+
+        $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodDocsRenderingRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+
+        $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
+        $result = $documentationJarRepository->findBy([
+            'packageName' => $documentationJar->getPackageName(),
+            'packageType' => $documentationJar->getPackageType(),
+            'branch' => $documentationJar->getBranch(),
+            'status' => DocumentationStatus::STATUS_RENDERED
+        ]);
+
+        $this->assertCount(1, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function failedRenderingSetsStatusToRenderingFailed(): void
+    {
+        $bambooBuildKey = 'CORE-DR-42';
+
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy
+            ->get(
+                'latest/result/' . $bambooBuildKey . '?os_authType=basic&expand=labels',
+                Argument::cetera()
+            )->shouldBeCalled()
+            ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildBadBambooDetailsDocsRenderingFailedResponse.php');
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $documentationJar = $this->generateRandomJar()
+            ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setBuildKey($bambooBuildKey);
+        $entityManager->persist($documentationJar);
+        $entityManager->flush();
+
+        $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodDocsRenderingRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+
+        $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
+        $result = $documentationJarRepository->findBy([
+            'packageName' => $documentationJar->getPackageName(),
+            'packageType' => $documentationJar->getPackageType(),
+            'branch' => $documentationJar->getBranch(),
+            'status' => DocumentationStatus::STATUS_RENDERING_FAILED
+        ]);
+
+        $this->assertCount(1, $result);
+    }
+
+    private function generateRandomJar(): DocumentationJar
+    {
+        $faker = \Faker\Factory::create();
+        $vendor = $faker->userName;
+        $name = $faker->slug;
+        $packageName = $vendor . '/' . $name;
+        $branch = $faker->randomElement(['master', 'draft', '8.7']);
+
+        $documentationJar = (new DocumentationJar())
+            ->setVendor($vendor)
+            ->setName($name)
+            ->setPackageName($packageName)
+            ->setPackageType('typo3-cms-extension')
+            ->setTypeShort('c')
+            ->setTypeLong('core-extension')
+            ->setRepositoryUrl('https://github.com/' . $packageName . '/')
+            ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/' . $packageName . '/' . $branch . '/composer.json')
+            ->setBranch($branch)
+            ->setTargetBranchDirectory($branch);
+
+        return $documentationJar;
     }
 }

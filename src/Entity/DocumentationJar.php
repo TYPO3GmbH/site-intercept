@@ -11,6 +11,7 @@ namespace App\Entity;
 
 use App\Enum\DocumentationStatus;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\DocumentationJarRepository")
@@ -28,11 +29,15 @@ class DocumentationJar
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Url
      */
     private $repositoryUrl;
 
     /**
      * @ORM\Column(type="string", length=255, options={"default": ""})
+     * @Assert\NotBlank
+     * @Assert\Url
      */
     private $publicComposerJsonUrl;
 
@@ -53,6 +58,7 @@ class DocumentationJar
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $packageType;
 
@@ -369,7 +375,11 @@ class DocumentationJar
 
     public function isRenderable(): bool
     {
-        return !empty($this->publicComposerJsonUrl) && in_array($this->status, [DocumentationStatus::STATUS_RENDERED, DocumentationStatus::STATUS_RENDERING_FAILED], true);
+        return !empty($this->publicComposerJsonUrl)
+            && in_array($this->status, [
+                DocumentationStatus::STATUS_RENDERED,
+                DocumentationStatus::STATUS_RENDERING_FAILED
+            ], true);
     }
 
     public function isDeletable(): bool
@@ -387,7 +397,9 @@ class DocumentationJar
         if ($this->getCreatedAt() === null) {
             $this->setCreatedAt(new \DateTime('now'));
         }
-        // Update last rendered each time record is updated
-        $this->setLastRenderedAt(new \DateTime('now'));
+        // Update last rendered if record is first persisted
+        if ($this->getLastRenderedAt() === null) {
+            $this->setLastRenderedAt(new \DateTime('now'));
+        }
     }
 }
