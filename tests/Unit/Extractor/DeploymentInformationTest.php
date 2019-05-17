@@ -26,6 +26,7 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => 'typo3-cms-extension',
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
 
         $subject = new DeploymentInformation(
@@ -59,6 +60,7 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => 'typo3-cms-extension',
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
 
         $expected = [
@@ -111,6 +113,7 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => $packageName,
             'type' => 'typo3-cms-extension',
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
 
         $subject = new DeploymentInformation(
@@ -190,6 +193,7 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => $type,
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
         $subject = new DeploymentInformation(
             $composerJsonAsArray['name'],
@@ -428,6 +432,7 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => $type,
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
         $subject = new DeploymentInformation(
             $composerJsonAsArray['name'],
