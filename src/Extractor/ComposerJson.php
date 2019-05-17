@@ -72,7 +72,7 @@ class ComposerJson
     {
         $typoVersion = $this->extractTypoVersion();
 
-        if (!preg_match('/\d\.\d/', $typoVersion)) {
+        if (!preg_match('/\d\.\d/', $typoVersion) && $this->getType() === 'typo3-cms-extension') {
             throw new ComposerJsonInvalidException();
         }
 
@@ -87,7 +87,7 @@ class ComposerJson
     {
         $typoVersion = $this->extractTypoVersion(true);
 
-        if (!preg_match('/\d\.\d/', $typoVersion)) {
+        if (!preg_match('/\d\.\d/', $typoVersion) && $this->getType() === 'typo3-cms-extension') {
             throw new ComposerJsonInvalidException();
         }
 
