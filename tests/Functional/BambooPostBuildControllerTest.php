@@ -162,6 +162,8 @@ class BambooPostBuildControllerTest extends TestCase
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
         $documentationJar = $this->generateRandomJar()
             ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5')
             ->setBuildKey($bambooBuildKey);
         $entityManager->persist($documentationJar);
         $entityManager->flush();
@@ -201,6 +203,8 @@ class BambooPostBuildControllerTest extends TestCase
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
         $documentationJar = $this->generateRandomJar()
             ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5')
             ->setBuildKey($bambooBuildKey);
         $entityManager->persist($documentationJar);
         $entityManager->flush();
