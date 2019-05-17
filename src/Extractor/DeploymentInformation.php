@@ -88,6 +88,11 @@ class DeploymentInformation
     public $relativeDumpFile;
 
     /**
+     * @var string TYPO3 version the package is compatible with
+     */
+    public $typoVersion;
+
+    /**
      * Constructor
      *
      * @param string $composerPackageName
@@ -121,6 +126,7 @@ class DeploymentInformation
         $this->sourceBranch = $version;
 
         $this->targetBranchDirectory = $this->getTargetBranchDirectory($this->sourceBranch, $this->typeLong);
+        $this->typoVersion = $composerJson->getTypoVersion();
 
         $buildTime = ceil(microtime(true) * 10000);
         $this->absoluteDumpFile = implode('/', [
