@@ -253,7 +253,6 @@ class DocumentationBuildInformationService
                 $record->setName($deploymentInformation->name);
             }
             $record->setStatus(DocumentationStatus::STATUS_RENDERING);
-            $this->entityManager->persist($record);
             $this->entityManager->flush();
         } else {
             // No entry, yet - create one
