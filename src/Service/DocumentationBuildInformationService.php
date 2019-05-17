@@ -239,6 +239,14 @@ class DocumentationBuildInformationService
                 $record->setName($deploymentInformation->name);
                 $needsUpdate = true;
             }
+            if (empty($record->getMinimumTypoVersion())) {
+                $record->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion);
+                $needsUpdate = true;
+            }
+            if (empty($record->getMaximumTypoVersion())) {
+                $record->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
+                $needsUpdate = true;
+            }
             if ($needsUpdate) {
                 $this->entityManager->flush();
             }
@@ -253,7 +261,9 @@ class DocumentationBuildInformationService
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
-                ->setTypeShort($deploymentInformation->typeShort);
+                ->setTypeShort($deploymentInformation->typeShort)
+                ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
+                ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
         }
