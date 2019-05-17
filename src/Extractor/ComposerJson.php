@@ -64,6 +64,14 @@ class ComposerJson
     }
 
     /**
+     * @return string|null
+     */
+    public function getTypoVersion(): ?string
+    {
+        return $this->composerJson['require']['typo3/cms-core'] ?? null;
+    }
+
+    /**
      * @param string $propertyName
      * @throws DocsComposerMissingValueException
      */
