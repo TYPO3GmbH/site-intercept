@@ -142,7 +142,9 @@ class BambooPostBuildController extends AbstractController
                 );
             } else {
                 // Build failed, revert status of documentation to "rendered"
-                $documentationEntry->setStatus(DocumentationStatus::STATUS_RENDERED);
+                $documentationEntry
+                    ->setStatus(DocumentationStatus::STATUS_RENDERED)
+                    ->setBuildKey('');
                 $manager->persist($documentationEntry);
                 $manager->flush();
 

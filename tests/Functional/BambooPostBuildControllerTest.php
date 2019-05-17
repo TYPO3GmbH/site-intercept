@@ -230,9 +230,7 @@ class BambooPostBuildControllerTest extends TestCase
         $kernel->terminate($request, $response);
 
         $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
-        $result = $documentationJarRepository->findBy([
-            'buildKey' => $bambooBuildKey,
-        ]);
+        $result = $documentationJarRepository->findAll();
 
         $this->assertCount(1, $result);
         $this->assertSame(DocumentationStatus::STATUS_RENDERED, current($result)->getStatus());
