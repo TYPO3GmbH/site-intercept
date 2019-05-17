@@ -57,6 +57,7 @@
   "require-dev": {
     "doctrine/doctrine-fixtures-bundle": "^3.1",
     "friendsofphp/php-cs-fixer": "^2.12",
+    "fzaninotto/faker": "^1.8",
     "phpunit/phpunit": "^7.4",
     "roave/security-advisories": "dev-master",
     "symfony/browser-kit": "^4.2",
