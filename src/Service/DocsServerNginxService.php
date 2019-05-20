@@ -47,6 +47,11 @@ location = %s {
     return %d https://$host%s;
 }';
 
+    protected $legacyRedirectTemplate = '# Rule: %d | Created: %s | Updated: %s | Legacy
+location ~ ^%s(.*) {
+    return %d https://$host%s$1;
+}';
+
     /**
      * NginxService constructor.
      * @param DocsServerRedirectRepository $redirectRepository
@@ -68,7 +73,7 @@ location = %s {
         $content = '';
         foreach ($redirects as $redirect) {
             $content .= chr(10) . sprintf(
-                $this->redirectTemplate,
+                $redirect->getIsLegacy() ? $this->legacyRedirectTemplate : $this->redirectTemplate,
                 $redirect->getId(),
                 $redirect->getCreatedAt()->format('d.m.Y H:i'),
                 $redirect->getUpdatedAt()->format('d.m.Y H:i'),

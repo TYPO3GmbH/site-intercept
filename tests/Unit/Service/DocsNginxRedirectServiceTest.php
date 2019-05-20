@@ -34,6 +34,14 @@ class DocsNginxRedirectServiceTest extends TestCase
                 ->setCreatedAt(new \DateTime('2019-03-20 13:00:00'))
                 ->setUpdatedAt(new \DateTime('2019-03-20 13:00:00'))
                 ->setStatusCode(301),
+            (new DocsServerRedirect())
+                ->setId(3)
+                ->setSource('/typo3cms/extensions/packageOld/1.0/')
+                ->setTarget('/p/vendor/packageOld/1.0/')
+                ->setCreatedAt(new \DateTime('2019-03-21 13:00:00'))
+                ->setUpdatedAt(new \DateTime('2019-03-21 13:00:00'))
+                ->setStatusCode(303)
+                ->setIsLegacy(true),
         ]);
         $this->subject = new DocsServerNginxService(
             $redirectRepositoryProphecy->reveal(),
@@ -60,6 +68,10 @@ class DocsNginxRedirectServiceTest extends TestCase
         $this->assertContains('# Rule: 2 | Created: 20.03.2019 13:00 | Updated: 20.03.2019 13:00', $fileContent);
         $this->assertContains('location = /p/vendor/packageOld/2.0/Foo.html {', $fileContent);
         $this->assertContains('return 301 https://$host/p/vendor/packageNew/2.0/Foo.html;', $fileContent);
+
+        $this->assertContains('# Rule: 3 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00 | Legacy', $fileContent);
+        $this->assertContains('location ~ ^/typo3cms/extensions/packageOld/1.0/(.*) {', $fileContent);
+        $this->assertContains('return 303 https://$host/p/vendor/packageOld/1.0/$1;', $fileContent);
     }
 
     /**
@@ -77,5 +89,9 @@ class DocsNginxRedirectServiceTest extends TestCase
         $this->assertContains('# Rule: 2 | Created: 20.03.2019 13:00 | Updated: 20.03.2019 13:00', $fileContent);
         $this->assertContains('location = /p/vendor/packageOld/2.0/Foo.html {', $fileContent);
         $this->assertContains('return 301 https://$host/p/vendor/packageNew/2.0/Foo.html;', $fileContent);
+
+        $this->assertContains('# Rule: 3 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00 | Legacy', $fileContent);
+        $this->assertContains('location ~ ^/typo3cms/extensions/packageOld/1.0/(.*) {', $fileContent);
+        $this->assertContains('return 303 https://$host/p/vendor/packageOld/1.0/$1;', $fileContent);
     }
 }

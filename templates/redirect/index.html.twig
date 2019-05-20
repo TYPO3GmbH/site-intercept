@@ -25,8 +25,7 @@
                     <table class="datatable-table">
                         <thead>
                             <tr>
-                                <th scope="col" data-type="uid">Id</th>
-                                <th scope="col">Source</th>
+                                <th scope="col" colspan="2">Source</th>
                                 <th scope="col">Target</th>
                                 <th scope="col">StatusCode</th>
                                 <th scope="col">Actions</th>
@@ -34,9 +33,13 @@
                         </thead>
                         <tbody>
                         {% for redirect in redirects %}
-                            <tr>
-                                <th scope="row" data-type="uid">{{ redirect.id }}</th>
-                                <th>{{ redirect.source }}</th>
+                            <tr data-id="{{ redirect.id }}">
+                                <th scope="row">{{ redirect.source }}</th>
+                                <th scope="row">
+                                    {% if redirect.isLegacy %}
+                                        <span class="badge badge-warning">Legacy location</span>
+                                    {% endif %}
+                                </th>
                                 <td>{{ redirect.target }}</td>
                                 <td>{{ redirect.statusCode }}</td>
                                 <td data-type="actions" data-label="Actions">

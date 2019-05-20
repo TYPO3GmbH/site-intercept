@@ -12,7 +12,10 @@ namespace App\Form;
 use App\Entity\DocsServerRedirect;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -28,11 +31,20 @@ class DocsServerRedirectType extends AbstractType
             ->add('target')
             ->add('statusCode', ChoiceType::class, [
                 'choices' => DocsServerRedirect::$allowedStatusCodes,
-                'choice_label' => function ($value) {
+                'choice_label' => static function ($value) {
                     return $value;
                 }
             ])
+            ->add('isLegacy', HiddenType::class, [
+                'data' => '0'
+            ])
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
+            $data = $event->getData();
+            $data['isLegacy'] = (int)(strpos($data['source'], '/typo3cms/extensions/') === 0);
+            $event->setData($data);
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)

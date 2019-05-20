@@ -55,7 +55,7 @@ class DocsServerRedirect
     /**
      * @ORM\Column(type="string", length=2000)
      * @Assert\Regex(
-     *     pattern="@^/([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)$@m",
+     *     pattern="@^/(([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)|typo3cms/extensions/([^/]*)/([^/]*)/)$@m",
      *     message="The path must start with /p/, /c/, /m/ or /h/ and contains at least the three parts: vendor/package/version/. example: /p/t3g/blog/9.0/Administration/Index.html"
      * )
      */
@@ -69,6 +69,11 @@ class DocsServerRedirect
      * )
      */
     private $target;
+
+    /**
+     * @ORM\Column(name="is_legacy", type="integer")
+     */
+    private $isLegacy = false;
 
     /**
      * @ORM\Column(type="integer")
@@ -154,6 +159,17 @@ class DocsServerRedirect
             throw new InvalidStatusException('The HTTP status code is invalid for a redirect', 1553001673);
         }
         $this->statusCode = $statusCode;
+        return $this;
+    }
+
+    public function getIsLegacy(): bool
+    {
+        return $this->isLegacy;
+    }
+
+    public function setIsLegacy(bool $isLegacy): self
+    {
+        $this->isLegacy = $isLegacy;
         return $this;
     }
 
