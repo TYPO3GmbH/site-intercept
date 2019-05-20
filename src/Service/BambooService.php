@@ -158,10 +158,6 @@ class BambooService
      */
     public function triggerDocumentationPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
     {
-        // Deployment Hack for homepage @TODO: remove me after Go-Live
-        if ($deploymentInformation->typeShort === 'h') {
-            $deploymentInformation->sourceBranch = 'new_docs_server';
-        }
         $uri = 'latest/queue/'
             . 'CORE-DR?'
             . implode('&', [
