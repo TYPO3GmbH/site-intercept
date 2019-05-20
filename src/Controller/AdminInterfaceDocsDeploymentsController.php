@@ -29,6 +29,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * Show and manipulate all docs deployments managed by intercept
@@ -38,24 +39,37 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
     /**
      * @Route("/admin/docs/deployments", name="admin_docs_deployments")
      *
+     * @param Request $request
+     * @param PaginatorInterface $paginator
      * @param BambooService $bambooService
      * @param GraylogService $graylogService
      * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
      */
     public function index(
+        Request $request,
+        PaginatorInterface $paginator,
         BambooService $bambooService,
         GraylogService $graylogService,
         DocumentationJarRepository $documentationJarRepository
     ): Response {
         $recentLogsMessages = $graylogService->getRecentBambooDocsActions();
         $deployments = $documentationJarRepository->findAll();
+        $pagination = $paginator->paginate(
+            $deployments,
+            $request->query->getInt('page', 1),
+            10,
+            [
+                'defaultSortFieldName' => 'lastRenderedAt',
+                'defaultSortDirection' => 'desc'
+            ]
+        );
 
         return $this->render(
             'docsDeployments.html.twig',
             [
+                'pagination' => $pagination,
                 'logMessages' => $recentLogsMessages,
-                'deployments' => $deployments,
                 'bambooStatus' => $bambooService->getBambooStatus(),
                 'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),
             ]

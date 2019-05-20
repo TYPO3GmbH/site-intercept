@@ -24,6 +24,7 @@
     "graylog2/gelf-php": "^1.6",
     "kbsali/redmine-api": "~1.0",
     "knplabs/knp-menu-bundle": "^2.2",
+    "knplabs/knp-paginator-bundle": "^3.0",
     "php-amqplib/php-amqplib": "^2.8",
     "psr/http-message": "^1",
     "psr/log": "^1",
