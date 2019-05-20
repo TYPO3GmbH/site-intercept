@@ -56,7 +56,7 @@ class DocsServerRedirect
      * @ORM\Column(type="string", length=2000)
      * @Assert\Regex(
      *     pattern="@^/(([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)|typo3cms/extensions/([^/]*)/([^/]*)/)$@m",
-     *     message="The path must start with /p/, /c/, /m/ or /h/ and contains at least the three parts: vendor/package/version/. example: /p/t3g/blog/9.0/Administration/Index.html"
+     *     message="The path must start with /p/, /c/, /m/ or /h/ and contains at least the three parts: vendor/package/version/, e.g. '/p/t3g/blog/9.0/Administration/Index.html'. Alternatively, add a so-called legacy location which requires the extension name and a version, e.g. '/typo3cms/extensions/my_exension/1.0/'"
      * )
      */
     private $source;
@@ -65,7 +65,7 @@ class DocsServerRedirect
      * @ORM\Column(type="string", length=2000)
      * @Assert\Regex(
      *     pattern="@^/([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)$@m",
-     *     message="The path must start with /p/, /c/, /m/ or /h/ and contains at least the three parts: vendor/package/version/. example: /p/t3g/blog/9.0/Administration/Index.html"
+     *     message="The path must start with /p/, /c/, /m/ or /h/ and contains at least the three parts: vendor/package/version/, e.g. '/p/t3g/blog/9.0/Administration/Index.html'"
      * )
      */
     private $target;
