@@ -117,6 +117,10 @@ $table-cell-padding: $table-padding-y $table-padding-x;
         padding-left: $table-padding / 2;
     }
 
+    [data-type="title"] + [data-type="badge"] {
+        padding-left: 0;
+    }
+
     [data-type="fill"] {
         width: 100%;
     }

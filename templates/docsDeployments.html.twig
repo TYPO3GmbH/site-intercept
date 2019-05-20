@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
 {% block title %}Documentation deployments{% endblock %}
-{% block headline %}Deployed documentation{% endblock %}
+{% block headline %}Documentation deployments{% endblock %}
 {% block body %}
 
     <div class="content-section">
@@ -10,15 +11,22 @@
                 {{ include('partials/bambooStatus.html.twig') }}
             </h2>
 
-            <h2>
-                Deployed documentation projects
-            </h2>
-
             <div class="card">
+
                 {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
-                <div class="card-header text-right">
-                    <a href="{{ path('admin_docs_deployments_add') }}" class="btn btn-outline-success">Add configuration</a>
-                </div>
+                    <div class="card-header">
+                        <div class="card-header-bar">
+                            <div class="card-header-actions">
+                                {{
+                                    macros.linkbutton(
+                                        path('admin_docs_deployments_add'),
+                                        'Add configuration',
+                                        'secondary'
+                                    )
+                                }}
+                            </div>
+                        </div>
+                    </div>
                 {% endif %}
 
                 <div class="datatable">
@@ -46,7 +54,7 @@
                                     <strong>{{ deployment.packageName }}</strong><br>
                                     <small>{{ deployment.packageType }}</small>
                                 </th>
-                                <th>
+                                <th data-type="badge">
                                     {% if deployment.status == "0" %}
                                         <span class="badge badge-info">Rendering</span>
                                     {% elseif deployment.status == "1" %}
@@ -77,7 +85,7 @@
                                     <td data-type="actions" data-label="Actions">
                                         {% if deployment.isRenderable() %}
                                             <a class="datatable-action" title="Re-render documentation" href="{{ path('docs_to_bamboo_render', {documentation: deployment.id}) }}">
-                                                <span class="datatable-action-icon"><i class="fas fa-shapes"></i></span>
+                                                <span class="datatable-action-icon"><i class="fas fa-sync"></i></span>
                                                 <span class="datatable-action-label datatable-visually-hidden">Re-render documentation</span>
                                             </a>
                                         {% endif %}
