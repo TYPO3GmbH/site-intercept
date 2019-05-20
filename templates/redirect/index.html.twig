@@ -8,6 +8,19 @@
         <div class="container">
 
             <div class="card">
+                <div class="card-header">
+                    <div class="card-header-bar">
+                        <div class="card-header-actions">
+                            {{ 
+                                macros.linkbutton(
+                                    path('admin_redirect_new'),
+                                    'Create new',
+                                    'secondary'
+                                )
+                            }}
+                        </div>
+                    </div>
+                </div>
                 <div class="datatable">
                     <table class="datatable-table">
                         <thead>
@@ -44,19 +57,6 @@
                         {% endfor %}
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <div class="row mt-4 justify-content-between">
-                <div class="col-auto">
-                    {{ 
-                        macros.linkbutton(
-                            path('admin_redirect_new'),
-                            'Create new',
-                            'primary',
-                            'plus'
-                        )
-                    }}
                 </div>
             </div>
 
