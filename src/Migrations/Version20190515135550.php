@@ -31,8 +31,8 @@ final class Version20190515135550 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'sqlite', 'Migration can only be executed safely on \'sqlite\'.');
 
-        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN status INTEGER DEFAULT ' . DocumentationStatus::STATUS_RENDERING . ' NOT NULL');
-        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN build_key VARCHAR(255) DEFAULT \'\' NOT NULL');
+        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN status VARCHAR(255) DEFAULT \'\' NOT NULL');
+        $this->addSql('ALTER TABLE documentation_jar ADD COLUMN build_key INTEGER DEFAULT ' . DocumentationStatus::STATUS_RENDERING . ' NOT NULL');
         $this->addSql('ALTER TABLE documentation_jar ADD COLUMN package_type VARCHAR(255) DEFAULT \'\' NOT NULL');
         $this->addSql('UPDATE documentation_jar SET status = ' . DocumentationStatus::STATUS_RENDERED);
         $this->addSql('UPDATE documentation_jar SET package_type = \'typo3-cms-documentation\' WHERE type_long = \'manual\' OR type_long = \'docs-home\'');
