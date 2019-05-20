@@ -27,8 +27,12 @@ class DocsServerRedirectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('source')
-            ->add('target')
+            ->add('source', null, [
+                'help' => 'The path must start with /p/, /c/, /m/ or /h/ and contains at least the three parts: vendor/package/version/, e.g. \'/p/t3g/blog/9.0/Administration/Index.html\'. Alternatively, add a so-called legacy location which requires the extension name and a version, e.g. \'/typo3cms/extensions/my_exension/1.0/\'',
+            ])
+            ->add('target', null, [
+                'help' => 'The path must start with /p/, /c/, /m/ or /h/ and contains at least the three parts: vendor/package/version/, e.g. \'/p/t3g/blog/9.0/Administration/Index.html\'. For legacy locations, provide a directory only, since every requested file will get redirected.',
+            ])
             ->add('statusCode', ChoiceType::class, [
                 'choices' => DocsServerRedirect::$allowedStatusCodes,
                 'choice_label' => static function ($value) {
