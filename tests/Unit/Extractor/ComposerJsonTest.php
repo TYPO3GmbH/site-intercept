@@ -159,7 +159,7 @@ class ComposerJsonTest extends TestCase
      * @param string $cmsCoreVersionString
      * @return array
      */
-    public function cmsCoreConstraintTestDataProvider(string $cmsCoreVersionString): array
+    public function dummyComposerJsonArray(string $cmsCoreVersionString): array
     {
         return [
             'name' => 'foobar/baz',
@@ -170,143 +170,34 @@ class ComposerJsonTest extends TestCase
     }
 
     /**
-     * @test
+     * @return array
      */
-    public function maximumCmsCoreVersionIsReturnedAsExpectedWithOneVersion(): void
+    public function cmsCoreConstraintProvider(): array
     {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^9.5'));
-
-        $this->assertEquals('9.5', $composerJson->getMaximumTypoVersion());
+        return [
+            ['^9.5', '9.5', '9.5'],
+            ['8.7.*, <= 9.5.*', '8.7', '9.5'],
+            ['^7.5.6 || ^8', '7.5', '8'],
+            ['2.7.44 || 2.8.37 || 3.4.7 || 4.0.7', '2.7', '4.0'],
+            ['10.0.x-dev', '10.0', '10.0'],
+            ['^9.5 || 10.0.*@dev', '9.5', '10.0'],
+            ['~9.5', '9.5', '9.5'],
+        ];
     }
 
     /**
      * @test
+     * @dataProvider cmsCoreConstraintProvider
+     * @param string $versionString
+     * @param string $expectedMin
+     * @param string $expectedMax
      */
-    public function maximumCmsCoreVersionIsReturnedAsExpectedWithTwoVersions(): void
+    public function testCoreConstraints(string $versionString, string $expectedMin, string $expectedMax): void
     {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('8.7.*, <= 9.5.*'));
+        $composerJson = new ComposerJson($this->dummyComposerJsonArray($versionString));
 
-        $this->assertEquals('9.5', $composerJson->getMaximumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function maximumCmsCoreVersionIsReturnedAsExpectedWithSmallRange(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^7.5.6 || ^8'));
-
-        $this->assertEquals('8', $composerJson->getMaximumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function maximumCmsCoreVersionIsReturnedAsExpectedWithBigRange(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('2.7.44 || 2.8.37 || 3.4.7 || 4.0.7'));
-
-        $this->assertEquals('4.0', $composerJson->getMaximumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function maximumCmsCoreVersionIsReturnedAsExpectedWithXDev(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('10.0.x-dev'));
-
-        $this->assertEquals('10.0', $composerJson->getMaximumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function maximumCmsCoreVersionIsReturnedAsExpectedWithMultipleXDev(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^9.5 || 10.0.*@dev'));
-
-        $this->assertEquals('10.0', $composerJson->getMaximumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function maximumCmsCoreVersionIsReturnedAsExpectedWithTilde(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('~9.5'));
-
-        $this->assertEquals('9.5', $composerJson->getMaximumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function minimumCmsCoreVersionIsReturnedAsExpectedWithOneVersion(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^9.5'));
-
-        $this->assertEquals('9.5', $composerJson->getMinimumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function minimumCmsCoreVersionIsReturnedAsExpectedWithTwoVersions(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('8.7.*, <= 9.5.*'));
-
-        $this->assertEquals('8.7', $composerJson->getMinimumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function minimumCmsCoreVersionIsReturnedAsExpectedWithSmallRange(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^7.5.6 || ^8'));
-
-        $this->assertEquals('7.5', $composerJson->getMinimumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function minimumCmsCoreVersionIsReturnedAsExpectedWithBigRange(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('2.7.44 || 2.8.37 || 3.4.7 || 4.0.7'));
-
-        $this->assertEquals('2.7', $composerJson->getMinimumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function minimumCmsCoreVersionIsReturnedAsExpectedWithXDev(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('10.0.x-dev'));
-
-        $this->assertEquals('10.0', $composerJson->getMinimumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function minimumCmsCoreVersionIsReturnedAsExpectedWithMultipleXDev(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('^9.5 || 10.0.*@dev'));
-
-        $this->assertEquals('9.5', $composerJson->getMinimumTypoVersion());
-    }
-
-    /**
-     * @test
-     */
-    public function minimumCmsCoreVersionIsReturnedAsExpectedWithTilde(): void
-    {
-        $composerJson = new ComposerJson($this->cmsCoreConstraintTestDataProvider('~9.5'));
-
-        $this->assertEquals('9.5', $composerJson->getMinimumTypoVersion());
+        $this->assertEquals($expectedMin, $composerJson->getMinimumTypoVersion());
+        $this->assertEquals($expectedMax, $composerJson->getMaximumTypoVersion());
     }
 
     /**
