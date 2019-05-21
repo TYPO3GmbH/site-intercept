@@ -25,4 +25,36 @@ class DocumentationJarRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, DocumentationJar::class);
     }
+
+    /**
+     * @return DocumentationJar[]
+     */
+    public function findCommunityExtensions(): array
+    {
+        return $this->findByTypeShort('p');
+    }
+
+    /**
+     * @return DocumentationJar[]
+     */
+    public function findCoreExtensions(): array
+    {
+        return $this->findByTypeShort('c');
+    }
+
+    /**
+     * @param string $typeShort
+     * @return DocumentationJar[]
+     */
+    private function findByTypeShort(string $typeShort): array
+    {
+        return $this->createQueryBuilder('d')
+            ->where(
+                'd.typeShort = :type_short'
+            )
+            ->setParameter('type_short', $typeShort)
+            ->orderBy('d.extensionKey', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
