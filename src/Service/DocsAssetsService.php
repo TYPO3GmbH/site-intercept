@@ -56,6 +56,11 @@ class DocsAssetsService
                     'url' => $this->buildDocsLink($extension),
                     'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
                 ];
+
+                $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getTargetBranchDirectory()] = [
+                    'url' => $this->buildDocsLink($extension),
+                    'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
+                ];
             }
 
             return $aggregatedExtensions;
