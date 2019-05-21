@@ -10,8 +10,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\DocumentationJar;
 use App\Repository\DocumentationJarRepository;
+use App\Service\DocsAssetsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,34 +26,16 @@ class AssetsDocsController extends AbstractController
      * @Route("/assets/docs/manuals.json", name="assets_docs_manuals")
      *
      * @param DocumentationJarRepository $documentationJarRepository
+     * @param DocsAssetsService $assetsService
      * @return Response
      */
     public function index(
-        DocumentationJarRepository $documentationJarRepository
+        DocumentationJarRepository $documentationJarRepository,
+        DocsAssetsService $assetsService
     ): Response {
         $extensions = $documentationJarRepository->findCommunityExtensions();
-        $aggregatedExtensions = [];
-
-        foreach ($extensions as $extension) {
-            if (!isset($aggregatedExtensions[$extension->getExtensionKey()])) {
-                $aggregatedExtensions[$extension->getExtensionKey()] = [
-                    'packageName' => $extension->getPackageName(),
-                    'docs' => [],
-                ];
-            }
-
-            $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getBranch()] = [
-                'url' => $this->buildDocsLink($extension),
-                'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM)
-            ];
-        }
+        $aggregatedExtensions = $assetsService->aggregateManuals($extensions);
 
         return JsonResponse::create($aggregatedExtensions);
-    }
-
-    private function buildDocsLink(DocumentationJar $documentationJar): string
-    {
-        $server = getenv('DOCS_LIVE_SERVER');
-        return sprintf('%s%s/%s/%s/en-us', $server, $documentationJar->getTypeShort(), $documentationJar->getPackageName(), $documentationJar->getTargetBranchDirectory());
     }
 }
