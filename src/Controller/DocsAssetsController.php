@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Provides actions to generate "static" assets used by docs and TER
  */
-class AssetsDocsController extends AbstractController
+class DocsAssetsController extends AbstractController
 {
     /**
      * @var DocsAssetsService
@@ -32,7 +32,7 @@ class AssetsDocsController extends AbstractController
     }
 
     /**
-     * @Route("/assets/docs/manuals.json", name="assets_docs_manuals")
+     * @Route("/docs/assets/manuals.json", name="docs_assets_manuals")
      *
      * @return Response
      */
@@ -44,7 +44,7 @@ class AssetsDocsController extends AbstractController
     }
 
     /**
-     * @Route("/assets/docs/extensions.js", name="assets_docs_extensions")
+     * @Route("/docs/assets/extensions.js", name="docs_assets_extensions")
      *
      * @return Response
      */

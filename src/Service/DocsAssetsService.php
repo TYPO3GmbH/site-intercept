@@ -77,6 +77,7 @@ class DocsAssetsService
 
             $template = implode("\r\n", [
                 '// This file has been automatically generated on %s',
+                '// DO NOT MODIFY THIS FILE',
                 'var extensionList = %s;',
             ]);
             $flatList = [];
@@ -143,7 +144,6 @@ class DocsAssetsService
 
     /**
      * Render a publicly available link to the rendered documentation.
-     * TODO: Make method public (and available in twig?)
      *
      * @param DocumentationJar $documentationJar
      * @return string
