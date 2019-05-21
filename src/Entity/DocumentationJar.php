@@ -65,6 +65,11 @@ class DocumentationJar
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $extensionKey;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $branch;
 
     /**
@@ -256,6 +261,24 @@ class DocumentationJar
     public function setPackageType(string $packageType): self
     {
         $this->packageType = $packageType;
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getExtensionKey(): ?string
+    {
+        return $this->extensionKey;
+    }
+
+    /**
+     * @param mixed $extensionKey
+     * @return DocumentationJar
+     */
+    public function setExtensionKey(?string $extensionKey): self
+    {
+        $this->extensionKey = $extensionKey;
         return $this;
     }
 

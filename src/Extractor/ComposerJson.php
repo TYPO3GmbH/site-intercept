@@ -64,6 +64,27 @@ class ComposerJson
     }
 
     /**
+     * Tries to determine the extension key based on package's composer.json
+     *
+     * @return null|string
+     */
+    public function getExtensionKey(): ?string
+    {
+        if (strpos($this->getType(), 'typo3-cms-') === false) {
+            return null;
+        }
+
+        if (!empty($this->composerJson['extra']['typo3/cms']['extension-key'])) {
+            $extensionKey = $this->composerJson['extra']['typo3/cms']['extension-key'];
+        } else {
+            [, $extensionKey] = explode('/', $this->getName(), 2);
+            $extensionKey = str_replace('-', '_', $extensionKey);
+        }
+
+        return $extensionKey;
+    }
+
+    /**
      * @param string $propertyName
      * @throws DocsComposerMissingValueException
      */

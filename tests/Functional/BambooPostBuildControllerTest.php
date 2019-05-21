@@ -318,6 +318,7 @@ class BambooPostBuildControllerTest extends TestCase
             ->setName($name)
             ->setPackageName($packageName)
             ->setPackageType('typo3-cms-extension')
+            ->setExtensionKey($name)
             ->setTypeShort('c')
             ->setTypeLong('core-extension')
             ->setRepositoryUrl('https://github.com/' . $packageName . '/')

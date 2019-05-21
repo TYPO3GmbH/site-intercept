@@ -137,6 +137,7 @@ class DocumentationBuildInformationService
         return new DeploymentInformation(
             $composerJson->getName(),
             $composerJson->getType(),
+            $composerJson->getExtensionKey(),
             $pushEvent->getRepositoryUrl(),
             $pushEvent->getUrlToComposerFile(),
             $pushEvent->getVersionString(),
@@ -158,6 +159,7 @@ class DocumentationBuildInformationService
         return new DeploymentInformation(
             $documentationJar->getPackageName(),
             $documentationJar->getPackageType(),
+            $documentationJar->getExtensionKey(),
             $documentationJar->getRepositoryUrl(),
             $documentationJar->getPublicComposerJsonUrl(),
             $documentationJar->getBranch(),
@@ -243,6 +245,9 @@ class DocumentationBuildInformationService
             if (empty($record->getTypeShort())) {
                 $record->setTypeShort($deploymentInformation->typeShort);
             }
+            if (empty($record->getExtensionKey())) {
+                $record->setExtensionKey($deploymentInformation->extensionKey);
+            }
             if (empty($record->getPublicComposerJsonUrl())) {
                 $record->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl);
             }
@@ -263,6 +268,7 @@ class DocumentationBuildInformationService
                 ->setName($deploymentInformation->name)
                 ->setPackageName($deploymentInformation->packageName)
                 ->setPackageType($deploymentInformation->packageType)
+                ->setExtensionKey($deploymentInformation->extensionKey)
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
