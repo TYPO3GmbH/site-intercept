@@ -17,12 +17,14 @@ use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\ComposerJson;
+use App\Form\DocsDeploymentFilterType;
 use App\Form\DocumentationDeployment;
 use App\Repository\DocumentationJarRepository;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\GitRepositoryService;
 use App\Service\GraylogService;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
@@ -54,7 +56,22 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         DocumentationJarRepository $documentationJarRepository
     ): Response {
         $recentLogsMessages = $graylogService->getRecentBambooDocsActions();
-        $deployments = $documentationJarRepository->findAll();
+        $criteria =  Criteria::create();
+
+        $form = $this->createForm(DocsDeploymentFilterType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $expressionBuilder = Criteria::expr();
+            $data = $form->getData();
+            if ($data['type']) {
+                $criteria->andWhere($expressionBuilder->eq('typeLong', $data['type']));
+            }
+            if ($data['search']) {
+                $criteria->andWhere($expressionBuilder->contains('packageName', $data['search']));
+            }
+        }
+
+        $deployments = $documentationJarRepository->matching($criteria);
         $pagination = $paginator->paginate(
             $deployments,
             $request->query->getInt('page', 1),
@@ -68,6 +85,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         return $this->render(
             'docsDeployments.html.twig',
             [
+                'filter' => $form->createView(),
                 'pagination' => $pagination,
                 'logMessages' => $recentLogsMessages,
                 'bambooStatus' => $bambooService->getBambooStatus(),

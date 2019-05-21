@@ -103,6 +103,19 @@
     margin-left: auto;
     flex-shrink: 0;
 }
+.card-header-form {
+    > form {
+        margin-bottom: 0.5rem;
+    }
+    > form > div {
+        display: flex;
+        margin: -0.25rem;
+    }
+    .form-group {
+        padding: 0.25rem;
+        margin: 0;
+    }
+}
 
 
 //

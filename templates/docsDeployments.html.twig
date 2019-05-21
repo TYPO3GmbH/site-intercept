@@ -12,9 +12,13 @@
             </h2>
 
             <div class="card">
-                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
-                    <div class="card-header">
-                        <div class="card-header-bar">
+
+                <div class="card-header">
+                    <div class="card-header-bar">
+                        <div class="card-header-form">
+                            {{ form(filter, {'attr': {'novalidate': 'novalidate'}}) }}
+                        </div>
+                        {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                             <div class="card-header-actions">
                                 {{
                                     macros.linkbutton(
@@ -24,9 +28,10 @@
                                     )
                                 }}
                             </div>
-                        </div>
+                        {% endif %}
                     </div>
-                {% endif %}
+                </div>
+
                 <div class="datatable">
                     <table class="datatable-table">
                         <thead>
