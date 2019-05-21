@@ -101,7 +101,7 @@ class ComposerJson
     {
         $typoVersion = '';
 
-        if (isset($this->composerJson['require']['typo3/cms-core'])) {
+        if ($this->requires('typo3/cms-core')) {
             $typoVersion = $this->composerJson['require']['typo3/cms-core'];
             if (strpos($typoVersion, ',') !== false) {
                 $typoVersion = explode(',', $typoVersion);
