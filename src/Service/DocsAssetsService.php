@@ -55,6 +55,11 @@ class DocsAssetsService
         });
     }
 
+    public function invalidate(): void
+    {
+        $this->cache->delete('aggregated_extensions');
+    }
+
     /**
      * Wrapper method that either gets data from cache by its cache identifier or composes the data as defined in its
      * callback function. The composition result is stored in the cache then.

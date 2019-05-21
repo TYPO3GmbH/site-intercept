@@ -20,7 +20,7 @@ class DocsAssetsCache
     /**
      * @var string
      */
-    private $ttl = '1 hour';
+    private $ttl = '24 hours';
 
     /**
      * @var FilesystemAdapter
