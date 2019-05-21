@@ -12,7 +12,6 @@
             </h2>
 
             <div class="card">
-
                 {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                     <div class="card-header">
                         <div class="card-header-bar">
@@ -28,22 +27,30 @@
                         </div>
                     </div>
                 {% endif %}
-
                 <div class="datatable">
                     <table class="datatable-table">
                         <thead>
                             <tr>
-                                <th scope="col" colspan="3">Package</th>
-                                <th scope="col">Type</th>
+                                <th scope="col" colspan="3">
+                                    Package
+                                    {{ knp_pagination_sortable(pagination, 'Package', 'packageName') }}
+                                </th>
+                                <th scope="col">
+                                    Type
+                                    {{ knp_pagination_sortable(pagination, 'Type', 'typeLong') }}
+                                </th>
                                 <th scope="col">Branch</th>
-                                <th scope="col">Last rendered</th>
+                                <th scope="col" data-type="localdate">
+                                    Last rendered
+                                    {{ knp_pagination_sortable(pagination, 'Last rendered', 'lastRenderedAt') }}
+                                </th>
                                 {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                                     <th scope="col">Actions</th>
                                 {% endif %}
                             </tr>
                         </thead>
                         <tbody>
-                        {% for deployment in deployments %}
+                        {% for deployment in pagination %}
                             <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('n/d/Y, g:i A', "UTC") }}">
                                 <th data-type="icon">
                                     <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
@@ -111,8 +118,14 @@
                         </tbody>
                     </table>
                 </div>
+                {% if pagination.getTotalItemCount > 10 %}
+                    <div class="card-footer">
+                        {{ knp_pagination_render(pagination) }}
+                    </div>
+                {% endif %}
             </div>
 
+            <div class="content-spacer"></div>
             <h2>
                 Recent actions
             </h2>

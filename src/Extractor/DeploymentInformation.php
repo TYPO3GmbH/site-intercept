@@ -169,9 +169,17 @@ class DeploymentInformation
             return 'master';
         }
 
-        // branch 'documentation-draft' becomes 'draft' (and is not indexed spiders later)
+        // branch 'documentation-draft' becomes 'draft' (and is not indexed by spiders later)
         if ($result === 'documentation-draft') {
             return 'draft';
+        }
+
+        // Quick hack to accept the branch 'new_docs_server' of the docs homepage repo
+        // and to make it render as 'master' target branch
+        // @todo: Remove this hack after go-live of new docs server and if the branch
+        // @todo: 'new_docs_server' has been merged as 'master'
+        if ($type === 'docs-home' && $branch === 'new_docs_server') {
+            return 'master';
         }
 
         // Cut off a leading 'v', a tag like v8.7.2 will become 8.7.2

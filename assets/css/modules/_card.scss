@@ -29,6 +29,14 @@
     border-bottom: 1px solid rgba(0,0,0,0.15);
 }
 .card-footer {
+    .datatable + & {
+        border-top: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .pagination {
+        margin-bottom: 0;
+    }
+
     .card-body + & {
         border-top: none;
         padding-top: 0;
