@@ -123,7 +123,7 @@ class MenuBuilder
         $menu->addChild(
             'documentation',
             [
-                'route' => 'admin_docs',
+                'route' => 'admin_docs_deployments',
                 'label' => 'Documentation',
                 'extras' => [
                     'icon' => 'book',
@@ -149,7 +149,7 @@ class MenuBuilder
         $menu['documentation']->addChild(
             'docs_index',
             [
-                'route' => 'admin_docs',
+                'route' => 'admin_docs_third_party',
                 'label' => 'Third Party',
             ]
         );

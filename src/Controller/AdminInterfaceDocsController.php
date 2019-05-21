@@ -31,7 +31,7 @@ class AdminInterfaceDocsController extends AbstractController
     private $logger;
 
     /**
-     * @Route("/admin/docs", name="admin_docs")
+     * @Route("/admin/docs", name="admin_docs_third_party")
      *
      * @param Request $request
      * @param LoggerInterface $logger
