@@ -21,6 +21,11 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class DocumentationJarRepository extends ServiceEntityRepository
 {
+    protected static $orderBy = [
+        'extensionKey' => 'ASC',
+        'branch' => 'DESC',
+    ];
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, DocumentationJar::class);
@@ -31,30 +36,18 @@ class DocumentationJarRepository extends ServiceEntityRepository
      */
     public function findCommunityExtensions(): array
     {
-        return $this->findByTypeShort('p');
+        return $this->findBy([
+            'typeShort' => ['p'],
+        ], static::$orderBy);
     }
 
     /**
      * @return DocumentationJar[]
      */
-    public function findCoreExtensions(): array
+    public function findAllExtensions(): array
     {
-        return $this->findByTypeShort('c');
-    }
-
-    /**
-     * @param string $typeShort
-     * @return DocumentationJar[]
-     */
-    private function findByTypeShort(string $typeShort): array
-    {
-        return $this->createQueryBuilder('d')
-            ->where(
-                'd.typeShort = :type_short'
-            )
-            ->setParameter('type_short', $typeShort)
-            ->orderBy('d.extensionKey', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return $this->findBy([
+            'typeShort' => ['p', 'c'],
+        ], static::$orderBy);
     }
 }

@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Repository\DocumentationJarRepository;
 use App\Service\DocsAssetsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,19 +22,36 @@ use Symfony\Component\Routing\Annotation\Route;
 class AssetsDocsController extends AbstractController
 {
     /**
+     * @var DocsAssetsService
+     */
+    private $assetsService;
+
+    public function __construct(DocsAssetsService $assetsService)
+    {
+        $this->assetsService = $assetsService;
+    }
+
+    /**
      * @Route("/assets/docs/manuals.json", name="assets_docs_manuals")
      *
-     * @param DocumentationJarRepository $documentationJarRepository
-     * @param DocsAssetsService $assetsService
      * @return Response
      */
-    public function index(
-        DocumentationJarRepository $documentationJarRepository,
-        DocsAssetsService $assetsService
-    ): Response {
-        $extensions = $documentationJarRepository->findCommunityExtensions();
-        $aggregatedExtensions = $assetsService->aggregateManuals($extensions);
+    public function manuals(): Response
+    {
+        $aggregatedExtensions = $this->assetsService->aggregateManuals();
 
         return JsonResponse::create($aggregatedExtensions);
+    }
+
+    /**
+     * @Route("/assets/docs/extensions.js", name="assets_docs_extensions")
+     *
+     * @return Response
+     */
+    public function extensions(): Response
+    {
+        $javaScript = $this->assetsService->generateExtensionJavaScript();
+
+        return Response::create($javaScript, 200, ['Content-Type' => 'text/javascript']);
     }
 }

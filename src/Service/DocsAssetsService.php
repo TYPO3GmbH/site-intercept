@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -12,6 +12,7 @@ namespace App\Service;
 
 use App\Cache\DocsAssetsCache;
 use App\Entity\DocumentationJar;
+use App\Repository\DocumentationJarRepository;
 
 /**
  * Prepare data for use in generated assets
@@ -19,22 +20,28 @@ use App\Entity\DocumentationJar;
 class DocsAssetsService
 {
     /**
+     * @var DocumentationJarRepository
+     */
+    private $repository;
+
+    /**
      * @var DocsAssetsCache
      */
     private $cache;
 
-    public function __construct(DocsAssetsCache $cache)
+    public function __construct(DocumentationJarRepository $documentationJarRepository, DocsAssetsCache $cache)
     {
+        $this->repository = $documentationJarRepository;
         $this->cache = $cache;
     }
 
     /**
-     * @param DocumentationJar[] $extensions
      * @return array
      */
-    public function aggregateManuals(array $extensions): array
+    public function aggregateManuals(): array
     {
-        return $this->getFromCacheOrCompose('aggregated_extensions', function() use ($extensions) {
+        return $this->getFromCacheOrCompose('aggregated_extensions', function () {
+            $extensions = $this->repository->findCommunityExtensions();
             $aggregatedExtensions = [];
 
             foreach ($extensions as $extension) {
@@ -47,7 +54,7 @@ class DocsAssetsService
 
                 $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getBranch()] = [
                     'url' => $this->buildDocsLink($extension),
-                    'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM)
+                    'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
                 ];
             }
 
@@ -55,9 +62,60 @@ class DocsAssetsService
         });
     }
 
+    /**
+     * @return string
+     */
+    public function generateExtensionJavaScript(): string
+    {
+        return $this->getFromCacheOrCompose('extensions_js', function () {
+            $extensions = $this->repository->findAllExtensions();
+
+            $template = implode("\r\n", [
+                '// This file has been automatically generated on %s',
+                'var extensionList = %s;',
+            ]);
+            $flatList = [];
+
+            foreach ($extensions as $extension) {
+                if (!isset($flatList[$extension->getExtensionKey()])) {
+                    $flatList[$extension->getExtensionKey()] = [
+                        'key' => $extension->getExtensionKey(),
+                        'latest' => null, // this will be set later
+                        'versions' => [$extension->getTargetBranchDirectory()],
+                    ];
+                } else {
+                    $flatList[$extension->getExtensionKey()]['versions'][] = $extension->getTargetBranchDirectory();
+                }
+            }
+
+            // Sort versions
+            foreach ($flatList as &$item) {
+                natsort($item['versions']);
+
+                // natsort() keeps the array keys, this is unwanted
+                $item['versions'] = array_values(array_reverse($item['versions']));
+
+                // As the items are sorted as expected now, we can safely set the latest stable version
+                $stableVersions = array_values(array_filter($item['versions'], static function (string $version): bool {
+                    // Remove any item not being a version number
+                    return preg_match('/\d+.\d+(.\d+)?/', $version) === 1;
+                }));
+
+                $item['latest'] = $stableVersions[0] ?? $item['versions'][0];
+            }
+            unset($item);
+
+            $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+            $encoded = json_encode(array_values($flatList));
+
+            return sprintf($template, $now->format(\DateTimeInterface::ATOM), $encoded);
+        });
+    }
+
     public function invalidate(): void
     {
         $this->cache->delete('aggregated_extensions');
+        $this->cache->delete('extensions_js');
     }
 
     /**
@@ -66,9 +124,9 @@ class DocsAssetsService
      *
      * @param string $cacheIdentifier
      * @param callable $composeCallback
-     * @return array
+     * @return mixed
      */
-    private function getFromCacheOrCompose(string $cacheIdentifier, callable $composeCallback): array
+    private function getFromCacheOrCompose(string $cacheIdentifier, callable $composeCallback)
     {
         if (($data = $this->cache->get($cacheIdentifier)) === null) {
             $data = $composeCallback();
