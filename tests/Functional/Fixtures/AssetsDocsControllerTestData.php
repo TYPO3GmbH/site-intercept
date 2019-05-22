@@ -79,6 +79,38 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
+        $documentationJar = (new DocumentationJar())
+            ->setRepositoryUrl('https://github.com/TYPO3-CMS/felogin.git')
+            ->setVendor('typo3')
+            ->setName('cms-felogin')
+            ->setPackageName('typo3/cms-felogin')
+            ->setPackageType('typo3-cms-framework')
+            ->setExtensionKey('felogin')
+            ->setBranch('8.7')
+            ->setTargetBranchDirectory('8.7')
+            ->setTypeLong('core-extension')
+            ->setTypeShort('c')
+            ->setStatus(DocumentationStatus::STATUS_RENDERING)
+            ->setBuildKey('')
+            ->setPublicComposerJsonUrl('');
+        $manager->persist($documentationJar);
+
+        $documentationJar = (new DocumentationJar())
+            ->setRepositoryUrl('https://github.com/TYPO3-CMS/felogin.git')
+            ->setVendor('typo3')
+            ->setName('cms-felogin')
+            ->setPackageName('typo3/cms-felogin')
+            ->setPackageType('typo3-cms-framework')
+            ->setExtensionKey('felogin')
+            ->setBranch('7.6')
+            ->setTargetBranchDirectory('7.6')
+            ->setTypeLong('core-extension')
+            ->setTypeShort('c')
+            ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setBuildKey('')
+            ->setPublicComposerJsonUrl('');
+        $manager->persist($documentationJar);
+
         // Community extension
         $documentationJar = (new DocumentationJar())
             ->setRepositoryUrl('https://github.com/TYPO3GmbH/blog.git')

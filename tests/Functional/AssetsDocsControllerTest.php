@@ -79,7 +79,7 @@ class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
         $content = $this->client->getResponse()->getContent();
 
         $this->assertStringContainsString('"key":"blog","latest":"8.7","versions":["master","8.7"]', $content);
-        $this->assertStringContainsString('"key":"felogin","latest":"9.5","versions":["master","9.5"]', $content);
+        $this->assertStringContainsString('"key":"felogin","latest":"9.5","versions":["master","9.5","8.7"]', $content);
         $this->assertStringContainsString('"key":"news","latest":"master","versions":["master"]', $content);
     }
 }

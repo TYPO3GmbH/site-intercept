@@ -10,6 +10,7 @@
 namespace App\Repository;
 
 use App\Entity\DocumentationJar;
+use App\Enum\DocumentationStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -29,7 +30,7 @@ class DocumentationJarRepository extends ServiceEntityRepository
     /**
      * @return DocumentationJar[]
      */
-    public function findCommunityExtensions(): array
+    public function findAvailableCommunityExtensions(): array
     {
         return $this->findByTypeShort(['p']);
     }
@@ -37,7 +38,7 @@ class DocumentationJarRepository extends ServiceEntityRepository
     /**
      * @return DocumentationJar[]
      */
-    public function findAllExtensions(): array
+    public function findAllAvailableExtensions(): array
     {
         return $this->findByTypeShort(['c', 'p']);
     }
@@ -47,8 +48,10 @@ class DocumentationJarRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('d')
             ->where('d.typeShort IN(:type_short)')
             ->andWhere('d.targetBranchDirectory != :target_branch_directory')
+            ->andWhere('d.status IN(:status)')
             ->setParameter('type_short', $typeShort)
             ->setParameter('target_branch_directory', 'draft')
+            ->setParameter('status', [DocumentationStatus::STATUS_RENDERING, DocumentationStatus::STATUS_RENDERED])
             ->orderBy('d.extensionKey', 'ASC')
             ->addOrderBy('d.branch', 'DESC')
             ->getQuery()

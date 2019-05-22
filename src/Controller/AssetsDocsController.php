@@ -39,7 +39,7 @@ class AssetsDocsController extends AbstractController
      */
     public function manuals(): Response
     {
-        $extensions = $this->documentationJarRepository->findCommunityExtensions();
+        $extensions = $this->documentationJarRepository->findAvailableCommunityExtensions();
         $aggregatedExtensions = [];
 
         foreach ($extensions as $extension) {
@@ -71,7 +71,7 @@ class AssetsDocsController extends AbstractController
      */
     public function extensions(): Response
     {
-        $extensions = $this->documentationJarRepository->findAllExtensions();
+        $extensions = $this->documentationJarRepository->findAllAvailableExtensions();
 
         $template = implode("\r\n", [
             '// This file has been automatically generated on %s',
