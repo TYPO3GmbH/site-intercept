@@ -49,6 +49,11 @@
         max-width: 35rem;
     }
 }
+.content-section-centered-wide {
+    .container {
+        max-width: 55rem;
+    }
+}
 .content-section-valign {
     flex-grow: 1;
     display: flex;

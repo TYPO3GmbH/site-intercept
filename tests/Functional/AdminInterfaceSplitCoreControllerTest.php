@@ -30,9 +30,9 @@ class AdminInterfaceSplitCoreControllerTest extends AbstractFunctionalWebTestCas
         $client = static::createClient();
         $client->request('GET', '/admin/split/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Rabbit: online/', $client->getResponse()->getContent());
-        $this->assertRegExp('/Worker: online/', $client->getResponse()->getContent());
-        $this->assertRegExp('/Jobs: 2/', $client->getResponse()->getContent());
+        $this->assertStringContainsString('data-rabbit-status="online"', $client->getResponse()->getContent());
+        $this->assertStringContainsString('data-rabbit-worker-status="online"', $client->getResponse()->getContent());
+        $this->assertStringContainsString('data-rabbit-jobs="2"', $client->getResponse()->getContent());
     }
 
     /**
@@ -51,7 +51,7 @@ class AdminInterfaceSplitCoreControllerTest extends AbstractFunctionalWebTestCas
         $client = static::createClient();
         $client->request('GET', '/admin/split/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Rabbit: offline/', $client->getResponse()->getContent());
+        $this->assertStringContainsString('data-rabbit-status="offline"', $client->getResponse()->getContent());
     }
 
     /**

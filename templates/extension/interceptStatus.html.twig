@@ -1,0 +1,67 @@
+<h3 class="text-white text-center mb-4">Platform Status</h3>
+<div class="card-deck text-left">
+    <div class="card" data-bamboo-status="{% if bambooStatus.isOnline == true %}online{% else %}offline{% endif %}">
+        <div class="card-header">
+            <div class="card-header-bar">
+                <div class="card-header-title">
+                    <h3>Bamboo</h3>
+                </div>
+                <div class="card-header-status">
+                    {% if bambooStatus.isOnline == true %}
+                        <span class="badge badge-success">online</span>
+                    {% else %}
+                        <span class="badge badge-danger">offline</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% if bambooStatus.isOnline == true %}
+            <div class="datatable" data-bamboo-agents-busy="{{ bambooStatus.busyAgents }}" data-bamboo-agents-available="{{ bambooStatus.onlineAgents }}" data-bamboo-queued="{{ bambooStatus.queueLength }}">
+                <table class="datatable-table">
+                    <tbody>
+                        <tr>
+                            <th>Busy Agents</th>
+                            <td>{{ bambooStatus.busyAgents }} / {{ bambooStatus.onlineAgents }}</td>
+                        </tr>
+                        <tr>
+                            <th>Queued jobs</th>
+                            <td class="{% if bambooStatus.queueLength > 0 %} text-danger{% endif %}">{{ bambooStatus.queueLength }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+    <div class="card" data-rabbit-status="{% if rabbitStatus.isRabbitOnline == true %}online{% else %}offline{% endif %}">
+        <div class="card-header">
+            <div class="card-header-bar">
+                <div class="card-header-title">
+                    <h3>Rabbit</h3>
+                </div>
+                <div class="card-header-status">
+                    {% if rabbitStatus.isRabbitOnline == true %}
+                        <span class="badge badge-success">online</span>
+                    {% else %}
+                        <span class="badge badge-danger">offline</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% if rabbitStatus.isRabbitOnline == true %}
+            <div class="datatable" data-rabbit-worker-status="{% if rabbitStatus.isWorkerOnline == true %}online{% else %}offline{% endif %}" data-rabbit-jobs="{{ rabbitStatus.numberOfJobs }}">
+                <table class="datatable-table">
+                    <tbody>
+                        <tr>
+                            <th>Agents</th>
+                            <td>{% if rabbitStatus.isWorkerOnline == true %}online{% else %}<span class="badge badge-danger">offline</span>{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th>Jobs</th>
+                            <td class="{% if rabbitStatus.numberOfJobs > 0 %} text-warning{% endif %}">{{ rabbitStatus.numberOfJobs }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>

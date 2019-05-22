@@ -15,7 +15,6 @@ use App\Form\SplitCoreSplitFormType;
 use App\Form\SplitCoreTagFormType;
 use App\Service\GraylogService;
 use App\Service\RabbitPublisherService;
-use App\Service\RabbitStatusService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,7 +28,6 @@ class AdminInterfaceSplitCoreController extends AbstractController
     /**
      * @Route("/admin/split/core", name="admin_split_core");
      * @param Request $request
-     * @param RabbitStatusService $rabbitStatus
      * @param RabbitPublisherService $rabbitService
      * @param GraylogService $graylogService
      * @return Response
@@ -37,7 +35,6 @@ class AdminInterfaceSplitCoreController extends AbstractController
      */
     public function index(
         Request $request,
-        RabbitStatusService $rabbitStatus,
         RabbitPublisherService $rabbitService,
         GraylogService $graylogService
     ): Response {
@@ -75,7 +72,6 @@ class AdminInterfaceSplitCoreController extends AbstractController
             [
                 'splitCoreSplit' => $splitForm->createView(),
                 'splitCoreTag' => $tagForm->createView(),
-                'rabbitStatus' => $rabbitStatus->getStatus(),
                 'logs' => $recentLogs,
             ]
         );

@@ -83,7 +83,6 @@ class AdminInterfaceDocsController extends AbstractController
             [
                 'fluidVhForm' => $fluidVhForm->createView(),
                 'logMessages' => $recentLogsMessages,
-                'bambooStatus' => $bambooService->getBambooStatus(),
             ]
         );
     }

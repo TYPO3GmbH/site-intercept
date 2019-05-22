@@ -69,7 +69,6 @@ class AdminInterfaceBambooCoreSecurityController extends AbstractController
                 'patchForm' => $patchForm->createView(),
                 'urlForm' => $urlForm->createView(),
                 'logMessages' => $recentLogsMessages,
-                'bambooStatus' => $bambooService->getBambooStatus(),
             ]
         );
     }

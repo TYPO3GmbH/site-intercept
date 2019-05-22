@@ -6,10 +6,6 @@
     <div class="content-section">
         <div class="container">
 
-            <h2>
-                {{ include('partials/bambooStatus.html.twig') }}
-            </h2>
-
             {% if is_granted('ROLE_ADMIN') %}
                 <div class="alert alert-danger">
                     Do not abuse this interface - triggering many builds can <strong>easily</strong>

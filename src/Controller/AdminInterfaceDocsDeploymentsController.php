@@ -89,7 +89,6 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 'filter' => $form->createView(),
                 'pagination' => $pagination,
                 'logMessages' => $recentLogsMessages,
-                'bambooStatus' => $bambooService->getBambooStatus(),
                 'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),
             ]
         );
