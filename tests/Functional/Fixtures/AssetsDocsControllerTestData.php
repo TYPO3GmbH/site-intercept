@@ -125,6 +125,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('p')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
             ->setBuildKey('')
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5')
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -141,6 +143,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('p')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
             ->setBuildKey('')
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5')
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -157,6 +161,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('p')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
             ->setBuildKey('')
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5')
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -174,6 +180,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('p')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
             ->setBuildKey('')
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5')
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
         $manager->flush();
