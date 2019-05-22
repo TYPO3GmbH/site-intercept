@@ -248,7 +248,8 @@ class DocsToBambooController extends AbstractController
                     'bambooKey' => $bambooBuildTriggered->buildResultKey,
                 ]
             );
-            return Response::create();
+            $this->addFlash('success', 'A re-rendering was triggered.');
+            return $this->redirectToRoute('admin_docs_deployments');
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
             $logger->warning(
