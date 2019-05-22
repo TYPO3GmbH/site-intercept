@@ -74,24 +74,18 @@ class ComposerJson
             return null;
         }
 
-        $extensionKey = null;
+        if (!empty($this->composerJson['extra']['typo3/cms']['extension-key'])) {
+            return $this->composerJson['extra']['typo3/cms']['extension-key'];
+        }
+
         foreach ($this->composerJson['replace'] ?? [] as $packageName => $version) {
             if (strpos($packageName, '/') === false) {
-                $extensionKey = trim($packageName);
-                break;
+                return trim($packageName);
             }
         }
 
-        if (!empty($this->composerJson['extra']['typo3/cms']['extension-key'])) {
-            $extensionKey = $this->composerJson['extra']['typo3/cms']['extension-key'];
-        }
-
-        if ($extensionKey === null) {
-            [, $extensionKey] = explode('/', $this->getName(), 2);
-            $extensionKey = str_replace('-', '_', $extensionKey);
-        }
-
-        return $extensionKey;
+        [, $extensionKey] = explode('/', $this->getName(), 2);
+        return str_replace('-', '_', $extensionKey);
     }
 
     /**
