@@ -10,8 +10,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\DocumentationJar;
 use App\Repository\DocumentationJarRepository;
+use App\Utility\DocsUtility;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,12 +51,12 @@ class DocsAssetsController extends AbstractController
             }
 
             $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getBranch()] = [
-                'url' => $this->buildDocsLink($extension),
+                'url' => DocsUtility::generateLinkToDocs($extension),
                 'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
             ];
 
             $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getTargetBranchDirectory()] = [
-                'url' => $this->buildDocsLink($extension),
+                'url' => DocsUtility::generateLinkToDocs($extension),
                 'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
             ];
         }
@@ -115,17 +115,5 @@ class DocsAssetsController extends AbstractController
         $javaScript = sprintf($template, $now->format(\DateTimeInterface::ATOM), $encoded);
 
         return Response::create($javaScript, 200, ['Content-Type' => 'text/javascript']);
-    }
-
-    /**
-     * Render a publicly available link to the rendered documentation.
-     *
-     * @param DocumentationJar $documentationJar
-     * @return string
-     */
-    private function buildDocsLink(DocumentationJar $documentationJar): string
-    {
-        $server = getenv('DOCS_LIVE_SERVER');
-        return sprintf('%s%s/%s/%s/en-us', $server, $documentationJar->getTypeShort(), $documentationJar->getPackageName(), $documentationJar->getTargetBranchDirectory());
     }
 }

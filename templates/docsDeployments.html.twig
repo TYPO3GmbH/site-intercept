@@ -80,9 +80,7 @@
                                     {% if deployment.branch != deployment.targetBranchDirectory %}
                                         {{ deployment.branch }} &raquo;
                                     {% endif %}
-                                    <a href="{{ docsLiveServer }}/{{ deployment.typeShort }}/{{ deployment.packageName }}/{{ deployment.targetBranchDirectory }}/en-us" rel="noopener" target="_blank">
-                                        {{ deployment.targetBranchDirectory }}
-                                    </a>
+                                    <a href="{{ deployment|intercept_link_to_docs }}">{{ deployment.targetBranchDirectory }}</a>
                                 </td>
                                 <td data-type="localdate">
                                     <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
