@@ -191,6 +191,24 @@ class BambooService
     /**
      * Trigger new build of project CORE-DRF: Documentation rendering fluid view helper reference
      *
+     * @return BambooBuildTriggered
+     */
+    public function triggerDocumentationSurfPlan(): BambooBuildTriggered
+    {
+        $uri = 'latest/queue/'
+            . 'CORE-DRS?'
+            . implode('&', [
+                'stage=',
+                'executeAllStages=',
+                'os_authType=basic',
+            ]);
+        $response = $this->sendBamboo('post', $uri);
+        return new BambooBuildTriggered((string)$response->getBody());
+    }
+
+    /**
+     * Trigger new build of project CORE-DRF: Documentation rendering fluid view helper reference
+     *
      * @param string|null $filename
      * @return BambooBuildTriggered
      */

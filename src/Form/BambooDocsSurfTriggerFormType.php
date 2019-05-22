@@ -15,15 +15,15 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Form class represents a form to trigger rendering and deployment of documentation
- * fluid view helper reference.
+ * Form class represents a form to trigger rendering and deployment of documentation for
+ * TYPO3 Surf.
  */
-class BambooDocsFluidVhTriggerFormType extends AbstractType
+class BambooDocsSurfTriggerFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('trigger', SubmitType::class, ['label' => 'Render Fluid View Helper Reference 9.5'])
+            ->add('trigger', SubmitType::class, ['label' => 'Render TYPO3 Surf 2.0 Documentation'])
         ;
     }
 }
