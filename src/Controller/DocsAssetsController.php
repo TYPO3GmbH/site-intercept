@@ -10,7 +10,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Service\DocsAssetsService;
+use App\Entity\DocumentationJar;
+use App\Repository\DocumentationJarRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,13 +23,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class DocsAssetsController extends AbstractController
 {
     /**
-     * @var DocsAssetsService
+     * @var DocumentationJarRepository
      */
-    private $assetsService;
+    private $documentationJarRepository;
 
-    public function __construct(DocsAssetsService $assetsService)
+    public function __construct(DocumentationJarRepository $documentationJarRepository)
     {
-        $this->assetsService = $assetsService;
+        $this->documentationJarRepository = $documentationJarRepository;
     }
 
     /**
@@ -38,7 +39,27 @@ class DocsAssetsController extends AbstractController
      */
     public function manuals(): Response
     {
-        $aggregatedExtensions = $this->assetsService->aggregateManuals();
+        $extensions = $this->documentationJarRepository->findCommunityExtensions();
+        $aggregatedExtensions = [];
+
+        foreach ($extensions as $extension) {
+            if (!isset($aggregatedExtensions[$extension->getExtensionKey()])) {
+                $aggregatedExtensions[$extension->getExtensionKey()] = [
+                    'packageName' => $extension->getPackageName(),
+                    'docs' => [],
+                ];
+            }
+
+            $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getBranch()] = [
+                'url' => $this->buildDocsLink($extension),
+                'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
+            ];
+
+            $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getTargetBranchDirectory()] = [
+                'url' => $this->buildDocsLink($extension),
+                'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
+            ];
+        }
 
         return JsonResponse::create($aggregatedExtensions);
     }
@@ -50,8 +71,61 @@ class DocsAssetsController extends AbstractController
      */
     public function extensions(): Response
     {
-        $javaScript = $this->assetsService->generateExtensionJavaScript();
+        $extensions = $this->documentationJarRepository->findAllExtensions();
+
+        $template = implode("\r\n", [
+            '// This file has been automatically generated on %s',
+            '// DO NOT MODIFY THIS FILE',
+            'var extensionList = %s;',
+        ]);
+        $flatList = [];
+
+        foreach ($extensions as $extension) {
+            if (!isset($flatList[$extension->getExtensionKey()])) {
+                $flatList[$extension->getExtensionKey()] = [
+                    'key' => $extension->getExtensionKey(),
+                    'latest' => null, // this will be set later
+                    'versions' => [$extension->getTargetBranchDirectory()],
+                ];
+            } else {
+                $flatList[$extension->getExtensionKey()]['versions'][] = $extension->getTargetBranchDirectory();
+            }
+        }
+
+        // Sort versions
+        foreach ($flatList as &$item) {
+            natsort($item['versions']);
+
+            // natsort() keeps the array keys, this is unwanted
+            $item['versions'] = array_values(array_reverse($item['versions']));
+
+            // As the items are sorted as expected now, we can safely set the latest stable version
+            $stableVersions = array_values(array_filter($item['versions'], static function (string $version): bool {
+                // Remove any item not being a version number
+                return preg_match('/\d+.\d+(.\d+)?/', $version) === 1;
+            }));
+
+            $item['latest'] = $stableVersions[0] ?? $item['versions'][0];
+        }
+        unset($item);
+
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $encoded = json_encode(array_values($flatList));
+
+        $javaScript = sprintf($template, $now->format(\DateTimeInterface::ATOM), $encoded);
 
         return Response::create($javaScript, 200, ['Content-Type' => 'text/javascript']);
+    }
+
+    /**
+     * Render a publicly available link to the rendered documentation.
+     *
+     * @param DocumentationJar $documentationJar
+     * @return string
+     */
+    private function buildDocsLink(DocumentationJar $documentationJar): string
+    {
+        $server = getenv('DOCS_LIVE_SERVER');
+        return sprintf('%s%s/%s/%s/en-us', $server, $documentationJar->getTypeShort(), $documentationJar->getPackageName(), $documentationJar->getTargetBranchDirectory());
     }
 }

@@ -30,7 +30,6 @@
     "psr/log": "^1",
     "ramsey/uuid": "^3.8",
     "sensio/framework-extra-bundle": "^5.2",
-    "symfony/cache": "^4.2",
     "symfony/console": "^4.2",
     "symfony/dependency-injection": "^4.2",
     "symfony/doctrine-bridge": "^4.2",

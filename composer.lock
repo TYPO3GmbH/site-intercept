@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3acf02fd27fe325b06c59d432ab4cd62",
+    "content-hash": "4673724a7a764f20312cc1265bff1dd9",
     "packages": [
         {
             "name": "adrenalinkin/doctrine-utc-date-time",

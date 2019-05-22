@@ -17,7 +17,6 @@ use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
-use App\Service\DocsAssetsService;
 use App\Service\GerritService;
 use App\Service\SlackService;
 use Psr\Log\LoggerInterface;
@@ -40,7 +39,6 @@ class BambooPostBuildController extends AbstractController
      * @param GerritService $gerritService
      * @param SlackService $slackService
      * @param LoggerInterface $logger
-     * @param DocsAssetsService $docsAssetsService
      * @return Response
      */
     public function index(
@@ -48,8 +46,7 @@ class BambooPostBuildController extends AbstractController
         BambooService $bambooService,
         GerritService $gerritService,
         SlackService $slackService,
-        LoggerInterface $logger,
-        DocsAssetsService $docsAssetsService
+        LoggerInterface $logger
     ): Response {
         $bambooSlack = new BambooSlackMessage($request);
         $buildDetails = $bambooService->getBuildStatus($bambooSlack);
@@ -130,7 +127,6 @@ class BambooPostBuildController extends AbstractController
                 // Build was successful, delete documentation from database
                 $manager->remove($documentationEntry);
                 $manager->flush();
-                $docsAssetsService->invalidate();
 
                 $logger->info(
                     'Deleted documentation'
@@ -178,7 +174,6 @@ class BambooPostBuildController extends AbstractController
                 $documentationEntry
                     ->setLastRenderedAt(new \DateTime('now'))
                     ->setStatus(DocumentationStatus::STATUS_RENDERED);
-                $docsAssetsService->invalidate();
 
                 $logger->info(
                     'Documentation rendered'
