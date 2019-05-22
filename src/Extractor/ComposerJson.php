@@ -74,9 +74,19 @@ class ComposerJson
             return null;
         }
 
+        $extensionKey = null;
+        foreach ($this->composerJson['replace'] ?? [] as $packageName => $version) {
+            if (strpos($packageName, '/') === false) {
+                $extensionKey = trim($packageName);
+                break;
+            }
+        }
+
         if (!empty($this->composerJson['extra']['typo3/cms']['extension-key'])) {
             $extensionKey = $this->composerJson['extra']['typo3/cms']['extension-key'];
-        } else {
+        }
+
+        if ($extensionKey === null) {
             [, $extensionKey] = explode('/', $this->getName(), 2);
             $extensionKey = str_replace('-', '_', $extensionKey);
         }
