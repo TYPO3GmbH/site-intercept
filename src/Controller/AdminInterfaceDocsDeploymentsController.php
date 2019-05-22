@@ -56,7 +56,13 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         DocumentationJarRepository $documentationJarRepository
     ): Response {
         $recentLogsMessages = $graylogService->getRecentBambooDocsActions();
-        $criteria =  Criteria::create();
+        $criteria = Criteria::create();
+
+        $requestSortDirection = $request->query->get('direction');
+        $requestSortField = $request->query->get('sort');
+        $sortDirection = $requestSortDirection === 'asc' ? Criteria::ASC : Criteria::DESC;
+        $sortField = in_array($requestSortField, ['packageName', 'typeLong', 'lastRenderedAt']) ? $requestSortField : 'lastRenderedAt';
+        $criteria->orderBy([$sortField => $sortDirection]);
 
         $form = $this->createForm(DocsDeploymentFilterType::class);
         $form->handleRequest($request);
@@ -74,12 +80,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         $deployments = $documentationJarRepository->matching($criteria);
         $pagination = $paginator->paginate(
             $deployments,
-            $request->query->getInt('page', 1),
-            10,
-            [
-                'defaultSortFieldName' => 'lastRenderedAt',
-                'defaultSortDirection' => 'desc'
-            ]
+            $request->query->getInt('page', 1)
         );
 
         return $this->render(
