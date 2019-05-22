@@ -226,6 +226,27 @@ class BambooService
     }
 
     /**
+     * This plan is triggered if patches are merged into the main docs
+     * homepage repository at https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage
+     *
+     * The plan extracts the static web document root resources for the
+     * docs.typo3.org live server and deploys them.
+     *
+     * @return BambooBuildTriggered
+     */
+    public function triggerDocmuntationServerWebrootResourcesPlan(): BambooBuildTriggered
+    {
+        $uri = 'latest/queue/CORE-DWR?'
+            . http_build_query([
+                'stage' => '',
+                'executeAllStages' => '',
+                'os_authType' => 'basic',
+            ]);
+        $response = $this->sendBamboo('post', $uri);
+        return new BambooBuildTriggered((string)$response->getBody());
+    }
+
+    /**
      * Execute http request to bamboo.
      *
      * Argument $elevated needs to be set to true if a "system" related bamboo call is executed

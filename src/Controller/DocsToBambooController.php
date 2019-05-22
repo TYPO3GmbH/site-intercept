@@ -63,6 +63,12 @@ class DocsToBambooController extends AbstractController
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
             $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
             $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
+            if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
+                && ($buildInformation->sourceBranch === 'master' || $buildInformation->sourceBranch === 'new_docs_server')
+            ) {
+                // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
+                $bambooService->triggerDocmuntationServerWebrootResourcesPlan();
+            }
             $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
             $logger->info(
                 'Triggered docs build',
@@ -234,6 +240,12 @@ class DocsToBambooController extends AbstractController
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
             $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
             $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
+            if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
+                && ($buildInformation->sourceBranch === 'master' || $buildInformation->sourceBranch === 'new_docs_server')
+            ) {
+                // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
+                $bambooService->triggerDocmuntationServerWebrootResourcesPlan();
+            }
             $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
             $logger->info(
                 'Triggered docs build',
