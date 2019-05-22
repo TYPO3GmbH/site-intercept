@@ -72,7 +72,7 @@ class ComposerJson
         $typoVersion = $this->extractTypoVersion();
 
         if (empty($typoVersion) && $this->getType() === 'typo3-cms-extension') {
-            throw new DocsComposerMissingValueException('typo3/cms-core is not required in the composer json', 1558084137);
+            throw new DocsComposerMissingValueException('typo3/cms-core must be required in the composer json, but was not found', 1558084137);
         }
 
         return $typoVersion;
@@ -87,7 +87,7 @@ class ComposerJson
         $typoVersion = $this->extractTypoVersion(true);
 
         if (empty($typoVersion) && $this->getType() === 'typo3-cms-extension') {
-            throw new DocsComposerMissingValueException('typo3/cms-core is not required in the composer json', 1558084146);
+            throw new DocsComposerMissingValueException('typo3/cms-core must be required in the composer json, but was not found', 1558084146);
         }
 
         return $typoVersion;
