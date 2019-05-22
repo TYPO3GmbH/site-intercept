@@ -37,6 +37,7 @@
                                 <th scope="col">Type</th>
                                 <th scope="col">Branch</th>
                                 <th scope="col">Last rendered</th>
+                                <th scope="col">TYPO3 versions</th>
                                 {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                                     <th scope="col">Actions</th>
                                 {% endif %}
@@ -80,6 +81,9 @@
                                     <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
                                         {{ deployment.lastRenderedAt|date('n/d/Y, g:i A', "UTC") }}
                                     </span>
+                                </td>
+                                <td>
+                                    Min: {{ deployment.minimumTypoVersion }} / Max: {{ deployment.minimumTypoVersion }}
                                 </td>
                                 {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                                     <td data-type="actions" data-label="Actions">
