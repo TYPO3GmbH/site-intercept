@@ -27,6 +27,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('h')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
             ->setBuildKey('')
+            ->setMaximumTypoVersion('')
+            ->setMinimumTypoVersion('')
             ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/TYPO3-Documentation/DocsTypo3Org-Homepage/master/composer.json');
         $manager->persist($documentationJar);
 
@@ -44,6 +46,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('c')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
             ->setBuildKey('')
+            ->setMaximumTypoVersion('')
+            ->setMinimumTypoVersion('')
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -60,6 +64,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('c')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
             ->setBuildKey('')
+            ->setMaximumTypoVersion('')
+            ->setMinimumTypoVersion('')
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -76,6 +82,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('c')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
             ->setBuildKey('')
+            ->setMaximumTypoVersion('')
+            ->setMinimumTypoVersion('')
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -92,6 +100,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('c')
             ->setStatus(DocumentationStatus::STATUS_RENDERING)
             ->setBuildKey('')
+            ->setMaximumTypoVersion('')
+            ->setMinimumTypoVersion('')
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -108,6 +118,8 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTypeShort('c')
             ->setStatus(DocumentationStatus::STATUS_DELETING)
             ->setBuildKey('')
+            ->setMaximumTypoVersion('')
+            ->setMinimumTypoVersion('')
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
