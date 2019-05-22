@@ -93,19 +93,19 @@ class DocumentationJar
     private $typeShort;
 
     /**
-     * @ORM\Column(type="string", length=255, options={"default": ""})
+     * @ORM\Column(type="string", length=20, options={"default": ""})
      */
     private $minimumTypoVersion;
+
+    /**
+     * @ORM\Column(type="string", length=20, options={"default": ""})
+     */
+    private $maximumTypoVersion;
 
     /**
      * @ORM\Column(type="integer", options={"default": 0})
      */
     private $status;
-
-    /**
-     * @ORM\Column(type="string", length=255, options={"default": ""})
-     */
-    private $maximumTypoVersion;
 
     /**
      * @ORM\Column(type="string", length=255, options={"default": ""})
