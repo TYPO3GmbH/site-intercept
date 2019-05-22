@@ -26,14 +26,18 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => 'typo3-cms-extension',
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
 
         $subject = new DeploymentInformation(
             $composerJsonAsArray['name'],
             $composerJsonAsArray['type'],
+            'bazfnord',
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '9.5',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -59,6 +63,7 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => 'typo3-cms-extension',
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
 
         $expected = [
@@ -68,6 +73,7 @@ class DeploymentInformationTest extends TestCase
             'name' => 'bazfnord',
             'package_name' => 'foobar/bazfnord',
             'package_type' => 'typo3-cms-extension',
+            'extension_key' => 'bazfnord',
             'source_branch' => 'master',
             'target_branch_directory' => 'master',
             'type_long' => 'extension',
@@ -76,9 +82,12 @@ class DeploymentInformationTest extends TestCase
         $subject = new DeploymentInformation(
             $composerJsonAsArray['name'],
             $composerJsonAsArray['type'],
+            'bazfnord',
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '9.5',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -111,14 +120,18 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => $packageName,
             'type' => 'typo3-cms-extension',
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
 
         $subject = new DeploymentInformation(
             $composerJsonAsArray['name'],
             $composerJsonAsArray['type'],
+            $expectedName,
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '9.5',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -158,9 +171,12 @@ class DeploymentInformationTest extends TestCase
         new DeploymentInformation(
             $composerJsonAsArray['name'],
             $composerJsonAsArray['type'],
+            'not_given',
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '9.5',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -190,13 +206,17 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => $type,
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
         $subject = new DeploymentInformation(
             $composerJsonAsArray['name'],
             $composerJsonAsArray['type'],
+            'bazfnord',
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '9.5',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -217,9 +237,12 @@ class DeploymentInformationTest extends TestCase
         $subject = new DeploymentInformation(
             $composerJsonAsArray['name'],
             $composerJsonAsArray['type'],
+            'bazfnord',
             'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
             'https://something',
             'master',
+            '9.5',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -264,9 +287,12 @@ class DeploymentInformationTest extends TestCase
         new DeploymentInformation(
             $composerJsonAsArray['name'],
             $composerJsonAsArray['type'],
+            'bazfnord',
             'https://github.com/lolli42/enetcache/',
             'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
             'master',
+            '9.5',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -428,13 +454,17 @@ class DeploymentInformationTest extends TestCase
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
             'type' => $type,
+            'require' => ['typo3/cms-core' => '^9.5'],
         ];
         $subject = new DeploymentInformation(
             $composerJsonAsArray['name'],
             $composerJsonAsArray['type'],
+            'bazfnord',
             'https://github.com/lolli42/enetcache/',
             'https://something',
             $branch,
+            '9.5',
+            '9.5',
             '/tmp/foo',
             'bar'
         );
@@ -525,9 +555,12 @@ class DeploymentInformationTest extends TestCase
         new DeploymentInformation(
             $composerJsonAsArray['name'],
             $composerJsonAsArray['type'],
+            'bazfnord',
             'https://github.com/lolli42/enetcache/',
             'https://something',
             $branch,
+            '9.5',
+            '9.5',
             '/tmp/foo',
             'bar'
         );

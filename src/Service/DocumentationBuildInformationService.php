@@ -137,9 +137,12 @@ class DocumentationBuildInformationService
         return new DeploymentInformation(
             $composerJson->getName(),
             $composerJson->getType(),
+            $composerJson->getExtensionKey(),
             $pushEvent->getRepositoryUrl(),
             $pushEvent->getUrlToComposerFile(),
             $pushEvent->getVersionString(),
+            $composerJson->getMinimumTypoVersion(),
+            $composerJson->getMaximumTypoVersion(),
             $this->privateDir,
             $this->subDir
         );
@@ -158,9 +161,12 @@ class DocumentationBuildInformationService
         return new DeploymentInformation(
             $documentationJar->getPackageName(),
             $documentationJar->getPackageType(),
+            $documentationJar->getExtensionKey() ?? '',
             $documentationJar->getRepositoryUrl(),
             $documentationJar->getPublicComposerJsonUrl(),
             $documentationJar->getBranch(),
+            $documentationJar->getMinimumTypoVersion(),
+            $documentationJar->getMaximumTypoVersion(),
             $this->privateDir,
             $this->subDir
         );
@@ -243,6 +249,9 @@ class DocumentationBuildInformationService
             if (empty($record->getTypeShort())) {
                 $record->setTypeShort($deploymentInformation->typeShort);
             }
+            if (empty($record->getExtensionKey())) {
+                $record->setExtensionKey($deploymentInformation->extensionKey);
+            }
             if (empty($record->getPublicComposerJsonUrl())) {
                 $record->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl);
             }
@@ -251,6 +260,12 @@ class DocumentationBuildInformationService
             }
             if (empty($record->getName())) {
                 $record->setName($deploymentInformation->name);
+            }
+            if (empty($record->getMinimumTypoVersion())) {
+                $record->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion);
+            }
+            if (empty($record->getMaximumTypoVersion())) {
+                $record->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
             }
             $record->setStatus(DocumentationStatus::STATUS_RENDERING);
             $this->entityManager->flush();
@@ -263,10 +278,13 @@ class DocumentationBuildInformationService
                 ->setName($deploymentInformation->name)
                 ->setPackageName($deploymentInformation->packageName)
                 ->setPackageType($deploymentInformation->packageType)
+                ->setExtensionKey($deploymentInformation->extensionKey)
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
                 ->setTypeShort($deploymentInformation->typeShort)
+                ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
+                ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion)
                 ->setStatus(DocumentationStatus::STATUS_RENDERING)
                 ->setBuildKey('');
             $this->entityManager->persist($documentationJar);

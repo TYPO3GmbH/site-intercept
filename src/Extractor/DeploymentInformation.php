@@ -48,6 +48,11 @@ class DeploymentInformation
     public $packageType;
 
     /**
+     * @var string Extension key, e.g. 'news'
+     */
+    public $extensionKey;
+
+    /**
      * @var string The (not changed) source branch or tag of the repository supposed to be checked out, eg. '1.2.3', '1.2', 'master', 'latest'
      */
     public $sourceBranch;
@@ -88,13 +93,26 @@ class DeploymentInformation
     public $relativeDumpFile;
 
     /**
+     * @var string TYPO3 version the package is compatible with (minimum)
+     */
+    public $minimumTypoVersion;
+
+    /**
+     * @var string TYPO3 version the package is compatible with (maximum)
+     */
+    public $maximumTypoVersion;
+
+    /**
      * Constructor
      *
      * @param string $composerPackageName
      * @param string $composerPackageType
+     * @param string $extensionKey
      * @param string $repositoryUrl
      * @param string $publicComposerJsonUrl
      * @param string $version
+     * @param string $minimumTypoVersion,
+     * @param string $maximumTypoVersion,
      * @param string $privateDir
      * @param string $subDir
      * @throws DocsPackageDoNotCareBranch
@@ -102,9 +120,12 @@ class DeploymentInformation
     public function __construct(
         string $composerPackageName,
         string $composerPackageType,
+        string $extensionKey,
         string $repositoryUrl,
         string $publicComposerJsonUrl,
         string $version,
+        string $minimumTypoVersion,
+        string $maximumTypoVersion,
         string $privateDir,
         string $subDir
     ) {
@@ -113,6 +134,7 @@ class DeploymentInformation
         $this->packageType = $composerPackageType;
         $packageName = $this->determinePackageName($composerPackageName);
         $packageType = $this->determinePackageType($composerPackageType, $this->repositoryUrl);
+        $this->extensionKey = $extensionKey;
         $this->vendor = key($packageName);
         $this->name = current($packageName);
         $this->packageName = $this->vendor . '/' . $this->name;
@@ -121,6 +143,8 @@ class DeploymentInformation
         $this->sourceBranch = $version;
 
         $this->targetBranchDirectory = $this->getTargetBranchDirectory($this->sourceBranch, $this->typeLong);
+        $this->minimumTypoVersion = $minimumTypoVersion;
+        $this->maximumTypoVersion = $maximumTypoVersion;
 
         $buildTime = ceil(microtime(true) * 10000);
         $this->absoluteDumpFile = implode('/', [
@@ -143,6 +167,7 @@ class DeploymentInformation
             'name' => $this->name,
             'package_name' => $this->packageName,
             'package_type' => $this->packageType,
+            'extension_key' => $this->extensionKey,
             'source_branch' => $this->sourceBranch,
             'target_branch_directory' => $this->targetBranchDirectory,
             'type_long' => $this->typeLong,

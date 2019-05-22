@@ -261,7 +261,9 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 $documentationBuildInformationService->assertComposerJsonContainsNecessaryData($composerJsonObject);
                 $documentationJar
                     ->setPackageName($composerJsonObject->getName())
-                    ->setPackageType($composerJsonObject->getType());
+                    ->setPackageType($composerJsonObject->getType())
+                    ->setMinimumTypoVersion($composerJsonObject->getMinimumTypoVersion())
+                    ->setMaximumTypoVersion($composerJsonObject->getMaximumTypoVersion());
                 $deploymentInformation = $documentationBuildInformationService
                     ->generateBuildInformationFromDocumentationJar($documentationJar);
             } catch (ComposerJsonNotFoundException | ComposerJsonInvalidException | DocsComposerDependencyException | DocsPackageDoNotCareBranch $e) {
@@ -282,7 +284,9 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
-                ->setTypeShort($deploymentInformation->typeShort);
+                ->setTypeShort($deploymentInformation->typeShort)
+                ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
+                ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
 
             $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
             $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);

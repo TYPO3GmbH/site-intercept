@@ -318,12 +318,15 @@ class BambooPostBuildControllerTest extends TestCase
             ->setName($name)
             ->setPackageName($packageName)
             ->setPackageType('typo3-cms-extension')
+            ->setExtensionKey($name)
             ->setTypeShort('c')
             ->setTypeLong('core-extension')
             ->setRepositoryUrl('https://github.com/' . $packageName . '/')
             ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/' . $packageName . '/' . $branch . '/composer.json')
             ->setBranch($branch)
-            ->setTargetBranchDirectory($branch);
+            ->setTargetBranchDirectory($branch)
+            ->setMinimumTypoVersion('9.5')
+            ->setMaximumTypoVersion('9.5');
 
         return $documentationJar;
     }

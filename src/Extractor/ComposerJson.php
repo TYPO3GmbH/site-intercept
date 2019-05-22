@@ -11,12 +11,15 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\Composer\DocsComposerMissingValueException;
+use Composer\Semver\Semver;
 
 /**
  * Contains contents of the composer.json
  */
 class ComposerJson
 {
+    private const ALLOWED_TYPO_VERSIONS = ['6.2', '7.6', '8.7', '9.5'];
+
     /**
      * @var array
      */
@@ -61,6 +64,82 @@ class ComposerJson
     {
         $this->assertPropertyContainsValue('authors');
         return current($this->composerJson['authors']);
+    }
+
+    /**
+     * @return string
+     * @throws DocsComposerMissingValueException
+     */
+    public function getMinimumTypoVersion(): string
+    {
+        if ($this->getType() !== 'typo3-cms-extension') {
+            return '';
+        }
+        if (!$this->requires('typo3/cms-core')) {
+            throw new DocsComposerMissingValueException('typo3/cms-core must be required in the composer json, but was not found', 1558084137);
+        }
+
+        return $this->extractTypoVersion();
+    }
+
+    /**
+     * @return string
+     * @throws DocsComposerMissingValueException
+     */
+    public function getMaximumTypoVersion(): string
+    {
+        if ($this->getType() !== 'typo3-cms-extension') {
+            return '';
+        }
+        if (!$this->requires('typo3/cms-core')) {
+            throw new DocsComposerMissingValueException('typo3/cms-core must be required in the composer json, but was not found', 1558084146);
+        }
+
+        return $this->extractTypoVersion(true);
+    }
+
+    /**
+     * @param bool $getMaximum
+     * @return string
+     */
+    private function extractTypoVersion(bool $getMaximum = false): string
+    {
+        $maxVersion = '';
+        foreach (self::ALLOWED_TYPO_VERSIONS as $typoVersion) {
+            if (Semver::satisfies($typoVersion, $this->composerJson['require']['typo3/cms-core'])) {
+                if (!$getMaximum) {
+                    return $typoVersion;
+                }
+                $maxVersion = $typoVersion;
+            }
+        }
+
+        return $maxVersion;
+    }
+
+    /**
+     * Tries to determine the extension key based on package's composer.json
+     *
+     * @return null|string
+     */
+    public function getExtensionKey(): ?string
+    {
+        if (strpos($this->getType(), 'typo3-cms-') === false) {
+            return null;
+        }
+
+        if (!empty($this->composerJson['extra']['typo3/cms']['extension-key'])) {
+            return $this->composerJson['extra']['typo3/cms']['extension-key'];
+        }
+
+        foreach ($this->composerJson['replace'] ?? [] as $packageName => $version) {
+            if (strpos($packageName, '/') === false) {
+                return trim($packageName);
+            }
+        }
+
+        [, $extensionKey] = explode('/', $this->getName(), 2);
+        return str_replace('-', '_', $extensionKey);
     }
 
     /**

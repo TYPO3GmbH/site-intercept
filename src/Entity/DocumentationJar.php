@@ -63,6 +63,11 @@ class DocumentationJar
     private $packageType;
 
     /**
+     * @ORM\Column(type="string", length=255, options={"default": ""}, nullable=true)
+     */
+    private $extensionKey;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $branch;
@@ -91,6 +96,16 @@ class DocumentationJar
      * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private $typeShort;
+
+    /**
+     * @ORM\Column(type="string", length=20, options={"default": ""})
+     */
+    private $minimumTypoVersion;
+
+    /**
+     * @ORM\Column(type="string", length=20, options={"default": ""})
+     */
+    private $maximumTypoVersion;
 
     /**
      * @ORM\Column(type="integer", options={"default": 0})
@@ -259,6 +274,24 @@ class DocumentationJar
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
+    public function getExtensionKey(): ?string
+    {
+        return $this->extensionKey;
+    }
+
+    /**
+     * @param mixed $extensionKey
+     * @return DocumentationJar
+     */
+    public function setExtensionKey(?string $extensionKey): self
+    {
+        $this->extensionKey = $extensionKey;
+        return $this;
+    }
+
     public function getBranch(): ?string
     {
         return $this->branch;
@@ -311,6 +344,18 @@ class DocumentationJar
         return $this;
     }
 
+    public function getMinimumTypoVersion(): ?string
+    {
+        return $this->minimumTypoVersion;
+    }
+
+    public function setMinimumTypoVersion(string $minimumTypoVersion): self
+    {
+        $this->minimumTypoVersion = $minimumTypoVersion;
+
+        return $this;
+    }
+
     public function getStatus(): ?int
     {
         return $this->status;
@@ -319,6 +364,18 @@ class DocumentationJar
     public function setStatus(?int $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getMaximumTypoVersion(): ?string
+    {
+        return $this->maximumTypoVersion;
+    }
+
+    public function setMaximumTypoVersion(string $maximumTypoVersion): self
+    {
+        $this->maximumTypoVersion = $maximumTypoVersion;
 
         return $this;
     }
