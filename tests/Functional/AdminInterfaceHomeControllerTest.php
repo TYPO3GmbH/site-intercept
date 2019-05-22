@@ -14,6 +14,6 @@ class AdminInterfaceHomeControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', '/admin');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Intercept web admin interface/', $client->getResponse()->getContent());
+        $this->assertRegExp('/About Intercept/', $client->getResponse()->getContent());
     }
 }

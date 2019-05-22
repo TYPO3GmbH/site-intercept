@@ -84,7 +84,4 @@
             }
         }
     }
-    .bg-#{$color} + .bg-#{$color} {
-        border-top: 1px solid darken($value, 10%);
-    }
 }
