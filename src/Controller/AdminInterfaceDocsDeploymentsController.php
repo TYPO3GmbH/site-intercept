@@ -16,6 +16,7 @@ use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
+use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\ComposerJson;
 use App\Form\DocsDeploymentFilterType;
 use App\Form\DocumentationDeployment;
@@ -233,6 +234,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
      * @param BambooService $bambooService
      * @return Response
      * @throws DocsPackageDoNotCareBranch
+     * @throws \App\Exception\Composer\DocsComposerMissingValueException
      */
     public function addConfigurationStep3(Request $request, DocumentationBuildInformationService $documentationBuildInformationService, BambooService $bambooService): Response
     {
@@ -304,6 +306,136 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
             'form' => $form->createView(),
             'showPrev' => true,
         ]);
+    }
+
+    /**
+     * @Route("/admin/docs/render", name="admin_docs_render")
+     * @param Request $request
+     * @param BambooService $bambooService
+     * @param DocumentationBuildInformationService $documentationBuildInformationService
+     * @param LoggerInterface $logger
+     * @param DocumentationJarRepository $documentationJarRepository
+     * @return Response
+     */
+    public function renderDocs(
+        Request $request,
+        BambooService $bambooService,
+        DocumentationBuildInformationService $documentationBuildInformationService,
+        LoggerInterface $logger,
+        DocumentationJarRepository $documentationJarRepository
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
+
+        try {
+            $documentationJarId = (int)$request->get('documentation');
+            $documentationJar = $documentationJarRepository->find($documentationJarId);
+            if ($documentationJar === null) {
+                throw new \InvalidArgumentException('no documentationJar given', 1557930900);
+            }
+
+            $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($documentationJar->getPublicComposerJsonUrl());
+            $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
+            $buildInformation = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
+            $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
+            $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
+            $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
+            if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
+                && ($buildInformation->sourceBranch === 'master' || $buildInformation->sourceBranch === 'new_docs_server')
+            ) {
+                // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
+                $bambooService->triggerDocmuntationServerWebrootResourcesPlan();
+            }
+            $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
+            $logger->info(
+                'Triggered docs build',
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'triggered',
+                    'triggeredBy' => 'interface',
+                    'repository' => $buildInformation->repositoryUrl,
+                    'package' => $buildInformation->packageName,
+                    'sourceBranch' => $buildInformation->sourceBranch,
+                    'targetBranch' => $buildInformation->targetBranchDirectory,
+                    'bambooKey' => $bambooBuildTriggered->buildResultKey,
+                ]
+            );
+            $this->addFlash('success', 'A re-rendering was triggered.');
+            return $this->redirectToRoute('admin_docs_deployments');
+        } catch (UnsupportedWebHookRequestException $e) {
+            // Hook payload could not be identified as hook that should trigger rendering
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'unsupportedHook',
+                    'headers' => $request->headers,
+                    'payload' => $request->getContent(),
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                ]
+            );
+            // 412: precondition failed
+            return Response::create('Invalid hook payload. See https://intercept.typo3.com for more information.', 412);
+        } catch (ComposerJsonNotFoundException $e) {
+            // Repository did not provide a composer.json, or fetch failed
+            $logger->warning(
+                'Can not render documentation: The repository at ' . $documentationJar->getRepositoryUrl() . ' MUST have a composer.json file on top level.',
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'noComposerJson',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $documentationJar->getRepositoryUrl(),
+                    'composerFile' => $documentationJar->getPublicComposerJsonUrl(),
+                ]
+            );
+            return Response::create('No composer.json found, invalid or unable to fetch. See https://intercept.typo3.com for more information.', 412);
+        } catch (ComposerJsonInvalidException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'invalidComposerJson',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $documentationJar->getRepositoryUrl(),
+                    'composerFile' => $documentationJar->getPublicComposerJsonUrl(),
+                ]
+            );
+            return Response::create('Invalid composer.json. See https://intercept.typo3.com for more information.', 412);
+        } catch (DocsPackageDoNotCareBranch $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'noRelevantBranchOrTag',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $documentationJar->getRepositoryUrl(),
+                    'package' => $buildInformation->packageName,
+                    'sourceBranch' => $documentationJar->getBranch(),
+                ]
+            );
+            return Response::create('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', 412);
+        } catch (DocsComposerDependencyException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'coreDependencyNotSet',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $documentationJar->getRepositoryUrl(),
+                    'package' => $composerAsObject->getName(),
+                    'sourceBranch' => $documentationJar->getBranch(),
+                ]
+            );
+            return Response::create('Dependencies are not fulfilled. See https://intercept.typo3.com for more information.', 412);
+        }
     }
 
     protected function resolveComposerJsonUrl(string $repositoryUrl, string $branch): string

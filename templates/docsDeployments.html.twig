@@ -88,7 +88,7 @@
                                 {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                                     <td data-type="actions" data-label="Actions">
                                         {% if deployment.isRenderable() %}
-                                            <a class="datatable-action" title="Re-render documentation" href="{{ path('docs_to_bamboo_render', {documentation: deployment.id}) }}">
+                                            <a class="datatable-action" title="Re-render documentation" href="{{ path('admin_docs_render', {documentation: deployment.id}) }}">
                                                 <span class="datatable-action-icon"><i class="fas fa-sync"></i></span>
                                                 <span class="datatable-action-label datatable-visually-hidden">Re-render documentation</span>
                                             </a>
