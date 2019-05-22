@@ -3,10 +3,10 @@ declare(strict_types = 1);
 namespace App\Tests\Functional;
 
 use App\Service\DocsAssetsService;
-use App\Tests\Functional\Fixtures\DocsAssetsControllerTestData;
+use App\Tests\Functional\Fixtures\AssetsDocsControllerTestData;
 use Symfony\Bundle\FrameworkBundle\Client;
 
-class DocsAssetsControllerTest extends AbstractFunctionalWebTestCase
+class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @var Client
@@ -20,7 +20,7 @@ class DocsAssetsControllerTest extends AbstractFunctionalWebTestCase
         DatabasePrimer::prime(self::$kernel);
 
         $this->client = static::createClient();
-        (new DocsAssetsControllerTestData())->load(
+        (new AssetsDocsControllerTestData())->load(
             self::$kernel->getContainer()->get('doctrine')->getManager()
         );
     }
@@ -30,7 +30,7 @@ class DocsAssetsControllerTest extends AbstractFunctionalWebTestCase
      */
     public function manualsJsonContainsCommunityExtensionsOnly(): void
     {
-        $this->client->request('GET', '/docs/assets/manuals.json');
+        $this->client->request('GET', '/assets/docs/manuals.json');
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $content = json_decode($this->client->getResponse()->getContent(), true);
 
@@ -44,7 +44,7 @@ class DocsAssetsControllerTest extends AbstractFunctionalWebTestCase
      */
     public function manualsJsonContainsMultipleVersionsWithoutDraft(): void
     {
-        $this->client->request('GET', '/docs/assets/manuals.json');
+        $this->client->request('GET', '/assets/docs/manuals.json');
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $content = json_decode($this->client->getResponse()->getContent(), true);
 
@@ -59,7 +59,7 @@ class DocsAssetsControllerTest extends AbstractFunctionalWebTestCase
      */
     public function extensionsJavaScriptContainsCoreAndCommunityExtensionsOnly(): void
     {
-        $this->client->request('GET', '/docs/assets/extensions.js');
+        $this->client->request('GET', '/assets/docs/extensions.js');
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $content = $this->client->getResponse()->getContent();
 
@@ -74,7 +74,7 @@ class DocsAssetsControllerTest extends AbstractFunctionalWebTestCase
      */
     public function extensionsJavaScriptContainsMultipleVersionsWithoutDraft(): void
     {
-        $this->client->request('GET', '/docs/assets/extensions.js');
+        $this->client->request('GET', '/assets/docs/extensions.js');
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $content = $this->client->getResponse()->getContent();
 

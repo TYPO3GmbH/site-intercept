@@ -9,7 +9,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class DocsAssetsControllerTestData extends Fixture implements OrderedFixtureInterface
+class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
