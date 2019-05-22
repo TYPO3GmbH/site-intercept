@@ -128,60 +128,86 @@
                 {% endif %}
             </div>
 
-            <div class="content-spacer"></div>
-            <h2>
-                Recent actions
-            </h2>
-            {% for log in logMessages %}
-                <div class="alert graylog-log
-                        alert-success
-                        {% if log.level == '6' %}
-                            alert-success
-                        {% else %}
-                            alert-warning
-                        {% endif %}
-                    "
-                >
-                    <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
-                    <span>
-                        {% if log.status == 'triggered' %}
-                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">{{ log.message }}</a>
-                        {% else %}
-                            {{ log.message }}
-                        {% endif %}
-                    </span>
-
-                    {% if log.bambooKey %}
-                        | <span>Bamboo key: {{ log.bambooKey }}</span>
-                    {% endif %}
-                    {% if log.package %}
-                        | <span>Package: {{ log.package }}</span>
-                    {% endif %}
-                    {% if log.sourceBranch %}
-                        | <span>Branch: {{ log.sourceBranch }}</span>
-                    {% endif %}
-                    {% if log.targetBranch %}
-                        | <span>Target directory: {{ log.targetBranch }}</span>
-                    {% endif %}
-                    {% if log.repository %}
-                        | <span>Repository: {{ log.repository }}</span>
-                    {% endif %}
-                    {% if log.composerFile %}
-                        | <span>Composer file: {{ log.composerFile }}</span>
-                    {% endif %}
-                    {% if log.exceptionCode %}
-                        | <span>Exception Code: {{ log.exceptionCode }}</span>
-                    {% endif %}
-                    {% if log.triggeredBy == 'api' %}
-                        | <span>Trigger: API</span>
-                    {% elseif log.triggeredBy == 'interface' %}
-                        | <span>Trigger: Web</span>
-                    {% endif %}
-                    {% if log.userDisplayName %}
-                        | <span>User: {{ log.userDisplayName }}</span>
-                    {% endif %}
+            {% if logMessages %}
+                <div class="content-spacer"></div>
+                <h2>Recent actions</h2>
+                <div class="card">
+                    <div class="message-list">
+                        {% for log in logMessages %}
+                            <div class="message {% if log.level == '6' %}message-success{% else %}message-warning{% endif %}">
+                                <div class="message-badge">
+                                    {% if log.triggeredBy == 'api' %}
+                                        <span class="badge badge-secondary">API</span>
+                                    {% elseif log.triggeredBy == 'interface' %}
+                                        <span class="badge badge-secondary">WEB</span>
+                                    {% endif %}
+                                </div>
+                                <div class="message-body">
+                                    <div class="message-meta">
+                                        <span class="message-date">
+                                            {{ log.time|date('n/d/Y, g:i A', "UTC") }}
+                                        </span>
+                                        {% if log.userDisplayName %}
+                                            <span class="message-user">- by {{ log.userDisplayName }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-text">
+                                        {% if log.status == 'triggered' %}
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">{{ log.message }}</a>
+                                        {% else %}
+                                            {{ log.message }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-detail">
+                                        {% if log.bambooKey %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Bamboo key</span>
+                                                <span class="message-detail-value">{{ log.bambooKey }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.package %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Package</span>
+                                                <span class="message-detail-value">{{ log.package }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.sourceBranch %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Branch</span>
+                                                <span class="message-detail-value">{{ log.sourceBranch }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.targetBranch %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Target directory</span>
+                                                <span class="message-detail-value">{{ log.targetBranch }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.repository %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Repository</span>
+                                                <span class="message-detail-value">{{ log.repository }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.composerFile %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Composer file</span>
+                                                <span class="message-detail-value">{{ log.composerFile }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.exceptionCode %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Exception Code</span>
+                                                <span class="message-detail-value">{{ log.exceptionCode }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            {% endfor %}
+            {% endif %}
 
         </div>
     </div>

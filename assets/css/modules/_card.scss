@@ -25,18 +25,17 @@
         font-size: 1.2rem;
         font-weight: bold;
     }
-    padding: $card-spacer-y $card-spacer-x;
+    padding: ($card-spacer * .75) $card-spacer;
     border-bottom: 1px solid rgba(0,0,0,0.15);
 }
 .card-footer {
+    padding: ($card-spacer * .75) $card-spacer; 
     .datatable + & {
         border-top: 1px solid rgba(0,0,0,0.15);
     }
-
     .pagination {
         margin-bottom: 0;
     }
-
     .card-body + & {
         border-top: none;
         padding-top: 0;
@@ -55,9 +54,6 @@
 //
 // Header Bar
 //
-.card-header {
-    padding: ($card-spacer * .75) $card-spacer;  
-}
 .card-header-bar {
     @include media-breakpoint-up('sm') {
         margin-left: -0.5rem;

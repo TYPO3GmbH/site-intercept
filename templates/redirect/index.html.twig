@@ -84,49 +84,71 @@
 
             {% if logMessages %}
                 <div class="content-spacer"></div>
+                <h2>Recent actions</h2>
                 <div class="card">
-                    <div class="card-header">
-                        <h2>
-                            Recent actions
-                        </h2>
-                    </div>
-                    <div class="card-body">
+                    <div class="message-list">
                         {% for log in logMessages %}
-                            <div class="alert graylog-log alert-info">
-                                <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
-                                <span>
-                                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo Documentation Redirects</a>
-                                </span>
-                                {% if log.bambooKey %}
-                                    | <span>Bamboo key: {{ log.bambooKey }}</span>
-                                {% endif %}
-                                {% if log.triggeredBy == 'api' %}
-                                    | <span>Trigger: API</span>
-                                {% elseif log.triggeredBy == 'interface' %}
-                                    | <span>Trigger: Web</span>
-                                {% endif %}
-                                {% if log.subType %}
-                                    | <span>Action: {{ log.subType }}</span>
-                                {% endif %}
-                                {% if log.userDisplayName %}
-                                    | <span>User: {{ log.userDisplayName }}</span>
-                                {% endif %}
-                                {% if log.redirect %}
-                                    {% if log.redirect.id %}
-                                        | <span>ID: {{ log.redirect.id }}</span>
+                            <div class="message message-info">
+                                <div class="message-badge">
+                                    {% if log.triggeredBy == 'api' %}
+                                        <span class="badge badge-secondary">API</span>
+                                    {% elseif log.triggeredBy == 'interface' %}
+                                        <span class="badge badge-secondary">WEB</span>
                                     {% endif %}
-                                    {% if log.redirect.source %}
-                                        | <span>Source: {{ log.redirect.source }}</span>
-                                    {% endif %}
-                                    {% if log.redirect.target %}
-                                        | <span>Target: {{ log.redirect.target }}</span>
-                                    {% endif %}
-                                {% endif %}
+                                </div>
+                                <div class="message-body">
+                                    <div class="message-meta">
+                                        <span class="message-date">
+                                            {{ log.time|date('n/d/Y, g:i A', "UTC") }}
+                                        </span>
+                                        {% if log.userDisplayName %}
+                                            <span class="message-user">- by {{ log.userDisplayName }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-text">
+                                        <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo Documentation Redirects</a>
+                                    </div>
+                                    <div class="message-detail">
+                                        {% if log.bambooKey %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Bamboo key</span>
+                                                <span class="message-detail-value">{{ log.bambooKey }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.subType %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Action</span>
+                                                <span class="message-detail-value">{{ log.subType }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.redirect %}
+                                            {% if log.redirect.id %}
+                                                <div class="message-detail-item">
+                                                    <span class="message-detail-key">ID</span>
+                                                    <span class="message-detail-value">{{ log.redirect.id }}</span>
+                                                </div>
+                                            {% endif %}
+                                            {% if log.redirect.source %}
+                                                <div class="message-detail-item">
+                                                    <span class="message-detail-key">Source</span>
+                                                    <span class="message-detail-value">{{ log.redirect.source }}</span>
+                                                </div>
+                                            {% endif %}
+                                            {% if log.redirect.target %}
+                                                <div class="message-detail-item">
+                                                    <span class="message-detail-key">Target</span>
+                                                    <span class="message-detail-value">{{ log.redirect.target }}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
                 </div>
             {% endif %}
+
         </div>
     </div>
 
