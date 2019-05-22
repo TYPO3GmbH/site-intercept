@@ -62,7 +62,7 @@
                                 <div class="message-body">
                                     <div class="message-meta">
                                         <span class="message-date">
-                                            {{ log.time|date('n/d/Y, g:i A', "UTC") }}
+                                            {{ intercept_date_time(log.time) }}
                                         </span>
                                         {% if log.userDisplayName %}
                                             <span class="message-user">- by {{ log.userDisplayName }}</span>

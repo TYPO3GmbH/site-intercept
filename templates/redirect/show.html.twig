@@ -16,11 +16,11 @@
                         </tr>
                         <tr>
                             <th>CreatedAt</th>
-                            <td>{{ redirect.createdAt ? redirect.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                            <td>{{ redirect.createdAt ? intercept_date_time(redirect.createdAt) : '' }}</td>
                         </tr>
                         <tr>
                             <th>UpdatedAt</th>
-                            <td>{{ redirect.updatedAt ? redirect.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                            <td>{{ redirect.updatedAt ? intercept_date_time(redirect.updatedAt) : '' }}</td>
                         </tr>
                         <tr>
                             <th>Source</th>

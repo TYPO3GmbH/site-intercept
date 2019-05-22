@@ -100,7 +100,7 @@
                                         {% endif %}
                                     "
                                 >
-                                    <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
+                                    <span>{{ intercept_date_time(log.time) }} - </span>
                                     {% if log.type == 'voteGerrit' %}
                                         <span>
                                             <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Voted on gerrit</a>

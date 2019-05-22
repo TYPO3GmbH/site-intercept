@@ -6,9 +6,9 @@ $table-text: #333;
 $table-link-highlight: $link-color;
 $table-row-hover-bg: theme-color("primary");
 $table-row-hover-color: color-yiq(theme-color("primary"));
-$table-padding: 1.5rem;
+$table-padding: 1rem;
 $table-padding-x: $table-padding;
-$table-padding-y: $table-padding / 2;
+$table-padding-y: $table-padding * 0.75;
 $table-cell-padding: $table-padding-y $table-padding-x;
 
 $table-sorting-icon-size: 1rem;
@@ -35,6 +35,12 @@ $table-sorting-icon-descending: '<svg viewBox="0 0 16 16"><g fill="#{$table-high
 
     th,
     td {
+        &:first-child {
+            padding-left: 1.5rem;
+        }
+        &:last-child {
+            padding-right: 1.5rem;
+        }
         padding: $table-cell-padding;
         white-space: nowrap;
         line-height: 1.2rem;

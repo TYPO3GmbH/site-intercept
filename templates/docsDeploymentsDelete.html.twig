@@ -22,7 +22,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                            <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('n/d/Y, g:i A', "UTC") }}">
+                            <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('m/d/y, H:i', "UTC") }}">
                                 <th data-type="icon">
                                     <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
                                         <i class="fab fa-fw fa-git-alt"></i>
@@ -55,9 +55,7 @@
                                     </a>
                                 </td>
                                 <td data-type="localdate">
-                                    <span data-processor="localdate" data-value="{{ deployment.lastRenderedAt|date('Y-m-d\\TH:i:sP', "UTC") }}">
-                                        {{ deployment.lastRenderedAt|date('n/d/Y, g:i A', "UTC") }}
-                                    </span>
+                                    {{ intercept_date_time(deployment.lastRenderedAt) }}
                                 </td>
                             </tr>
                         </tbody>

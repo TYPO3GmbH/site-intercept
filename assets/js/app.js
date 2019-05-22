@@ -21,6 +21,13 @@ $(document).ready(function () {
 function convertDates() {
     Array.from(document.querySelectorAll('[data-processor="localdate"]')).forEach(function (element) {
         const value = element.dataset.value;
-        element.textContent = DateTime.fromISO(value).toLocaleString(DateTime.DATETIME_SHORT);
+        element.textContent = DateTime.fromISO(value).toLocaleString({ 
+            month: '2-digit',
+            day: '2-digit',
+            year: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
     });
 }

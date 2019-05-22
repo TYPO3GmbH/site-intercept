@@ -118,7 +118,7 @@
                         <div class="card-body">
                             {% for log in logMessages %}
                                 <div class="alert graylog-log {% if log.vote == '-1' or log.type == 'rebuildNightly' %}alert-warning{% elseif log.vote == '+1' %}alert-success{% elseif log.type == 'reportBrokenNightly' %}alert-danger{% else %}alert-info{% endif %}">
-                                    <span>{{ log.time|date("d.m.Y H:i:s") }} UTC - </span>
+                                    <span>{{ intercept_date_time(log.time) }} - </span>
                                     {% if log.type == 'voteGerrit' %}
                                         <span>
                                             <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Voted on gerrit</a>
