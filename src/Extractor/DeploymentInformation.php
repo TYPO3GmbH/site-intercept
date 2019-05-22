@@ -105,6 +105,8 @@ class DeploymentInformation
      * @param string $repositoryUrl
      * @param string $publicComposerJsonUrl
      * @param string $version
+     * @param string $minimumTypoVersion,
+     * @param string $maximumTypoVersion,
      * @param string $privateDir
      * @param string $subDir
      * @throws DocsPackageDoNotCareBranch
