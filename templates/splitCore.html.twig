@@ -6,26 +6,6 @@
     <div class="content-section">
         <div class="container">
 
-            <h2>
-                {% if rabbitStatus.isRabbitOnline == true %}
-                    <span class="badge badge-success">Rabbit: online</span>
-                {% else %}
-                    <span class="badge badge-danger">Rabbit: offline</span>
-                {% endif %}
-
-                {% if rabbitStatus.isWorkerOnline == true and rabbitStatus.isRabbitOnline == true %}
-                    <span class="badge badge-success">Worker: online</span>
-                {% elseif rabbitStatus.isRabbitOnline == true %}
-                    <span class="badge badge-danger">Worker: offline</span>
-                {% endif %}
-
-                {% if rabbitStatus.numberOfJobs == 0 and rabbitStatus.isRabbitOnline == true %}
-                    <span class="badge badge-success">Jobs: {{ rabbitStatus.numberOfJobs }}</span>
-                {% elseif rabbitStatus.isRabbitOnline == true %}
-                    <span class="badge badge-warning">Jobs: {{ rabbitStatus.numberOfJobs }}</span>
-                {% endif %}
-            </h2>
-
             {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <h2>
                     Core mono repo splitting and tagging to sub repos

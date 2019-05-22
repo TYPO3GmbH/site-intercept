@@ -29,6 +29,14 @@
     border-bottom: 1px solid rgba(0,0,0,0.15);
 }
 .card-footer {
+    .datatable + & {
+        border-top: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .pagination {
+        margin-bottom: 0;
+    }
+
     .card-body + & {
         border-top: none;
         padding-top: 0;
@@ -89,11 +97,25 @@
     }
 }
 .card-header-title {
+    flex-grow: 1;
     overflow: hidden;
 }
 .card-header-actions {
     margin-left: auto;
     flex-shrink: 0;
+}
+.card-header-form {
+    > form {
+        margin-bottom: 0.5rem;
+    }
+    > form > div {
+        display: flex;
+        margin: -0.25rem;
+    }
+    .form-group {
+        padding: 0.25rem;
+        margin: 0;
+    }
 }
 
 

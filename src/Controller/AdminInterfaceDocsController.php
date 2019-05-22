@@ -11,10 +11,12 @@ declare(strict_types = 1);
 namespace App\Controller;
 
 use App\Form\BambooDocsFluidVhTriggerFormType;
+use App\Form\BambooDocsSurfTriggerFormType;
 use App\Service\BambooService;
 use App\Service\GraylogService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -31,7 +33,7 @@ class AdminInterfaceDocsController extends AbstractController
     private $logger;
 
     /**
-     * @Route("/admin/docs", name="admin_docs")
+     * @Route("/admin/docs", name="admin_docs_third_party")
      *
      * @param Request $request
      * @param LoggerInterface $logger
@@ -47,6 +49,28 @@ class AdminInterfaceDocsController extends AbstractController
     ): Response {
         $this->logger = $logger;
 
+        $fluidVhForm = $this->getFluidVhForm($request, $bambooService);
+        $surfForm = $this->getSurfForm($request, $bambooService);
+
+        $recentLogsMessages = $graylogService->getRecentBambooDocsThirdPartyTriggers();
+
+        return $this->render(
+            'docs.html.twig',
+            [
+                'fluidVhForm' => $fluidVhForm->createView(),
+                'surfForm' => $surfForm->createView(),
+                'logMessages' => $recentLogsMessages,
+            ]
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @param BambooService $bambooService
+     * @return FormInterface
+     */
+    protected function getFluidVhForm(Request $request, BambooService $bambooService): FormInterface
+    {
         $fluidVhForm = $this->createForm(BambooDocsFluidVhTriggerFormType::class);
         $fluidVhForm->handleRequest($request);
         if ($fluidVhForm->isSubmitted() && $fluidVhForm->isValid()) {
@@ -62,7 +86,7 @@ class AdminInterfaceDocsController extends AbstractController
                 $this->logger->info(
                     'Triggered fluid view helper build "' . $bambooTriggered->buildResultKey . '".',
                     [
-                        'type' => 'triggerBambooDocsFluidVh',
+                        'type' => 'triggerBambooDocsThirdParty',
                         'bambooKey' => $bambooTriggered->buildResultKey,
                         'triggeredBy' => 'interface',
                     ]
@@ -75,16 +99,44 @@ class AdminInterfaceDocsController extends AbstractController
                 );
             }
         }
+        return $fluidVhForm;
+    }
 
-        $recentLogsMessages = $graylogService->getRecentBambooDocsFluidVhTriggers();
-
-        return $this->render(
-            'docs.html.twig',
-            [
-                'fluidVhForm' => $fluidVhForm->createView(),
-                'logMessages' => $recentLogsMessages,
-                'bambooStatus' => $bambooService->getBambooStatus(),
-            ]
-        );
+    /**
+     * @param Request $request
+     * @param BambooService $bambooService
+     * @return FormInterface
+     */
+    protected function getSurfForm(Request $request, BambooService $bambooService): FormInterface
+    {
+        $surfForm = $this->createForm(BambooDocsSurfTriggerFormType::class);
+        $surfForm->handleRequest($request);
+        if ($surfForm->isSubmitted() && $surfForm->isValid()) {
+            $this->denyAccessUnlessGranted('ROLE_USER');
+            $bambooTriggered = $bambooService->triggerDocumentationSurfPlan();
+            if (!empty($bambooTriggered->buildResultKey)) {
+                $this->addFlash(
+                    'success',
+                    'Triggered fluid view helper build'
+                    . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
+                    . ' of plan key "CORE-DRS".'
+                );
+                $this->logger->info(
+                    'Triggered TYPO3 Surf build "' . $bambooTriggered->buildResultKey . '".',
+                    [
+                        'type' => 'triggerBambooDocsThirdParty',
+                        'bambooKey' => $bambooTriggered->buildResultKey,
+                        'triggeredBy' => 'interface',
+                    ]
+                );
+            } else {
+                $this->addFlash(
+                    'danger',
+                    'Bamboo trigger not successful'
+                    . ' of plan key "CORE-DRS".'
+                );
+            }
+        }
+        return $surfForm;
     }
 }

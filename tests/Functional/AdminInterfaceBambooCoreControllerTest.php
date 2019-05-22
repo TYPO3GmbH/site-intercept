@@ -28,7 +28,7 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/bamboo/core');
-        $this->assertRegExp('/Bamboo: offline/', $client->getResponse()->getContent());
+        $this->assertStringContainsString('data-bamboo-status="offline"', $client->getResponse()->getContent());
     }
 
     /**
@@ -60,10 +60,10 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/bamboo/core');
-        $this->assertRegExp('/Bamboo: online/', $client->getResponse()->getContent());
-        $this->assertRegExp('/Agents: 2/', $client->getResponse()->getContent());
-        $this->assertRegExp('/Busy agents: 1/', $client->getResponse()->getContent());
-        $this->assertRegExp('/Queued jobs: 3/', $client->getResponse()->getContent());
+        $this->assertStringContainsString('data-bamboo-status="online"', $client->getResponse()->getContent());
+        $this->assertStringContainsString('data-bamboo-agents-available="2"', $client->getResponse()->getContent());
+        $this->assertStringContainsString('data-bamboo-agents-busy="1"', $client->getResponse()->getContent());
+        $this->assertStringContainsString('data-bamboo-queued="3"', $client->getResponse()->getContent());
     }
 
     /**

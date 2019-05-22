@@ -94,17 +94,17 @@ class GraylogService
     }
 
     /**
-     * Log entries related to documentation fluid vh rendering tasks.
+     * Log entries related to documentation third party packages rendering tasks.
      * Shown on documentation site in web interface.
      *
      * @return GraylogLogEntry[]
      */
-    public function getRecentBambooDocsFluidVhTriggers(): array
+    public function getRecentBambooDocsThirdPartyTriggers(): array
     {
         return $this->getLogs(
             'application:intercept AND level:6'
             . ' AND env:' . getenv('GRAYLOG_ENV')
-            . ' AND (ctxt_type:triggerBambooDocsFluidVh)'
+            . ' AND (ctxt_type:triggerBambooDocsThirdParty)'
         );
     }
 

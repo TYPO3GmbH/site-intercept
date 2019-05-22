@@ -76,7 +76,6 @@ class AdminInterfaceBambooCoreController extends AbstractController
                 'urlForm' => $urlForm->createView(),
                 'triggerForm' => $triggerForm->createView(),
                 'logMessages' => $recentLogsMessages,
-                'bambooStatus' => $bambooService->getBambooStatus(),
             ]
         );
     }

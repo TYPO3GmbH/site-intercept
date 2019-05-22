@@ -6,27 +6,43 @@
     <div class="content-section">
         <div class="container">
 
-            <h2>
-                {{ include('partials/bambooStatus.html.twig') }}
-            </h2>
-
             {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <h2>
-                    Trigger Fluid View Helper Reference rendering and deployment
+                    Trigger stand alone packages documentation rendering
                 </h2>
                 <p>
+                    Some packages provide documentation displayed on TYPO3s official documentation, but do not fit
+                    in any other category like manuals, system extensions or community extensions.
+                    These documentations are also rendered automatically, but if some urgent need arises, you find the
+                    trigger buttons for immediate re-rendering here.
+
                     Interface to render the Fluid View Helper Reference and deploy it to the
                     <a target="_blank" href="https://docs.typo3.org/typo3cms/ViewHelperReference/Index.html">OLD docs server</a>.
                     This build and deployment is scheduled on  a daily basis, but can be triggered here manually
                     if an urgent update is wanted.
                 </p>
-                {{ form_start(fluidVhForm) }}
-                    {{ form_errors(fluidVhForm) }}
+                <div>
+                    <h3>Fluid View Helper Reference</h3>
+
+                    {{ form_start(fluidVhForm) }}
+                        {{ form_errors(fluidVhForm) }}
+                        <div class="form-group">
+                            {{ form_widget(fluidVhForm.trigger) }}
+                        </div>
+                        {{ form_widget(fluidVhForm._token) }}
+                    {{ form_end(fluidVhForm, {'render_rest': false}) }}
+                </div>
+                <div>
+                    <h3>TYPO3 Surf Documentation</h3>
+
+                    {{ form_start(surfForm) }}
+                    {{ form_errors(surfForm) }}
                     <div class="form-group">
-                        {{ form_widget(fluidVhForm.trigger) }}
+                        {{ form_widget(surfForm.trigger) }}
                     </div>
-                    {{ form_widget(fluidVhForm._token) }}
-                {{ form_end(fluidVhForm, {'render_rest': false}) }}
+                    {{ form_widget(surfForm._token) }}
+                    {{ form_end(surfForm, {'render_rest': false}) }}
+                </div>
             {% endif %}
 
             <h2>

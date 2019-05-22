@@ -43,7 +43,8 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
 
         $client = static::createClient();
         $client->request('GET', '/admin/docs');
-        $this->assertRegExp('/12345/', $client->getResponse()->getContent());
+        $response = $client->getResponse()->getContent();
+        $this->assertRegExp('/12345/', $response);
     }
 
     /**
@@ -84,8 +85,21 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/docs');
+        $response = $client->getResponse()->getContent();
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Trigger Fluid View Helper Reference rendering and deployment/', $client->getResponse()->getContent());
+        $this->assertRegExp('/Render Fluid View Helper Reference 9.5/', $response);
+    }
+
+    /**
+     * @test
+     */
+    public function bambooDocsSurfFormIsRendered()
+    {
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $client->request('GET', '/admin/docs');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertRegExp('/Render TYPO3 Surf 2.0 Documentation/', $client->getResponse()->getContent());
     }
 
     /**
@@ -114,11 +128,44 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
         );
 
         // Get the rendered form, feed it with some data and submit it
-        $form = $crawler->selectButton('Trigger bamboo')->form();
+        $form = $crawler->selectButton('Render Fluid View Helper Reference 9.5')->form();
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertRegExp('/CORE-DRF-123/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function bambooDocsSurfCanBeTriggered()
+    {
+        // Bamboo client double for the first request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $crawler = $client->request('GET', '/admin/docs');
+
+        // Bamboo client double for the second request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        $bambooClientProphecy->post(Argument::cetera())->willReturn(
+            new Response(200, [], json_encode(['buildResultKey' => 'CORE-DRS-123']))
+        );
+
+        // Get the rendered form, feed it with some data and submit it
+        $form = $crawler->selectButton('Render TYPO3 Surf 2.0 Documentation')->form();
+        $client->submit($form);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        // The build key is shown
+        $this->assertRegExp('/CORE-DRS-123/', $client->getResponse()->getContent());
     }
 
     /**
@@ -148,7 +195,40 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
         );
 
         // Get the rendered form, feed it with some data and submit it
-        $form = $crawler->selectButton('Trigger bamboo')->form();
+        $form = $crawler->selectButton('Render Fluid View Helper Reference 9.5')->form();
+        $client->submit($form);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function bambooDocsSurfReturnsErrorIfBambooClientDoesNotCreateBuild()
+    {
+        // Bamboo client double for the first request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $crawler = $client->request('GET', '/admin/docs');
+
+        // Bamboo client double for the second request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        // Simulate bamboo did not trigger a build - buildResultKey missing in response
+        $bambooClientProphecy->post(Argument::cetera())->willReturn(
+            new Response(200, [], json_encode([]))
+        );
+
+        // Get the rendered form, feed it with some data and submit it
+        $form = $crawler->selectButton('Render TYPO3 Surf 2.0 Documentation')->form();
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());

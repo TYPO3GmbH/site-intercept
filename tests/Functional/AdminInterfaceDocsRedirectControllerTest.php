@@ -72,7 +72,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
      */
     public function updateRenderTableWithRedirectEntries()
     {
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $this->createPlainBambooProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
@@ -97,7 +97,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         $this->client->submit($form);
         $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
 
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $this->createPlainBambooProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
@@ -113,7 +113,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
      */
     public function newRenderTableWithRedirectEntries()
     {
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $this->createPlainBambooProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
@@ -132,7 +132,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         $this->client->submit($form);
         $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
 
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $this->createPlainBambooProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
@@ -147,7 +147,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
      */
     public function deleteRenderTableWithRedirectEntries()
     {
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $this->createPlainBambooProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
@@ -165,7 +165,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         $this->client->submit($form);
         $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
 
-        TestDoubleBundle::addProphecy(BambooClient::class, $this->prophesize(BambooClient::class));
+        $this->createPlainBambooProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
@@ -175,5 +175,17 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         $this->assertNotContains('/p/vendor/packageOld/1.0/Foo.html', $content);
         $this->assertNotContains('/p/vendor/packageNew/1.0/Foo.html', $content);
         $this->assertContains('no records found', $content);
+    }
+
+    private function createPlainBambooProphecy()
+    {
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get('latest/agent/remote?os_authType=basic', Argument::cetera())->willReturn(
+            new Response(200, [], json_encode([]))
+        );
+        $bambooClientProphecy->get('latest/queue?os_authType=basic', Argument::cetera())->willReturn(
+            new Response(200, [], json_encode([]))
+        );
     }
 }

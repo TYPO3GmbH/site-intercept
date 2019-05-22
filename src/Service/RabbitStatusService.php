@@ -12,7 +12,7 @@ namespace App\Service;
 
 use App\Client\RabbitManagementClient;
 use App\Extractor\RabbitQueueStatus;
-use GuzzleHttp\Exception\ClientException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Service class to retrieve various rabbit mq stats and data
@@ -26,11 +26,18 @@ class RabbitStatusService
     private $client;
 
     /**
-     * @param RabbitManagementClient $client
+     * @var LoggerInterface
      */
-    public function __construct(RabbitManagementClient $client)
+    private $logger;
+
+    /**
+     * @param RabbitManagementClient $client
+     * @param LoggerInterface $logger
+     */
+    public function __construct(RabbitManagementClient $client, LoggerInterface $logger)
     {
         $this->client = $client;
+        $this->logger = $logger;
     }
 
     /**
@@ -48,7 +55,8 @@ class RabbitStatusService
                 ]
             );
             $body = json_decode((string)$response->getBody(), true);
-        } catch (ClientException $e) {
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage(), ['exception' => $e]);
             $body = [];
         }
         return new RabbitQueueStatus($body);
