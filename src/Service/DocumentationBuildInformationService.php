@@ -159,7 +159,7 @@ class DocumentationBuildInformationService
         return new DeploymentInformation(
             $documentationJar->getPackageName(),
             $documentationJar->getPackageType(),
-            $documentationJar->getExtensionKey(),
+            $documentationJar->getExtensionKey() ?? '',
             $documentationJar->getRepositoryUrl(),
             $documentationJar->getPublicComposerJsonUrl(),
             $documentationJar->getBranch(),
