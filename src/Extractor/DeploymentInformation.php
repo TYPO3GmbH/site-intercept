@@ -48,6 +48,11 @@ class DeploymentInformation
     public $packageType;
 
     /**
+     * @var string Extension key, e.g. 'news'
+     */
+    public $extensionKey;
+
+    /**
      * @var string The (not changed) source branch or tag of the repository supposed to be checked out, eg. '1.2.3', '1.2', 'master', 'latest'
      */
     public $sourceBranch;
@@ -102,6 +107,7 @@ class DeploymentInformation
      *
      * @param string $composerPackageName
      * @param string $composerPackageType
+     * @param string $extensionKey
      * @param string $repositoryUrl
      * @param string $publicComposerJsonUrl
      * @param string $version
@@ -114,6 +120,7 @@ class DeploymentInformation
     public function __construct(
         string $composerPackageName,
         string $composerPackageType,
+        string $extensionKey,
         string $repositoryUrl,
         string $publicComposerJsonUrl,
         string $version,
@@ -127,6 +134,7 @@ class DeploymentInformation
         $this->packageType = $composerPackageType;
         $packageName = $this->determinePackageName($composerPackageName);
         $packageType = $this->determinePackageType($composerPackageType, $this->repositoryUrl);
+        $this->extensionKey = $extensionKey;
         $this->vendor = key($packageName);
         $this->name = current($packageName);
         $this->packageName = $this->vendor . '/' . $this->name;
@@ -159,6 +167,7 @@ class DeploymentInformation
             'name' => $this->name,
             'package_name' => $this->packageName,
             'package_type' => $this->packageType,
+            'extension_key' => $this->extensionKey,
             'source_branch' => $this->sourceBranch,
             'target_branch_directory' => $this->targetBranchDirectory,
             'type_long' => $this->typeLong,
