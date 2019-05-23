@@ -264,6 +264,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 $documentationJar
                     ->setPackageName($composerJsonObject->getName())
                     ->setPackageType($composerJsonObject->getType())
+                    ->setExtensionKey($composerJsonObject->getExtensionKey())
                     ->setMinimumTypoVersion($composerJsonObject->getMinimumTypoVersion())
                     ->setMaximumTypoVersion($composerJsonObject->getMaximumTypoVersion());
                 $deploymentInformation = $documentationBuildInformationService
@@ -283,6 +284,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 ->setVendor($deploymentInformation->vendor)
                 ->setName($deploymentInformation->name)
                 ->setPackageName($deploymentInformation->packageName)
+                ->setExtensionKey($deploymentInformation->extensionKey)
                 ->setBranch($deploymentInformation->sourceBranch)
                 ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
                 ->setTypeLong($deploymentInformation->typeLong)
