@@ -10,7 +10,9 @@
 namespace App\Entity;
 
 use App\Exception\InvalidStatusException;
+use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -19,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass="App\Repository\DocsServerRedirectRepository")
  * @ORM\Table("redirect")
  * @ORM\HasLifecycleCallbacks()
+ * @UniqueEntity("source")
  * @codeCoverageIgnore
  */
 class DocsServerRedirect
@@ -56,6 +59,7 @@ class DocsServerRedirect
      *     pattern="@^/(([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)|typo3cms/extensions/([^/]*)/([^/]*)/)$@m",
      *     message="The path doesn't match the required format"
      * )
+     * @AppAssert\InvalidCharacter
      */
     private $source;
 
@@ -65,6 +69,7 @@ class DocsServerRedirect
      *     pattern="@^/([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)$@m",
      *     message="The path doesn't match the required format"
      * )
+     * @AppAssert\InvalidCharacter
      */
     private $target;
 

@@ -100,8 +100,7 @@ location ~ ^%s(.*) {
             return null;
         }
 
-        $finder = new Finder();
-        $files = $finder
+        $files = (new Finder())
             ->in($this->getPrivateDirectory())
             ->files()
             ->name('nginx_redirects_*.conf')
