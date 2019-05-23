@@ -313,7 +313,7 @@ class DocumentationBuildInformationService
      */
     public function assertComposerJsonContainsNecessaryData(ComposerJson $composerJson): void
     {
-        if ($composerJson->getName() !== 'typo3/cms-core' && !$composerJson->requires('typo3/cms-core')) {
+        if ($composerJson->getCoreRequirement() === null && !in_array($composerJson->getName(), ['typo3/cms', 'typo3/cms-core'], true)) {
             throw new DocsComposerDependencyException('Dependency typo3/cms-core is missing', 1557310527);
         }
     }

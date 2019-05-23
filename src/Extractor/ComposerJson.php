@@ -58,6 +58,14 @@ class ComposerJson
     }
 
     /**
+     * @return string|null
+     */
+    public function getCoreRequirement(): ?string
+    {
+        return $this->composerJson['require']['typo3/cms-core'] ?? $this->composerJson['require']['typo3/cms'] ?? null;
+    }
+
+    /**
      * @return array
      */
     public function getFirstAuthor(): array
@@ -75,7 +83,7 @@ class ComposerJson
         if ($this->getType() !== 'typo3-cms-extension') {
             return '';
         }
-        if (!$this->requires('typo3/cms-core')) {
+        if ($this->getCoreRequirement() === null) {
             throw new DocsComposerMissingValueException('typo3/cms-core must be required in the composer json, but was not found', 1558084137);
         }
 
@@ -91,7 +99,7 @@ class ComposerJson
         if ($this->getType() !== 'typo3-cms-extension') {
             return '';
         }
-        if (!$this->requires('typo3/cms-core')) {
+        if ($this->getCoreRequirement() === null) {
             throw new DocsComposerMissingValueException('typo3/cms-core must be required in the composer json, but was not found', 1558084146);
         }
 
@@ -106,7 +114,7 @@ class ComposerJson
     {
         $maxVersion = '';
         foreach (self::ALLOWED_TYPO_VERSIONS as $typoVersion) {
-            if (Semver::satisfies($typoVersion, $this->composerJson['require']['typo3/cms-core'])) {
+            if (Semver::satisfies($typoVersion, $this->getCoreRequirement())) {
                 if (!$getMaximum) {
                     return $typoVersion;
                 }
