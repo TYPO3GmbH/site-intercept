@@ -80,8 +80,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         $content = $this->client->getResponse()->getContent();
         $this->assertContains('/p/vendor/packageOld/1.0/Foo.html', $content);
         $this->assertContains('/p/vendor/packageNew/1.0/Foo.html', $content);
-        $this->assertContains('301', $content);
-
+        $this->assertContains('302', $content);
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
@@ -91,7 +90,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
             'docs_server_redirect' => [
                 'source' => '/p/vendor/packageOld/1.0/Bar.html',
                 'target' => '/p/vendor/packageNew/1.0/Bar.html',
-                'statusCode' => 301
+                'statusCode' => 302
             ],
         ]);
         $this->client->submit($form);
@@ -105,7 +104,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         $content = $this->client->getResponse()->getContent();
         $this->assertContains('/p/vendor/packageOld/1.0/Bar.html', $content);
         $this->assertContains('/p/vendor/packageNew/1.0/Bar.html', $content);
-        $this->assertContains('301', $content);
+        $this->assertContains('302', $content);
     }
 
     /**

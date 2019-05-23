@@ -23,13 +23,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class DocsServerRedirect
 {
-    public const STATUS_CODE_301 = 301; // Moved Permanently
     public const STATUS_CODE_302 = 302; // Found
     public const STATUS_CODE_303 = 303; // See Other
     public const STATUS_CODE_307 = 307; // Temporary Redirect
 
     public static $allowedStatusCodes = [
-        self::STATUS_CODE_301,
         self::STATUS_CODE_302,
         self::STATUS_CODE_303,
         self::STATUS_CODE_307,
