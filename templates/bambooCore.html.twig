@@ -107,70 +107,80 @@
                 </div>
             {% endif %}
 
-            <div class="row mb-4">
-                <div class="col-lg-12 col-md-12 col-sm-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>
-                                Recent actions
-                            </h2>
-                        </div>
-                        <div class="card-body">
-                            {% for log in logMessages %}
-                                <div class="alert graylog-log {% if log.vote == '-1' or log.type == 'rebuildNightly' %}alert-warning{% elseif log.vote == '+1' %}alert-success{% elseif log.type == 'reportBrokenNightly' %}alert-danger{% else %}alert-info{% endif %}">
-                                    <span>{{ intercept_date_time(log.time) }} - </span>
-                                    {% if log.type == 'voteGerrit' %}
-                                        <span>
-                                            <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Voted on gerrit</a>
-                                            by
-                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">bamboo result</a>
-                                        </span>
-                                    {% elseif log.type == 'triggerBamboo' and log.bambooKey != '' %}
-                                        <span>
-                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a>
-                                            {% if log.change and log.patch %}
-                                                for <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">gerrit patch</a>
-                                            {% endif %}
-                                        </span>
-                                    {% elseif log.type == 'rebuildNightly' and log.bambooKey != '' %}
-                                        <span>
-                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Re-triggered failed bamboo nightly</a>
-                                        </span>
-                                    {% elseif log.type == 'reportBrokenNightly' and log.bambooKey != '' %}
-                                        <span>
-                                            Reported <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">broken nightly</a> to slack
-                                        </span>
-                                    {% endif %}
-
-                                    {% if log.vote %}
-                                        | <span>Vote: {{ log.vote }}</span>
-                                    {% endif %}
-                                    {% if log.branch %}
-                                        | <span>Branch: {{ log.branch }}</span>
-                                    {% endif %}
-                                    {% if log.change %}
-                                        | <span>Change: {{ log.change }}</span>
-                                    {% endif %}
-                                    {% if log.patch %}
-                                        | <span>Patch: {{ log.patch }}</span>
-                                    {% endif %}
-                                    {% if log.bambooKey %}
-                                        | <span>Bamboo key: {{ log.bambooKey }}</span>
-                                    {% endif %}
+            {% if logMessages %}
+                <div class="content-spacer"></div>
+                <h2>Recent actions</h2>
+                <div class="card">
+                    <div class="message-list">
+                        {% for log in logMessages %}
+                            <div class="message message-{% if log.vote == '-1' or log.type == 'rebuildNightly' %}warning{% elseif log.vote == '+1' %}success{% elseif log.type == 'reportBrokenNightly' %}danger{% else %}info{% endif %}">
+                                <div class="message-badge">
                                     {% if log.triggeredBy == 'api' %}
-                                        | <span>Trigger: API</span>
+                                        <span class="badge badge-secondary">API</span>
                                     {% elseif log.triggeredBy == 'interface' %}
-                                        | <span>Trigger: Web</span>
-                                    {% endif %}
-                                    {% if log.userDisplayName %}
-                                        | <span>User: {{ log.userDisplayName }}</span>
+                                        <span class="badge badge-secondary">WEB</span>
                                     {% endif %}
                                 </div>
-                            {% endfor %}
-                        </div>
+                                <div class="message-body">
+                                    <div class="message-meta">
+                                        <span class="message-date">
+                                            {{ intercept_date_time(log.time) }}
+                                        </span>
+                                        {% if log.userDisplayName %}
+                                            <span class="message-user">- by {{ log.userDisplayName }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-text">
+                                        {% if log.type == 'voteGerrit' %}
+                                            <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Voted on gerrit</a> 
+                                            by <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">bamboo result</a>
+                                        {% elseif log.type == 'triggerBamboo' and log.bambooKey != '' %}
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a>
+                                            {% if log.change and log.patch %}for <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">gerrit patch</a>{% endif %}
+                                        {% elseif log.type == 'rebuildNightly' and log.bambooKey != '' %}
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Re-triggered failed bamboo nightly</a>
+                                        {% elseif log.type == 'reportBrokenNightly' and log.bambooKey != '' %}
+                                            Reported <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">broken nightly</a> to slack
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-detail">
+                                        {% if log.vote %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Vote</span>
+                                                <span class="message-detail-value">{{ log.vote }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.branch %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Branch</span>
+                                                <span class="message-detail-value">{{ log.branch }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.change %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Change</span>
+                                                <span class="message-detail-value">{{ log.change }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.patch %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Patch</span>
+                                                <span class="message-detail-value">{{ log.patch }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.bambooKey %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Bamboo key</span>
+                                                <span class="message-detail-value">{{ log.bambooKey }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
-            </div>
+            {% endif %}
 
         </div>
     </div>
