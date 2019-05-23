@@ -43,6 +43,12 @@ class DocumentationJarRepository extends ServiceEntityRepository
         return $this->findByTypeShort(['c', 'p']);
     }
 
+    public function findByPackageIdentifier(string $packageIdentifier): ?DocumentationJar
+    {
+        [$packageName, $version] = explode(':', $packageIdentifier);
+        return $this->findOneBy(['branch' => $version, 'packageName' => $packageName]);
+    }
+
     private function findByTypeShort(array $typeShort): array
     {
         return $this->createQueryBuilder('d')
