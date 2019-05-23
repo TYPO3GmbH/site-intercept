@@ -12,6 +12,7 @@ namespace App;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Return a list of other versions of given documentation
@@ -26,98 +27,131 @@ class DocumentationVersions
     }
 
     /**
-     * Output list of versions
+     * Creates a HTML response which contains a list if <dd> tags with links to all versions
+     * @return Response
      */
     public function getVersions(): Response
     {
-        $url = $this->request->getQueryParams()['url'] ?? '';
-
-        // /p/vendor/package/version/some/sub/page/Index.html/
-        $urlPath = '/' . trim((parse_url($url)['path']) ?? '', '/') . '/';
-
-        // Simple path traversal protection: remove '/../' and '/./'
-        $urlPath = str_replace('/../', '', $urlPath);
-        $urlPath = str_replace('/./', '', $urlPath);
-
-        // Remove leading and trailing slashes again
-        $urlPath = trim($urlPath, '/');
-        $urlPath = explode('/', $urlPath);
-        if (count($urlPath) < 5) {
-            return new Response(200, [], '');
+        $pathSegments = $this->resolvePathSegments();
+        if (count($pathSegments) < 5) {
+            return $this->getEmptyResponse();
         }
 
         // first three segments are main root of that repo - eg. '[p, lolli42, enetcache]'
-        $entryPoint = array_slice($urlPath, 0, 3);
+        $entryPoint = implode('/', array_slice($pathSegments, 0, 3));
         // 'current' called version, eg. 'master', or '9.5'
-        $currentVersion = array_slice($urlPath, 3, 1)[0];
+        $currentVersion = array_slice($pathSegments, 3, 1)[0];
         // 'current' called language eg. 'en-us'
-        $currentLanguage = array_slice($urlPath, 4, 1)[0];
+        $currentLanguage = array_slice($pathSegments, 4, 1)[0];
         // further path to currently viewed sub file, eg. '[subPage, Index.html]'
-        $pathAfterEntryPoint = array_slice($urlPath, 5, 99);
+        $pathAfterEntryPoint = array_slice($pathSegments, 5);
+        $absolutePathToDocsEntryPoint = $GLOBALS['_SERVER']['DOCUMENT_ROOT'] . '/' . $entryPoint;
 
-        if (empty($currentVersion) || empty($currentLanguage)) {
-            return new Response(200, [], '');
-        }
-
-        // verify entry path exists and current version and full path actually exist
-        // this additionally sanitizes the input url
-        $documentRoot = $GLOBALS['_SERVER']['DOCUMENT_ROOT'];
-        $filePathToDocsEntryPoint = $documentRoot . '/' . implode('/', $entryPoint);
-        if (!is_dir($filePathToDocsEntryPoint)
-            || !is_dir($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . $currentLanguage)
-            || !file_exists($filePathToDocsEntryPoint . '/' . $currentVersion . '/' . $currentLanguage . '/' . implode('/', $pathAfterEntryPoint))
+        if (empty($currentVersion) || empty($currentLanguage)
+            || (
+                // verify entry path exists and current version and full path actually exist
+                // this additionally sanitizes the input url
+                !is_dir($absolutePathToDocsEntryPoint)
+                || !is_dir($absolutePathToDocsEntryPoint . '/' . $currentVersion . '/' . $currentLanguage)
+                || !file_exists($absolutePathToDocsEntryPoint . '/' . $currentVersion . '/' . $currentLanguage . '/' . implode('/', $pathAfterEntryPoint))
+            )
         ) {
-            return new Response(200, [], '');
+            return $this->getEmptyResponse();
         }
 
         // find versions and language variants of this project
-        $versions = scandir($filePathToDocsEntryPoint);
+        $validatedVersions = $this->resolveVersionsAndLanguages($absolutePathToDocsEntryPoint);
+        // final version entries
+        $validatedVersions = $this->resolvePathInformation($validatedVersions, $pathAfterEntryPoint, $absolutePathToDocsEntryPoint);
+
+        return $this->getHTMLResponse($validatedVersions);
+    }
+
+    protected function resolvePathSegments(): array
+    {
+        $url = $this->request->getQueryParams()['url'] ?? '';
+        // /p/vendor/package/version/some/sub/page/Index.html/
+        $urlPath = '/' . trim(parse_url($url)['path'] ?? '', '/') . '/';
+
+        // Simple path traversal protection: remove '/../' and '/./'
+        $urlPath = str_replace(['/../', '/./'], '', $urlPath);
+
+        // Remove leading and trailing slashes again
+        return explode('/', trim($urlPath, '/'));
+    }
+
+    protected function resolveVersionsAndLanguages(string $filePathToDocsEntryPoint): array
+    {
+        /** @var Finder $finder */
+        $finder = (new Finder())
+            ->directories()
+            ->in($filePathToDocsEntryPoint)
+            ->depth('1');
         $validatedVersions = [];
-        foreach ($versions as $version) {
-            if ($version === '.' || $version === '..' || !is_dir($filePathToDocsEntryPoint . '/' . $version)) {
-                continue;
-            }
-            $languages = scandir($filePathToDocsEntryPoint . '/' . $version);
-            foreach ($languages as $language) {
-                if ($language === '.' || $language === '..' || !is_dir($filePathToDocsEntryPoint . '/' . $version . '/' . $language)) {
-                    continue;
-                }
+        if ($finder->hasResults()) {
+            foreach ($finder as $result) {
+                [$version, $language] = explode('/', $result->getRelativePathname());
                 $validatedVersions[] = [
                     'version' => $version,
                     'language' => $language
                 ];
             }
         }
+        return $validatedVersions;
+    }
 
-        // final version entries
+    protected function resolvePathInformation(array $validatedVersions, array $pathAfterEntryPoint, string $absolutePathToDocsEntryPoint): array
+    {
         $entries = [];
         // One entry per version that is deployed
-        foreach ($validatedVersions as $version) {
+        foreach ($validatedVersions as $validatedVersion) {
             $checkSubPaths = $pathAfterEntryPoint;
             $subPathCount = count($checkSubPaths);
             $found = false;
             for ($i = 0; $i < $subPathCount; $i++) {
                 // Traverse sub path segments up until one has been found in filesystem, to find the
                 // "nearest" matching version of currently viewed file
-                $pathToCheck = $filePathToDocsEntryPoint . '/' . $version['version'] . '/' . $version['language'] . '/' . implode('/', $checkSubPaths);
+                $pathToCheck = $absolutePathToDocsEntryPoint . '/' . $validatedVersion['version'] . '/' . $validatedVersion['language'] . '/' . implode('/', $checkSubPaths);
                 if (is_file($pathToCheck) || is_dir($pathToCheck)) {
-                    $version['path'] = $pathToCheck;
+                    $validatedVersion['path'] = $pathToCheck;
                     $found = true;
                     break;
                 }
                 array_pop($checkSubPaths);
             }
             if (!$found) {
-               $version['path'] = $filePathToDocsEntryPoint . '/' . $version['version'] . '/' . $version['language'] . '/';
+                $validatedVersion['path'] = $absolutePathToDocsEntryPoint . '/' . $validatedVersion['version'] . '/' . $validatedVersion['language'] . '/';
             }
-            $entries[] = $version;
+            $singleHtmlPath = $absolutePathToDocsEntryPoint . '/' . $validatedVersion['version'] . '/' . $validatedVersion['language'] . '/singlehtml/';
+            if (is_file($singleHtmlPath) || is_dir($singleHtmlPath)) {
+                $validatedVersion['single_path'] = $singleHtmlPath;
+            }
+            $entries[] = $validatedVersion;
         }
+        return $entries;
+    }
 
-        $finalEntries = [];
+    protected function getHTMLResponse(array $entries): Response
+    {
+        $firstEntries = [];
+        $secondEntries = [];
+        $versions = array_column($entries, 'version');
+        array_multisort($versions, SORT_ASC, $entries);
         foreach ($entries as $entry) {
-            $finalEntries[] = '<dd><a href="' . str_replace($documentRoot, '', $entry['path']) . '">' . $entry['version'] . ' ' . $entry['language'] . '</a></dd>';
+            $url = str_replace($GLOBALS['_SERVER']['DOCUMENT_ROOT'], '', $entry['path'] ?? '');
+            $singleUrl = str_replace($GLOBALS['_SERVER']['DOCUMENT_ROOT'], '', $entry['single_path'] ?? '');
+            $title = $entry['version'] . ' ' . $entry['language'];
+            $firstEntries[] = $url !== '' ? '<dd><a href="' . htmlspecialchars($url, ENT_QUOTES | ENT_HTML5) . '">' . htmlspecialchars($title, ENT_QUOTES | ENT_HTML5) . '</a></dd>' : '';
+            $secondEntries[] = $singleUrl !== '' ? '<dd><a href="' . htmlspecialchars($singleUrl, ENT_QUOTES | ENT_HTML5) . '">' . htmlspecialchars('In one file: ' . $title, ENT_QUOTES | ENT_HTML5) . '</a></dd>' : '';
         }
 
-        return new Response(200, [], implode(chr(10), $finalEntries));
+        $firstEntries = array_reverse($firstEntries);
+        $secondEntries = array_reverse($secondEntries);
+        return new Response(200, [], implode(chr(10), array_merge($firstEntries, $secondEntries)));
+    }
+
+    protected function getEmptyResponse(): Response
+    {
+        return new Response(200, [], '');
     }
 }
