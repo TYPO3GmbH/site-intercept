@@ -56,7 +56,7 @@ class DocsServerRedirect
     /**
      * @ORM\Column(type="string", length=2000)
      * @Assert\Regex(
-     *     pattern="@^/(([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)|typo3cms/extensions/([^/]*)/([^/]*)/)$@m",
+     *     pattern="@^/(([pcmh]{1}|other)/([^/]*)/([^/]*)/([^/]*)/(.*)|typo3cms/extensions/([^/]*)/([^/]*)/)$@m",
      *     message="The path doesn't match the required format"
      * )
      * @AppAssert\InvalidCharacter
@@ -66,7 +66,7 @@ class DocsServerRedirect
     /**
      * @ORM\Column(type="string", length=2000)
      * @Assert\Regex(
-     *     pattern="@^/([pcmh]{1})/([^/]*)/([^/]*)/([^/]*)/(.*)$@m",
+     *     pattern="@^/([pcmh]{1}|other)/([^/]*)/([^/]*)/([^/]*)/(.*)$@m",
      *     message="The path doesn't match the required format"
      * )
      * @AppAssert\InvalidCharacter

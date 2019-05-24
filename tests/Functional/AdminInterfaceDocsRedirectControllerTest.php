@@ -8,6 +8,7 @@ use App\Tests\Functional\Fixtures\AdminInterfaceDocsRedirectControllerTestData;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Symfony\Component\BrowserKit\Cookie;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTestCase
@@ -17,7 +18,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
      */
     private $client;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         self::bootKernel();
@@ -186,5 +187,128 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         $bambooClientProphecy->get('latest/queue?os_authType=basic', Argument::cetera())->willReturn(
             new Response(200, [], json_encode([]))
         );
+    }
+
+    /**
+     * @test
+     * @dataProvider invalidRedirectStrings
+     */
+    public function invalidSourceInputTriggersValidationError(string $input)
+    {
+        $this->client = static::createClient();
+        $this->logInAsDocumentationMaintainer($this->client);
+
+        $crawler = $this->client->request('GET', '/redirect/new');
+        $form = $crawler->selectButton('redirectformaction')->form([
+            'docs_server_redirect' => [
+                'source' => $input,
+                'target' => '/p/vendor/packageNew/4.0/Bar.html',
+                'statusCode' => 303
+            ],
+        ]);
+        $this->client->submit($form);
+        $response = $this->client->getResponse();
+        $this->assertEquals(200, $response->getStatusCode());
+        $content = $response->getContent();
+
+        $responseCrawler = new Crawler('');
+        $responseCrawler->addHtmlContent($content);
+        $sourceLabel = $responseCrawler->filter('#docs_server_redirect div label')->text();
+        $this->assertStringContainsString('Source', $sourceLabel);
+        $this->assertStringContainsString('The path doesn\'t match the required format', $sourceLabel);
+    }
+
+    /**
+     * @test
+     * @dataProvider invalidRedirectStrings
+     * @param string $input
+     */
+    public function invalidTargetInputTriggersValidationError(string $input)
+    {
+        $this->client = static::createClient();
+        $this->logInAsDocumentationMaintainer($this->client);
+
+        $crawler = $this->client->request('GET', '/redirect/new');
+        $form = $crawler->selectButton('redirectformaction')->form([
+            'docs_server_redirect' => [
+                'source' => '/p/vendor/packageOld/1.0/Foo.html',
+                'target' => $input,
+                'statusCode' => 303
+            ],
+        ]);
+
+        $this->client->submit($form);
+        $response = $this->client->getResponse();
+        $this->assertEquals(200, $response->getStatusCode());
+        $content = $response->getContent();
+
+        $responseCrawler = new Crawler('');
+        $responseCrawler->addHtmlContent($content);
+        $targetLabel = $responseCrawler->filter('#docs_server_redirect')->children()->getNode(1)->textContent;
+        $this->assertStringContainsString('Target', $targetLabel);
+        $this->assertStringContainsString('The path doesn\'t match the required format', $targetLabel);
+    }
+
+    /**
+     * @test
+     * @dataProvider validRedirectStrings
+     * @param string $input
+     */
+    public function validTargetInputTriggersFormSubmit(string $input)
+    {
+        $this->createPlainBambooProphecy();
+        $this->client = static::createClient();
+        $this->logInAsDocumentationMaintainer($this->client);
+
+        $crawler = $this->client->request('GET', '/redirect/new');
+        $form = $crawler->selectButton('redirectformaction')->form([
+            'docs_server_redirect' => [
+                'source' => $input,
+                'target' => $input,
+                'statusCode' => 303
+            ],
+        ]);
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+
+        $this->client->submit($form);
+        $response = $this->client->getResponse();
+        $this->assertEquals(302, $response->getStatusCode());
+        $content = $response->getContent();
+        $this->assertStringContainsString('Redirecting to <a href="/redirect/">/redirect/</a>.', $content);
+    }
+
+    public function validRedirectStrings(): array
+    {
+        return [
+            'package' => [
+                '/p/vendor/packageOld/2.0/Foo.html',
+            ],
+            'manual' => [
+                '/m/vendor/packageOld/2.0/Foo.html',
+            ],
+            'system extension' => [
+                '/c/vendor/packageOld/2.0/Foo.html',
+            ],
+            'home' => [
+                '/h/vendor/packageOld/2.0/Foo.html',
+            ],
+            'third party' => [
+                '/other/vendor/packageOld/2.0/Foo.html',
+            ],
+        ];
+    }
+
+    public function invalidRedirectStrings(): array
+    {
+        return [
+            'something random' => [
+                'invalid-target/String',
+            ],
+            'package without vendor' => [
+                '/p/packageOld/2.0/Foo.html',
+            ],
+        ];
     }
 }
