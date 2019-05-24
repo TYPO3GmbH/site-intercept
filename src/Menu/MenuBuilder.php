@@ -146,13 +146,15 @@ class MenuBuilder
                 ]
             );
         }
-        $menu['documentation']->addChild(
-            'docs_index',
-            [
-                'route' => 'admin_docs_third_party',
-                'label' => 'Third Party',
-            ]
-        );
+        if ($this->authorizationChecker->isGranted('ROLE_USER')) {
+            $menu['documentation']->addChild(
+                'docs_index',
+                [
+                    'route' => 'admin_docs_third_party',
+                    'label' => 'Third Party',
+                ]
+            );
+        }
         $menu->addChild(
             'help',
             [
