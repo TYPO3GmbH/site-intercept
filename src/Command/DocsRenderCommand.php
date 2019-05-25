@@ -68,8 +68,13 @@ class DocsRenderCommand extends Command
         try {
             if ($all) {
                 if ($io->confirm('Are you really sure, you want to render ALL docs?', false)) {
-                    $this->renderAll();
-                    $io->success('Rendering all docs. This will require some time.');
+                    foreach ($this->documentationJarRepository->findAll() as $documentationJar) {
+                        $this->renderDocumentation($documentationJar);
+                        $io->success('Triggered package "' . $documentationJar->getPackageName() . '" with target branch "' . $documentationJar->getTargetBranchDirectory() . '"');
+                        // sleep a second to not hammer bamboo too heavily, otherwise builds may be lost
+                        sleep(1);
+                    }
+                    $io->success('Triggered re-rendering of all docs.');
                 } else {
                     $io->success('Rendering of ALL documentations aborted');
                 }
@@ -84,16 +89,6 @@ class DocsRenderCommand extends Command
             }
         } catch (DocsPackageDoNotCareBranch $exception) {
             $io->writeln($exception->getMessage());
-        }
-    }
-
-    /**
-     * @throws DocsPackageDoNotCareBranch
-     */
-    protected function renderAll(): void
-    {
-        foreach ($this->documentationJarRepository->findAll() as $documentationJar) {
-            $this->renderDocumentation($documentationJar);
         }
     }
 
