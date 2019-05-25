@@ -86,6 +86,8 @@ class DocsToBambooControllerTest extends KernelTestCase
     }
 
     /**
+     * cms-core can not require cms-core in its composer.json
+     *
      * @test
      */
     public function bambooBuildIsTriggeredForPackageThatCanNotRequireItself(): void
@@ -100,7 +102,7 @@ class DocsToBambooControllerTest extends KernelTestCase
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
             ->post(
-                file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodBambooPostUrl.txt'),
+                'latest/queue/CORE-DR?stage=&executeAllStages=&os_authType=basic&bamboo.variable.BUILD_INFORMATION_FILE=docs-build-information%2F1553095156937&bamboo.variable.PACKAGE=typo3%2Fcms-core&bamboo.variable.DIRECTORY=master',
                 require __DIR__ . '/Fixtures/DocsToBambooGoodBambooPostData.php'
             )->shouldBeCalled()
             ->willReturn(new Response());

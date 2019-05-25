@@ -165,6 +165,8 @@ class BambooService
                 'executeAllStages=',
                 'os_authType=basic',
                 'bamboo.variable.BUILD_INFORMATION_FILE=' . urlencode($deploymentInformation->relativeDumpFile),
+                'bamboo.variable.PACKAGE=' . urlencode($deploymentInformation->packageName),
+                'bamboo.variable.DIRECTORY=' . urlencode($deploymentInformation->targetBranchDirectory),
             ]);
         $response = $this->sendBamboo('post', $uri);
         return new BambooBuildTriggered((string)$response->getBody());
