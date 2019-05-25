@@ -165,16 +165,13 @@ class BambooPostBuildController extends AbstractController
             // This is a back-channel triggered by Bamboo after a "documentation rendering" build is done
             $manager = $this->getDoctrine()->getManager();
             $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
-
             /** @var DocumentationJar $documentationEntry */
             $documentationEntry = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
-
             if ($buildDetails->success) {
                 // Build was successful, set status to "rendered"
                 $documentationEntry
                     ->setLastRenderedAt(new \DateTime('now'))
                     ->setStatus(DocumentationStatus::STATUS_RENDERED);
-
                 $logger->info(
                     'Documentation rendered'
                     . ' due to bamboo build "' . $buildDetails->buildKey . '"',
@@ -190,7 +187,6 @@ class BambooPostBuildController extends AbstractController
             } else {
                 // Build failed, set status of documentation to "rendering failed"
                 $documentationEntry->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED);
-
                 $logger->warning(
                     'Failed to render documentation'
                     . ' due to bamboo build "' . $buildDetails->buildKey . '"',
@@ -204,10 +200,6 @@ class BambooPostBuildController extends AbstractController
                     ]
                 );
             }
-
-            // Build is done, remove build key
-            $documentationEntry->setBuildKey('');
-            $manager->persist($documentationEntry);
             $manager->flush();
         }
 

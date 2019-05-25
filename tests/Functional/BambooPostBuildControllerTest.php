@@ -253,14 +253,15 @@ class BambooPostBuildControllerTest extends TestCase
         $kernel->terminate($request, $response);
 
         $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
-        $result = $documentationJarRepository->findBy([
+        $result = $documentationJarRepository->findOneBy([
             'packageName' => $documentationJar->getPackageName(),
             'packageType' => $documentationJar->getPackageType(),
             'branch' => $documentationJar->getBranch(),
             'status' => DocumentationStatus::STATUS_RENDERED
         ]);
 
-        $this->assertCount(1, $result);
+        // Ensure 'last' build key is still set
+        $this->assertEquals('CORE-DR-42', $result->getBuildKey());
     }
 
     /**
@@ -268,7 +269,7 @@ class BambooPostBuildControllerTest extends TestCase
      */
     public function failedRenderingSetsStatusToRenderingFailed(): void
     {
-        $bambooBuildKey = 'CORE-DR-42';
+        $bambooBuildKey = 'CORE-DR-43';
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
@@ -285,12 +286,12 @@ class BambooPostBuildControllerTest extends TestCase
         /** @var EntityManager $entityManager */
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
         $documentationJar = $this->generateRandomJar()
-            ->setStatus(DocumentationStatus::STATUS_DELETING)
+            ->setStatus(DocumentationStatus::STATUS_RENDERING)
             ->setBuildKey($bambooBuildKey);
         $entityManager->persist($documentationJar);
         $entityManager->flush();
 
-        $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodDocsRenderingRequest.php';
+        $request = require __DIR__ . '/Fixtures/BambooPostBuildBadDocsRenderingRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
 

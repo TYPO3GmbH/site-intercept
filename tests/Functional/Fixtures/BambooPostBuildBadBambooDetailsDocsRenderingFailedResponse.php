@@ -7,7 +7,7 @@ return new Response(
     '{
         "expand": "changes,metadata,plan,vcsRevisions,artifacts,comments,labels,jiraIssues,stages",
         "link": {
-            "href": "https://bamboo.typo3.com/rest/api/latest/result/CORE-DR-42",
+            "href": "https://bamboo.typo3.com/rest/api/latest/result/CORE-DR-43",
             "rel": "self"
         },
         "plan": {
@@ -27,7 +27,7 @@ return new Response(
         },
         "planName": "Documentation rendering",
         "projectName": "Core",
-        "buildResultKey": "CORE-DR-42",
+        "buildResultKey": "CORE-DR-43",
         "lifeCycleState": "Finished",
         "id": 104342325,
         "buildStartedTime": "2018-11-24T17:43:15.141+01:00",
@@ -98,17 +98,17 @@ return new Response(
             "start-index": 0,
             "max-result": 2
         },
-        "key": "CORE-DR-42",
+        "key": "CORE-DR-43",
         "planResultKey": {
-            "key": "CORE-DR-42",
+            "key": "CORE-DR-43",
             "entityKey": {
                 "key": "CORE-DR"
             },
-            "resultNumber": 42
+            "resultNumber": 43
         },
         "state": "Successful",
         "buildState": "Successful",
-        "number": 42,
-        "buildNumber": 42
+        "number": 43,
+        "buildNumber": 43
     }'
 );
