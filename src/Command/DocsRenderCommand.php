@@ -22,7 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class DocsRenderCommand extends Command
 {
-    protected static $defaultName = 'docs:render';
+    protected static $defaultName = 'app:docs-render';
 
     /**
      * @var RenderDocumentationService

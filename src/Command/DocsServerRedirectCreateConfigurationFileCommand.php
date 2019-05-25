@@ -22,7 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DocsServerRedirectCreateConfigurationFileCommand extends Command
 {
-    protected static $defaultName = 'redirect:create-config-and-deploy';
+    protected static $defaultName = 'app:docs-redirect-deploy';
 
     /**
      * @var DocsServerNginxService
@@ -44,7 +44,7 @@ class DocsServerRedirectCreateConfigurationFileCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Create nginx redirect configuration file')
+            ->setDescription('Deploy current docs redirects to live server')
         ;
     }
 
