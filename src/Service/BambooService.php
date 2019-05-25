@@ -189,14 +189,32 @@ class BambooService
     }
 
     /**
-     * Trigger new build of project CORE-DRF: Documentation rendering fluid view helper reference
+     * Trigger new build of project CORE-DRS: Documentation rendering Surf 2.0 reference
      *
      * @return BambooBuildTriggered
      */
-    public function triggerDocumentationSurfPlan(): BambooBuildTriggered
+    public function triggerDocumentationSurf20Plan(): BambooBuildTriggered
     {
         $uri = 'latest/queue/'
             . 'CORE-DRS?'
+            . implode('&', [
+                'stage=',
+                'executeAllStages=',
+                'os_authType=basic',
+            ]);
+        $response = $this->sendBamboo('post', $uri);
+        return new BambooBuildTriggered((string)$response->getBody());
+    }
+
+    /**
+     * Trigger new build of project CORE-DRSM: Documentation rendering Surf master reference
+     *
+     * @return BambooBuildTriggered
+     */
+    public function triggerDocumentationSurfMasterPlan(): BambooBuildTriggered
+    {
+        $uri = 'latest/queue/'
+            . 'CORE-DRSM?'
             . implode('&', [
                 'stage=',
                 'executeAllStages=',

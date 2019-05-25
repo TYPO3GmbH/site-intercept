@@ -11,7 +11,8 @@ declare(strict_types = 1);
 namespace App\Controller;
 
 use App\Form\BambooDocsFluidVhTriggerFormType;
-use App\Form\BambooDocsSurfTriggerFormType;
+use App\Form\BambooDocsSurf20TriggerFormType;
+use App\Form\BambooDocsSurfMasterTriggerFormType;
 use App\Service\BambooService;
 use App\Service\GraylogService;
 use Psr\Log\LoggerInterface;
@@ -50,7 +51,8 @@ class AdminInterfaceDocsController extends AbstractController
         $this->logger = $logger;
 
         $fluidVhForm = $this->getFluidVhForm($request, $bambooService);
-        $surfForm = $this->getSurfForm($request, $bambooService);
+        $surf20Form = $this->getSurf20Form($request, $bambooService);
+        $surfMasterForm = $this->getSurfMasterForm($request, $bambooService);
 
         $recentLogsMessages = $graylogService->getRecentBambooDocsThirdPartyTriggers();
 
@@ -58,7 +60,8 @@ class AdminInterfaceDocsController extends AbstractController
             'docs.html.twig',
             [
                 'fluidVhForm' => $fluidVhForm->createView(),
-                'surfForm' => $surfForm->createView(),
+                'surf20Form' => $surf20Form->createView(),
+                'surfMasterForm' => $surfMasterForm->createView(),
                 'logMessages' => $recentLogsMessages,
             ]
         );
@@ -107,13 +110,13 @@ class AdminInterfaceDocsController extends AbstractController
      * @param BambooService $bambooService
      * @return FormInterface
      */
-    protected function getSurfForm(Request $request, BambooService $bambooService): FormInterface
+    protected function getSurf20Form(Request $request, BambooService $bambooService): FormInterface
     {
-        $surfForm = $this->createForm(BambooDocsSurfTriggerFormType::class);
+        $surfForm = $this->createForm(BambooDocsSurf20TriggerFormType::class);
         $surfForm->handleRequest($request);
         if ($surfForm->isSubmitted() && $surfForm->isValid()) {
             $this->denyAccessUnlessGranted('ROLE_USER');
-            $bambooTriggered = $bambooService->triggerDocumentationSurfPlan();
+            $bambooTriggered = $bambooService->triggerDocumentationSurf20Plan();
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
@@ -122,7 +125,7 @@ class AdminInterfaceDocsController extends AbstractController
                     . ' of plan key "CORE-DRS".'
                 );
                 $this->logger->info(
-                    'Triggered TYPO3 Surf build "' . $bambooTriggered->buildResultKey . '".',
+                    'Triggered TYPO3 Surf 2.0 build "' . $bambooTriggered->buildResultKey . '".',
                     [
                         'type' => 'triggerBambooDocsThirdParty',
                         'bambooKey' => $bambooTriggered->buildResultKey,
@@ -134,6 +137,44 @@ class AdminInterfaceDocsController extends AbstractController
                     'danger',
                     'Bamboo trigger not successful'
                     . ' of plan key "CORE-DRS".'
+                );
+            }
+        }
+        return $surfForm;
+    }
+
+    /**
+     * @param Request $request
+     * @param BambooService $bambooService
+     * @return FormInterface
+     */
+    protected function getSurfMasterForm(Request $request, BambooService $bambooService): FormInterface
+    {
+        $surfForm = $this->createForm(BambooDocsSurfMasterTriggerFormType::class);
+        $surfForm->handleRequest($request);
+        if ($surfForm->isSubmitted() && $surfForm->isValid()) {
+            $this->denyAccessUnlessGranted('ROLE_USER');
+            $bambooTriggered = $bambooService->triggerDocumentationSurfMasterPlan();
+            if (!empty($bambooTriggered->buildResultKey)) {
+                $this->addFlash(
+                    'success',
+                    'Triggered fluid view helper build'
+                    . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
+                    . ' of plan key "CORE-DRSM".'
+                );
+                $this->logger->info(
+                    'Triggered TYPO3 Surf master build "' . $bambooTriggered->buildResultKey . '".',
+                    [
+                        'type' => 'triggerBambooDocsThirdParty',
+                        'bambooKey' => $bambooTriggered->buildResultKey,
+                        'triggeredBy' => 'interface',
+                    ]
+                );
+            } else {
+                $this->addFlash(
+                    'danger',
+                    'Bamboo trigger not successful'
+                    . ' of plan key "CORE-DRSM".'
                 );
             }
         }

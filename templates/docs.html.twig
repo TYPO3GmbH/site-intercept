@@ -35,13 +35,21 @@
                 <div>
                     <h3>TYPO3 Surf Documentation</h3>
 
-                    {{ form_start(surfForm) }}
-                    {{ form_errors(surfForm) }}
+                    {{ form_start(surfMasterForm) }}
+                    {{ form_errors(surfMasterForm) }}
                     <div class="form-group">
-                        {{ form_widget(surfForm.trigger) }}
+                        {{ form_widget(surfMasterForm.trigger) }}
                     </div>
-                    {{ form_widget(surfForm._token) }}
-                    {{ form_end(surfForm, {'render_rest': false}) }}
+                    {{ form_widget(surfMasterForm._token) }}
+                    {{ form_end(surfMasterForm, {'render_rest': false}) }}
+                    
+                    {{ form_start(surf20Form) }}
+                    {{ form_errors(surf20Form) }}
+                    <div class="form-group">
+                        {{ form_widget(surf20Form.trigger) }}
+                    </div>
+                    {{ form_widget(surf20Form._token) }}
+                    {{ form_end(surf20Form, {'render_rest': false}) }}
                 </div>
             {% endif %}
 

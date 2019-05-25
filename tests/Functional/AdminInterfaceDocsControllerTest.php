@@ -93,13 +93,25 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function bambooDocsSurfFormIsRendered()
+    public function bambooDocsSurf20FormIsRendered()
     {
         $client = static::createClient();
         $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/docs');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Render TYPO3 Surf 2.0 Documentation/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function bambooDocsSurfMasterFormIsRendered()
+    {
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $client->request('GET', '/admin/docs');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertRegExp('/Render TYPO3 Surf Master Documentation/', $client->getResponse()->getContent());
     }
 
     /**
@@ -138,7 +150,7 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function bambooDocsSurfCanBeTriggered()
+    public function bambooDocsSurf20CanBeTriggered()
     {
         // Bamboo client double for the first request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -166,6 +178,39 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertRegExp('/CORE-DRS-123/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function bambooDocsSurfMasterCanBeTriggered()
+    {
+        // Bamboo client double for the first request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $crawler = $client->request('GET', '/admin/docs');
+
+        // Bamboo client double for the second request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        $bambooClientProphecy->post(Argument::cetera())->willReturn(
+            new Response(200, [], json_encode(['buildResultKey' => 'CORE-DRSM-123']))
+        );
+
+        // Get the rendered form, feed it with some data and submit it
+        $form = $crawler->selectButton('Render TYPO3 Surf Master Documentation')->form();
+        $client->submit($form);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        // The build key is shown
+        $this->assertRegExp('/CORE-DRSM-123/', $client->getResponse()->getContent());
     }
 
     /**
@@ -204,7 +249,7 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function bambooDocsSurfReturnsErrorIfBambooClientDoesNotCreateBuild()
+    public function bambooDocsSurf20ReturnsErrorIfBambooClientDoesNotCreateBuild()
     {
         // Bamboo client double for the first request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -229,6 +274,39 @@ class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Render TYPO3 Surf 2.0 Documentation')->form();
+        $client->submit($form);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function bambooDocsSurfMasterReturnsErrorIfBambooClientDoesNotCreateBuild()
+    {
+        // Bamboo client double for the first request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $crawler = $client->request('GET', '/admin/docs');
+
+        // Bamboo client double for the second request
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::cetera())->willThrow(
+            new RequestException('testing', new Request('GET', ''))
+        );
+        // Simulate bamboo did not trigger a build - buildResultKey missing in response
+        $bambooClientProphecy->post(Argument::cetera())->willReturn(
+            new Response(200, [], json_encode([]))
+        );
+
+        // Get the rendered form, feed it with some data and submit it
+        $form = $crawler->selectButton('Render TYPO3 Surf Master Documentation')->form();
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
