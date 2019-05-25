@@ -43,10 +43,19 @@ class DocumentationJarRepository extends ServiceEntityRepository
         return $this->findByTypeShort(['c', 'p']);
     }
 
+    /**
+     * Find a rendered documentation by package name and TARGET DIRECTORY (not source branch).
+     * Example: lolli/enetcache:draft.
+     *
+     * Used in 're-render docs' command controller
+     *
+     * @param string $packageIdentifier
+     * @return DocumentationJar|null
+     */
     public function findByPackageIdentifier(string $packageIdentifier): ?DocumentationJar
     {
         [$packageName, $version] = explode(':', $packageIdentifier);
-        return $this->findOneBy(['branch' => $version, 'packageName' => $packageName]);
+        return $this->findOneBy(['targetBranchDirectory' => $version, 'packageName' => $packageName]);
     }
 
     private function findByTypeShort(array $typeShort): array

@@ -47,7 +47,7 @@ class DocsRenderCommand extends Command
             ->setDescription('Command to re-render all docs or one specific')
             ->addOption('all', 'a', InputOption::VALUE_NONE, 're-render all existing configurations')
             ->addOption('configuration', 'c', InputOption::VALUE_OPTIONAL, 'render configuration by given ID')
-            ->addOption('package', 'p', InputOption::VALUE_OPTIONAL, 'render configuration by given package and version, e.g. typo3/team-t3docteam:master')
+            ->addOption('package', 'p', InputOption::VALUE_OPTIONAL, 'render configuration by given package and target directory, e.g. typo3/team-t3docteam:master')
         ;
     }
 
