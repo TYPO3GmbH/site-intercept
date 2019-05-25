@@ -120,7 +120,7 @@ class AdminInterfaceDocsController extends AbstractController
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
-                    'Triggered fluid view helper build'
+                    'Triggered surf 2.0 build'
                     . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
                     . ' of plan key "CORE-DRS".'
                 );
@@ -158,7 +158,7 @@ class AdminInterfaceDocsController extends AbstractController
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
-                    'Triggered fluid view helper build'
+                    'Triggered surf master build'
                     . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
                     . ' of plan key "CORE-DRSM".'
                 );
