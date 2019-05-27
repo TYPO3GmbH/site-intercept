@@ -33,17 +33,21 @@ class DocumentationDownloads
         $url = $this->request->getQueryParams()['url'] ?? '';
 
         // /p/vendor/package/version/some/sub/page/Index.html/
-        $urlPath = '/' . trim((parse_url($url)['path']) ?? '', '/') . '/';
+        $urlPath = '/' . trim(parse_url($url)['path'] ?? '', '/') . '/';
 
         // Simple path traversal protection: remove '/../' and '/./'
-        $urlPath = str_replace('/../', '', $urlPath);
-        $urlPath = str_replace('/./', '', $urlPath);
+        $urlPath = str_replace(['/../', '/./'], '', $urlPath);
 
         // Remove leading and trailing slashes again
         $urlPath = trim($urlPath, '/');
         $urlPath = explode('/', $urlPath);
         if (count($urlPath) < 5) {
             return new Response(200, [], '');
+        }
+
+        if (in_array($urlPath[0], ['Home', '404.html', 'Index.html'], true)) {
+            $content = '<dd class="related-link-buildinfo"><a href="/_buildinfo" target="_blank">BUILDINFO</a></dd>';
+            return new Response(200, [], $content);
         }
 
         // first three segments are main root of that repo - eg. '[p, lolli42, enetcache]'
