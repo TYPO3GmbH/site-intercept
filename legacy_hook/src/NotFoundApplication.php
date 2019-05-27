@@ -39,7 +39,7 @@ class NotFoundApplication
         if (empty($notFoundPage)) {
             $notFoundPage = $this->getDocumentRoot() . $this->defaultNotFoundPage;
         }
-        return new Response(200, [], file_get_contents($notFoundPage));
+        return new Response(404, [], file_get_contents($notFoundPage));
     }
 
     protected function findNextNotFoundPage(): string
