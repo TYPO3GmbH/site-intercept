@@ -47,7 +47,8 @@ class DocsNginxRedirectServiceTest extends TestCase
             $redirectRepositoryProphecy->reveal(),
             new Filesystem(),
             '/tmp/',
-            'docs-redirects'
+            'docs-redirects',
+            '/tmp/'
         );
     }
 

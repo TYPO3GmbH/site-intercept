@@ -38,6 +38,11 @@ class DocsServerNginxService
     protected $subDir;
 
     /**
+     * @var string
+     */
+    protected $staticDir;
+
+    /**
      * @var Filesystem
      */
     protected $filesystem;
@@ -59,12 +64,13 @@ location ~ ^%s(.*) {
      * @param string $privateDir
      * @param string $subDir
      */
-    public function __construct(DocsServerRedirectRepository $redirectRepository, Filesystem $fileSystem, string $privateDir, string $subDir)
+    public function __construct(DocsServerRedirectRepository $redirectRepository, Filesystem $fileSystem, string $privateDir, string $subDir, $staticDir)
     {
         $this->redirectRepository = $redirectRepository;
         $this->privateDir = $privateDir;
         $this->subDir = $subDir;
         $this->filesystem = $fileSystem;
+        $this->staticDir = $staticDir;
     }
 
     public function createRedirectConfigFile(): string
@@ -112,10 +118,38 @@ location ~ ^%s(.*) {
     }
 
     /**
+     * Finds the static configuration file being in place
+     *
+     * @return SplFileInfo|null
+     */
+    public function getStaticConfiguration(): ?SplFileInfo
+    {
+        if (!is_dir($this->getStaticDirectory())) {
+            return null;
+        }
+
+        $file = (new Finder())
+            ->in($this->getStaticDirectory())
+            ->files()
+            ->name('redirects.conf');
+
+        $asArray = iterator_to_array($file);
+        return current($asArray) ?: null;
+    }
+
+    /**
      * @return string
      */
     private function getPrivateDirectory(): string
     {
         return rtrim($this->privateDir, '/') . '/' . rtrim($this->subDir, '/') . '/';
+    }
+
+    /**
+     * @return string
+     */
+    private function getStaticDirectory(): string
+    {
+        return rtrim($this->staticDir, '/') . '/';
     }
 }

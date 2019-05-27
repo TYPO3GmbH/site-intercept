@@ -60,6 +60,7 @@ class AdminInterfaceDocsRedirectController extends AbstractController
     public function index(DocsServerRedirectRepository $redirectRepository, GraylogService $graylogService, Request $request, PaginatorInterface $paginator): Response
     {
         $currentConfigurationFile = $this->nginxService->findCurrentConfiguration();
+        $staticConfigurationFile = $this->nginxService->getStaticConfiguration();
         $recentLogsMessages = $graylogService->getRecentRedirectActions();
 
         $criteria = Criteria::create();
@@ -93,6 +94,7 @@ class AdminInterfaceDocsRedirectController extends AbstractController
             'logMessages' => $recentLogsMessages,
             'pagination' => $pagination,
             'filter' => $form->createView(),
+            'staticConfiguration' => $staticConfigurationFile,
         ]);
     }
 
