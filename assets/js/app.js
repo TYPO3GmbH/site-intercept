@@ -9,13 +9,14 @@ let $ = require('jquery');
 require('bootstrap');
 require('./libs/navbar.js');
 
-// We need bootstrap collapse
+// Syntax Highlighter
+require('prismjs');
+require('prismjs/components/prism-nginx');
+
 var { DateTime } = require('luxon');
-import hljs from 'highlightjs';
 
 $(document).ready(function () {
     convertDates();
-    hljs.initHighlightingOnLoad();
 });
 
 function convertDates() {

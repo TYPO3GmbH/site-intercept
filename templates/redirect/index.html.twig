@@ -81,44 +81,72 @@
 
             {% if currentConfiguration or staticConfiguration %}
                 <div class="content-spacer"></div>
-                <h2>Current active configuration</h2>
-                <p>These are the currently loaded NGINX configuration files. The static configuration file is always loaded <strong>before</strong> the dynamic configuration file.</p>
-            {% endif %}
-
-            {% if currentConfiguration %}
-                <h3>Dynamic Configuration</h3>
-                <p>This file is dynamically generated from the contents in the table above.</p>
-                <div class="accordion" id="nginxConfigurationFiles">
-                    <div class="card">
-                        <div class="card-header" id="heading_nginxConfigurationFile_{{ currentConfiguration.ctime }}">
-                            <h2 class="mb-0">
-                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse_nginxConfigurationFile_{{ currentConfiguration.ctime }}" aria-expanded="false" aria-controls="collapse_nginxConfigurationFile_{{ currentConfiguration.ctime }}">
-                                    {{ currentConfiguration.fileName }}
+                <h2>Current NGINX Configuration</h2>
+                <div class="card-deck card-deck-dashboard">
+                    {% if currentConfiguration %}
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-header-bar">
+                                    <div class="card-header-title">
+                                        <h3>Dynamic Configuration</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                This file is dynamically generated from the contents in the table above.
+                            </div>
+                            <div class="card-footer">
+                                <div class="modal fade" id="currentConfiguration" tabindex="-1" role="dialog" aria-labelledby="currentConfigurationLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <span class="modal-title" id="currentConfigurationLabel">{{ currentConfiguration.fileName }}</span>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <pre><code class="language-nginx">{{ currentConfiguration.contents }}</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#currentConfiguration">
+                                    <span class="btn-text">Show Configuration</span>
                                 </button>
-                            </h2>
+                            </div>
                         </div>
-                        <div id="collapse_nginxConfigurationFile_{{ currentConfiguration.ctime }}" class="collapse" aria-labelledby="heading_nginxConfigurationFile_{{ currentConfiguration.ctime }}" data-parent="#nginxConfigurationFiles">
-                            <pre class="mb-0"><code class="nginx">{{ currentConfiguration.contents }}</code></pre>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-            {% if staticConfiguration %}
-                <h3>Static Configuration</h3>
-                <p>This is a static configuration file on the intercept server.</p>
-                <div class="accordion" id="nginxConfigurationFiles">
-                    <div class="card">
-                        <div class="card-header" id="heading_nginxConfigurationFile_{{ staticConfiguration.ctime }}">
-                            <h2 class="mb-0">
-                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse_nginxConfigurationFile_{{ staticConfiguration.ctime }}" aria-expanded="false" aria-controls="collapse_nginxConfigurationFile_{{ staticConfiguration.ctime }}">
-                                    {{ staticConfiguration.fileName }}
+                    {% endif %}
+                    {% if staticConfiguration %}
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-header-bar">
+                                    <div class="card-header-title">
+                                        <h3>Static Configuration</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                The static configuration file is always loaded <strong>before</strong> the dynamic configuration file.
+                            </div>
+                            <div class="card-footer">
+                                <div class="modal fade" id="staticConfiguration" tabindex="-1" role="dialog" aria-labelledby="staticConfigurationLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <span class="modal-title" id="staticConfigurationLabel">{{ staticConfiguration.fileName }}</span>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <pre><code class="language-nginx">{{ staticConfiguration.contents }}</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticConfiguration">
+                                    <span class="btn-text">Show Configuration</span>
                                 </button>
-                            </h2>
+                            </div>
                         </div>
-                        <div id="collapse_nginxConfigurationFile_{{ staticConfiguration.ctime }}" class="collapse" aria-labelledby="heading_nginxConfigurationFile_{{ staticConfiguration.ctime }}" data-parent="#nginxConfigurationFiles">
-                            <pre class="mb-0"><code class="nginx">{{ staticConfiguration.contents }}</code></pre>
-                        </div>
-                    </div>
+                    {% endif %}
                 </div>
             {% endif %}
 

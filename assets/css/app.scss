@@ -3,7 +3,7 @@
 
 // Include Dependencies
 @import '~bootstrap/scss/bootstrap';
-@import "~highlightjs/styles/agate.css";
+@import '~prismjs/themes/prism-okaidia';
 
 // Mixins
 @import 'mixins/function';
@@ -19,3 +19,4 @@
 @import 'modules/btn';
 @import 'modules/message';
 @import 'modules/fontawesome';
+@import 'modules/syntax';
