@@ -11,10 +11,13 @@ namespace App\Controller;
 
 use App\Entity\DocsServerRedirect;
 use App\Form\DocsServerRedirectType;
+use App\Form\RedirectFilterType;
 use App\Repository\DocsServerRedirectRepository;
 use App\Service\BambooService;
 use App\Service\DocsServerNginxService;
 use App\Service\GraylogService;
+use Doctrine\Common\Collections\Criteria;
+use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,14 +57,43 @@ class AdminInterfaceDocsRedirectController extends AbstractController
      * @param GraylogService $graylogService
      * @return Response
      */
-    public function index(DocsServerRedirectRepository $redirectRepository, GraylogService $graylogService): Response
+    public function index(DocsServerRedirectRepository $redirectRepository, GraylogService $graylogService, Request $request, PaginatorInterface $paginator): Response
     {
         $currentConfigurationFile = $this->nginxService->findCurrentConfiguration();
         $recentLogsMessages = $graylogService->getRecentRedirectActions();
+
+        $criteria = Criteria::create();
+
+        $requestSortDirection = $request->query->get('direction');
+        $requestSortField = $request->query->get('sort');
+        $sortDirection = $requestSortDirection === 'asc' ? Criteria::ASC : Criteria::DESC;
+        $sortField = in_array($requestSortField, ['source', 'target']) ? $requestSortField : 'target';
+        $criteria->orderBy([$sortField => $sortDirection]);
+
+        $form = $this->createForm(RedirectFilterType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $expressionBuilder = Criteria::expr();
+            $data = $form->getData();
+            if ($data['search']) {
+                $criteria->where($expressionBuilder->contains('source', $data['search']))
+                ->orWhere($expressionBuilder->contains('target', $data['search']));
+            }
+        }
+
+        $redirects = $redirectRepository->matching($criteria);
+
+        $pagination = $paginator->paginate(
+            $redirects,
+            $request->query->getInt('page', 1)
+        );
+
         return $this->render('redirect/index.html.twig', [
-            'redirects' => $redirectRepository->findAll(),
+            'redirects' => $redirects,
             'currentConfiguration' => $currentConfigurationFile,
             'logMessages' => $recentLogsMessages,
+            'pagination' => $pagination,
+            'filter' => $form->createView(),
         ]);
     }
 

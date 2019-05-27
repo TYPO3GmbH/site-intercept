@@ -10,6 +10,9 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-header-bar">
+                        <div class="card-header-form">
+                            {{ form(filter, {'attr': {'novalidate': 'novalidate'}}) }}
+                        </div>
                         <div class="card-header-actions">
                             {{ 
                                 macros.linkbutton(
@@ -25,8 +28,12 @@
                     <table class="datatable-table">
                         <thead>
                             <tr>
-                                <th scope="col" colspan="2">Source</th>
-                                <th scope="col">Target</th>
+                                <th scope="col" colspan="2">
+                                    Source
+                                    {{ knp_pagination_sortable(pagination, 'Source', 'source') }}
+                                    Target
+                                    {{ knp_pagination_sortable(pagination, 'Target', 'target') }}
+                                </th>
                                 <th scope="col">StatusCode</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -34,13 +41,17 @@
                         <tbody>
                         {% for redirect in redirects %}
                             <tr data-id="{{ redirect.id }}">
-                                <th scope="row">{{ redirect.source }}</th>
+                                <th scope="row">
+                                    <span class="datatable-text"><i class="fa fa-size-small fa-style-fade fa-arrow-left"></i></span> 
+                                    <span class="datatable-text">{{ redirect.source }}</span><br>
+                                    <span class="datatable-text"><i class="fa fa-size-small fa-style-fade fa-arrow-right"></i></span> 
+                                    <span class="datatable-text"><a class="datatable-link-highlight" href="{{ redirect.target|intercept_docs_server_link }}" target="_blank">{{ redirect.target }}</a></span>
+                                </th>
                                 <th scope="row">
                                     {% if redirect.isLegacy %}
                                         <span class="badge badge-warning">Legacy location</span>
                                     {% endif %}
                                 </th>
-                                <td>{{ redirect.target }}</td>
                                 <td>{{ redirect.statusCode }}</td>
                                 <td data-type="actions" data-label="Actions">
                                     <a class="datatable-action" href="{{ path('admin_redirect_show', {'id': redirect.id}) }}">
@@ -61,6 +72,11 @@
                         </tbody>
                     </table>
                 </div>
+                {% if pagination.getTotalItemCount > 10 %}
+                    <div class="card-footer">
+                        {{ knp_pagination_render(pagination) }}
+                    </div>
+                {% endif %}
             </div>
 
             {% if currentConfiguration %}
