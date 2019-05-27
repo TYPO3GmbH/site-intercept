@@ -45,6 +45,7 @@
                                     Last rendered
                                     {{ knp_pagination_sortable(pagination, 'Last rendered', 'lastRenderedAt') }}
                                 </th>
+                                <th scope="col">Support</th>
                                 {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                                     <th scope="col">Actions</th>
                                 {% endif %}
@@ -84,6 +85,13 @@
                                 </td>
                                 <td data-type="localdate">
                                     {{ intercept_date_time(deployment.lastRenderedAt) }}
+                                </td>
+                                <td>
+                                    {% if deployment.minimumTypoVersion == deployment.maximumTypoVersion %}
+                                        {{ deployment.minimumTypoVersion }}
+                                    {% else %}
+                                        {{ deployment.minimumTypoVersion }} - {{ deployment.maximumTypoVersion }}
+                                    {% endif %}
                                 </td>
                                 {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                                     <td data-type="actions" data-label="Actions">
