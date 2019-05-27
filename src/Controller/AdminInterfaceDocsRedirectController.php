@@ -89,7 +89,6 @@ class AdminInterfaceDocsRedirectController extends AbstractController
         );
 
         return $this->render('redirect/index.html.twig', [
-            'redirects' => $redirects,
             'currentConfiguration' => $currentConfigurationFile,
             'logMessages' => $recentLogsMessages,
             'pagination' => $pagination,
