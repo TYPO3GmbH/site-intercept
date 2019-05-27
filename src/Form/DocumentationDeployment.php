@@ -57,6 +57,19 @@ class DocumentationDeployment extends AbstractType
             if ($options['step2']) {
                 $repositoryUrl = $event->getData()->getRepositoryUrl();
                 $branches = (new GitRepositoryService())->getBranchesFromRepositoryUrl($repositoryUrl);
+                $documentationJarRepository = $options['entity_manager']->getRepository(DocumentationJar::class);
+                foreach ($branches as $key => $branch) {
+                    $jar = $documentationJarRepository
+                        ->findBy([
+                            'repositoryUrl' => $repositoryUrl,
+                            'branch' => $key,
+                        ]);
+
+                    if (!empty($jar)) {
+                        unset($branches[$key]);
+                    }
+                }
+
                 $optionsStep2['choices'] = array_flip($branches);
 
                 $event->getForm()->add('branch', ChoiceType::class, $optionsStep2);
@@ -73,6 +86,7 @@ class DocumentationDeployment extends AbstractType
             'step1' => true,
             'step2' => false,
             'step3' => false,
+            'entity_manager' => null,
         ]);
     }
 }

@@ -16,6 +16,7 @@ use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
+use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\ComposerJson;
 use App\Form\DocsDeploymentFilterType;
@@ -31,6 +32,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -187,8 +189,13 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
 
         $form = $this->createForm(DocumentationDeployment::class, $documentationJar);
         $form->handleRequest($request);
-        if ($repositoryUrl !== '') {
-            return $this->forward(self::class . '::addConfigurationStep2');
+        if (!empty($repositoryUrl)) {
+            if (preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, $repositoryUrl) !== 1) {
+                $error = new FormError('A repository url must be a valid https git url. Staring with \'https://\' and ending with \'.git\'.');
+                $form->addError($error);
+            } else {
+                return $this->forward(self::class . '::addConfigurationStep2');
+            }
         }
 
         return $this->render('docs_deployments/addConfiguration.html.twig', [
@@ -214,7 +221,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         $branch = $request->get('documentation_deployment')['branch'] ?? '';
         $documentationJar->setBranch($branch);
 
-        $form = $this->createForm(DocumentationDeployment::class, $documentationJar, ['step2' => true]);
+        $form = $this->createForm(DocumentationDeployment::class, $documentationJar, ['step2' => true, 'entity_manager' => $this->getDoctrine()->getManager()]);
         $form->setData($documentationJar);
         if ($branch !== '') {
             return $this->forward(self::class . '::addConfigurationStep3');
@@ -237,7 +244,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
      * @throws DocsPackageDoNotCareBranch
      * @throws \App\Exception\Composer\DocsComposerMissingValueException
      */
-    public function addConfigurationStep3(Request $request, DocumentationBuildInformationService $documentationBuildInformationService, BambooService $bambooService): Response
+    public function addConfigurationStep3(Request $request, DocumentationBuildInformationService $documentationBuildInformationService, BambooService $bambooService, DocumentationJarRepository $documentationJarRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $documentationJar = new DocumentationJar();
@@ -268,9 +275,20 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                     ->setExtensionKey($composerJsonObject->getExtensionKey())
                     ->setMinimumTypoVersion($composerJsonObject->getMinimumTypoVersion())
                     ->setMaximumTypoVersion($composerJsonObject->getMaximumTypoVersion());
+                $existWithDifferentUrl = $documentationJarRepository
+                    ->createQueryBuilder('d')
+                    ->where('d.repositoryUrl <> :repositoryUrl')
+                    ->andWhere('d.packageName = :packageName')
+                    ->setParameter('repositoryUrl', $repositoryUrl)
+                    ->setParameter('packageName', $composerJsonObject->getName())
+                    ->getQuery()
+                    ->getResult();
+                if (!empty($existWithDifferentUrl)) {
+                    throw new DocsPackageRegisteredWithDifferentRepositoryException('This package already exists with a different repository url', 1558697388);
+                }
                 $deploymentInformation = $documentationBuildInformationService
                     ->generateBuildInformationFromDocumentationJar($documentationJar);
-            } catch (ComposerJsonNotFoundException | ComposerJsonInvalidException | DocsComposerDependencyException | DocsPackageDoNotCareBranch $e) {
+            } catch (ComposerJsonNotFoundException | ComposerJsonInvalidException | DocsComposerDependencyException | DocsPackageDoNotCareBranch | DocsPackageRegisteredWithDifferentRepositoryException $e) {
                 $this->addFlash('danger', $e->getMessage());
             }
         }
