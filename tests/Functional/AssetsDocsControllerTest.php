@@ -63,9 +63,9 @@ class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $content = $this->client->getResponse()->getContent();
 
-        $this->assertStringContainsString('"key":"blog"', $content);
-        $this->assertStringContainsString('"key":"felogin"', $content);
-        $this->assertStringContainsString('"key":"news"', $content);
+        $this->assertStringContainsString('"key":"t3g\/blog"', $content);
+        $this->assertStringContainsString('"key":"typo3\/cms-felogin"', $content);
+        $this->assertStringContainsString('"key":"georgringer\/news"', $content);
         $this->assertStringNotContainsString('"key":"docs_that_is_no_extension"', $content);
     }
 
@@ -78,8 +78,8 @@ class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $content = $this->client->getResponse()->getContent();
 
-        $this->assertStringContainsString('"key":"blog","latest":"8.7","versions":["master","8.7"]', $content);
-        $this->assertStringContainsString('"key":"felogin","latest":"9.5","versions":["master","9.5","8.7"]', $content);
-        $this->assertStringContainsString('"key":"news","latest":"master","versions":["master"]', $content);
+        $this->assertStringContainsString('"key":"t3g\/blog","latest":"8.7","versions":{"master":"\/p\/t3g\/blog\/master\/en-us","8.7":"\/p\/t3g\/blog\/8.7\/en-us"}', $content);
+        $this->assertStringContainsString('"key":"typo3\/cms-felogin","latest":"9.5","versions":{"master":"\/c\/typo3\/cms-felogin\/master\/en-us","9.5":"\/c\/typo3\/cms-felogin\/9.5\/en-us","8.7":"\/c\/typo3\/cms-felogin\/8.7\/en-us"}', $content);
+        $this->assertStringContainsString('"key":"georgringer\/news","latest":"master","versions":{"master":"\/p\/georgringer\/news\/master\/en-us"}', $content);
     }
 }

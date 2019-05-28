@@ -81,14 +81,19 @@ class AssetsDocsController extends AbstractController
         $flatList = [];
 
         foreach ($extensions as $extension) {
-            if (!isset($flatList[$extension->getExtensionKey()])) {
-                $flatList[$extension->getExtensionKey()] = [
-                    'key' => $extension->getExtensionKey(),
+            $path = '/' . $extension->getTypeShort() . '/' . $extension->getPackageName() . '/' . $extension->getTargetBranchDirectory() . '/en-us';
+            if (!isset($flatList[$extension->getPackageName()])) {
+                $flatList[$extension->getPackageName()] = [
+                    'key' => $extension->getPackageName(),
                     'latest' => null, // this will be set later
                     'versions' => [$extension->getTargetBranchDirectory()],
+                    'paths' => [
+                        $extension->getTargetBranchDirectory() => $path,
+                    ],
                 ];
             } else {
-                $flatList[$extension->getExtensionKey()]['versions'][] = $extension->getTargetBranchDirectory();
+                $flatList[$extension->getPackageName()]['versions'][] = $extension->getTargetBranchDirectory();
+                $flatList[$extension->getPackageName()]['paths'][$extension->getTargetBranchDirectory()] = $path;
             }
         }
 
@@ -104,8 +109,15 @@ class AssetsDocsController extends AbstractController
                 // Remove any item not being a version number
                 return preg_match('/\d+.\d+(.\d+)?/', $version) === 1;
             }));
-
             $item['latest'] = $stableVersions[0] ?? $item['versions'][0];
+
+            // Create ['versions'] = ['version' => 'path']
+            $versionsWithPath = [];
+            foreach ($item['versions'] as $version) {
+                $versionsWithPath[$version] = $item['paths'][$version];
+            }
+            $item['versions'] = $versionsWithPath;
+            unset($item['paths']);
         }
         unset($item);
 
