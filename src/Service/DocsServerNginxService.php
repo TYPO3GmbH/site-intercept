@@ -49,12 +49,12 @@ class DocsServerNginxService
 
     protected $redirectTemplate = '# Rule: %d | Created: %s | Updated: %s
 location = %s {
-    return %d https://$host%s;
+    return %d %s;
 }';
 
     protected $legacyRedirectTemplate = '# Rule: %d | Created: %s | Updated: %s | Legacy
 location ~ ^%s(.*) {
-    return %d https://$host%s$1;
+    return %d %s$1;
 }';
 
     /**
