@@ -206,7 +206,7 @@ class ComposerJsonTest extends TestCase
     {
         $composerJson = new ComposerJson([
             'name' => 'foobar/baz',
-            'type' => 'not-a-typo3-cms-extension',
+            'type' => 'typo3-cms-framework',
             'require' => ['foobar/bark' => '^4.2'],
             'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
         ]);
