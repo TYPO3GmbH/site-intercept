@@ -29,10 +29,13 @@ class RequestForwarder
 
     public function to(Uri $target): void
     {
+        // Unset "Host" header, otherwise request goes to wrong target domain ...
+        $headers = $this->request->getHeaders();
+        unset($headers['Host']);
         $newRequest = new Request(
             $this->request->getMethod(),
             (string)$target,
-            $this->request->getHeaders(),
+            $headers,
             (string)$this->request->getBody()
         );
         $promise = (new Client())->sendAsync($newRequest);
