@@ -146,6 +146,7 @@ class DocsToBambooController extends AbstractController
                     'exceptionMessage' => $e->getMessage(),
                     'repository' => $pushEvent->getRepositoryUrl(),
                     'composerFile' => $pushEvent->getUrlToComposerFile(),
+                    'payload' => $request->getContent(),
                 ]
             );
             return Response::create('No composer.json found, invalid or unable to fetch. See https://intercept.typo3.com for more information.', 412);
@@ -160,6 +161,7 @@ class DocsToBambooController extends AbstractController
                     'exceptionMessage' => $e->getMessage(),
                     'repository' => $pushEvent->getRepositoryUrl(),
                     'composerFile' => $pushEvent->getUrlToComposerFile(),
+                    'payload' => $request->getContent(),
                 ]
             );
             return Response::create('Invalid composer.json. See https://intercept.typo3.com for more information.', 412);
