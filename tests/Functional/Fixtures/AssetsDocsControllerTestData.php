@@ -21,7 +21,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setPackageName('typo3/docs-homepage')
             ->setPackageType('typo3-cms-documentation')
             ->setExtensionKey('docs_that_is_no_extension')
-            ->setBranch('new_docs_server')
+            ->setBranch('master')
             ->setTargetBranchDirectory('master')
             ->setTypeLong('docs-home')
             ->setTypeShort('h')

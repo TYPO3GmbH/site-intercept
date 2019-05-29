@@ -53,7 +53,7 @@ class RenderDocumentationService
         $documentationJar = $this->documentationBuildInformationService->registerDocumentationRendering($buildInformation);
         $bambooBuildTriggered = $this->bambooService->triggerDocumentationPlan($buildInformation);
         if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
-            && ($buildInformation->sourceBranch === 'master' || $buildInformation->sourceBranch === 'new_docs_server')
+            && $buildInformation->sourceBranch === 'master'
         ) {
             // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
             /** @noinspection UnusedFunctionResultInspection */
