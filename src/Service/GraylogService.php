@@ -164,7 +164,7 @@ class GraylogService
      * @param int $limit
      * @return GraylogLogEntry[]
      */
-    private function getLogs(string $query, int $limit = 10): array
+    private function getLogs(string $query, int $limit = 20): array
     {
         $query = urlencode($query);
         try {
