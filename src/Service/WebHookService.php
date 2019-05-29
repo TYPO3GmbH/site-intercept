@@ -72,7 +72,19 @@ class WebHookService
 
     protected function getPushEventFromGithub(Request $request, string $eventType): PushEvent
     {
-        $payload = json_decode($request->getContent(), false);
+        $content = $request->getContent();
+        $payload = json_decode($content, false);
+        if ($payload === null) {
+            // If can't be decoded to json, this might be a x-www-form-encoded body
+            // probably by using the old legacy hook, that used this
+            $payload = urldecode($content);
+            $payload = substr($payload, 8); // cut off 'payload=', rest should be json, then
+            $payload = json_decode($payload, false);
+        }
+        if ($payload === null) {
+            throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
+        }
+
         $repositoryUrl = (string)$payload->repository->clone_url;
         $versionString = ($eventType === 'release')
             ? (string)$payload->release->tag_name
