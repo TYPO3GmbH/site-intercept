@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
@@ -61,27 +62,48 @@ class DocsToBambooController extends AbstractController
             $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
             $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
             $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
-            $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
-            if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
-                && ($buildInformation->sourceBranch === 'master' || $buildInformation->sourceBranch === 'new_docs_server')
-            ) {
-                // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
-                $bambooService->triggerDocmuntationServerWebrootResourcesPlan();
+            // Trigger build only if status is not already "I'm rendering". Else, only set a flag that re-rendering is needed.
+            // The re-render flag is used and reset by the bamboo post build controller if it is set, to trigger a new
+            // rendering. This suppresses multiple builds for one repo at the same time and prevents conditions where
+            // an older build finishes after a younger triggered build which would overwrite the result af the later build.
+            if ($documentationJar->getStatus() === DocumentationStatus::STATUS_RENDERING) {
+                $documentationBuildInformationService->updateReRenderNeeded($documentationJar, true);
+                $logger->info(
+                    'Registered docs build for re-rendering',
+                    [
+                        'type' => 'docsRendering',
+                        'status' => 're-render-needed',
+                        'triggeredBy' => 'api',
+                        'repository' => $buildInformation->repositoryUrl,
+                        'package' => $buildInformation->packageName,
+                        'sourceBranch' => $buildInformation->sourceBranch,
+                        'targetBranch' => $buildInformation->targetBranchDirectory,
+                    ]
+                );
+            } else {
+                $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
+                if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
+                    && ($buildInformation->sourceBranch === 'master' || $buildInformation->sourceBranch === 'new_docs_server')
+                ) {
+                    // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
+                    $bambooService->triggerDocmuntationServerWebrootResourcesPlan();
+                }
+                $documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
+                $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
+                $logger->info(
+                    'Triggered docs build',
+                    [
+                        'type' => 'docsRendering',
+                        'status' => 'triggered',
+                        'triggeredBy' => 'api',
+                        'repository' => $buildInformation->repositoryUrl,
+                        'package' => $buildInformation->packageName,
+                        'sourceBranch' => $buildInformation->sourceBranch,
+                        'targetBranch' => $buildInformation->targetBranchDirectory,
+                        'bambooKey' => $bambooBuildTriggered->buildResultKey,
+                    ]
+                );
             }
-            $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
-            $logger->info(
-                'Triggered docs build',
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'triggered',
-                    'triggeredBy' => 'api',
-                    'repository' => $buildInformation->repositoryUrl,
-                    'package' => $buildInformation->packageName,
-                    'sourceBranch' => $buildInformation->sourceBranch,
-                    'targetBranch' => $buildInformation->targetBranchDirectory,
-                    'bambooKey' => $bambooBuildTriggered->buildResultKey,
-                ]
-            );
             return Response::create();
         } catch (GithubHookPingException $e) {
             // Hook payload is a 'github ping' - log that as "info / success' with the

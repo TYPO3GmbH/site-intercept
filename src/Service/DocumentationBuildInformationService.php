@@ -267,7 +267,7 @@ class DocumentationBuildInformationService
             if (empty($record->getMaximumTypoVersion())) {
                 $record->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
             }
-            $record->setStatus(DocumentationStatus::STATUS_RENDERING);
+            // status is not updated at this point, this is done later by controllers
             $this->entityManager->flush();
         } else {
             // No entry, yet - create one
@@ -285,7 +285,9 @@ class DocumentationBuildInformationService
                 ->setTypeShort($deploymentInformation->typeShort)
                 ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
                 ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion)
-                ->setStatus(DocumentationStatus::STATUS_RENDERING)
+                ->setReRenderNeeded(false)
+                // Set a new record to 'rendered' for now, this will be updated by controllers later on
+                ->setStatus(DocumentationStatus::STATUS_RENDERED)
                 ->setBuildKey('');
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
@@ -303,7 +305,26 @@ class DocumentationBuildInformationService
     public function updateBuildKey(DocumentationJar $documentationJar, string $buildKey): void
     {
         $documentationJar->setBuildKey($buildKey);
-        $this->entityManager->persist($documentationJar);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @param DocumentationJar $documentationJar
+     * @param int $status
+     */
+    public function updateStatus(DocumentationJar $documentationJar, int $status): void
+    {
+        $documentationJar->setStatus($status);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @param DocumentationJar $documentationJar
+     * @param bool $reRenderNeeded
+     */
+    public function updateReRenderNeeded(DocumentationJar $documentationJar, bool $reRenderNeeded): void
+    {
+        $documentationJar->setReRenderNeeded($reRenderNeeded);
         $this->entityManager->flush();
     }
 

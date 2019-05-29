@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Entity\DocumentationJar;
+use App\Enum\DocumentationStatus;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\DeploymentInformation;
 use Psr\Log\LoggerInterface;
@@ -58,6 +59,7 @@ class RenderDocumentationService
             /** @noinspection UnusedFunctionResultInspection */
             $this->bambooService->triggerDocmuntationServerWebrootResourcesPlan();
         }
+        $this->documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
         $this->documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
         $this->logger->info(
             'Triggered docs build',

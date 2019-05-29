@@ -120,6 +120,29 @@ class DocumentationJar
     private $buildKey;
 
     /**
+     * @ORM\Column(type="boolean", options={"default": "0"})
+     */
+    private $reRenderNeeded;
+
+    /**
+     * @return bool
+     */
+    public function isReRenderNeeded(): bool
+    {
+        return (bool)$this->reRenderNeeded;
+    }
+
+    /**
+     * @param bool $needed
+     * @return DocumentationJar
+     */
+    public function setReRenderNeeded(bool $needed): self
+    {
+        $this->reRenderNeeded = $needed;
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getTypeShort(): ?string

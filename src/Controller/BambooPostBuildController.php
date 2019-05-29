@@ -18,6 +18,7 @@ use App\Enum\DocumentationStatus;
 use App\Extractor\BambooSlackMessage;
 use App\Service\BambooService;
 use App\Service\GerritService;
+use App\Service\RenderDocumentationService;
 use App\Service\SlackService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -39,6 +40,7 @@ class BambooPostBuildController extends AbstractController
      * @param GerritService $gerritService
      * @param SlackService $slackService
      * @param LoggerInterface $logger
+     * @param RenderDocumentationService $renderDocumentationService
      * @return Response
      */
     public function index(
@@ -46,7 +48,8 @@ class BambooPostBuildController extends AbstractController
         BambooService $bambooService,
         GerritService $gerritService,
         SlackService $slackService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        RenderDocumentationService $renderDocumentationService
     ): Response {
         $bambooSlack = new BambooSlackMessage($request);
         $buildDetails = $bambooService->getBuildStatus($bambooSlack);
@@ -120,12 +123,12 @@ class BambooPostBuildController extends AbstractController
             $manager = $this->getDoctrine()->getManager();
             $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
 
-            /** @var DocumentationJar $documentationEntry */
-            $documentationEntry = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
+            /** @var DocumentationJar $documentationJar */
+            $documentationJar = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
 
             if ($buildDetails->success) {
                 // Build was successful, delete documentation from database
-                $manager->remove($documentationEntry);
+                $manager->remove($documentationJar);
                 $manager->flush();
 
                 $logger->info(
@@ -135,17 +138,17 @@ class BambooPostBuildController extends AbstractController
                         'type' => 'docsRendering',
                         'status' => 'documentationDeleted',
                         'triggeredBy' => 'api',
-                        'repository' => $documentationEntry->getRepositoryUrl(),
-                        'package' => $documentationEntry->getPackageName(),
+                        'repository' => $documentationJar->getRepositoryUrl(),
+                        'package' => $documentationJar->getPackageName(),
                         'bambooKey' => $buildDetails->buildKey,
                     ]
                 );
             } else {
                 // Build failed, revert status of documentation to "rendered"
-                $documentationEntry
+                $documentationJar
                     ->setStatus(DocumentationStatus::STATUS_RENDERED)
                     ->setBuildKey('');
-                $manager->persist($documentationEntry);
+                $manager->persist($documentationJar);
                 $manager->flush();
 
                 $logger->warning(
@@ -155,8 +158,8 @@ class BambooPostBuildController extends AbstractController
                         'type' => 'docsRendering',
                         'status' => 'documentationDeleteFailed',
                         'triggeredBy' => 'api',
-                        'repository' => $documentationEntry->getRepositoryUrl(),
-                        'package' => $documentationEntry->getPackageName(),
+                        'repository' => $documentationJar->getRepositoryUrl(),
+                        'package' => $documentationJar->getPackageName(),
                         'bambooKey' => $buildDetails->buildKey,
                     ]
                 );
@@ -165,11 +168,11 @@ class BambooPostBuildController extends AbstractController
             // This is a back-channel triggered by Bamboo after a "documentation rendering" build is done
             $manager = $this->getDoctrine()->getManager();
             $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
-            /** @var DocumentationJar $documentationEntry */
-            $documentationEntry = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
+            /** @var DocumentationJar $documentationJar */
+            $documentationJar = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
             if ($buildDetails->success) {
                 // Build was successful, set status to "rendered"
-                $documentationEntry
+                $documentationJar
                     ->setLastRenderedAt(new \DateTime('now'))
                     ->setStatus(DocumentationStatus::STATUS_RENDERED);
                 $logger->info(
@@ -179,14 +182,14 @@ class BambooPostBuildController extends AbstractController
                         'type' => 'docsRendering',
                         'status' => 'documentationRendered',
                         'triggeredBy' => 'api',
-                        'repository' => $documentationEntry->getRepositoryUrl(),
-                        'package' => $documentationEntry->getPackageName(),
+                        'repository' => $documentationJar->getRepositoryUrl(),
+                        'package' => $documentationJar->getPackageName(),
                         'bambooKey' => $buildDetails->buildKey,
                     ]
                 );
             } else {
                 // Build failed, set status of documentation to "rendering failed"
-                $documentationEntry->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED);
+                $documentationJar->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED);
                 $logger->warning(
                     'Failed to render documentation'
                     . ' due to bamboo build "' . $buildDetails->buildKey . '"',
@@ -194,11 +197,16 @@ class BambooPostBuildController extends AbstractController
                         'type' => 'docsRendering',
                         'status' => 'documentationRenderingFailed',
                         'triggeredBy' => 'api',
-                        'repository' => $documentationEntry->getRepositoryUrl(),
-                        'package' => $documentationEntry->getPackageName(),
+                        'repository' => $documentationJar->getRepositoryUrl(),
+                        'package' => $documentationJar->getPackageName(),
                         'bambooKey' => $buildDetails->buildKey,
                     ]
                 );
+            }
+            // If a re-rendering is registered, trigger docs rendering again and unset flag
+            if ($documentationJar->isReRenderNeeded()) {
+                $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'api');
+                $documentationJar->setReRenderNeeded(false);
             }
             $manager->flush();
         }
