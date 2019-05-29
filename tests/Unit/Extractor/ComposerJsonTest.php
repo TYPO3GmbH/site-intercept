@@ -202,10 +202,10 @@ class ComposerJsonTest extends TestCase
     /**
      * @test
      */
-    public function exceptionIsNotThrownWhenCmsCoreVersionNotPresentInNonExtensionPackage(): void
+    public function exceptionIsNotThrownForTypo3CmsCorePackage(): void
     {
         $composerJson = new ComposerJson([
-            'name' => 'foobar/baz',
+            'name' => 'typo3/cms-core',
             'type' => 'typo3-cms-framework',
             'require' => ['foobar/bark' => '^4.2'],
             'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],

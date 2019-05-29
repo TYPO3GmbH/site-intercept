@@ -80,10 +80,8 @@ class ComposerJson
      */
     public function getMinimumTypoVersion(): string
     {
-        // We don't have the packageName at this point usually, and cms-core has no
-        // requirement to itself. Thus, we blacklist especially typo3-cms-framework extensions (core extensions)
-        // here - their minimum and maximum typo3 version is clear by the according branch anyway.
-        if ($this->getType() === 'typo3-cms-framework') {
+        // Leave version constraint empty for typo3/cms-core itself
+        if ($this->getName() === 'typo3/cms-core') {
             return '';
         }
         if ($this->getCoreRequirement() === null) {
@@ -99,10 +97,8 @@ class ComposerJson
      */
     public function getMaximumTypoVersion(): string
     {
-        // We don't have the packageName at this point usually, and cms-core has no
-        // requirement to itself. Thus, we blacklist especially typo3-cms-framework extensions (core extensions)
-        // here - their minimum and maximum typo3 version is clear by the according branch anyway.
-        if ($this->getType() === 'typo3-cms-framework') {
+        // Leave version constraint empty for typo3/cms-core itself
+        if ($this->getName() === 'typo3/cms-core') {
             return '';
         }
         if ($this->getCoreRequirement() === null) {
