@@ -38,16 +38,19 @@ class DocumentationDownloads
         // Simple path traversal protection: remove '/../' and '/./'
         $urlPath = str_replace(['/../', '/./'], '', $urlPath);
 
+        // _buildinfo link for homepage repository on document root:
+        // If a homepage related url is called (main index, the 404 page, no page at all, or something below Home/
+        // Then show the _buildinfo of the hompage repository in web document root _buildinfo
+        if (isset($urlPath[0]) && in_array($urlPath[0], ['Home', '404.html', 'Index.html', ''], true)) {
+            $content = '<dd class="related-link-buildinfo"><a href="/_buildinfo" target="_blank">BUILDINFO</a></dd>';
+            return new Response(200, [], $content);
+        }
+
         // Remove leading and trailing slashes again
         $urlPath = trim($urlPath, '/');
         $urlPath = explode('/', $urlPath);
         if (count($urlPath) < 5) {
             return new Response(200, [], '');
-        }
-
-        if (in_array($urlPath[0], ['Home', '404.html', 'Index.html'], true)) {
-            $content = '<dd class="related-link-buildinfo"><a href="/_buildinfo" target="_blank">BUILDINFO</a></dd>';
-            return new Response(200, [], $content);
         }
 
         // first three segments are main root of that repo - eg. '[p, lolli42, enetcache]'

@@ -14,6 +14,12 @@ of that documentation.
 Similar to ajaxversions.php. This script outputs links to _buildinfo directory
 of the given rendered repository.
 
+## 404.php
+
+This php file is registered as nginx services/404.php 404 error handler. It traverses
+the document root path up from the orgininally requested file until it find the first
+404.html. Documentation repositories can have own 404.rst files this way. 
+
 
 ## Hook for documentation rendering
 
