@@ -47,11 +47,11 @@ class NotFoundApplication
         // Simple path traversal protection: remove '/../' and '/./'
         $path = str_replace(['/../', '/./'], '', $this->request->getUri()->getPath());
 
-        $pathParts = explode('/', $path);
+        $pathParts = explode('/', trim($path, '/'));
         $notFoundPath = '';
         while (count($pathParts) > 0) {
             $tmpPath = $this->getDocumentRoot() . '/' . implode('/', $pathParts) . '/404.html';
-            if (file_exists($tmpPath)) {
+            if (@file_exists($tmpPath)) {
                 $notFoundPath = $tmpPath;
                 break;
             }
@@ -62,6 +62,6 @@ class NotFoundApplication
 
     protected function getDocumentRoot(): string
     {
-        return $GLOBALS['_SERVER']['DOCUMENT_ROOT'];
+        return rtrim($GLOBALS['_SERVER']['DOCUMENT_ROOT'], '/');
     }
 }
