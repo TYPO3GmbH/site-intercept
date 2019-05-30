@@ -55,7 +55,9 @@ class WebHookService
             // The URL should be the clone url, poorly Bitbucket does not provide this url.
             // Therefore we use HTML url, which will work with git clone
             $repositoryUrl = (string)$payload->push->changes[0]->new->target->links->html->href;
-            $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
+            if (is_int(strpos($repositoryUrl, '/commits/'))) {
+                $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
+            }
             $versionString = (string)$payload->push->changes[0]->new->name;
         } else {
             // Server (refs_changed)
