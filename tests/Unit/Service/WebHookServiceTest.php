@@ -24,7 +24,7 @@ class WebHookServiceTest extends TestCase
         return [
             'Payload_Bitbucket_Event_Push' => [
                 new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:push'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Event_Push.json')),
-                new PushEvent('https://bitbucket.org/user_name/repo_name', 'name-of-branch', 'https://bitbucket.org/account/user/teamawesome/projects/proj/repos/repo_name/raw/composer.json?at=refs%2Fheads%2Fname-of-branch')
+                new PushEvent('https://bitbucket.org/DanielSiepmann/contacts', 'documentation-draft', 'https://bitbucket.org/DanielSiepmann/contacts/raw/documentation-draft/composer.json')
             ],
             'Payload_GitHub_Event_Push_Branch' => [
                 new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Branch.json')),

@@ -1,0 +1,75 @@
+{
+    "actor": {
+        "active": true,
+        "displayName": "Christian Kuhn",
+        "emailAddress": "christian.kuhn@typo3.com",
+        "id": 52,
+        "links": {
+            "self": [
+                {
+                    "href": "https://bitbucket.typo3.com/users/christian.kuhn"
+                }
+            ]
+        },
+        "name": "christian.kuhn",
+        "slug": "christian.kuhn",
+        "type": "NORMAL"
+    },
+    "changes": [
+        {
+            "fromHash": "0000000000000000000000000000000000000000",
+            "ref": {
+                "displayId": "documentation-draft",
+                "id": "refs/heads/documentation-draft",
+                "type": "BRANCH"
+            },
+            "refId": "refs/heads/documentation-draft",
+            "toHash": "7a1c7fe4226d54d1e647c90f6b730cbc1c67fcd1",
+            "type": "ADD"
+        }
+    ],
+    "date": "2019-05-29T21:30:59+0200",
+    "eventKey": "repo:refs_changed",
+    "repository": {
+        "forkable": false,
+        "id": 40,
+        "links": {
+            "clone": [
+                {
+                    "href": "ssh://git@bitbucket.typo3.com:7999/ext/querybuilder.git",
+                    "name": "ssh"
+                },
+                {
+                    "href": "https://bitbucket.typo3.com/scm/ext/querybuilder.git",
+                    "name": "http"
+                }
+            ],
+            "self": [
+                {
+                    "href": "https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/browse"
+                }
+            ]
+        },
+        "name": "querybuilder",
+        "project": {
+            "description": "Extensions",
+            "id": 30,
+            "key": "EXT",
+            "links": {
+                "self": [
+                    {
+                        "href": "https://bitbucket.typo3.com/projects/EXT"
+                    }
+                ]
+            },
+            "name": "Extensions",
+            "public": false,
+            "type": "NORMAL"
+        },
+        "public": true,
+        "scmId": "git",
+        "slug": "querybuilder",
+        "state": "AVAILABLE",
+        "statusMessage": "Available"
+    }
+}

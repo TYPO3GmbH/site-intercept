@@ -17,11 +17,14 @@ use Symfony\Component\Process\Process;
 class GitRepositoryService
 {
     public const SERVICE_BITBUCKET = 'bitbucket';
+    public const SERVICE_BITBUCKET_CLOUD = 'bitbucket-cloud';
+    public const SERVICE_BITBUCKET_SERVER = 'bitbucket-server';
     public const SERVICE_GITHUB = 'github';
     public const SERVICE_GITLAB = 'gitlab';
 
     protected $composerJsonUrlFormat = [
-        self::SERVICE_BITBUCKET => '{baseUrl}/repos/{repoName}/raw/composer.json?at=refs%2Fheads%2F{version}',
+        self::SERVICE_BITBUCKET_CLOUD => '{baseUrl}/raw/{version}/composer.json',
+        self::SERVICE_BITBUCKET_SERVER => '{baseUrl}/raw/composer.json?at=refs%2Fheads%2F{version}',
         self::SERVICE_GITLAB => '{baseUrl}/raw/{version}/composer.json',
         self::SERVICE_GITHUB => 'https://raw.githubusercontent.com/{repoName}/{version}/composer.json',
     ];
@@ -32,6 +35,8 @@ class GitRepositoryService
     {
         switch ($repoService) {
             case self::SERVICE_BITBUCKET:
+            case self::SERVICE_BITBUCKET_CLOUD:
+            case self::SERVICE_BITBUCKET_SERVER:
                 return $this->getPublicComposerUrlForBitbucket($payload);
                 break;
             case self::SERVICE_GITHUB:
@@ -92,10 +97,18 @@ class GitRepositoryService
 
     protected function getPublicComposerUrlForBitbucket(stdClass $payload): string
     {
-        return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_BITBUCKET], [
-            '{baseUrl}' => (string)$payload->repository->project->links->html->href,
+        if (isset($payload->repository->links->html->href)) {
+            return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_BITBUCKET_CLOUD], [
+                '{baseUrl}' => (string)$payload->repository->links->html->href,
+                '{repoName}' => (string)$payload->repository->name,
+                '{version}' => (string)$payload->push->changes[0]->new->name,
+            ]);
+        }
+
+        return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_BITBUCKET_SERVER], [
+            '{baseUrl}' => trim(str_replace('browse', '', (string)$payload->repository->links->self[0]->href), '/'),
             '{repoName}' => (string)$payload->repository->name,
-            '{version}' => (string)$payload->push->changes[0]->new->name,
+            '{version}' => (string)$payload->changes[0]->ref->displayId,
         ]);
     }
 
