@@ -26,6 +26,10 @@ class WebHookServiceTest extends TestCase
                 new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:push'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Event_Push.json')),
                 new PushEvent('https://bitbucket.org/DanielSiepmann/contacts', 'documentation-draft', 'https://bitbucket.org/DanielSiepmann/contacts/raw/documentation-draft/composer.json')
             ],
+            'Payload_Bitbucket_Event_Refs_Changed' => [
+                new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:refs_changed'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Event_Refs_Changed.json')),
+                new PushEvent('https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft')
+            ],
             'Payload_GitHub_Event_Push_Branch' => [
                 new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Branch.json')),
                 new PushEvent('https://github.com/Codertocat/Hello-World.git', 'master', 'https://raw.githubusercontent.com/Codertocat/Hello-World/master/composer.json')

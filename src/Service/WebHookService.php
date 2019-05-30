@@ -31,7 +31,7 @@ class WebHookService
      */
     public function createPushEvent(Request $request): PushEvent
     {
-        if ($request->headers->get('X-Event-Key', '') === 'repo:push') {
+        if (in_array($request->headers->get('X-Event-Key', ''), ['repo:push', 'repo:refs_changed'], true)) {
             return $this->getPushEventFromBitbucket($request);
         }
         if (in_array($request->headers->get('X-Gitlab-Event', ''), ['Push Hook', 'Tag Push Hook'], true)) {
@@ -50,9 +50,17 @@ class WebHookService
     protected function getPushEventFromBitbucket(Request $request): PushEvent
     {
         $payload = json_decode($request->getContent(), false);
-        $repositoryUrl = (string)$payload->push->changes[0]->new->target->links->html->href;
-        $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
-        $versionString = (string)$payload->push->changes[0]->new->name;
+        if (isset($payload->push->changes[0]->new->target->links->html->href)) {
+            // Cloud (Push)
+            $repositoryUrl = (string)$payload->push->changes[0]->new->target->links->html->href;
+            $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
+            $versionString = (string)$payload->push->changes[0]->new->name;
+        } else {
+            // Server (refs_changed)
+            $repositoryUrl = (string)$payload->repository->links->self[0]->href;
+            $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, 'browse'));
+            $versionString = (string)$payload->changes[0]->ref->displayId;
+        }
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET);
 
