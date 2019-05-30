@@ -28,7 +28,7 @@ class WebHookServiceTest extends TestCase
             ],
             'Payload_Bitbucket_Event_Refs_Changed' => [
                 new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:refs_changed'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Event_Refs_Changed.json')),
-                new PushEvent('https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft')
+                new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft')
             ],
             'Payload_GitHub_Event_Push_Branch' => [
                 new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Branch.json')),

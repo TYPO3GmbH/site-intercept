@@ -52,13 +52,21 @@ class WebHookService
         $payload = json_decode($request->getContent(), false);
         if (isset($payload->push->changes[0]->new->target->links->html->href)) {
             // Cloud (Push)
+            // The URL should be the clone url, poorly Bitbucket does not provide this url.
+            // Therefore we use HTML url, which will work with git clone
             $repositoryUrl = (string)$payload->push->changes[0]->new->target->links->html->href;
             $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
             $versionString = (string)$payload->push->changes[0]->new->name;
         } else {
             // Server (refs_changed)
-            $repositoryUrl = (string)$payload->repository->links->self[0]->href;
-            $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, 'browse'));
+            // In case of self hosted, Bitbucket provides a git clone url
+            // We have to use this url, as html url will not work with git clone
+            foreach ($payload->repository->links->clone as $cloneInformation) {
+                if ($cloneInformation->name === 'http') {
+                    $repositoryUrl = (string)$cloneInformation->href;
+                    break;
+                }
+            }
             $versionString = (string)$payload->changes[0]->ref->displayId;
         }
         $urlToComposerFile = (new GitRepositoryService())
