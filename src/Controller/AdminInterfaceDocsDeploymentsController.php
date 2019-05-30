@@ -309,7 +309,8 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 ->setTypeLong($deploymentInformation->typeLong)
                 ->setTypeShort($deploymentInformation->typeShort)
                 ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
-                ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
+                ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion)
+                ->setReRenderNeeded(false);
 
             $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
             $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
