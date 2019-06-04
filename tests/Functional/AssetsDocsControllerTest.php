@@ -78,6 +78,6 @@ class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $content = $this->client->getResponse()->getContent();
 
-        $this->assertStringContainsString('"key":"t3g\/blog","extensionKey":"blog","latest":"9.1","versions":{"master":"\/p\/t3g\/blog\/master\/en-us","9.1":"typo3cms\/extensions\/blog\/9.1.1","9.0":"typo3cms\/extensions\/blog\/9.0.0","8.7":"\/p\/t3g\/blog\/8.7\/en-us"', $content);
+        $this->assertStringContainsString('"key":"t3g\/blog","extensionKey":"blog","latest":"9.1","versions":{"master":"\/p\/t3g\/blog\/master\/en-us","9.1":"\/typo3cms\/extensions\/blog\/9.1.1","9.0":"\/typo3cms\/extensions\/blog\/9.0.0","8.7":"\/p\/t3g\/blog\/8.7\/en-us"', $content);
     }
 }
