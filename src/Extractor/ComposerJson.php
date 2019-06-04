@@ -116,7 +116,7 @@ class ComposerJson
     {
         $maxVersion = '';
         foreach (self::ALLOWED_TYPO_VERSIONS as $typoVersion) {
-            if (Semver::satisfies($typoVersion, $this->getCoreRequirement())) {
+            if (Semver::satisfies($typoVersion . '.999', $this->getCoreRequirement())) {
                 if (!$getMaximum) {
                     return $typoVersion;
                 }
