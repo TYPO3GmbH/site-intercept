@@ -78,22 +78,32 @@ class AssetsDocsController extends AbstractController
             '// DO NOT MODIFY THIS FILE',
             'var extensionList = %s;',
         ]);
-        $flatList = [];
+
+        $legacyExtensions = json_decode(file_get_contents(__DIR__ . '/../../config/docs-legacy-rendering/typo3cms-extensions.json'), true);
+        $flatList = $legacyExtensions;
 
         foreach ($extensions as $extension) {
+            // We use the extension key (not package name) as array key here to have an easier game with legacy renderings
             $path = '/' . $extension->getTypeShort() . '/' . $extension->getPackageName() . '/' . $extension->getTargetBranchDirectory() . '/en-us';
-            if (!isset($flatList[$extension->getPackageName()])) {
-                $flatList[$extension->getPackageName()] = [
+            if (!isset($flatList[$extension->getExtensionKey()])) {
+                // A new extension not yet in legacy list
+                $flatList[$extension->getExtensionKey()] = [
                     'key' => $extension->getPackageName(),
+                    'extensionKey' => $extension->getExtensionKey(),
                     'latest' => null, // this will be set later
-                    'versions' => [$extension->getTargetBranchDirectory()],
+                    'versions' => [
+                        $extension->getTargetBranchDirectory() => $extension->getTargetBranchDirectory()
+                    ],
                     'paths' => [
                         $extension->getTargetBranchDirectory() => $path,
                     ],
                 ];
             } else {
-                $flatList[$extension->getPackageName()]['versions'][] = $extension->getTargetBranchDirectory();
-                $flatList[$extension->getPackageName()]['paths'][$extension->getTargetBranchDirectory()] = $path;
+                // New rendering has a fresh version for this 'branch', or this is a new branch
+                $flatList[$extension->getExtensionKey()]['versions'][$extension->getTargetBranchDirectory()] = $extension->getTargetBranchDirectory();
+                $flatList[$extension->getExtensionKey()]['paths'][$extension->getTargetBranchDirectory()] = $path;
+                // Update packageName if possible, so 'key' is now packageName, and only 'extensionKey' is extensionKey ... this was not possible with legacy rendering
+                $flatList[$extension->getExtensionKey()]['key'] = $extension->getPackageName();
             }
         }
 
