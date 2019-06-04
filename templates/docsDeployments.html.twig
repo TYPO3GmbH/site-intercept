@@ -84,7 +84,13 @@
                                     <a href="{{ deployment|intercept_link_to_docs }}">{{ deployment.targetBranchDirectory }}</a>
                                 </td>
                                 <td data-type="localdate">
-                                    {{ intercept_date_time(deployment.lastRenderedAt) }}
+                                    {% if deployment.buildKey %}
+                                        <a href="https://bamboo.typo3.com/browse/{{ deployment.buildKey }}">
+                                            {{ intercept_date_time(deployment.lastRenderedAt) }}
+                                        </a>
+                                    {% else %}
+                                        {{ intercept_date_time(deployment.lastRenderedAt) }}
+                                    {% endif %}
                                 </td>
                                 <td>
                                     {% if deployment.minimumTypoVersion == deployment.maximumTypoVersion %}
