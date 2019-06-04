@@ -53,8 +53,12 @@ class WebHookService
         if (isset($payload->push->changes[0]->new->target->links->html->href)) {
             // Cloud (Push)
             // The URL should be the clone url, poorly Bitbucket does not provide this url.
-            // Therefore we use HTML url, which will work with git clone
+            // Therefore we use HTML url, which will work with git clone, we may however add .git if it misses
             $repositoryUrl = (string)$payload->push->changes[0]->new->target->links->html->href;
+            // Add .git at end if it misses. This must be aligned, otherwise manual adding of configuration will go wrong.
+            if (substr($repositoryUrl, -4) !== '.git') {
+                $repositoryUrl = $repositoryUrl . '.git';
+            }
             if (is_int(strpos($repositoryUrl, '/commits/'))) {
                 $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
             }

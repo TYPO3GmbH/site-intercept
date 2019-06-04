@@ -33,7 +33,7 @@ class GitRepositoryServiceTest extends TestCase
         return [
             'Bitbucket (cloud) push' => [
                 'expectedUrl' => 'https://bitbucket.org/DanielSiepmann/contacts/raw/documentation-draft/composer.json',
-                'payload' => $this->getPayloadFromFixture('Payload_Bitbucket_Event_Push.json'),
+                'payload' => $this->getPayloadFromFixture('Payload_Bitbucket_Cloud_Event_Push.json'),
                 'repoService' => GitRepositoryService::SERVICE_BITBUCKET_CLOUD,
                 'eventType' => null,
             ],
