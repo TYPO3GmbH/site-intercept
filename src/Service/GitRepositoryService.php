@@ -22,9 +22,16 @@ class GitRepositoryService
     public const SERVICE_GITHUB = 'github';
     public const SERVICE_GITLAB = 'gitlab';
 
+    public const SERVICE_NAMES = [
+        self::SERVICE_GITHUB => 'GitHub',
+        self::SERVICE_GITLAB => 'GitLab',
+        self::SERVICE_BITBUCKET_CLOUD => 'Bitbucket Cloud',
+        self::SERVICE_BITBUCKET_SERVER => 'Bitbucket Server'
+    ];
+
     protected $composerJsonUrlFormat = [
-        self::SERVICE_BITBUCKET_CLOUD => '{baseUrl}/raw/{version}/composer.json',
-        self::SERVICE_BITBUCKET_SERVER => '{baseUrl}/raw/composer.json?at=refs%2Fheads%2F{version}',
+        self::SERVICE_BITBUCKET_CLOUD => '{baseUrl}/{repoName}/raw/{version}/composer.json',
+        self::SERVICE_BITBUCKET_SERVER => '{baseUrl}/projects/{project}/repos/{package}/raw/composer.json?at=refs%2Fheads%2F{version}',
         self::SERVICE_GITLAB => '{baseUrl}/raw/{version}/composer.json',
         self::SERVICE_GITHUB => 'https://raw.githubusercontent.com/{repoName}/{version}/composer.json',
     ];
@@ -99,15 +106,16 @@ class GitRepositoryService
     {
         if (isset($payload->repository->links->html->href)) {
             return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_BITBUCKET_CLOUD], [
-                '{baseUrl}' => (string)$payload->repository->links->html->href,
-                '{repoName}' => (string)$payload->repository->name,
+                '{baseUrl}' => 'https://bitbucket.org',
+                '{repoName}' => (string)$payload->repository->full_name,
                 '{version}' => (string)$payload->push->changes[0]->new->name,
             ]);
         }
 
         return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_BITBUCKET_SERVER], [
-            '{baseUrl}' => trim(str_replace('browse', '', (string)$payload->repository->links->self[0]->href), '/'),
-            '{repoName}' => (string)$payload->repository->name,
+            '{baseUrl}' => 'https://' . explode('/', str_replace('https://', '', (string)$payload->repository->links->self[0]->href))[0],
+            '{package}' => (string)$payload->repository->name,
+            '{project}' => (string)$payload->repository->project->key,
             '{version}' => (string)$payload->changes[0]->ref->displayId,
         ]);
     }

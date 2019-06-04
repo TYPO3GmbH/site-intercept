@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class DocumentationJar
 {
-    public const VALID_REPOSITORY_URL_REGEX = '/^https:\/\/[-a-zA-Z0-9_.-]{1,100}\.[-a-zA-Z0-9_.-]{2,10}\/[-a-zA-Z0-9_-]{2,100}\/[-a-zA-Z0-9_-]{2,100}\.git$/';
+    public const VALID_REPOSITORY_URL_REGEX = '/^https:\/\/[-a-zA-Z0-9_.-\/]{2,300}\.git$/';
 
     /**
      * @ORM\Id()

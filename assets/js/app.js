@@ -17,6 +17,27 @@ var { DateTime } = require('luxon');
 
 $(document).ready(function () {
     convertDates();
+    $("#documentation_deployment_repositoryUrl").change(function(){
+        const value = $("#documentation_deployment_repositoryUrl").val();
+        if (value.indexOf('https://github.com') === 0) {
+            $("#documentation_deployment_repositoryType option[value=github]").removeAttr('disabled');
+            $("#documentation_deployment_repositoryType").val('github').attr('readonly', true);
+            $("#documentation_deployment_repositoryType option:selected").siblings().attr('disabled', 'disabled');
+        } else if (value.indexOf('https://gitlab.com') === 0) {
+            $("#documentation_deployment_repositoryType option[value=gitlab]").removeAttr('disabled');
+            $("#documentation_deployment_repositoryType").val('gitlab').attr('readonly', true);
+            $("#documentation_deployment_repositoryType option:selected").siblings().attr('disabled', 'disabled');
+        } else if (value.indexOf('https://bitbucket.org') === 0) {
+            $("#documentation_deployment_repositoryType option[value=bitbucket-cloud]").removeAttr('disabled');
+            $("#documentation_deployment_repositoryType").val('bitbucket-cloud').attr('readonly', true);
+            $("#documentation_deployment_repositoryType option:selected").siblings().attr('disabled', 'disabled');
+        } else {
+            $("#documentation_deployment_repositoryType").removeAttr('readonly');
+            $("#documentation_deployment_repositoryType option").filter(function() {
+                return this.value.length !== 0;
+            }).removeAttr('disabled');
+        }
+    });
 });
 
 function convertDates() {
@@ -32,3 +53,4 @@ function convertDates() {
         });
     });
 }
+

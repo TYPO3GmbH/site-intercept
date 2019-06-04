@@ -188,6 +188,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         $documentationJar->setRepositoryUrl($repositoryUrl);
 
         $form = $this->createForm(DocumentationDeployment::class, $documentationJar);
+        $form->get('repositoryType')->setData($request->get('documentation_deployment')['repositoryType']);
         $form->handleRequest($request);
         if (!empty($repositoryUrl)) {
             if (preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, $repositoryUrl) !== 1) {
@@ -223,6 +224,7 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
 
         $form = $this->createForm(DocumentationDeployment::class, $documentationJar, ['step2' => true, 'entity_manager' => $this->getDoctrine()->getManager()]);
         $form->setData($documentationJar);
+        $form->get('repositoryType')->setData($request->get('documentation_deployment')['repositoryType']);
         if ($branch !== '') {
             return $this->forward(self::class . '::addConfigurationStep3');
         }
@@ -253,11 +255,12 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         $branch = $request->get('documentation_deployment')['branch'] ?? '';
         $documentationJar->setBranch($branch);
         $publicComposerJsonUrl = $request->get('documentation_deployment')['publicComposerJsonUrl'] ?? '';
+        $repositoryType = $request->get('documentation_deployment')['repositoryType'] ?? '';
         $documentationJar->setPublicComposerJsonUrl($publicComposerJsonUrl);
 
         if ($publicComposerJsonUrl === '') {
             // public composer url not set yet, try to resolve it
-            $publicComposerJsonUrl = $this->resolveComposerJsonUrl($repositoryUrl, $branch);
+            $publicComposerJsonUrl = $this->resolveComposerJsonUrl($repositoryUrl, $branch, $repositoryType);
         }
         $documentationJar->setPublicComposerJsonUrl($publicComposerJsonUrl);
         $requestData = $request->request->get('documentation_deployment');
@@ -389,11 +392,24 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         }
     }
 
-    protected function resolveComposerJsonUrl(string $repositoryUrl, string $branch): string
+    protected function resolveComposerJsonUrl(string $repositoryUrl, string $branch, string $repositoryType = null): string
     {
         $repoService = '';
         $parameters = [];
-        if (strpos($repositoryUrl, 'github.com') !== false) {
+        if ($repositoryType === GitRepositoryService::SERVICE_BITBUCKET_SERVER) {
+            $repoService = GitRepositoryService::SERVICE_BITBUCKET_SERVER;
+            $repositoryUrl = str_replace('.git', '', $repositoryUrl);
+            $packageParts = explode('/', $repositoryUrl);
+            $package = array_pop($packageParts);
+            $project = array_pop($packageParts);
+            $parameters = [
+                '{baseUrl}' => 'https://' . explode('/', str_replace('https://', '', $repositoryUrl))[0],
+                '{package}' => $package,
+                '{project}' => $project,
+                '{version}' => $branch,
+            ];
+        }
+        if (strpos($repositoryUrl, 'https://github.com') !== false) {
             $repoService = GitRepositoryService::SERVICE_GITHUB;
             $packageParts = explode('/', str_replace(['https://github.com/', '.git'], '', $repositoryUrl));
             $parameters = [
@@ -401,19 +417,19 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 '{version}' => $branch,
             ];
         }
-        if (strpos($repositoryUrl, 'gitlab.com') !== false) {
+        if (strpos($repositoryUrl, 'https://gitlab.com') !== false) {
             $repoService = GitRepositoryService::SERVICE_GITLAB;
             $parameters = [
                 '{baseUrl}' => str_replace('.git', '', $repositoryUrl),
                 '{version}' => $branch,
             ];
         }
-        if (strpos($repositoryUrl, 'bitbucket.com') !== false) {
-            $repoService = GitRepositoryService::SERVICE_BITBUCKET;
+        if (strpos($repositoryUrl, 'https://bitbucket.org') !== false) {
+            $repoService = GitRepositoryService::SERVICE_BITBUCKET_CLOUD;
             $packageParts = explode('/', str_replace('https://bitbucket.org/', '', $repositoryUrl));
             $parameters = [
-                '{baseUrl}' => 'https://bitbucket.org/',
-                '{repoName}' => $packageParts[0] . '/' . $packageParts[1],
+                '{baseUrl}' => 'https://bitbucket.org',
+                '{repoName}' => $packageParts[0] . '/' . str_replace('.git', '', $packageParts[1]),
                 '{version}' => $branch,
             ];
         }

@@ -34,14 +34,14 @@ class GitRepositoryServiceTest extends TestCase
             'Bitbucket (cloud) push' => [
                 'expectedUrl' => 'https://bitbucket.org/DanielSiepmann/contacts/raw/documentation-draft/composer.json',
                 'payload' => $this->getPayloadFromFixture('Payload_Bitbucket_Event_Push.json'),
-                'repoService' => GitRepositoryService::SERVICE_BITBUCKET,
+                'repoService' => GitRepositoryService::SERVICE_BITBUCKET_CLOUD,
                 'eventType' => null,
             ],
             'Bitbucket (server) push' => [
                 'expectedUrl' => 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at='
                     . urlencode('refs/heads/documentation-draft'),
                 'payload' => $this->getPayloadFromFixture('Payload_Bitbucket_Server_Event_Push.json'),
-                'repoService' => GitRepositoryService::SERVICE_BITBUCKET,
+                'repoService' => GitRepositoryService::SERVICE_BITBUCKET_SERVER,
                 'eventType' => null,
             ],
             'GitHub (cloud) push branch' => [

@@ -29,7 +29,7 @@ class DocumentationDeployment extends AbstractType
         $optionsStep1 = $options['step2'] || $options['step3'] ? [
             'attr' => [
                 'class' => 'disabled',
-                'readonly' => 'readonly'
+                'readonly' => 'readonly',
             ],
         ] : [];
         $optionsStep2 = $options['step3'] ? [
@@ -40,7 +40,22 @@ class DocumentationDeployment extends AbstractType
         ] : [];
 
         $builder
-            ->add('repositoryUrl', null, $optionsStep1);
+            ->add('repositoryUrl', null, $optionsStep1)
+            ->add(
+                'repositoryType',
+                ChoiceType::class,
+                [
+                    'mapped' => false,
+                    'choices' => ['Please select a repository type' => ''] + array_flip(GitRepositoryService::SERVICE_NAMES),
+                    'choice_attr' => function ($key, $val, $index) {
+                        if ($val === '') {
+                            return ['disabled' => 'disabled'];
+                        }
+
+                        return [];
+                    }
+                ] + $optionsStep1
+            );
 
         if ($options['step2']) {
             $builder
