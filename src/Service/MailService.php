@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Extractor\ComposerJson;
 use App\Extractor\PushEvent;
 use Twig\Environment;
@@ -40,20 +41,29 @@ class MailService
      */
     public function sendMailToAuthorDueToMissingDependency(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
     {
-        $message = $this->createMessageWithTemplate(
-            'Documentation rendering failed',
-            'email/docs/renderingFailedDueToMissingDependency.html.twig',
-            [
-                'author' => $composerJson->getFirstAuthor(),
-                'package' => $composerJson->getName(),
-                'pushEvent' => $pushEvent,
-                'reasonPhrase' => $exceptionMessage,
-            ]
-        );
-        $message
-            ->setFrom('intercept@typo3.com')
-            ->setTo($composerJson->getFirstAuthor()['email'])
-        ;
+        try {
+            $author = $composerJson->getFirstAuthor();
+            $message = $this->createMessageWithTemplate(
+                'Documentation rendering failed',
+                'email/docs/renderingFailedDueToMissingDependency.html.twig',
+                [
+                    'author' => $author,
+                    'package' => $composerJson->getName(),
+                    'pushEvent' => $pushEvent,
+                    'reasonPhrase' => $exceptionMessage,
+                ]
+            );
+            if (!empty($author['email'])) {
+                $message
+                    ->setFrom('intercept@typo3.com')
+                    ->setTo($composerJson->getFirstAuthor()['email']);
+            } else {
+                return 0;
+            }
+        } catch (DocsComposerMissingValueException $e) {
+            // Thrown if author is not set, we can't send a mail, then.
+            return 0;
+        }
 
         return $this->send($message);
     }
