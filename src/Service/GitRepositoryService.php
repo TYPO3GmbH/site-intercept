@@ -64,6 +64,51 @@ class GitRepositoryService
 
     public function getBranchesFromRepositoryUrl(string $repositoryUrl): array
     {
+        $output = $this->runGitProcess($repositoryUrl);
+        $branchesAndTags = [];
+        $regEx = '/([a-z0-9]{40}[\s]*refs\/(heads|tags)\/)(.*)/m';
+        foreach (explode(chr(10), $output) as $row) {
+            preg_match_all($regEx, $row, $matches, PREG_SET_ORDER, 0);
+            if (!empty($matches[0][3])) {
+                $branchesAndTags[] = $matches[0][3];
+            }
+        }
+
+        return $this->filterAllowedBranches($branchesAndTags);
+    }
+
+    public function filterAllowedBranches(array $branchesAndTags): array
+    {
+        $results = [];
+        $versions = [];
+        foreach ($branchesAndTags as $item) {
+            if (in_array($item, $this->allowedBranches, true)) {
+                $results[$item] = $item;
+            }
+            if (preg_match('/^v?(\d+.\d+.\d+)$/', $item)) {
+                $versions[] = $item;
+            }
+        }
+        $uniqueVersion = [];
+
+        // Trims down the displayed version of a branch/tag
+        foreach ($versions as $version) {
+            $versionParts = explode('.', ltrim($version, 'v'));
+            $shortVersion = $versionParts[0] . '.' . $versionParts[1];
+            if (!isset($uniqueVersion[$shortVersion]) || version_compare(ltrim($version, 'v'), ltrim($uniqueVersion[$shortVersion], 'v')) > 0) {
+                $uniqueVersion[$shortVersion] = $version;
+            }
+        }
+
+        $uniqueVersion = array_flip($uniqueVersion);
+        asort($uniqueVersion);
+
+        // Keep master branch on top, then list tags
+        return array_merge($results, $uniqueVersion);
+    }
+
+    protected function runGitProcess(string $repositoryUrl): string
+    {
         $process = new Process(['git', 'ls-remote', '-h', '-t', $repositoryUrl]);
         $process->run();
 
@@ -71,35 +116,7 @@ class GitRepositoryService
             throw new ProcessFailedException($process);
         }
 
-        $branchesAndTags = [];
-        $regEx = '/([a-z0-9]{40}[\s]*refs\/(heads|tags)\/)(.*)/m';
-        foreach (explode(chr(10), $process->getOutput()) as $row) {
-            preg_match_all($regEx, $row, $matches, PREG_SET_ORDER, 0);
-            if (!empty($matches[0][3])) {
-                $branchesAndTags[] = $matches[0][3];
-            }
-        }
-        $results = [];
-        $versions = [];
-        foreach ($branchesAndTags as $item) {
-            if (in_array($item, $this->allowedBranches, true)) {
-                $results[$item] = $item;
-            }
-            $version = ltrim($item, 'v');
-            if (preg_match('/^(\d+.\d+.\d+)$/', $version)) {
-                $versions[] = $version;
-            }
-        }
-        sort($versions);
-        $uniqueVersion = [];
-        foreach ($versions as $version) {
-            $versionParts = explode('.', $version);
-            $shortVersion = $versionParts[0] . '.' . $versionParts[1];
-            if (!isset($uniqueVersion[$shortVersion]) || version_compare($version, $uniqueVersion[$shortVersion]) > 0) {
-                $uniqueVersion[$shortVersion] = $version;
-            }
-        }
-        return array_merge($results, array_flip($uniqueVersion));
+        return $process->getOutput();
     }
 
     protected function getPublicComposerUrlForBitbucket(stdClass $payload): string
