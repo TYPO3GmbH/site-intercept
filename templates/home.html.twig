@@ -27,21 +27,36 @@
                 <div class="card">
                     <div class="card-body">
                         <p>
-                            You can login to intercept with your <a href="https://typo3.org" target="_blank" rel="noopener">typo3.org</a> account.
+                            {% if app.user %}
+                                Welcome {{ app.user.username }}, you are logged in to Intercept.
+                            {% else %}
+                                You can login to Intercept with your <a href="https://typo3.org" target="_blank" rel="noopener">typo3.org</a> account.
+                            {% endif %}
                             This enables various interfaces to trigger intercept jobs. Members
                             of the documentation team have additional access right to manage the documentation
                             server deployments.
                         </p>
                     </div>
                     <div class="card-footer">
-                        {{
-                            macros.linkbutton(
-                                path('admin_login'),
-                                'Login',
-                                'primary',
-                                'unlock'
-                            )
-                        }}
+                        {% if app.user %}
+                            {{
+                                macros.linkbutton(
+                                    path('logout'),
+                                    'Logout',
+                                    'primary',
+                                    'lock'
+                                )
+                            }}
+                        {% else %}
+                            {{
+                                macros.linkbutton(
+                                    path('admin_login'),
+                                    'Login',
+                                    'primary',
+                                    'unlock'
+                                )
+                            }}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -210,6 +225,15 @@
                             triggers documentation rendering in bamboo and deploys it to the <a href="https://docs.typo3.org">documentation server</a>.
                             Members of the documentation team can manage redirects on the documentation server and deployed documentation.
                         </p>
+                    </div>
+                    <div class="card-footer">
+                        {{
+                        macros.linkbutton(
+                            path('admin_docs_deployments'),
+                            'Recent Renderings',
+                            'light'
+                        )
+                        }}
                     </div>
                 </div>
             </div>
