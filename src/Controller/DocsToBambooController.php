@@ -203,7 +203,6 @@ class DocsToBambooController extends AbstractController
                     'exceptionCode' => $e->getCode(),
                     'exceptionMessage' => $e->getMessage(),
                     'repository' => $pushEvent->getRepositoryUrl(),
-                    'package' => $composerAsObject->getName(),
                     'sourceBranch' => $pushEvent->getVersionString(),
                 ]
             );
@@ -218,7 +217,6 @@ class DocsToBambooController extends AbstractController
                     'exceptionCode' => $e->getCode(),
                     'exceptionMessage' => $e->getMessage(),
                     'repository' => $pushEvent->getRepositoryUrl(),
-                    'package' => $composerAsObject->getName(),
                     'sourceBranch' => $pushEvent->getVersionString(),
                 ]
             );
