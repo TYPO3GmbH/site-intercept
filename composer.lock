@@ -4,55 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e8a50e3921d12ac7d923f19eb8039bfe",
+    "content-hash": "f230854df58108a88eaa1750aeca3b00",
     "packages": [
-        {
-            "name": "adrenalinkin/doctrine-utc-date-time",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/adrenalinkin/doctrine-utc-date-time.git",
-                "reference": "69a70f57d47c33cf1f25b5350621a40817df94cd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/adrenalinkin/doctrine-utc-date-time/zipball/69a70f57d47c33cf1f25b5350621a40817df94cd",
-                "reference": "69a70f57d47c33cf1f25b5350621a40817df94cd",
-                "shasum": ""
-            },
-            "require": {
-                "doctrine/dbal": "^2.6",
-                "php": "^7.1"
-            },
-            "suggest": {
-                "symfony/symfony": "Allows more advanced functionality with full Symfony package"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Linkin\\Component\\DoctrineUTCDateTime\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Viktor Linkin",
-                    "email": "adrenalinkin@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Provides Doctrine DBAL date and time types for storing in UTC format into database",
-            "keywords": [
-                "doctrine-dbal",
-                "doctrine-utc",
-                "symfony-component",
-                "utc-datetime"
-            ],
-            "time": "2019-04-13T17:34:34+00:00"
-        },
         {
             "name": "composer/semver",
             "version": "1.5.0",
@@ -7277,6 +7230,17 @@
         {
             "name": "roave/security-advisories",
             "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Roave/SecurityAdvisories.git",
+                "reference": "4c0ba8a35f1f12dd9236452e9fae4346b0bf2a56"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/4c0ba8a35f1f12dd9236452e9fae4346b0bf2a56",
+                "reference": "4c0ba8a35f1f12dd9236452e9fae4346b0bf2a56",
+                "shasum": ""
+            },
             "conflict": {
                 "3f/pygmentize": "<1.2",
                 "adodb/adodb-php": "<5.20.12",
@@ -7470,7 +7434,7 @@
                 }
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
-            "time": "2019-05-10T14:32:12+00:00"
+            "time": "2019-05-23T20:42:12+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

@@ -19,23 +19,17 @@ doctrine:
 
         types:
             utc_date:
-                class: Linkin\Component\DoctrineUTCDateTime\DBAL\Types\UtcDateType
-                commented: true
+                class: App\DBAL\Types\UtcDateType
             utc_datetime:
-                class: Linkin\Component\DoctrineUTCDateTime\DBAL\Types\UtcDateTimeType
-                commented: true
+                class: App\DBAL\Types\UtcDateTimeType
             utc_time:
-                class: Linkin\Component\DoctrineUTCDateTime\DBAL\Types\UtcTimeType
-                commented: true
+                class: App\DBAL\Types\UtcTimeType
             date:
-                class: Linkin\Component\DoctrineUTCDateTime\DBAL\Types\UtcDateType
-                commented: true
+                class: App\DBAL\Types\UtcDateType
             datetime:
-                class: Linkin\Component\DoctrineUTCDateTime\DBAL\Types\UtcDateTimeType
-                commented: true
+                class: App\DBAL\Types\UtcDateTimeType
             time:
-                class: Linkin\Component\DoctrineUTCDateTime\DBAL\Types\UtcTimeType
-                commented: true
+                class: App\DBAL\Types\UtcTimeType
     orm:
         auto_generate_proxy_classes: true
         naming_strategy: doctrine.orm.naming_strategy.underscore
