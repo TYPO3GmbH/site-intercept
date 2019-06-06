@@ -35,7 +35,7 @@ class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
         $content = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('blog', $content);
-        $this->assertArrayNotHasKey('felogin', $content);
+        $this->assertArrayNotHasKey('adminpanel', $content);
         $this->assertArrayNotHasKey('docs_that_is_no_extension', $content);
     }
 

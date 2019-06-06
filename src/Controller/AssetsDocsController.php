@@ -39,8 +39,28 @@ class AssetsDocsController extends AbstractController
      */
     public function manuals(): Response
     {
-        $extensions = $this->documentationJarRepository->findAvailableCommunityExtensions();
         $aggregatedExtensions = [];
+
+        $legacyExtensions = json_decode(file_get_contents(__DIR__ . '/../../config/docs-legacy-rendering/typo3cms-extensions.json'), true);
+        foreach ($legacyExtensions as $extension) {
+            $extensionKey = $extension['key'];
+            $aggregatedExtensions[$extensionKey]['docs'] = [];
+            foreach ($extension['paths'] as $majorMinorVersion => $path) {
+                $majorMinorPatchVersion = explode('/', $path);
+                if (empty($majorMinorPatchVersion[4])) {
+                    continue;
+                }
+                $majorMinorPatchVersion = $majorMinorPatchVersion[4];
+                $aggregatedExtensions[$extensionKey]['docs'][$majorMinorVersion] = [
+                    'url' => 'https://docs.typo3.org' . $path,
+                ];
+                $aggregatedExtensions[$extensionKey]['docs'][$majorMinorPatchVersion] = [
+                    'url' => 'https://docs.typo3.org' . $path,
+                ];
+            }
+        }
+
+        $extensions = $this->documentationJarRepository->findAvailableCommunityExtensions();
 
         foreach ($extensions as $extension) {
             if (!isset($aggregatedExtensions[$extension->getExtensionKey()])) {
@@ -48,6 +68,9 @@ class AssetsDocsController extends AbstractController
                     'packageName' => $extension->getPackageName(),
                     'docs' => [],
                 ];
+            }
+            if (!isset($aggregatedExtensions[$extension->getExtensionKey()]['packageName'])) {
+                $aggregatedExtensions[$extension->getExtensionKey()]['packageName'] = $extension->getPackageName();
             }
 
             $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getBranch()] = [
