@@ -32,6 +32,7 @@ class ComposerJson
 
     /**
      * @return string
+     * @throws DocsComposerMissingValueException
      */
     public function getName(): string
     {
@@ -41,6 +42,7 @@ class ComposerJson
 
     /**
      * @return string
+     * @throws DocsComposerMissingValueException
      */
     public function getType(): string
     {
@@ -67,6 +69,7 @@ class ComposerJson
 
     /**
      * @return array
+     * @throws DocsComposerMissingValueException
      */
     public function getFirstAuthor(): array
     {

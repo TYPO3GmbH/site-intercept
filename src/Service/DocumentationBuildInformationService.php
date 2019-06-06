@@ -130,6 +130,7 @@ class DocumentationBuildInformationService
      * @throws \App\Exception\ComposerJsonInvalidException
      * @throws \App\Exception\DocsPackageDoNotCareBranch
      * @throws DocsComposerDependencyException
+     * @throws \App\Exception\Composer\DocsComposerMissingValueException
      */
     public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {

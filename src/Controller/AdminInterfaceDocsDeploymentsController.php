@@ -384,7 +384,6 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                     'exceptionCode' => $e->getCode(),
                     'exceptionMessage' => $e->getMessage(),
                     'repository' => $documentationJar->getRepositoryUrl(),
-                    'package' => $buildInformation->packageName,
                     'sourceBranch' => $documentationJar->getBranch(),
                 ]
             );

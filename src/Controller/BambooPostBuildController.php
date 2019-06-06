@@ -170,45 +170,47 @@ class BambooPostBuildController extends AbstractController
             $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
             /** @var DocumentationJar $documentationJar */
             $documentationJar = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
-            if ($buildDetails->success) {
-                // Build was successful, set status to "rendered"
-                $documentationJar
-                    ->setLastRenderedAt(new \DateTime('now'))
-                    ->setStatus(DocumentationStatus::STATUS_RENDERED);
-                $logger->info(
-                    'Documentation rendered'
-                    . ' due to bamboo build "' . $buildDetails->buildKey . '"',
-                    [
-                        'type' => 'docsRendering',
-                        'status' => 'documentationRendered',
-                        'triggeredBy' => 'api',
-                        'repository' => $documentationJar->getRepositoryUrl(),
-                        'package' => $documentationJar->getPackageName(),
-                        'bambooKey' => $buildDetails->buildKey,
-                    ]
-                );
-            } else {
-                // Build failed, set status of documentation to "rendering failed"
-                $documentationJar->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED);
-                $logger->warning(
-                    'Failed to render documentation'
-                    . ' due to bamboo build "' . $buildDetails->buildKey . '"',
-                    [
-                        'type' => 'docsRendering',
-                        'status' => 'documentationRenderingFailed',
-                        'triggeredBy' => 'api',
-                        'repository' => $documentationJar->getRepositoryUrl(),
-                        'package' => $documentationJar->getPackageName(),
-                        'bambooKey' => $buildDetails->buildKey,
-                    ]
-                );
+            if ($documentationJar instanceof DocumentationJar) {
+                if ($buildDetails->success) {
+                    // Build was successful, set status to "rendered"
+                    $documentationJar
+                        ->setLastRenderedAt(new \DateTime('now'))
+                        ->setStatus(DocumentationStatus::STATUS_RENDERED);
+                    $logger->info(
+                        'Documentation rendered'
+                        . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                        [
+                            'type' => 'docsRendering',
+                            'status' => 'documentationRendered',
+                            'triggeredBy' => 'api',
+                            'repository' => $documentationJar->getRepositoryUrl(),
+                            'package' => $documentationJar->getPackageName(),
+                            'bambooKey' => $buildDetails->buildKey,
+                        ]
+                    );
+                } else {
+                    // Build failed, set status of documentation to "rendering failed"
+                    $documentationJar->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED);
+                    $logger->warning(
+                        'Failed to render documentation'
+                        . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                        [
+                            'type' => 'docsRendering',
+                            'status' => 'documentationRenderingFailed',
+                            'triggeredBy' => 'api',
+                            'repository' => $documentationJar->getRepositoryUrl(),
+                            'package' => $documentationJar->getPackageName(),
+                            'bambooKey' => $buildDetails->buildKey,
+                        ]
+                    );
+                }
+                // If a re-rendering is registered, trigger docs rendering again and unset flag
+                if ($documentationJar->isReRenderNeeded()) {
+                    $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'api');
+                    $documentationJar->setReRenderNeeded(false);
+                }
+                $manager->flush();
             }
-            // If a re-rendering is registered, trigger docs rendering again and unset flag
-            if ($documentationJar->isReRenderNeeded()) {
-                $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'api');
-                $documentationJar->setReRenderNeeded(false);
-            }
-            $manager->flush();
         }
 
         return Response::create();
