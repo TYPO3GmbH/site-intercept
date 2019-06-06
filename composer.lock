@@ -5510,22 +5510,22 @@
         },
         {
             "name": "symfony/twig-bridge",
-            "version": "v4.2.8",
+            "version": "v4.2.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/twig-bridge.git",
-                "reference": "4dcd115799163409c74ad54e9a3788211daa9f74"
+                "reference": "43d65f955d05e21a4ee0904a6212790ba9b05093"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/twig-bridge/zipball/4dcd115799163409c74ad54e9a3788211daa9f74",
-                "reference": "4dcd115799163409c74ad54e9a3788211daa9f74",
+                "url": "https://api.github.com/repos/symfony/twig-bridge/zipball/43d65f955d05e21a4ee0904a6212790ba9b05093",
+                "reference": "43d65f955d05e21a4ee0904a6212790ba9b05093",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1.3",
                 "symfony/contracts": "^1.0.2",
-                "twig/twig": "^1.40|^2.9"
+                "twig/twig": "^1.41|^2.10"
             },
             "conflict": {
                 "symfony/console": "<3.4",
@@ -5598,7 +5598,7 @@
             ],
             "description": "Symfony Twig Bridge",
             "homepage": "https://symfony.com",
-            "time": "2019-05-01T05:55:04+00:00"
+            "time": "2019-05-10T06:54:47+00:00"
         },
         {
             "name": "symfony/twig-bundle",
@@ -8341,16 +8341,16 @@
         },
         {
             "name": "symfony/web-profiler-bundle",
-            "version": "v4.2.8",
+            "version": "v4.2.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/web-profiler-bundle.git",
-                "reference": "f4c054dad30b46f23aae60ecfedacc08462c47ef"
+                "reference": "1bd05666e23aff4306d7b236b6ccdf6d2e99fe00"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/web-profiler-bundle/zipball/f4c054dad30b46f23aae60ecfedacc08462c47ef",
-                "reference": "f4c054dad30b46f23aae60ecfedacc08462c47ef",
+                "url": "https://api.github.com/repos/symfony/web-profiler-bundle/zipball/1bd05666e23aff4306d7b236b6ccdf6d2e99fe00",
+                "reference": "1bd05666e23aff4306d7b236b6ccdf6d2e99fe00",
                 "shasum": ""
             },
             "require": {
@@ -8360,7 +8360,7 @@
                 "symfony/routing": "~3.4|~4.0",
                 "symfony/twig-bundle": "~4.2",
                 "symfony/var-dumper": "~3.4|~4.0",
-                "twig/twig": "~1.34|~2.4"
+                "twig/twig": "^1.41|^2.10"
             },
             "conflict": {
                 "symfony/dependency-injection": "<3.4",
@@ -8403,7 +8403,7 @@
             ],
             "description": "Symfony WebProfilerBundle",
             "homepage": "https://symfony.com",
-            "time": "2019-04-27T11:48:17+00:00"
+            "time": "2019-05-26T20:47:34+00:00"
         },
         {
             "name": "theseer/tokenizer",
