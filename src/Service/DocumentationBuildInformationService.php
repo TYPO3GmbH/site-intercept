@@ -264,7 +264,7 @@ class DocumentationBuildInformationService
             if (empty($record->getMinimumTypoVersion()) || $record->getMinimumTypoVersion() !== $deploymentInformation->minimumTypoVersion) {
                 $record->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion);
             }
-            if (empty($record->getMaximumTypoVersion()) || $record->getMinimumTypoVersion() !== $deploymentInformation->maximumTypoVersion) {
+            if (empty($record->getMaximumTypoVersion()) || $record->getMaximumTypoVersion() !== $deploymentInformation->maximumTypoVersion) {
                 $record->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion);
             }
             // status is not updated at this point, this is done later by controllers
