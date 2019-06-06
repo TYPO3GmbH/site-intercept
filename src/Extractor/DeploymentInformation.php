@@ -116,6 +116,7 @@ class DeploymentInformation
      * @param string $privateDir
      * @param string $subDir
      * @throws DocsPackageDoNotCareBranch
+     * @throws ComposerJsonInvalidException
      */
     public function __construct(
         string $composerPackageName,

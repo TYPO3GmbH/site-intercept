@@ -150,6 +150,9 @@ class DeploymentInformationTest extends TestCase
             ['baz', 1553082490],
             ['3245345', 1553082490],
             ['husel_pusel:foobar', 1553082490],
+            ['../enetcache', 1553082490],
+            ['lolli/../', 1553082490],
+            ['lolli/../enetcache', 1553082490],
         ];
     }
 
