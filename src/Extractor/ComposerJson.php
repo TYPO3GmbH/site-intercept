@@ -18,7 +18,7 @@ use Composer\Semver\Semver;
  */
 class ComposerJson
 {
-    private const ALLOWED_TYPO_VERSIONS = ['6.2', '7.6', '8.7', '9.5'];
+    private const ALLOWED_TYPO3_VERSIONS = ['6.2', '7.6', '8.7', '9.5', '10.0'];
 
     /**
      * @var array
@@ -115,7 +115,7 @@ class ComposerJson
     private function extractTypoVersion(bool $getMaximum = false): string
     {
         $maxVersion = '';
-        foreach (self::ALLOWED_TYPO_VERSIONS as $typoVersion) {
+        foreach (self::ALLOWED_TYPO3_VERSIONS as $typoVersion) {
             if (Semver::satisfies($typoVersion . '.999', $this->getCoreRequirement())) {
                 if (!$getMaximum) {
                     return $typoVersion;
