@@ -31,7 +31,7 @@ class GitRepositoryService
 
     protected $composerJsonUrlFormat = [
         self::SERVICE_BITBUCKET_CLOUD => '{baseUrl}/{repoName}/raw/{version}/composer.json',
-        self::SERVICE_BITBUCKET_SERVER => '{baseUrl}/projects/{project}/repos/{package}/raw/composer.json?at=refs%2Fheads%2F{version}',
+        self::SERVICE_BITBUCKET_SERVER => '{baseUrl}/projects/{project}/repos/{package}/raw/composer.json?at=refs%2F{type}%2F{version}',
         self::SERVICE_GITLAB => '{baseUrl}/raw/{version}/composer.json',
         self::SERVICE_GITHUB => 'https://raw.githubusercontent.com/{repoName}/{version}/composer.json',
     ];
@@ -129,11 +129,17 @@ class GitRepositoryService
             ]);
         }
 
+        $tag = false;
+        if (preg_match('/^v?(\d+.\d+.\d+)$/', (string)$payload->changes[0]->ref->displayId)) {
+            $tag = true;
+        }
+
         return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_BITBUCKET_SERVER], [
             '{baseUrl}' => 'https://' . explode('/', str_replace('https://', '', (string)$payload->repository->links->self[0]->href))[0],
             '{package}' => (string)$payload->repository->name,
             '{project}' => (string)$payload->repository->project->key,
             '{version}' => (string)$payload->changes[0]->ref->displayId,
+            '{type}' => $tag ? 'tags' : 'heads',
         ]);
     }
 

@@ -401,11 +401,16 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
             $packageParts = explode('/', $repositoryUrl);
             $package = array_pop($packageParts);
             $project = array_pop($packageParts);
+            $tag = false;
+            if (preg_match('/^v?(\d+.\d+.\d+)$/', $branch)) {
+                $tag = true;
+            }
             $parameters = [
                 '{baseUrl}' => 'https://' . explode('/', str_replace('https://', '', $repositoryUrl))[0],
                 '{package}' => $package,
                 '{project}' => $project,
                 '{version}' => $branch,
+                '{type}' => $tag ? 'tags' : 'heads',
             ];
         }
         if (strpos($repositoryUrl, 'https://github.com') !== false) {

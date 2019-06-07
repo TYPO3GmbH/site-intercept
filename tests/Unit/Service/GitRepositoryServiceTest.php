@@ -44,6 +44,13 @@ class GitRepositoryServiceTest extends TestCase
                 'repoService' => GitRepositoryService::SERVICE_BITBUCKET_SERVER,
                 'eventType' => null,
             ],
+            'Bitbucket (server) push with tag' => [
+                'expectedUrl' => 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at='
+                    . urlencode('refs/tags/v1.1.1'),
+                'payload' => $this->getPayloadFromFixture('Payload_Bitbucket_Server_Event_Push_Tag.json'),
+                'repoService' => GitRepositoryService::SERVICE_BITBUCKET_SERVER,
+                'eventType' => null,
+            ],
             'GitHub (cloud) push branch' => [
                 'expectedUrl' => 'https://raw.githubusercontent.com/Codertocat/Hello-World/master/composer.json',
                 'payload' => $this->getPayloadFromFixture('Payload_GitHub_Event_Push_Branch.json'),
