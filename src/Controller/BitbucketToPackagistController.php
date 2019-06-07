@@ -13,6 +13,7 @@ namespace App\Controller;
 use App\Exception\DoNotCareException;
 use App\Extractor\PackagistUpdateRequest;
 use App\Service\PackagistService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,9 +33,15 @@ class BitbucketToPackagistController extends AbstractController
      */
     private $packagistService;
 
-    public function __construct(PackagistService $packagistService)
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(PackagistService $packagistService, LoggerInterface $logger)
     {
         $this->packagistService = $packagistService;
+        $this->logger = $logger;
     }
     /**
      * Called by bitbucket as webhook to update packagist packages
@@ -46,10 +53,12 @@ class BitbucketToPackagistController extends AbstractController
     public function index(Request $request): Response
     {
         if (!$request->query->has('apiToken') || !$request->query->has('username')) {
+            $this->logger->notice('Missing apiToken or username in request.');
             return Response::create('Missing apiToken or username in request.', Response::HTTP_BAD_REQUEST);
         }
         $pushEventInformation = json_decode($request->getContent(), true);
         if (!$pushEventInformation) {
+            $this->logger->notice('Could not decode payload.', ['payload' => $request->getContent()]);
             return Response::create('Could not decode payload.', Response::HTTP_BAD_REQUEST);
         }
         $apiToken = $request->query->get('apiToken');
