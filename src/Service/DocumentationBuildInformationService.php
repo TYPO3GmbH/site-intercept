@@ -250,7 +250,7 @@ class DocumentationBuildInformationService
             if (empty($record->getTypeShort())) {
                 $record->setTypeShort($deploymentInformation->typeShort);
             }
-            if (empty($record->getExtensionKey())) {
+            if (empty($record->getExtensionKey()) || $record->getExtensionKey() !== $deploymentInformation->extensionKey) {
                 $record->setExtensionKey($deploymentInformation->extensionKey);
             }
             if (empty($record->getPublicComposerJsonUrl())) {
