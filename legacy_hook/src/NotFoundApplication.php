@@ -14,7 +14,7 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Return a list of other versions of given documentation
+ * Handles 404 state for docs.typo3.org
  */
 class NotFoundApplication
 {
@@ -39,7 +39,7 @@ class NotFoundApplication
         if (empty($notFoundPage)) {
             $notFoundPage = $this->getDocumentRoot() . $this->defaultNotFoundPage;
         }
-        return new Response(404, [], file_get_contents($notFoundPage));
+        return new Response(404, [], $this->getNotFoundContent($notFoundPage));
     }
 
     protected function findNextNotFoundPage(): string
@@ -58,6 +58,22 @@ class NotFoundApplication
             array_pop($pathParts);
         }
         return $notFoundPath;
+    }
+
+    protected function getNotFoundContent(string $notFoundFile): string
+    {
+        $content = file_get_contents($notFoundFile);
+
+        $tagBeforeBaseTag = '<meta charset="utf-8"/>';
+        $baseTag = '<base href="https://docs.typo3.org/">';
+
+        $content = str_replace(
+            $tagBeforeBaseTag,
+            $tagBeforeBaseTag. PHP_EOL . $baseTag,
+            $content
+        );
+
+        return $content;
     }
 
     protected function getDocumentRoot(): string
