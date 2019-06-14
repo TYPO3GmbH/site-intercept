@@ -49,6 +49,48 @@ class DocsToBambooControllerTest extends KernelTestCase
     /**
      * @test
      */
+    public function bambooBuildForMultipleBranchesIsTriggered()
+    {
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        $generalClientProphecy
+            ->request('GET', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/master/composer.json')
+            ->shouldBeCalled()
+            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json')));
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+        $generalClientProphecy
+            ->request('GET', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/composer.json')
+            ->shouldBeCalled()
+            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json')));
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy
+            ->post(
+                file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchBambooPostUrl.txt'),
+                require __DIR__ . '/Fixtures/DocsToBambooGoodBambooPostData.php'
+            )->shouldBeCalled()
+            ->willReturn(new Response());
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $bambooClientProphecy
+            ->post(
+                file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchBambooPostUrlWithTag.txt'),
+                require __DIR__ . '/Fixtures/DocsToBambooGoodBambooPostData.php'
+            )->shouldBeCalled()
+            ->willReturn(new Response());
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
+        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * @test
+     */
     public function bambooBuildIsNotTriggered()
     {
         $bambooClientProphecy = $this->prophesize(BambooClient::class);

@@ -19,6 +19,7 @@ use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
+use App\Extractor\PushEvent;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\MailService;
@@ -55,55 +56,174 @@ class DocsToBambooController extends AbstractController
         MailService $mailService
     ): Response {
         try {
-            $pushEvent = $webhookService->createPushEvent($request);
-            $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
-            $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
-            $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
-            $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
-            $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
-            $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
-            // Trigger build only if status is not already "I'm rendering". Else, only set a flag that re-rendering is needed.
-            // The re-render flag is used and reset by the bamboo post build controller if it is set, to trigger a new
-            // rendering. This suppresses multiple builds for one repo at the same time and prevents conditions where
-            // an older build finishes after a younger triggered build which would overwrite the result af the later build.
-            if ($documentationJar->getStatus() === DocumentationStatus::STATUS_RENDERING) {
-                $documentationBuildInformationService->updateReRenderNeeded($documentationJar, true);
-                $logger->info(
-                    'Registered docs build for re-rendering',
-                    [
-                        'type' => 'docsRendering',
-                        'status' => 're-render-needed',
-                        'triggeredBy' => 'api',
-                        'repository' => $buildInformation->repositoryUrl,
-                        'package' => $buildInformation->packageName,
-                        'sourceBranch' => $buildInformation->sourceBranch,
-                        'targetBranch' => $buildInformation->targetBranchDirectory,
-                    ]
-                );
-            } else {
-                $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
-                if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
-                    && $buildInformation->sourceBranch === 'master'
-                ) {
-                    // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
-                    $bambooService->triggerDocmuntationServerWebrootResourcesPlan();
+            $pushEvents = $webhookService->createPushEvent($request);
+            $erroredPushes = 0;
+            $errorMessage = '';
+
+            /** @var PushEvent $pushEvent */
+            foreach ($pushEvents as $pushEvent) {
+                try {
+                    $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
+                    $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
+                    $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
+                    $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
+                    $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
+                    $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
+                    // Trigger build only if status is not already "I'm rendering". Else, only set a flag that re-rendering is needed.
+                    // The re-render flag is used and reset by the bamboo post build controller if it is set, to trigger a new
+                    // rendering. This suppresses multiple builds for one repo at the same time and prevents conditions where
+                    // an older build finishes after a younger triggered build which would overwrite the result af the later build.
+                    if ($documentationJar->getStatus() === DocumentationStatus::STATUS_RENDERING) {
+                        $documentationBuildInformationService->updateReRenderNeeded($documentationJar, true);
+                        $logger->info(
+                            'Registered docs build for re-rendering',
+                            [
+                                'type' => 'docsRendering',
+                                'status' => 're-render-needed',
+                                'triggeredBy' => 'api',
+                                'repository' => $buildInformation->repositoryUrl,
+                                'package' => $buildInformation->packageName,
+                                'sourceBranch' => $buildInformation->sourceBranch,
+                                'targetBranch' => $buildInformation->targetBranchDirectory,
+                            ]
+                        );
+                    } else {
+                        $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
+                        if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
+                            && $buildInformation->sourceBranch === 'master'
+                        ) {
+                            // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
+                            $bambooService->triggerDocmuntationServerWebrootResourcesPlan();
+                        }
+                        $documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
+                        $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
+                        $logger->info(
+                            'Triggered docs build',
+                            [
+                                'type' => 'docsRendering',
+                                'status' => 'triggered',
+                                'triggeredBy' => 'api',
+                                'repository' => $buildInformation->repositoryUrl,
+                                'package' => $buildInformation->packageName,
+                                'sourceBranch' => $buildInformation->sourceBranch,
+                                'targetBranch' => $buildInformation->targetBranchDirectory,
+                                'bambooKey' => $bambooBuildTriggered->buildResultKey,
+                            ]
+                        );
+                    }
+                } catch (ComposerJsonNotFoundException $e) {
+                    // Repository did not provide a composer.json, or fetch failed
+                    $logger->warning(
+                        'Can not render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' MUST have a composer.json file on top level.',
+                        [
+                            'type' => 'docsRendering',
+                            'status' => 'noComposerJson',
+                            'triggeredBy' => 'api',
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'composerFile' => $pushEvent->getUrlToComposerFile(),
+                            'payload' => $request->getContent(),
+                        ]
+                    );
+                    $erroredPushes++;
+                    $errorMessage = 'No composer.json found, invalid or unable to fetch. See https://intercept.typo3.com for more information.';
+                    continue;
+                } catch (ComposerJsonInvalidException $e) {
+                    $logger->warning(
+                        'Can not render documentation: ' . $e->getMessage(),
+                        [
+                            'type' => 'docsRendering',
+                            'status' => 'invalidComposerJson',
+                            'triggeredBy' => 'api',
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'composerFile' => $pushEvent->getUrlToComposerFile(),
+                            'payload' => $request->getContent(),
+                        ]
+                    );
+                    $erroredPushes++;
+                    $errorMessage = 'Invalid composer.json. See https://intercept.typo3.com for more information.';
+                    continue;
+                } catch (DocsPackageRegisteredWithDifferentRepositoryException $e) {
+                    $logger->warning(
+                        'Can not render documentation: ' . $e->getMessage(),
+                        [
+                            'type' => 'docsRendering',
+                            'status' => 'packageRegisteredWithDifferentRepository',
+                            'triggeredBy' => 'api',
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'package' => $buildInformation->packageName,
+                        ]
+                    );
+                    $erroredPushes++;
+                    $errorMessage = 'Package already registered for different repository. See https://intercept.typo3.com for more information.';
+                    continue;
+                } catch (DocsPackageDoNotCareBranch $e) {
+                    $logger->warning(
+                        'Can not render documentation: ' . $e->getMessage(),
+                        [
+                            'type' => 'docsRendering',
+                            'status' => 'noRelevantBranchOrTag',
+                            'triggeredBy' => 'api',
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'sourceBranch' => $pushEvent->getVersionString(),
+                        ]
+                    );
+                    $erroredPushes++;
+                    $errorMessage = 'Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.';
+                    continue;
+                } catch (DocsComposerMissingValueException $e) {
+                    $logger->warning(
+                        'Can not render documentation: ' . $e->getMessage(),
+                        [
+                            'type' => 'docsRendering',
+                            'status' => 'missingValueInComposerJson',
+                            'triggeredBy' => 'api',
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'sourceBranch' => $pushEvent->getVersionString(),
+                        ]
+                    );
+                    $erroredPushes++;
+                    $errorMessage = 'A mandatory value is missing in the composer.json. See https://intercept.typo3.com for more information.';
+                    continue;
+                } catch (DocsComposerDependencyException $e) {
+                    $logger->warning(
+                        'Can not render documentation: ' . $e->getMessage(),
+                        [
+                            'type' => 'docsRendering',
+                            'status' => 'coreDependencyNotSet',
+                            'triggeredBy' => 'api',
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'sourceBranch' => $pushEvent->getVersionString(),
+                        ]
+                    );
+                    try {
+                        $author = $composerAsObject->getFirstAuthor();
+                        if (filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
+                            $mailService->sendMailToAuthorDueToMissingDependency($pushEvent, $composerAsObject, $e->getMessage());
+                        }
+                    } catch (DocsComposerMissingValueException $e) {
+                        // Do not send mail if 'authors' is not set in composer.json
+                    }
+                    $erroredPushes++;
+                    $errorMessage = 'Dependencies are not fulfilled. See https://intercept.typo3.com for more information.';
+                    continue;
                 }
-                $documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
-                $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
-                $logger->info(
-                    'Triggered docs build',
-                    [
-                        'type' => 'docsRendering',
-                        'status' => 'triggered',
-                        'triggeredBy' => 'api',
-                        'repository' => $buildInformation->repositoryUrl,
-                        'package' => $buildInformation->packageName,
-                        'sourceBranch' => $buildInformation->sourceBranch,
-                        'targetBranch' => $buildInformation->targetBranchDirectory,
-                        'bambooKey' => $bambooBuildTriggered->buildResultKey,
-                    ]
-                );
             }
+            if (count($pushEvents) === $erroredPushes) {
+                return Response::create($errorMessage, 412);
+            }
+
             return Response::create();
         } catch (GithubHookPingException $e) {
             // Hook payload is a 'github ping' - log that as "info / success' with the
@@ -134,102 +254,6 @@ class DocsToBambooController extends AbstractController
             );
             // 412: precondition failed
             return Response::create('Invalid hook payload. See https://intercept.typo3.com for more information.', 412);
-        } catch (ComposerJsonNotFoundException $e) {
-            // Repository did not provide a composer.json, or fetch failed
-            $logger->warning(
-                'Can not render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' MUST have a composer.json file on top level.',
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'noComposerJson',
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                    'exceptionMessage' => $e->getMessage(),
-                    'repository' => $pushEvent->getRepositoryUrl(),
-                    'composerFile' => $pushEvent->getUrlToComposerFile(),
-                    'payload' => $request->getContent(),
-                ]
-            );
-            return Response::create('No composer.json found, invalid or unable to fetch. See https://intercept.typo3.com for more information.', 412);
-        } catch (ComposerJsonInvalidException $e) {
-            $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'invalidComposerJson',
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                    'exceptionMessage' => $e->getMessage(),
-                    'repository' => $pushEvent->getRepositoryUrl(),
-                    'composerFile' => $pushEvent->getUrlToComposerFile(),
-                    'payload' => $request->getContent(),
-                ]
-            );
-            return Response::create('Invalid composer.json. See https://intercept.typo3.com for more information.', 412);
-        } catch (DocsPackageRegisteredWithDifferentRepositoryException $e) {
-            $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'packageRegisteredWithDifferentRepository',
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                    'exceptionMessage' => $e->getMessage(),
-                    'repository' => $pushEvent->getRepositoryUrl(),
-                    'package' => $buildInformation->packageName,
-                ]
-            );
-            return Response::create('Package already registered for different repository. See https://intercept.typo3.com for more information.', 412);
-        } catch (DocsPackageDoNotCareBranch $e) {
-            $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'noRelevantBranchOrTag',
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                    'exceptionMessage' => $e->getMessage(),
-                    'repository' => $pushEvent->getRepositoryUrl(),
-                    'sourceBranch' => $pushEvent->getVersionString(),
-                ]
-            );
-            return Response::create('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', 412);
-        } catch (DocsComposerMissingValueException $e) {
-            $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'missingValueInComposerJson',
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                    'exceptionMessage' => $e->getMessage(),
-                    'repository' => $pushEvent->getRepositoryUrl(),
-                    'sourceBranch' => $pushEvent->getVersionString(),
-                ]
-            );
-            return Response::create('A mandatory value is missing in the composer.json. See https://intercept.typo3.com for more information.', 412);
-        } catch (DocsComposerDependencyException $e) {
-            $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'coreDependencyNotSet',
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                    'exceptionMessage' => $e->getMessage(),
-                    'repository' => $pushEvent->getRepositoryUrl(),
-                    'sourceBranch' => $pushEvent->getVersionString(),
-                ]
-            );
-            try {
-                $author = $composerAsObject->getFirstAuthor();
-                if (filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
-                    $mailService->sendMailToAuthorDueToMissingDependency($pushEvent, $composerAsObject, $e->getMessage());
-                }
-            } catch (DocsComposerMissingValueException $e) {
-                // Do not send mail if 'authors' is not set in composer.json
-            }
-
-            return Response::create('Dependencies are not fulfilled. See https://intercept.typo3.com for more information.', 412);
         }
     }
 }

@@ -26,6 +26,17 @@
             "refId": "refs/heads/documentation-draft",
             "toHash": "419fa1919e7425c25d0ae587edb8bba82e14d594",
             "type": "UPDATE"
+        },
+        {
+            "fromHash": "7a1c7fe4226d54d1e647c90f6b730cbc1c67fcd1",
+            "ref": {
+                "displayId": "some-other-branch",
+                "id": "refs/heads/some-other-branch",
+                "type": "BRANCH"
+            },
+            "refId": "refs/heads/some-other-branch",
+            "toHash": "419fa1919e7425c25d0ae587edb8bba82e14d594",
+            "type": "UPDATE"
         }
     ],
     "date": "2019-05-30T09:58:37+0200",

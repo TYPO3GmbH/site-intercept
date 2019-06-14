@@ -13,6 +13,7 @@ namespace App\Service;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
+use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -29,7 +30,7 @@ class WebHookService
      * github / gitlab / bitbucket repository hook. Used to trigger documentation
      * rendering.
      */
-    public function createPushEvent(Request $request): PushEvent
+    public function createPushEvent(Request $request): array
     {
         if (in_array($request->headers->get('X-Event-Key', ''), ['repo:push', 'repo:refs_changed'], true)) {
             return $this->getPushEventFromBitbucket($request);
@@ -47,41 +48,42 @@ class WebHookService
         throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1553256930);
     }
 
-    protected function getPushEventFromBitbucket(Request $request): PushEvent
+    protected function getPushEventFromBitbucket(Request $request): array
     {
         $payload = json_decode($request->getContent(), false);
+        $events = [];
         if (isset($payload->push->changes[0]->new->target->links->html->href)) {
             // Cloud (Push)
-            // The URL should be the clone url, poorly Bitbucket does not provide this url.
-            // Therefore we use HTML url, which will work with git clone, we may however add .git if it misses
-            $repositoryUrl = (string)$payload->push->changes[0]->new->target->links->html->href;
-            // Add .git at end if it misses. This must be aligned, otherwise manual adding of configuration will go wrong.
-            if (substr($repositoryUrl, -4) !== '.git') {
-                $repositoryUrl = $repositoryUrl . '.git';
+            // Bitbucket sends one hook, even when multiple branches are pushed
+            // Here we extract those brances and create a pushevent per branch
+            $versions = [];
+            foreach ($payload->push->changes as $change) {
+                if (in_array((string)$change->new->name, $versions, true)) {
+                    continue;
+                }
+
+                $events[] = $this->pushEventFromBitbucketCloudChange($payload, $change);
+                $versions[] = (string)$change->new->name;
             }
-            if (is_int(strpos($repositoryUrl, '/commits/'))) {
-                $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
-            }
-            $versionString = (string)$payload->push->changes[0]->new->name;
         } else {
             // Server (refs_changed)
-            // In case of self hosted, Bitbucket provides a git clone url
-            // We have to use this url, as html url will not work with git clone
-            foreach ($payload->repository->links->clone as $cloneInformation) {
-                if ($cloneInformation->name === 'http') {
-                    $repositoryUrl = (string)$cloneInformation->href;
-                    break;
+            // Bitbucket sends one hook, even when multiple branches are pushed
+            // Here we extract those brances and create a pushevent per branch
+            $versions = [];
+            foreach ($payload->changes as $change) {
+                if (in_array((string)$change->ref->displayId, $versions, true)) {
+                    continue;
                 }
-            }
-            $versionString = (string)$payload->changes[0]->ref->displayId;
-        }
-        $urlToComposerFile = (new GitRepositoryService())
-            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET);
 
-        return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
+                $events[] = $this->pushEventFromBitbucketServerChange($payload, $change);
+                $versions[] = (string)$change->ref->displayId;
+            }
+        }
+
+        return $events;
     }
 
-    protected function getPushEventFromGitlab(Request $request): PushEvent
+    protected function getPushEventFromGitlab(Request $request): array
     {
         $payload = json_decode($request->getContent(), false);
         $repositoryUrl = (string)$payload->repository->git_http_url;
@@ -89,10 +91,10 @@ class WebHookService
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITLAB);
 
-        return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
+        return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile)];
     }
 
-    protected function getPushEventFromGithub(Request $request, string $eventType): PushEvent
+    protected function getPushEventFromGithub(Request $request, string $eventType): array
     {
         $content = $request->getContent();
         $payload = json_decode($content, false);
@@ -113,6 +115,45 @@ class WebHookService
             : str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITHUB, $eventType);
+
+        return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile)];
+    }
+
+    protected function pushEventFromBitbucketCloudChange(stdClass $payload, stdClass $change): PushEvent
+    {
+        unset($payload->push->changes);
+        $payload->push->changes = [0 => $change];
+        $versionString = (string)$change->new->name;
+        $repositoryUrl = (string)$change->new->target->links->html->href;
+        // Add .git at end if it misses. This must be aligned, otherwise manual adding of configuration will go wrong.
+        if (substr($repositoryUrl, -4) !== '.git') {
+            $repositoryUrl = $repositoryUrl . '.git';
+        }
+        if (is_int(strpos($repositoryUrl, '/commits/'))) {
+            $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
+        }
+        $urlToComposerFile = (new GitRepositoryService())
+            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET_CLOUD);
+
+        return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
+    }
+
+    protected function pushEventFromBitbucketServerChange(stdClass $payload, stdClass $change): PushEvent
+    {
+        unset($payload->changes);
+        $payload->changes = [0 => $change];
+        $versionString = (string)$change->ref->displayId;
+        // Server (refs_changed)
+        // In case of self hosted, Bitbucket provides a git clone url
+        // We have to use this url, as html url will not work with git clone
+        foreach ($payload->repository->links->clone as $cloneInformation) {
+            if ($cloneInformation->name === 'http') {
+                $repositoryUrl = (string)$cloneInformation->href;
+                break;
+            }
+        }
+        $urlToComposerFile = (new GitRepositoryService())
+            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET_SERVER);
 
         return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
     }

@@ -16,7 +16,6 @@ use Symfony\Component\Process\Process;
 
 class GitRepositoryService
 {
-    public const SERVICE_BITBUCKET = 'bitbucket';
     public const SERVICE_BITBUCKET_CLOUD = 'bitbucket-cloud';
     public const SERVICE_BITBUCKET_SERVER = 'bitbucket-server';
     public const SERVICE_GITHUB = 'github';
@@ -41,9 +40,8 @@ class GitRepositoryService
     public function resolvePublicComposerJsonUrlByPayload(stdClass $payload, string $repoService, string $eventType = null): string
     {
         switch ($repoService) {
-            case self::SERVICE_BITBUCKET:
-            case self::SERVICE_BITBUCKET_CLOUD:
             case self::SERVICE_BITBUCKET_SERVER:
+            case self::SERVICE_BITBUCKET_CLOUD:
                 return $this->getPublicComposerUrlForBitbucket($payload);
                 break;
             case self::SERVICE_GITHUB:
