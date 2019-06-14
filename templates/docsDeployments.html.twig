@@ -148,6 +148,8 @@
                                         <span class="badge badge-secondary">API</span>
                                     {% elseif log.triggeredBy == 'interface' %}
                                         <span class="badge badge-secondary">WEB</span>
+                                    {% elseif log.triggeredBy == 'CLI' %}
+                                        <span class="badge badge-secondary">CLI</span>
                                     {% endif %}
                                 </div>
                                 <div class="message-body">

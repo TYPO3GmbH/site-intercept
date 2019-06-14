@@ -290,6 +290,19 @@ class DocumentationBuildInformationService
                 // Set a new record to 'rendered' for now, this will be updated by controllers later on
                 ->setStatus(DocumentationStatus::STATUS_RENDERED)
                 ->setBuildKey('');
+
+            // Check if this repository is entirely new (aka, no branches at all known)
+            // And mark it as new if needed
+            $branchExists = $this->documentationJarRepository->findBy([
+                'repositoryUrl' => $deploymentInformation->repositoryUrl,
+                'packageName' => $deploymentInformation->packageName,
+            ]);
+            if (count($branchExists) === 0) {
+                $documentationJar->setNew(true);
+            } else {
+                $documentationJar->setNew(false);
+            }
+
             $this->entityManager->persist($documentationJar);
             $this->entityManager->flush();
 

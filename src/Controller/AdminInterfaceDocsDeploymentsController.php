@@ -315,6 +315,18 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion)
                 ->setReRenderNeeded(false);
 
+            // Check if this repository is entirely new (aka, no branches at all known)
+            // And mark it as new if needed
+            $branchExists = $documentationJarRepository->findBy([
+                'repositoryUrl' => $deploymentInformation->repositoryUrl,
+                'packageName' => $deploymentInformation->packageName,
+            ]);
+            if (count($branchExists) === 0) {
+                $documentationJar->setNew(true);
+            } else {
+                $documentationJar->setNew(false);
+            }
+
             $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
             $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
             $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($informationFile);

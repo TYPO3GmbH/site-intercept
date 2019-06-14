@@ -125,6 +125,11 @@ class DocumentationJar
     private $reRenderNeeded;
 
     /**
+     * @ORM\Column(type="boolean", options={"default": "0"})
+     */
+    private $new;
+
+    /**
      * @return bool
      */
     public function isReRenderNeeded(): bool
@@ -411,6 +416,18 @@ class DocumentationJar
     public function getBuildKey(): ?string
     {
         return $this->buildKey;
+    }
+
+    public function setNew(bool $new): self
+    {
+        $this->new = $new;
+
+        return $this;
+    }
+
+    public function isNew(): bool
+    {
+        return (bool)$this->new;
     }
 
     /**

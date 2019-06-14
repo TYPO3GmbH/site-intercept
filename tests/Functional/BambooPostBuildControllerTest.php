@@ -331,7 +331,8 @@ class BambooPostBuildControllerTest extends TestCase
             ->setBranch($branch)
             ->setTargetBranchDirectory($branch)
             ->setMinimumTypoVersion('9.5')
-            ->setMaximumTypoVersion('9.5');
+            ->setMaximumTypoVersion('9.5')
+            ->setNew(false);
 
         return $documentationJar;
     }
