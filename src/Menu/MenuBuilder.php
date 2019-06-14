@@ -177,6 +177,16 @@ class MenuBuilder
         $menu = $this->factory->createItem('root');
         if ($this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
             $menu->addChild(
+                'username',
+                [
+                    'label' => $this->tokenStorage->getToken()->getUsername(),
+                    'uri' => '#',
+                    'extras' => [
+                        'icon' => 'user',
+                    ],
+                ]
+            );
+            $menu->addChild(
                 'logout',
                 [
                     'route' => 'logout',
