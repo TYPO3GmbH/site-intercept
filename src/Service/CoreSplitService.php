@@ -15,6 +15,7 @@ use App\GitWrapper\Event\GitOutputListener;
 use GitWrapper\GitException;
 use GitWrapper\GitWorkingCopy;
 use GitWrapper\GitWrapper;
+use PhpAmqpLib\Wire\IO\AbstractIO;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -94,8 +95,9 @@ class CoreSplitService
      * Execute core splitting
      *
      * @param GithubPushEventForCore $event
+     * @param AbstractIO $rabbitIO
      */
-    public function split(GithubPushEventForCore $event): void
+    public function split(GithubPushEventForCore $event, AbstractIO $rabbitIO): void
     {
         $this->event = $event;
 
@@ -107,6 +109,8 @@ class CoreSplitService
         $workingCopy = $gitWrapper->workingCopy($this->splitCorePath);
 
         $this->initialCloneAndCheckout($workingCopy, $event->sourceBranch);
+        // Send a heartbeat after initial clone
+        $rabbitIO->read(0);
 
         $splitBinary = $this->getSplitBinary();
         $extensions = $this->getExtensions();
@@ -123,6 +127,8 @@ class CoreSplitService
                 $this->gitCommand($workingCopy, false, 'remote', 'add', $extension, $this->splitSingleRepoBase . $extension . '.git');
             }
             $this->gitCommand($workingCopy, false, 'fetch', $extension);
+            // Send a heartbeat after each fetch
+            $rabbitIO->read(0);
         }
 
         // Split and push
@@ -142,6 +148,8 @@ class CoreSplitService
             $remoteRef = $splitSha . ':refs/heads/' . $event->targetBranch;
             $this->log('Pushing extension "' . $extension . '" to remote ' . $remoteRef);
             $this->gitCommand($workingCopy, false, 'push', $extension, $remoteRef);
+            // Send a heartbeat after each push
+            $rabbitIO->read(0);
         }
     }
 
@@ -149,8 +157,9 @@ class CoreSplitService
      * Tag sub tree repositories
      *
      * @param GithubPushEventForCore $event
+     * @param AbstractIO $rabbitIO
      */
-    public function tag(GithubPushEventForCore $event): void
+    public function tag(GithubPushEventForCore $event, AbstractIO $rabbitIO): void
     {
         $this->event = $event;
 
@@ -171,6 +180,8 @@ class CoreSplitService
         $coreWorkingCopy = $coreGitWrapper->workingCopy($this->splitCorePath);
 
         $this->initialCloneAndCheckout($coreWorkingCopy, 'master');
+        // Send a heartbeat after initial clone
+        $rabbitIO->read(0);
 
         // Verify given tag is in one of the branches we DO consider: TYPO3_8_7, 9.x, 10.x, ..., master)
         try {
@@ -204,6 +215,9 @@ class CoreSplitService
         // Check out this tag to get a list of extensions
         $this->checkoutDetachedHead($coreWorkingCopy, $event->tag);
         $extensions = $this->getExtensions();
+
+        // Send a heartbeat after checkout
+        $rabbitIO->read(0);
 
         // Make sure base extension path exists
         @mkdir($this->splitSingleRepoPath);
@@ -273,6 +287,9 @@ class CoreSplitService
             );
             $this->gitCommand($extensionWorkingCopy, true, 'tag', '-f', $event->tag, $foundCommitHash);
             $this->gitCommand($extensionWorkingCopy, true, 'push', 'origin', $event->tag);
+
+            // Send a heartbeat after an extension has been handled (a single extension should hopefully not take longer than 2 minutes)
+            $rabbitIO->read(0);
         }
     }
 

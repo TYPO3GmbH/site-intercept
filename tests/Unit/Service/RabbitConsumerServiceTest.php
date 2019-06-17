@@ -8,6 +8,7 @@ use App\Service\RabbitConsumerService;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Wire\IO\AbstractIO;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
@@ -22,7 +23,9 @@ class RabbitConsumerServiceTest extends TestCase
         $loggerProphecy = $this->prophesize(LoggerInterface::class);
         $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
         $rabbitChannel = $this->prophesize(AMQPChannel::class);
+        $rabbitIo = $this->prophesize(AbstractIO::class);
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
+        $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
 
         $subject = new RabbitConsumerService(
@@ -48,7 +51,9 @@ class RabbitConsumerServiceTest extends TestCase
         $loggerProphecy = $this->prophesize(LoggerInterface::class);
         $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
         $rabbitChannel = $this->prophesize(AMQPChannel::class);
+        $rabbitIo = $this->prophesize(AbstractIO::class);
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
+        $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
 
         $subject = new RabbitConsumerService(
@@ -71,7 +76,7 @@ class RabbitConsumerServiceTest extends TestCase
         ]);
         $message->getBody()->shouldBeCalled()->willReturn($messageBody);
 
-        $coreSplitService->split(Argument::type(GithubPushEventForCore::class))->shouldBeCalled();
+        $coreSplitService->split(Argument::type(GithubPushEventForCore::class), Argument::type(AbstractIO::class))->shouldBeCalled();
 
         $subject->handleWorkerJob($message->reveal());
     }
@@ -84,7 +89,9 @@ class RabbitConsumerServiceTest extends TestCase
         $loggerProphecy = $this->prophesize(LoggerInterface::class);
         $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
         $rabbitChannel = $this->prophesize(AMQPChannel::class);
+        $rabbitIo = $this->prophesize(AbstractIO::class);
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
+        $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
 
         $subject = new RabbitConsumerService(
@@ -108,7 +115,7 @@ class RabbitConsumerServiceTest extends TestCase
         ]);
         $message->getBody()->shouldBeCalled()->willReturn($messageBody);
 
-        $coreSplitService->tag(Argument::type(GithubPushEventForCore::class))->shouldBeCalled();
+        $coreSplitService->tag(Argument::type(GithubPushEventForCore::class), Argument::type(AbstractIO::class))->shouldBeCalled();
 
         $subject->handleWorkerJob($message->reveal());
     }

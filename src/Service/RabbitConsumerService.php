@@ -14,6 +14,7 @@ use App\Extractor\GithubPushEventForCore;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Wire\IO\AbstractIO;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
@@ -26,6 +27,11 @@ class RabbitConsumerService
      * @var AMQPChannel The rabbit channel to messages to and fetch from
      */
     private $rabbitChannel;
+
+    /**
+     * @var AbstractIO Direct rabbit IO connection, used to send heartbeats in between single worker jobs
+     */
+    private $rabbitIO;
 
     /**
      * @var string Name of the queue to push to and fetch from
@@ -62,6 +68,13 @@ class RabbitConsumerService
         $this->coreSplitService = $coreSplitService;
         $this->rabbitChannel = $rabbitConnection->channel();
         $this->rabbitChannel->queue_declare($this->queueName, false, true, false, false);
+        // Note getIO() is 'internal' / 'deprecated' in amqplib 2.9.2. However, there is
+        // currently no other way to send heardbeats in between jobs manually, which also
+        // updates the 'last_read' / 'last_write' values.
+        // Solution from https://blog.mollie.com/keeping-rabbitmq-connections-alive-in-php-b11cb657d5fb
+        // Default heartbeat: 60 seconds, so any single job running longer than 2 minutes (two heartbeats missed), will crash.
+        // Thus, the IO object is given down to jobs, to send a heartbeat in between single units of jobs
+        $this->rabbitIO = $rabbitConnection->getIO();
     }
 
     /**
@@ -104,9 +117,9 @@ class RabbitConsumerService
             ]
         );
         if ($event->type === 'patch') {
-            $this->coreSplitService->split($event);
+            $this->coreSplitService->split($event, $this->rabbitIO);
         } elseif ($event->type === 'tag') {
-            $this->coreSplitService->tag($event);
+            $this->coreSplitService->tag($event, $this->rabbitIO);
         }
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
         $this->logger->info(
