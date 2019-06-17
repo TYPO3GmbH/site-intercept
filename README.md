@@ -64,7 +64,7 @@ Interface to deal with documentation rendering and management.
 * github.com - repository hooks trigger: git subtree split, git subtree tagging, pull request
   handling, documentation rendering. intercept pushes patches and tags to core subtree split
   repositories.
-* rabbitmq.typo3.com - intercept web controlles push new subtree split & tag jobs to a rabbitmq queue,
+* rabbitmq.typo3.com - intercept web controls push new subtree split & tag jobs to a rabbitmq queue,
   a intercept cli job connects to rabbit to handle these jobs.
 * elk.typo3.com (graylog) - intercept logs details to graylog, the web intercept interface reads various
   log entries and renders them.
@@ -152,6 +152,7 @@ Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` o
 
 * http://intercept.ddev.local/admin/ - intercept web interface
 * http://intercept.ddev.local:9101/ - graylog interface, user: admin, password: foo
+* http://intercept.ddev.local:15672/ - rabbitmq interface, user: admin, password: foo
 
 ### Upgrading ddev based
 
@@ -165,6 +166,7 @@ Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` o
 * $ docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
 * $ ddev exec -s graylogmongo mongorestore -d graylog /dump/graylog
 * $ ddev exec -s graylogmongo rm -rf /dump
+* $ ddev exec -s rabbitmq rabbitmqadmin -u admin -p foo declare queue name=intercept-core-split-testing
 
 ### Development
 
