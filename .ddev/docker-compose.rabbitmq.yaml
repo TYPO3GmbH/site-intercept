@@ -1,0 +1,20 @@
+version: "3.6"
+services:
+  rabbitmq:
+    image: rabbitmq:3.7-management
+    container_name: ddev-${DDEV_SITENAME}-rabbitmq
+    ports:
+      - 5672
+      - 15672
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+      com.ddev.app-url: $DDEV_URL
+    environment:
+      - VIRTUAL_HOST=${DDEV_HOSTNAME}
+      - HTTP_EXPOSE=15672
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+  web:
+    links:
+      - rabbitmq:$DDEV_HOSTNAME
