@@ -452,7 +452,7 @@ class DocumentationJar
 
     public function isDeletable(): bool
     {
-        return $this->status === DocumentationStatus::STATUS_RENDERED;
+        return $this->status === DocumentationStatus::STATUS_RENDERED || $this->status === DocumentationStatus::STATUS_RENDERING_FAILED;
     }
 
     /**
