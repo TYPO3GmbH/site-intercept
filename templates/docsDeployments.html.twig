@@ -61,7 +61,9 @@
                                 </th>
                                 <th data-type="title">
                                     <strong>{{ deployment.packageName }}</strong><br>
-                                    <small>{{ deployment.packageType }}</small>
+                                    {% if deployment.extensionKey %}
+                                        <small>ext key: {{ deployment.extensionKey }}</small>
+                                    {% endif %}
                                 </th>
                                 <th data-type="badge">
                                     {% if deployment.status == "0" %}
