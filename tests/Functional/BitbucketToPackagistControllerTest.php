@@ -1,8 +1,14 @@
 <?php
 declare(strict_types = 1);
 
-namespace App\Tests\Functional;
+/*
+ * This file is part of the package t3g/intercept.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
 
+namespace App\Tests\Functional;
 
 use App\Bundle\TestDoubleBundle;
 use App\Client\PackagistClient;
@@ -112,7 +118,6 @@ class BitbucketToPackagistControllerTest extends TestCase
         $this->assertSame('Could not decode payload.', $response->getContent());
     }
 
-
     /**
      * @test
      */
@@ -138,7 +143,7 @@ class BitbucketToPackagistControllerTest extends TestCase
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
         $this->assertSame(400, $response->getStatusCode());
-        $this->assertSame('Wrong eventKey. Expected \'repo:refs_changed\' got \'foo\'' , $response->getContent());
+        $this->assertSame('Wrong eventKey. Expected \'repo:refs_changed\' got \'foo\'', $response->getContent());
     }
 
     /**

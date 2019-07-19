@@ -154,7 +154,11 @@
 {# icon #}
 {% block icon %}
     {% if item.getExtra('icon') %}
-        <span class="nav-item-icon"><i class="fa fa-{{ item.getExtra('icon') }}"></i></span>
+        {% if item.getExtra('fab') %}
+            <span class="nav-item-icon"><i class="fab fa-{{ item.getExtra('icon') }}"></i></span>
+        {% else %}
+            <span class="nav-item-icon"><i class="fa fa-{{ item.getExtra('icon') }}"></i></span>
+        {% endif %}
     {% endif %}
 {% endblock %}
 

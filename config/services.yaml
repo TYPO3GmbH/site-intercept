@@ -64,6 +64,17 @@ services:
         tags:
             - testDouble
 
+    App\Service\DiscordServerService:
+        class: App\Service\DiscordServerService
+        public: true
+        arguments:
+            $serverId: '%env(DISCORD_SERVER_ID)%'
+            $botToken: '%env(DISCORD_BOT_TOKEN)%'
+
+    App\Service\DiscordWebhookService:
+        class: App\Service\DiscordWebhookService
+        public: true
+
     App\Service\GithubService:
         class: App\Service\GithubService
         arguments:
