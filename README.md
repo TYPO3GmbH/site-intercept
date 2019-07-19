@@ -52,9 +52,6 @@ Trigger subtree splitting and tagging manually.
 #### Docs control
 Interface to deal with documentation rendering and management.
 
-#### Discord Webhooks
-Interface to link other services to Discord webhooks.
-
 
 ## List of services interacted with
 
@@ -74,7 +71,6 @@ Interface to link other services to Discord webhooks.
 * typo3.slack.com - intercept pushs messages to slack for failed nightly builds
 * sqlite - a local sqlite, stores users, documentation details, information if a single core
   nightly build has been rebuild already
-* Discord -  Creating and sending webhooks in Discord
 
 
 ## Architecture
@@ -181,21 +177,6 @@ If changing js / css / web images, files to public dirs need to be recompiled an
 An alternative is to start an explicit watcher process to recompile if css files change:
 
 * $ ddev exec yarn encore dev --watch
-
-### Discord
-
-To use the Discord part of Intercept you need two variables in your `.env.local` file
-* DISCORD_SERVER_ID
-* DISCORD_BOT_TOKEN
-
-The server ID is the ID of the Discord server you wish to interact with. You can find this out by turning on developer 
-mode in Discord, right clicking the server, and then clicking `copy id`.
-
-The Bot is a token needed to interact with the Discord API. You can read more about these [here](https://discordapp.com/developers/docs/topics/oauth2#bots).
-You also need to make sure the bot you are using is a member of the server you are using!
-
-Once set up you must run the command `bin/console app:discord-sync`. This commend will fetch a list of Discord channels to your Intercept installation.
-In a production environment, this command should be set as a cronjob for roughly every 10 minutes.
 
 ### Test execution
 

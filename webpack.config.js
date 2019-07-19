@@ -28,10 +28,6 @@ Encore
         to: 'images/[path][name].[hash:8].[ext]'
     })
     .copyFiles({
-        from: './assets/webhookavatars',
-        to: 'images/webhookavatars/[path][name].[ext]'
-    })
-    .copyFiles({
         from: './config/nginx',
         to: 'nginx/[path][name].[ext]'
     })

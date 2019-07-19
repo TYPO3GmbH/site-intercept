@@ -155,33 +155,6 @@ class MenuBuilder
                 ]
             );
         }
-        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            $menu->addChild(
-                'discord',
-                [
-                    'route' => 'admin_discord_webhooks',
-                    'label' => 'Discord',
-                    'extras' => [
-                        'icon' => 'discord',
-                        'fab' => true,
-                    ],
-                ]
-            );
-            $menu['discord']->addChild(
-                'discord_webhooks',
-                [
-                    'route' => 'admin_discord_webhooks',
-                    'label' => 'Webhooks',
-                ]
-            );
-            $menu['discord']->addChild(
-                'discord_howto',
-                [
-                    'route' => 'admin_discord_webhooks_howto',
-                    'label' => 'Configuring Services',
-                ]
-            );
-        }
         $menu->addChild(
             'help',
             [

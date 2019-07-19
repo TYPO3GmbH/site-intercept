@@ -1,10 +1,12 @@
 <?php
 
 /*
- * This file is part of the package t3g/intercept.
+ * This file is part of the Symfony package.
  *
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace App\Tests\Unit\Security;
@@ -237,9 +239,7 @@ class LdapUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
-            ->will($this->returnValue(new Entry(
-                'foo',
-                [
+            ->will($this->returnValue(new Entry('foo', [
                     'sAMAccountName' => ['foo'],
                     'userpassword' => ['bar', 'baz'],
                 ]
@@ -286,9 +286,7 @@ class LdapUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
-            ->will($this->returnValue(new Entry(
-                'foo',
-                [
+            ->will($this->returnValue(new Entry('foo', [
                     'sAMAccountName' => ['foo'],
                 ]
             )))

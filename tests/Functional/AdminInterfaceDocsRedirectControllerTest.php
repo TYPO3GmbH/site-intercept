@@ -1,13 +1,5 @@
 <?php
 declare(strict_types = 1);
-
-/*
- * This file is part of the package t3g/intercept.
- *
- * For the full copyright and license information, please read the
- * LICENSE file that was distributed with this source code.
- */
-
 namespace App\Tests\Functional;
 
 use App\Bundle\TestDoubleBundle;
@@ -15,7 +7,9 @@ use App\Client\BambooClient;
 use App\Tests\Functional\Fixtures\AdminInterfaceDocsRedirectControllerTestData;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTestCase
 {
