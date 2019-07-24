@@ -1,5 +1,13 @@
 <?php
 declare(strict_types = 1);
+
+/*
+ * This file is part of the package t3g/intercept.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace App\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Client;
@@ -26,7 +34,7 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
             'ROLE_DOCUMENTATION_MAINTAINER',
         ];
         $token = new UsernamePasswordToken('admin', null, $firewallName, $roles);
-        $session->set('_security_'.$firewallContext, serialize($token));
+        $session->set('_security_' . $firewallContext, serialize($token));
         $session->save();
 
         $cookie = new Cookie($session->getName(), $session->getId());
@@ -49,7 +57,7 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
             'ROLE_ADMIN',
         ];
         $token = new UsernamePasswordToken('admin', null, $firewallName, $roles);
-        $session->set('_security_'.$firewallContext, serialize($token));
+        $session->set('_security_' . $firewallContext, serialize($token));
         $session->save();
 
         $cookie = new Cookie($session->getName(), $session->getId());
