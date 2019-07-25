@@ -14,6 +14,7 @@ use App\Exception\DiscordTransformerTypeNotFoundException;
 use App\Repository\DiscordWebhookRepository;
 use App\Service\DiscordWebhookService;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,9 +28,10 @@ class WebhookToDiscordController extends AbstractController
      * @param string $identifier
      * @param DiscordWebhookRepository $discordWebhookRepository
      * @param DiscordWebhookService $discordWebhookService
+     * @param LoggerInterface $logger
      * @return Response
      */
-    public function execute(Request $request, string $identifier, DiscordWebhookRepository $discordWebhookRepository, DiscordWebhookService $discordWebhookService): Response
+    public function execute(Request $request, string $identifier, DiscordWebhookRepository $discordWebhookRepository, DiscordWebhookService $discordWebhookService, LoggerInterface $logger): Response
     {
         $hook = $discordWebhookRepository->findOneBy(['identifier' => $identifier]);
 
@@ -49,11 +51,21 @@ class WebhookToDiscordController extends AbstractController
             return Response::create('Webhook is of an unknown service type', Response::HTTP_PRECONDITION_FAILED);
         }
 
-        if (!$transformer->shouldBeSent(json_decode($request->getContent(), true), $hook)) {
+        $content = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $logger->warning(
+                'Could not decode webhook payload',
+                ['hook' => $hook, 'payload' => $request->getContent(), 'error' => json_last_error_msg()]
+            );
+            return Response::create('Could not decode json payload', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        if (!$transformer->shouldBeSent($content, $hook)) {
             return Response::create('The request was ok, but not all conditions for Discord delivery were met.', Response::HTTP_NO_CONTENT);
         }
 
-        $message = $transformer->getDiscordMessage(json_decode($request->getContent(), true));
+        $message = $transformer->getDiscordMessage($content);
         if (null !== $hook->getUsername()) {
             $message->setUsername($hook->getUsername());
         }
