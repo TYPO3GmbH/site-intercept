@@ -103,6 +103,26 @@ class WebhookToDiscordControllerTest extends KernelTestCase
     /**
      * @test
      */
+    public function discordWebhookIsTriggeredWithWwwEncodedRequest()
+    {
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        $generalClientProphecy
+            ->request('POST', 'https://discordapp.com/api/webhooks/123/test', Argument::any())
+            ->shouldBeCalled()
+            ->willReturn(new Response(200, []));
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+
+        $request = require __DIR__ . '/Fixtures/BambooToDiscordGoodWwwEncodedRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * @test
+     */
     public function discordWebhookIsNotFound()
     {
         $kernel = new \App\Kernel('test', true);

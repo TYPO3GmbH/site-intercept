@@ -53,12 +53,18 @@ class WebhookToDiscordController extends AbstractController
 
         $content = json_decode($request->getContent(), true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $logger->warning(
-                'Could not decode webhook payload',
-                ['hook' => $hook, 'payload' => $request->getContent(), 'error' => json_last_error_msg()]
-            );
-            return Response::create('Could not decode json payload', Response::HTTP_INTERNAL_SERVER_ERROR);
+        if (null === $content) {
+            $content = urldecode($request->getContent());
+            $content = substr($content, 8); // cut off 'payload=', rest should be json, then
+            $content = json_decode($content, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $logger->warning(
+                    'Could not decode webhook payload',
+                    ['hook' => $hook, 'payload' => $request->getContent(), 'error' => json_last_error_msg()]
+                );
+                return Response::create('Could not decode json payload', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
 
         if (!$transformer->shouldBeSent($content, $hook)) {
