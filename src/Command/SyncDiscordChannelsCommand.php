@@ -13,6 +13,7 @@ namespace App\Command;
 use App\Entity\DiscordChannel;
 use App\Exception\UnexpectedDiscordApiResponseException;
 use App\Repository\DiscordChannelRepository;
+use App\Repository\DiscordScheduledMessageRepository;
 use App\Repository\DiscordWebhookRepository;
 use App\Service\DiscordServerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -46,6 +47,11 @@ class SyncDiscordChannelsCommand extends Command
     protected $discordWebhookRepository;
 
     /**
+     * @var DiscordScheduledMessageRepository
+     */
+    protected $discordScheduledMessageRepository;
+
+    /**
      * @var LoggerInterface
      */
     protected $logger;
@@ -57,14 +63,22 @@ class SyncDiscordChannelsCommand extends Command
      * @param DiscordChannelRepository $discordChannelRepository
      * @param LoggerInterface $logger
      * @param DiscordWebhookRepository $discordWebhookRepository
+     * @param DiscordScheduledMessageRepository $discordScheduledMessageRepository
      */
-    public function __construct(DiscordServerService $discordServerService, EntityManagerInterface $entityManager, DiscordChannelRepository $discordChannelRepository, LoggerInterface $logger, DiscordWebhookRepository $discordWebhookRepository)
-    {
+    public function __construct(
+        DiscordServerService $discordServerService,
+        EntityManagerInterface $entityManager,
+        DiscordChannelRepository $discordChannelRepository,
+        LoggerInterface $logger,
+        DiscordWebhookRepository $discordWebhookRepository,
+        DiscordScheduledMessageRepository $discordScheduledMessageRepository
+    ) {
         parent::__construct();
         $this->discordServerService = $discordServerService;
         $this->entityManager = $entityManager;
         $this->discordChannelRepository = $discordChannelRepository;
         $this->discordWebhookRepository = $discordWebhookRepository;
+        $this->discordScheduledMessageRepository = $discordScheduledMessageRepository;
         $this->logger = $logger;
     }
 
@@ -138,10 +152,15 @@ class SyncDiscordChannelsCommand extends Command
 
         foreach ($deletedChannels as $deletedChannel) {
             $hooks = $this->discordWebhookRepository->findBy(['channel' => $deletedChannel]);
+            $messages = $this->discordScheduledMessageRepository->findBy(['channel' => $deletedChannel]);
 
             foreach ($hooks as $hook) {
                 $hook->setChannel(null);
                 $this->entityManager->persist($hook);
+            }
+            foreach ($messages as $message) {
+                $message->setChannel(null);
+                $this->entityManager->persist($message);
             }
 
             $this->entityManager->remove($deletedChannel);

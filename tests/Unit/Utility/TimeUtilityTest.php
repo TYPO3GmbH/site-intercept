@@ -41,4 +41,23 @@ class TimeUtilityTest extends TestCase
         $result = TimeUtility::convertSecondsToHumanReadable($seconds);
         self::assertSame($expected, $result);
     }
+
+    /**
+     * @test
+     */
+    public function hasTimezones()
+    {
+        $data = TimeUtility::timeZones();
+
+        // Check all continents
+        $this->assertArrayHasKey('Europe/Berlin', $data);
+        $this->assertArrayHasKey('UTC', $data);
+        $this->assertArrayHasKey('Africa/Algiers', $data);
+        $this->assertArrayHasKey('Antarctica/Mawson', $data);
+        $this->assertArrayHasKey('Pacific/Apia', $data);
+        $this->assertArrayHasKey('Asia/Kabul', $data);
+        $this->assertArrayHasKey('Australia/Darwin', $data);
+        $this->assertArrayHasKey('America/New_York', $data);
+        $this->assertArrayHasKey('Indian/Mahe', $data);
+    }
 }

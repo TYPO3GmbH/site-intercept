@@ -59,6 +59,11 @@ class DiscordChannel
     private $webhooks;
 
     /**
+     * @OneToMany(targetEntity="DiscordScheduledMessage", mappedBy="channel", cascade={"remove"})
+     */
+    private $scheduledMessages;
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $webhookUrl;

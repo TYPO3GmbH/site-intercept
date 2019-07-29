@@ -175,6 +175,13 @@ class MenuBuilder
                 ]
             );
             $menu['discord']->addChild(
+                'discord_scheduled_messages',
+                [
+                    'route' => 'admin_discord_scheduled_messages',
+                    'label' => 'Scheduled Messages',
+                ]
+            );
+            $menu['discord']->addChild(
                 'discord_howto',
                 [
                     'route' => 'admin_discord_webhooks_howto',

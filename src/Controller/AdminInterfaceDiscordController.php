@@ -9,13 +9,16 @@
 
 namespace App\Controller;
 
+use App\Entity\DiscordScheduledMessage;
 use App\Repository\DiscordChannelRepository;
+use App\Repository\DiscordScheduledMessageRepository;
 use App\Repository\DiscordWebhookRepository;
 use App\Service\DiscordWebhookService;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Setono\CronExpressionBundle\Form\DataTransformer\CronExpressionToPartsTransformer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -272,5 +275,173 @@ class AdminInterfaceDiscordController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_discord_webhooks');
+    }
+
+    /**
+     * @Route("/admin/discord/scheduled", name="admin_discord_scheduled_messages")
+     * @IsGranted("ROLE_ADMIN")
+     *
+     * @param Request $request
+     * @param DiscordScheduledMessageRepository $discordScheduledMessageRepository
+     * @param PaginatorInterface $paginator
+     * @return Response
+     */
+    public function scheduledMessagesIndex(Request $request, DiscordScheduledMessageRepository $discordScheduledMessageRepository, PaginatorInterface $paginator): Response
+    {
+        $messaged = $discordScheduledMessageRepository->findAll();
+        $pagination = $paginator->paginate(
+            $messaged,
+            $request->query->getInt('page', 1)
+        );
+
+        return $this->render(
+            'discordScheduledMessages.html.twig',
+            [
+                'pagination' => $pagination,
+            ]
+        );
+    }
+
+    /**
+     * @Route("/admin/discord/scheduled/add", name="admin_discord_scheduled_messages_add_action")
+     * @IsGranted("ROLE_ADMIN")
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param DiscordChannelRepository $discordChannelRepository
+     * @return Response
+     * @throws \Exception
+     */
+    public function scheduledMessagesAdd(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        DiscordChannelRepository $discordChannelRepository
+    ): Response {
+        $message = new DiscordScheduledMessage();
+        $form = $this->createForm(\App\Form\DiscordScheduledMessage::class, $message, ['entity_manager' => $this->getDoctrine()->getManager()]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $channel = $discordChannelRepository->findOneBy(['channelId' => $request->get('discord_scheduled_message')['channelId']]);
+            if (null !== $channel) {
+                $transformer = new CronExpressionToPartsTransformer();
+                $cronArray = ['minutes' => [], 'hours' => [], 'days' => [], 'weekdays' => [], 'months' => []];
+                $message->setName($request->get('discord_scheduled_message')['name'])
+                    ->setChannel($channel)
+                    ->setMessage($request->get('discord_scheduled_message')['message'])
+                    ->setSchedule($transformer->reverseTransform(array_merge($cronArray, $request->get('discord_scheduled_message')['schedule'])))
+                    ->setTimezone($request->get('discord_scheduled_message')['timezone']);
+
+                if (!empty($request->get('discord_scheduled_message')['username'])) {
+                    $message->setUsername($request->get('discord_scheduled_message')['username']);
+                }
+                if (!empty($request->get('discord_scheduled_message')['avatarUrl'])) {
+                    $message->setAvatarUrl($request->get('discord_scheduled_message')['avatarUrl']);
+                }
+
+                $entityManager->persist($message);
+                $entityManager->flush();
+                $this->addFlash('success', 'Discord message created for channel: #' . $channel->getChannelName());
+
+                return $this->redirectToRoute('admin_discord_scheduled_messages');
+            }
+        }
+
+        return $this->render(
+            'discord_scheduled_messages/addMessage.html.twig',
+            [
+                'form' => $form->createView(),
+            ]
+        );
+    }
+
+    /**
+     * @Route("/admin/discord/scheduled/edit/{messageId}", name="admin_discord_scheduled_messages_edit_action")
+     * @IsGranted("ROLE_ADMIN")
+     *
+     * @param int $messageId
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param DiscordChannelRepository $discordChannelRepository
+     * @param DiscordScheduledMessageRepository $discordScheduledMessageRepository
+     * @return Response
+     */
+    public function scheduledMessagesEdit(
+        int $messageId,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        DiscordChannelRepository $discordChannelRepository,
+        DiscordScheduledMessageRepository $discordScheduledMessageRepository
+    ): Response {
+        $message = $discordScheduledMessageRepository->find($messageId);
+
+        if (null === $message) {
+            return $this->redirectToRoute('admin_discord_scheduled_messages_add_action');
+        }
+
+        $form = $this->createForm(\App\Form\DiscordScheduledMessage::class, $message, ['entity_manager' => $this->getDoctrine()->getManager()]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $channel = $discordChannelRepository->findOneBy(['channelId' => $request->get('discord_scheduled_message')['channelId']]);
+            if (null !== $channel) {
+                $transformer = new CronExpressionToPartsTransformer();
+                $cronArray = ['minutes' => [], 'hours' => [], 'days' => [], 'weekdays' => [], 'months' => []];
+                $message->setName($request->get('discord_scheduled_message')['name'])
+                    ->setChannel($channel)
+                    ->setMessage($request->get('discord_scheduled_message')['message'])
+                    ->setSchedule($transformer->reverseTransform(array_merge($cronArray, $request->get('discord_scheduled_message')['schedule'])))
+                    ->setTimezone($request->get('discord_scheduled_message')['timezone']);
+
+                if (!empty($request->get('discord_scheduled_message')['username'])) {
+                    $message->setUsername($request->get('discord_scheduled_message')['username']);
+                }
+                if (!empty($request->get('discord_scheduled_message')['avatarUrl'])) {
+                    $message->setAvatarUrl($request->get('discord_scheduled_message')['avatarUrl']);
+                }
+
+                $entityManager->persist($message);
+                $entityManager->flush();
+                $this->addFlash('success', 'Discord message created for channel: #' . $channel->getChannelName());
+
+                return $this->redirectToRoute('admin_discord_scheduled_messages');
+            }
+        }
+
+        if ($message->getChannel() !== null) {
+            $form->get('channelId')->setData($message->getChannel()->getChannelId());
+        } else {
+            $form->get('channelId')->setData(null);
+        }
+
+        return $this->render(
+            'discord_scheduled_messages/addMessage.html.twig',
+            [
+                'form' => $form->createView(),
+                'edit' => true,
+            ]
+        );
+    }
+
+    /**
+     * @Route("/admin/discord/scheduled/delete/{messageId}", name="admin_discord_scheduled_messages_delete_action")
+     * @IsGranted("ROLE_ADMIN")
+     *
+     * @param int $messageId
+     * @param DiscordScheduledMessageRepository $discordScheduledMessageRepository
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
+    public function scheduledMessagesDelete(int $messageId, DiscordScheduledMessageRepository $discordScheduledMessageRepository, EntityManagerInterface $entityManager): Response
+    {
+        $message = $discordScheduledMessageRepository->find($messageId);
+
+        if (null !== $message) {
+            $entityManager->remove($message);
+            $entityManager->flush();
+            $this->addFlash('success', 'Discord message deleted');
+        }
+
+        return $this->redirectToRoute('admin_discord_scheduled_messages');
     }
 }

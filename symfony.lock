@@ -1,4 +1,7 @@
 {
+    "brick/reflection": {
+        "version": "0.2.2"
+    },
     "composer/semver": {
         "version": "1.4.2"
     },
@@ -88,6 +91,9 @@
     },
     "doctrine/reflection": {
         "version": "v1.0.0"
+    },
+    "dragonmantank/cron-expression": {
+        "version": "v2.3.0"
     },
     "egulias/email-validator": {
         "version": "2.1.7"
@@ -274,6 +280,9 @@
             "version": "5.2",
             "ref": "fb7e19da7f013d0d422fa9bce16f5c510e27609b"
         }
+    },
+    "setono/cron-expression-bundle": {
+        "version": "v1.0.0"
     },
     "swiftmailer/swiftmailer": {
         "version": "v6.2.1"
