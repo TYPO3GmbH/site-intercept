@@ -3,7 +3,7 @@
   "before": "a10867b14bb761a232cd80139fbd4c0d33264240",
   "after": "0000000000000000000000000000000000000000",
   "created": false,
-  "deleted": true,
+  "deleted": false,
   "forced": false,
   "base_ref": null,
   "compare": "https://github.com/Codertocat/Hello-World/compare/a10867b14bb7...000000000000",

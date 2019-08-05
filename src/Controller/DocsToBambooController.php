@@ -17,6 +17,7 @@ use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
+use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
@@ -254,6 +255,18 @@ class DocsToBambooController extends AbstractController
             );
             // 412: precondition failed
             return Response::create('Invalid hook payload. See https://intercept.typo3.com for more information.', 412);
+        } catch (GitBranchDeletedException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'branchDeleted',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                ]
+            );
+            return Response::create('The branch in this push event has been deleted.', 412);
         }
     }
 }

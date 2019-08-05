@@ -171,6 +171,22 @@ class DocsToBambooControllerTest extends KernelTestCase
     /**
      * @test
      */
+    public function bambooBuildIsNotTriggeredDueToDeletedBranch(): void
+    {
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
+        $request = require __DIR__ . '/Fixtures/DocsToBamboGithubDeletedBranchRequest.php';
+        $response = $kernel->handle($request);
+        $this->assertSame('The branch in this push event has been deleted.', $response->getContent());
+        $this->assertSame(412, $response->getStatusCode());
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * @test
+     */
     public function githubPingIsHandled()
     {
         $kernel = new \App\Kernel('test', true);

@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
@@ -107,6 +108,12 @@ class WebHookService
         }
         if ($payload === null) {
             throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
+        }
+        if (!empty($payload->deleted) && $payload->deleted === true) {
+            throw new GitBranchDeletedException(
+                'Webhook was triggered on a deleted branch for repository ' . $payload->repository->clone_url . '.',
+                1564408696
+            );
         }
 
         $repositoryUrl = (string)$payload->repository->clone_url;
