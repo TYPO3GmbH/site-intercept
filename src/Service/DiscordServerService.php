@@ -13,6 +13,8 @@ namespace App\Service;
 use App\Entity\DiscordChannel;
 use App\Exception\UnexpectedDiscordApiResponseException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use Symfony\Component\HttpFoundation\Response;
 use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 
 class DiscordServerService
@@ -130,31 +132,38 @@ class DiscordServerService
             if ($sleep > 0) {
                 usleep($sleep * 1000);
             }
-            if ($method === 'POST') {
-                $response = $client->request(
-                    $method,
-                    $url,
-                    [
-                        'headers' => [
-                            'Authorization' => 'Bot ' . $this->botToken,
-                            'Content-Type' => 'application/json',
-                        ],
-                        'body' => json_encode($payload),
-                    ]
-                );
-            } else {
-                $response = $client->request(
-                    $method,
-                    $url,
-                    [
-                        'headers' => [
-                            'Authorization' => 'Bot ' . $this->botToken,
-                            'Content-Type' => 'application/json',
-                        ],
-                    ]
-                );
+            try {
+                if ($method === 'POST') {
+                    $response = $client->request(
+                        $method,
+                        $url,
+                        [
+                            'headers' => [
+                                'Authorization' => 'Bot ' . $this->botToken,
+                                'Content-Type' => 'application/json',
+                            ],
+                            'body' => json_encode($payload),
+                        ]
+                    );
+                } else {
+                    $response = $client->request(
+                        $method,
+                        $url,
+                        [
+                            'headers' => [
+                                'Authorization' => 'Bot ' . $this->botToken,
+                                'Content-Type' => 'application/json',
+                            ],
+                        ]
+                    );
+                }
+            } catch (BadResponseException $e) {
+                // We don't want to break on 429 too many requests
+                if ($e->getResponse()->getStatusCode() !== Response::HTTP_TOO_MANY_REQUESTS) {
+                    throw $e;
+                }
             }
-            $result   = json_decode((string)$response->getBody(), true);
+            $result = json_decode((string)$response->getBody(), true);
             if (isset($result['retry_after'])) {
                 $sleep = $result['retry_after'];
             } else {
