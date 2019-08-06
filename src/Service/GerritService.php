@@ -17,6 +17,7 @@ use App\Extractor\BambooBuildStatus;
 use App\Extractor\GerritToBambooCore;
 use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Post a vote with build information on gerrit.
@@ -29,13 +30,20 @@ class GerritService
     private $client;
 
     /**
+     * @var string
+     */
+    private $token;
+
+    /**
      * GerritService constructor.
      *
      * @param GerritClient $client
+     * @param string $gerritToken
      */
-    public function __construct(GerritClient $client)
+    public function __construct(GerritClient $client, string $gerritToken)
     {
         $this->client = $client;
+        $this->token = $gerritToken;
     }
 
     /**
@@ -109,6 +117,17 @@ class GerritService
             }
         }
         return new GerritToBambooCore((string)$changeId, $patchSet, $branch, $project);
+    }
+
+    /**
+     * Checks if a request from Gerrit has the correct token
+     *
+     * @param Request $request
+     * @return bool
+     */
+    public function requestIsAuthorized(Request $request): bool
+    {
+        return $this->token === $request->get('token');
     }
 
     /**

@@ -101,6 +101,12 @@ services:
         tags:
             - testDouble
 
+    App\Service\GerritService:
+        class: App\Service\GerritService
+        public: true
+        arguments:
+            $gerritToken: '%env(GERRIT_TOKEN)%'
+
     App\Menu\MenuBuilder:
         tags:
             -

@@ -13,6 +13,7 @@ namespace App\Controller;
 use App\Exception\DoNotCareException;
 use App\Extractor\GerritToBambooCore;
 use App\Service\BambooService;
+use App\Service\GerritService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,10 +32,15 @@ class GerritToBambooController extends AbstractController
      * @param Request $request
      * @param LoggerInterface $logger
      * @param BambooService $bambooService
+     * @param GerritService $gerritService
      * @return Response
      */
-    public function index(Request $request, LoggerInterface $logger, BambooService $bambooService): Response
+    public function index(Request $request, LoggerInterface $logger, BambooService $bambooService, GerritService $gerritService): Response
     {
+        if (!$gerritService->requestIsAuthorized($request)) {
+            return Response::create('Incorrect Gerrit token.', Response::HTTP_UNAUTHORIZED);
+        }
+
         try {
             $branch = $request->get('branch');
             $project = $request->get('project') ?? '';
