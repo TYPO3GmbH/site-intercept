@@ -30,6 +30,9 @@ doctrine:
                 class: App\DBAL\Types\UtcDateTimeType
             time:
                 class: App\DBAL\Types\UtcTimeType
+            cron_expression:
+                class: Setono\CronExpressionBundle\Doctrine\DBAL\Types\CronExpressionType
+                commented: false
     orm:
         auto_generate_proxy_classes: true
         naming_strategy: doctrine.orm.naming_strategy.underscore
