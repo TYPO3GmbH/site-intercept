@@ -17,6 +17,7 @@ use App\Client\GraylogClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
@@ -634,5 +635,29 @@ class AdminInterfaceBambooCoreControllerTest extends AbstractFunctionalWebTestCa
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+    }
+
+    /**
+     * @test
+     */
+    public function bambooBuildIsNotTriggeredIfGerritIsDown()
+    {
+        $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
+        $crawler = $client->request('GET', '/admin/bamboo/core');
+
+        $gerritClientProphecy = $this->prophesize(GerritClient::class);
+        TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
+        $gerritClientProphecy->get(Argument::cetera())->willThrow(
+            new ServerException('testing', new Request('GET', ''))
+        );
+
+        // Get the rendered form, feed it with some data and submit it
+        $form = $crawler->selectButton('Trigger bamboo')->form();
+        $form['bamboo_core_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
+        $client->submit($form);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        // The build key is shown
+        $this->assertRegExp('/Gerrit is currently unreachable/', $client->getResponse()->getContent());
     }
 }

@@ -20,6 +20,7 @@ use App\Service\BambooService;
 use App\Service\GerritService;
 use App\Service\GraylogService;
 use App\Utility\BranchUtility;
+use GuzzleHttp\Exception\ServerException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -136,6 +137,11 @@ class AdminInterfaceBambooCoreController extends AbstractController
                 $this->addFlash(
                     'danger',
                     'Trigger not successful. Typical cases: invalid url, change or patch set does not exist, invalid branch.'
+                );
+            } catch (ServerException $e) {
+                $this->addFlash(
+                    'danger',
+                    'Trigger not successful. Gerrit is currently unreachable.'
                 );
             }
         }
