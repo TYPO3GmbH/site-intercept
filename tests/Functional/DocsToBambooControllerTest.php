@@ -14,13 +14,56 @@ use App\Bundle\ClockMockBundle;
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
 use App\Client\GeneralClient;
+use App\Entity\DocumentationJar;
 use App\Extractor\DeploymentInformation;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class DocsToBambooControllerTest extends KernelTestCase
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function setUp()
+    {
+        $kernel = self::bootKernel();
+
+        $this->entityManager = $kernel->getContainer()
+            ->get('doctrine')
+            ->getManager();
+
+        ClockMockBundle::register(DeploymentInformation::class);
+        ClockMockBundle::withClockMock(155309515.6937);
+    }
+
+    /**
+     * @test
+     */
+    public function bambooBuildIsNotTriggeredWithNewRepo()
+    {
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        $generalClientProphecy
+            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
+            ->shouldBeCalled()
+            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
+        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+    }
+
     /**
      * @test
      */
@@ -33,6 +76,27 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
+        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+
+        $jar = $this->entityManager
+            ->getRepository(DocumentationJar::class)
+            ->findOneBy(['packageName' => 'johndoe/make-good']);
+        $jar->setApproved(true);
+        $this->entityManager->persist($jar);
+        $this->entityManager->flush();
+
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        $generalClientProphecy
+            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
+            ->shouldBeCalled()
+            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
             ->post(
@@ -44,10 +108,6 @@ class DocsToBambooControllerTest extends KernelTestCase
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
-        DatabasePrimer::prime($kernel);
-
-        ClockMockBundle::register(DeploymentInformation::class);
-        ClockMockBundle::withClockMock(155309515.6937);
 
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
         $response = $kernel->handle($request);
@@ -71,6 +131,23 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
+        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+
+        $jars = $this->entityManager
+            ->getRepository(DocumentationJar::class)
+            ->findBy(['packageName' => 'bla/yay']);
+        foreach ($jars as $jar) {
+            $jar->setApproved(true);
+            $this->entityManager->persist($jar);
+        }
+        $this->entityManager->flush();
+
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
             ->post(
@@ -89,7 +166,6 @@ class DocsToBambooControllerTest extends KernelTestCase
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
-        DatabasePrimer::prime($kernel);
 
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php';
         $response = $kernel->handle($request);
@@ -148,6 +224,28 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->shouldBeCalled()
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+        $kernel = new \App\Kernel('test', true);
+        $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
+        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
+        $response = $kernel->handle($request);
+        $this->assertSame(200, $response->getStatusCode());
+        $kernel->terminate($request, $response);
+
+        $jar = $this->entityManager
+            ->getRepository(DocumentationJar::class)
+            ->findOneBy(['packageName' => 'typo3/cms-core']);
+        $jar->setApproved(true);
+        $this->entityManager->persist($jar);
+        $this->entityManager->flush();
+
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        $generalClientProphecy
+            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
+            ->shouldBeCalled()
+            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
@@ -160,7 +258,6 @@ class DocsToBambooControllerTest extends KernelTestCase
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
-        DatabasePrimer::prime($kernel);
 
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
         $response = $kernel->handle($request);

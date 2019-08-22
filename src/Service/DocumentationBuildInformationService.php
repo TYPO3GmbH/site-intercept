@@ -104,7 +104,9 @@ class DocumentationBuildInformationService
         if ($statusCode !== 200) {
             throw new ComposerJsonNotFoundException('Fetching composer.json did not return HTTP 200', 1557489013);
         }
-        $json = json_decode($response->getBody()->getContents(), true);
+        $stream = $response->getBody();
+        $stream->rewind();
+        $json = json_decode($stream->getContents(), true);
         if (!is_array($json)) {
             throw new ComposerJsonInvalidException('Decoding composer.json did not return an object. Invalid json syntax?', 1558022442);
         }
@@ -290,17 +292,22 @@ class DocumentationBuildInformationService
                 // Set a new record to 'rendered' for now, this will be updated by controllers later on
                 ->setStatus(DocumentationStatus::STATUS_RENDERED)
                 ->setBuildKey('');
-
             // Check if this repository is entirely new (aka, no branches at all known)
             // And mark it as new if needed
-            $branchExists = $this->documentationJarRepository->findBy([
+            $branchExists = $this->documentationJarRepository->findOneBy([
                 'repositoryUrl' => $deploymentInformation->repositoryUrl,
                 'packageName' => $deploymentInformation->packageName,
             ]);
-            if (count($branchExists) === 0) {
+            if (null === $branchExists) {
                 $documentationJar->setNew(true);
+                $documentationJar->setApproved(false);
             } else {
                 $documentationJar->setNew(false);
+                $documentationJar->setApproved($branchExists->isApproved());
+            }
+
+            if (!$documentationJar->isApproved()) {
+                $documentationJar->setStatus(DocumentationStatus::STATUS_AWAITING_APPROVAL);
             }
 
             $this->entityManager->persist($documentationJar);

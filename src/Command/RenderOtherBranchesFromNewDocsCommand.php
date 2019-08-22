@@ -88,6 +88,7 @@ class RenderOtherBranchesFromNewDocsCommand extends Command
     {
         $newRepositories = $this->documentationJarRepository->findBy([
             'new' => true,
+            'approved' => true,
         ]);
 
         if (count($newRepositories) === 0) {

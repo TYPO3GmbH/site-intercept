@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Enum\DocumentationStatus;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
@@ -34,6 +35,11 @@ class DocsDeploymentFilterType extends AbstractType
                     'manual' => 'manual',
                     'docs-home' => 'docs-home',
                 ]
+            ])
+            ->add('status', ChoiceType::class, [
+                'label' => false,
+                'placeholder' => 'All',
+                'choices'  => array_flip(DocumentationStatus::STATUSSES)
             ])
             ->add('trigger', SubmitType::class, [
                 'label' => 'Search'

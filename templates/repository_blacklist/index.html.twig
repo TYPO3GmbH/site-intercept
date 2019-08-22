@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Repository Blacklist{% endblock %}
+{% block headline %}Repository Blacklist{% endblock %}
+{% block body %}
+
+    <div class="content-section">
+        <div class="container">
+
+            <div class="card">
+
+{#                <div class="card-header">#}
+{#                    <div class="card-header-bar">#}
+{#                        <div class="card-header-actions">#}
+{#                            {{#}
+{#                            macros.linkbutton(#}
+{#                                path('admin_discord_scheduled_messages_add_action'),#}
+{#                                'Add message',#}
+{#                                'secondary'#}
+{#                            )#}
+{#                            }}#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+
+                <div class="datatable">
+                    <table class="datatable-table">
+                        <thead>
+                        <tr>
+                            <th scope="col">URL</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for repository in pagination %}
+                            <tr data-id="{{ repository.id }}">
+                                <td>{{ repository.repositoryUrl }}</td>
+                                <td data-type="actions" data-label="Actions">
+                                    <a class="datatable-action" title="Delete" href="{{ path('admin_docs_deployments_blacklist_delete_action', {'entryId': repository.getId()}) }}">
+                                        <span class="datatable-action-icon"><i class="fa fa-trash"></i></span>
+                                        <span class="datatable-action-label datatable-visually-hidden">Delete</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5">no records found</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if pagination.getTotalItemCount > 10 %}
+                    <div class="card-footer">
+                        {{ knp_pagination_render(pagination) }}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

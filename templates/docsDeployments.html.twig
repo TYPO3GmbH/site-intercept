@@ -74,6 +74,8 @@
                                         <span class="badge badge-warning">Deleting</span>
                                     {% elseif deployment.status == "3" %}
                                         <span class="badge badge-danger">Failed</span>
+                                    {% elseif deployment.status == "4" %}
+                                        <span class="badge badge-warning">Awaiting Approval</span>
                                     {% else %}
                                         <span class="badge badge-secondary">Unknown</span>
                                     {% endif %}
@@ -107,6 +109,17 @@
                                             <a class="datatable-action" title="Re-render documentation" href="{{ path('admin_docs_render', {documentation: deployment.id}) }}">
                                                 <span class="datatable-action-icon"><i class="fas fa-sync"></i></span>
                                                 <span class="datatable-action-label datatable-visually-hidden">Re-render documentation</span>
+                                            </a>
+                                        {% endif %}
+
+                                        {% if deployment.getStatus() == "4" %}
+                                            <a class="datatable-action" title="Approve documentation" href="{{ path('admin_docs_deployments_approve_action', {documentationJarId: deployment.id}) }}">
+                                                <span class="datatable-action-icon"><i class="fas fa-check"></i></span>
+                                                <span class="datatable-action-label datatable-visually-hidden">Approve documentation</span>
+                                            </a>
+                                            <a class="datatable-action" title="Blacklist repository" href="{{ path('admin_docs_deployments_blacklist_action', {documentationJarId: deployment.id}) }}">
+                                                <span class="datatable-action-icon"><i class="fas fa-ban"></i></span>
+                                                <span class="datatable-action-label datatable-visually-hidden">Blacklist repository</span>
                                             </a>
                                         {% endif %}
 

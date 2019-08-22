@@ -15,4 +15,13 @@ final class DocumentationStatus
     public const STATUS_RENDERED = 1;
     public const STATUS_DELETING = 2;
     public const STATUS_RENDERING_FAILED = 3;
+    public const STATUS_AWAITING_APPROVAL = 4;
+
+    public const STATUSSES = [
+        self::STATUS_RENDERING => 'Rendering',
+        self::STATUS_RENDERED => 'Rendered',
+        self::STATUS_DELETING => 'Deleting',
+        self::STATUS_RENDERING_FAILED => 'Rendering Failed',
+        self::STATUS_AWAITING_APPROVAL => 'Awaiting Approval',
+    ];
 }

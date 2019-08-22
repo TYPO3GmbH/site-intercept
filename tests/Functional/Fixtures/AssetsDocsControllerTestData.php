@@ -38,6 +38,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMinimumTypoVersion('')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/TYPO3-Documentation/DocsTypo3Org-Homepage/master/composer.json');
         $manager->persist($documentationJar);
 
@@ -59,6 +60,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMinimumTypoVersion('')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -79,6 +81,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMinimumTypoVersion('')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -99,6 +102,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMinimumTypoVersion('')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -119,6 +123,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMinimumTypoVersion('')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -139,6 +144,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMinimumTypoVersion('')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -160,6 +166,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMaximumTypoVersion('9.5')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -180,6 +187,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMaximumTypoVersion('9.5')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -200,6 +208,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMaximumTypoVersion('9.5')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
@@ -221,6 +230,7 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setMaximumTypoVersion('9.5')
             ->setReRenderNeeded(false)
             ->setNew(false)
+            ->setApproved(true)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
         $manager->flush();

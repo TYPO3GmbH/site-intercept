@@ -21,6 +21,7 @@ use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
+use App\Repository\RepositoryBlacklistEntryRepository;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\MailService;
@@ -44,6 +45,7 @@ class DocsToBambooController extends AbstractController
      * @param BambooService $bambooService
      * @param WebHookService $webhookService
      * @param DocumentationBuildInformationService $documentationBuildInformationService
+     * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
      * @param LoggerInterface $logger
      * @param MailService $mailService
      * @return Response
@@ -53,6 +55,7 @@ class DocsToBambooController extends AbstractController
         BambooService $bambooService,
         WebHookService $webhookService,
         DocumentationBuildInformationService $documentationBuildInformationService,
+        RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
         LoggerInterface $logger,
         MailService $mailService
     ): Response {
@@ -64,6 +67,20 @@ class DocsToBambooController extends AbstractController
             /** @var PushEvent $pushEvent */
             foreach ($pushEvents as $pushEvent) {
                 try {
+                    if ($repositoryBlacklistEntryRepository->isBlacklisted($pushEvent->getRepositoryUrl())) {
+                        $logger->warning(
+                            'Can not render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' due to it being blacklisted.',
+                            [
+                                'type' => 'docsRendering',
+                                'status' => 'blacklisted',
+                                'triggeredBy' => 'api',
+                                'repository' => $pushEvent->getRepositoryUrl(),
+                                'composerFile' => $pushEvent->getUrlToComposerFile(),
+                                'payload' => $request->getContent(),
+                            ]
+                        );
+                        continue;
+                    }
                     $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
                     $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
                     $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
@@ -88,6 +105,8 @@ class DocsToBambooController extends AbstractController
                                 'targetBranch' => $buildInformation->targetBranchDirectory,
                             ]
                         );
+                    } elseif (!$documentationJar->isApproved()) {
+                        // Repository present, but not approved. Do nothing.
                     } else {
                         $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
                         if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'

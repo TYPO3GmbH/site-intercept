@@ -145,6 +145,13 @@ class MenuBuilder
                     'label' => 'Redirects',
                 ]
             );
+            $menu['documentation']->addChild(
+                'docs_blacklist_index',
+                [
+                    'route' => 'admin_docs_deployments_blacklist_index',
+                    'label' => 'Blacklist',
+                ]
+            );
         }
         if ($this->authorizationChecker->isGranted('ROLE_USER')) {
             $menu['documentation']->addChild(

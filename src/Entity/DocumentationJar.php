@@ -130,6 +130,11 @@ class DocumentationJar
     private $new;
 
     /**
+     * @ORM\Column(type="boolean", options={"default": "1"})
+     */
+    private $approved;
+
+    /**
      * @return bool
      */
     public function isReRenderNeeded(): bool
@@ -428,6 +433,18 @@ class DocumentationJar
     public function isNew(): bool
     {
         return (bool)$this->new;
+    }
+
+    public function setApproved(bool $approved): self
+    {
+        $this->approved = $approved;
+
+        return $this;
+    }
+
+    public function isApproved(): bool
+    {
+        return (bool)$this->approved;
     }
 
     /**

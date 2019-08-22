@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Controller;
 
 use App\Entity\DocumentationJar;
+use App\Entity\RepositoryBlacklistEntry;
 use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\ComposerJsonInvalidException;
@@ -22,6 +23,7 @@ use App\Extractor\ComposerJson;
 use App\Form\DocsDeploymentFilterType;
 use App\Form\DocumentationDeployment;
 use App\Repository\DocumentationJarRepository;
+use App\Repository\RepositoryBlacklistEntryRepository;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\GitRepositoryService;
@@ -75,6 +77,9 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
             $data = $form->getData();
             if ($data['type']) {
                 $criteria->andWhere($expressionBuilder->eq('typeLong', $data['type']));
+            }
+            if ($data['status'] || $data['status'] === 0) {
+                $criteria->andWhere($expressionBuilder->eq('status', $data['status']));
             }
             if ($data['search']) {
                 $criteria->andWhere($expressionBuilder->contains('packageName', $data['search']));
@@ -175,12 +180,124 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
     }
 
     /**
+     * @Route("/admin/docs/deployments/approve/{documentationJarId}", name="admin_docs_deployments_approve_action", requirements={"documentationJarId"="\d+"})
+     *
+     * @param int $documentationJarId
+     * @param DocumentationJarRepository $documentationJarRepository
+     * @param EntityManagerInterface $entityManager
+     * @param RenderDocumentationService $renderDocumentationService
+     * @return Response
+     * @throws DocsPackageDoNotCareBranch
+     */
+    public function approve(
+        int $documentationJarId,
+        DocumentationJarRepository $documentationJarRepository,
+        EntityManagerInterface $entityManager,
+        RenderDocumentationService $renderDocumentationService
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
+        $originalJar = $documentationJarRepository->find($documentationJarId);
+        $jars = $documentationJarRepository->findBy(['repositoryUrl' => $originalJar->getRepositoryUrl()]);
+
+        foreach ($jars as $jar) {
+            $jar->setApproved(true);
+            $entityManager->persist($jar);
+            $entityManager->flush();
+            $renderDocumentationService->renderDocumentationByDocumentationJar($jar, 'interface');
+        }
+
+        $this->addFlash('success', 'Repository has been approved.');
+
+        return $this->redirectToRoute('admin_docs_deployments');
+    }
+
+    /**
+     * @Route("/admin/docs/deployments/blacklist/{documentationJarId}", name="admin_docs_deployments_blacklist_action", requirements={"documentationJarId"="\d+"})
+     *
+     * @param int $documentationJarId
+     * @param DocumentationJarRepository $documentationJarRepository
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
+    public function blacklist(
+        int $documentationJarId,
+        DocumentationJarRepository $documentationJarRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
+        $originalJar = $documentationJarRepository->find($documentationJarId);
+        $jars = $documentationJarRepository->findBy(['repositoryUrl' => $originalJar->getRepositoryUrl()]);
+
+        $blacklistEntry = new RepositoryBlacklistEntry();
+        $blacklistEntry->setRepositoryUrl($originalJar->getRepositoryUrl());
+        $entityManager->persist($blacklistEntry);
+
+        foreach ($jars as $jar) {
+            $entityManager->remove($jar);
+        }
+        $entityManager->flush();
+        $this->addFlash('success', 'Repository has been blacklisted.');
+
+        return $this->redirectToRoute('admin_docs_deployments');
+    }
+
+    /**
+     * @Route("/admin/docs/deployments/blacklist", name="admin_docs_deployments_blacklist_index")
+     *
+     * @param Request $request
+     * @param PaginatorInterface $paginator
+     * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
+     * @return Response
+     */
+    public function blacklistIndex(
+        Request $request,
+        PaginatorInterface $paginator,
+        RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
+        $entries = $repositoryBlacklistEntryRepository->findAll();
+
+        $pagination = $paginator->paginate(
+            $entries,
+            $request->query->getInt('page', 1)
+        );
+
+        return $this->render('repository_blacklist/index.html.twig', ['pagination' => $pagination]);
+    }
+
+    /**
+     * @Route("/admin/docs/deployments/blacklist/delete/{entryId}", name="admin_docs_deployments_blacklist_delete_action", requirements={"entryId"="\d+"})
+     *
+     * @param int $entryId
+     * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
+    public function blacklistDelete(
+        int $entryId,
+        RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
+        $entry = $repositoryBlacklistEntryRepository->find($entryId);
+
+        if (null !== $entry) {
+            $entityManager->remove($entry);
+            $entityManager->flush();
+            $this->addFlash('success', 'Blacklist entry deleted.');
+        }
+
+        return $this->redirectToRoute('admin_docs_deployments_blacklist_index');
+    }
+
+    /**
      * @Route("/admin/docs/deployments/add", name="admin_docs_deployments_add")
      *
      * @param Request $request
+     * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
      * @return Response
      */
-    public function addConfiguration(Request $request): Response
+    public function addConfiguration(Request $request, RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $documentationJar = new DocumentationJar();
@@ -193,6 +310,9 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
         if (!empty($repositoryUrl)) {
             if (preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, $repositoryUrl) !== 1) {
                 $error = new FormError('A repository url must be a valid https git url. Staring with \'https://\' and ending with \'.git\'.');
+                $form->addError($error);
+            } elseif ($repositoryBlacklistEntryRepository->isBlacklisted($repositoryUrl)) {
+                $error = new FormError('This repository has been blacklisted and cannot be added.');
                 $form->addError($error);
             } else {
                 return $this->forward(self::class . '::addConfigurationStep2');
@@ -327,10 +447,24 @@ class AdminInterfaceDocsDeploymentsController extends AbstractController
                 $documentationJar->setNew(false);
             }
 
-            $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
-            $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
-            $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($informationFile);
-            $documentationJar->setBuildKey($bambooBuildTriggered->buildResultKey);
+            $approved = $documentationJarRepository->findBy([
+                'repositoryUrl' => $deploymentInformation->repositoryUrl,
+                'packageName' => $deploymentInformation->packageName,
+                'approved' => true,
+            ]);
+
+            if (count($approved) > 0) {
+                $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
+                $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
+                $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($informationFile);
+                $documentationJar->setBuildKey($bambooBuildTriggered->buildResultKey);
+                $documentationJar->setApproved(true);
+            } else {
+                $documentationJar
+                    ->setApproved(false)
+                    ->setStatus(DocumentationStatus::STATUS_AWAITING_APPROVAL);
+            }
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($documentationJar);
             $entityManager->flush();
