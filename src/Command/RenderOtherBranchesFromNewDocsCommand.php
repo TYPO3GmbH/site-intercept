@@ -94,7 +94,6 @@ class RenderOtherBranchesFromNewDocsCommand extends Command
         if (count($newRepositories) === 0) {
             return;
         }
-
         foreach ($newRepositories as $documentationJar) {
             // No need to filter these anymore, this is already done in the service
             $branches = (new GitRepositoryService())->getBranchesFromRepositoryUrl($documentationJar->getRepositoryUrl());
@@ -156,7 +155,8 @@ class RenderOtherBranchesFromNewDocsCommand extends Command
                         ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
                         ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion)
                         ->setReRenderNeeded(false)
-                        ->setNew(false);
+                        ->setNew(false)
+                        ->setApproved(true);
 
                     $informationFile = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($newJar);
                     $this->documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
