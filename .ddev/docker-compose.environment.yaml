@@ -2,4 +2,4 @@ version: '3.6'
 services:
   web:
     environment:
-      - PHP_IDE_CONFIG=serverName=intercept.ddev.local
+      - PHP_IDE_CONFIG=serverName=intercept.ddev.site
