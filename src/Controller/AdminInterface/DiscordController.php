@@ -7,7 +7,7 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Controller;
+namespace App\Controller\AdminInterface;
 
 use App\Entity\DiscordScheduledMessage;
 use App\Repository\DiscordChannelRepository;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
 
-class AdminInterfaceDiscordController extends AbstractController
+class DiscordController extends AbstractController
 {
     /**
      * @Route("/admin/discord", name="admin_discord_webhooks")

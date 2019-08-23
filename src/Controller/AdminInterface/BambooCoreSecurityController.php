@@ -8,19 +8,16 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Controller;
+namespace App\Controller\AdminInterface;
 
 use App\Exception\DoNotCareException;
 use App\Extractor\GerritToBambooCore;
 use App\Extractor\GerritUrl;
-use App\Form\BambooCoreByUrlTriggerFormType;
-use App\Form\BambooCoreTriggerFormType;
-use App\Form\BambooCoreTriggerFormWithoutPatchSetType;
+use App\Form\BambooCoreSecurityByUrlTriggerFormType;
+use App\Form\BambooCoreSecurityTriggerFormType;
 use App\Service\BambooService;
 use App\Service\GerritService;
 use App\Service\GraylogService;
-use App\Utility\BranchUtility;
-use GuzzleHttp\Exception\ServerException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -29,9 +26,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Handle the web admin interface
+ * Handle the web admin interface bamboo core security
  */
-class AdminInterfaceBambooCoreController extends AbstractController
+class BambooCoreSecurityController extends AbstractController
 {
     /**
      * @var LoggerInterface
@@ -39,7 +36,7 @@ class AdminInterfaceBambooCoreController extends AbstractController
     private $logger;
 
     /**
-     * @Route("/admin/bamboo/core", name="admin_bamboo_core")
+     * @Route("/admin/bamboo/core/security", name="admin_bamboo_core_security")
      * @param Request $request
      * @param LoggerInterface $logger
      * @param BambooService $bambooService
@@ -56,26 +53,21 @@ class AdminInterfaceBambooCoreController extends AbstractController
     ): Response {
         $this->logger = $logger;
 
-        $patchForm = $this->createForm(BambooCoreTriggerFormType::class);
+        $patchForm = $this->createForm(BambooCoreSecurityTriggerFormType::class);
         $patchForm->handleRequest($request);
         $this->handlePatchForm($patchForm, $bambooService);
 
-        $urlForm = $this->createForm(BambooCoreByUrlTriggerFormType::class);
+        $urlForm = $this->createForm(BambooCoreSecurityByUrlTriggerFormType::class);
         $urlForm->handleRequest($request);
         $this->handleUrlForm($urlForm, $bambooService, $gerritService);
 
-        $triggerForm = $this->createForm(BambooCoreTriggerFormWithoutPatchSetType::class);
-        $triggerForm->handleRequest($request);
-        $this->handleTriggerForm($triggerForm, $bambooService);
-
-        $recentLogsMessages = $graylogService->getRecentBambooTriggersAndVotes();
+        $recentLogsMessages = $graylogService->getRecentBambooCoreSecurityTriggersAndVotes();
 
         return $this->render(
-            'bambooCore.html.twig',
+            'bambooCoreSecurity.html.twig',
             [
                 'patchForm' => $patchForm->createView(),
                 'urlForm' => $urlForm->createView(),
-                'triggerForm' => $triggerForm->createView(),
                 'logMessages' => $recentLogsMessages,
             ]
         );
@@ -90,14 +82,14 @@ class AdminInterfaceBambooCoreController extends AbstractController
      */
     private function handleUrlForm(FormInterface $form, BambooService $bambooService, GerritService $gerritService): void
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->denyAccessUnlessGranted('ROLE_USER');
             $formData = $form->getData();
             try {
                 $gerritUrl = new GerritUrl($formData['url']);
                 $bambooData = $gerritService->getChangeDetails($gerritUrl->changeId, $gerritUrl->patchSet);
-                if ($bambooData->isSecurity) {
-                    // Never trigger security builds from "normal" core build interface
+                if (!$bambooData->isSecurity) {
+                    // Only trigger security builds from core security build interface
                     throw new DoNotCareException();
                 }
                 $bambooTriggered = $bambooService->triggerNewCoreBuild($bambooData);
@@ -138,11 +130,6 @@ class AdminInterfaceBambooCoreController extends AbstractController
                     'danger',
                     'Trigger not successful. Typical cases: invalid url, change or patch set does not exist, invalid branch.'
                 );
-            } catch (ServerException $e) {
-                $this->addFlash(
-                    'danger',
-                    'Trigger not successful. Gerrit is currently unreachable.'
-                );
             }
         }
     }
@@ -155,28 +142,28 @@ class AdminInterfaceBambooCoreController extends AbstractController
      */
     private function handlePatchForm(FormInterface $form, BambooService $bambooService): void
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->denyAccessUnlessGranted('ROLE_USER');
             $formData = $form->getData();
             try {
                 $bambooData = new GerritToBambooCore(
                     (string)$formData['change'],
                     $formData['set'],
                     $form->getClickedButton()->getName(),
-                    'Packages/TYPO3.CMS'
+                    'Teams/Security/TYPO3v4-Core'
                 );
                 $bambooTriggered = $bambooService->triggerNewCoreBuild($bambooData);
                 if (!empty($bambooTriggered->buildResultKey)) {
                     $this->addFlash(
                         'success',
-                        'Triggered bamboo build'
+                        'Triggered bamboo security build'
                         . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
                         . ' of change "' . $bambooData->changeId . '"'
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'
                     );
                     $this->logger->info(
-                        'Triggered bamboo core build "' . $bambooTriggered->buildResultKey . '"'
+                        'Triggered bamboo core security build "' . $bambooTriggered->buildResultKey . '"'
                         . ' for change "' . $bambooData->changeId . '"'
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' on branch "' . $bambooData->branch . '".',
@@ -200,46 +187,6 @@ class AdminInterfaceBambooCoreController extends AbstractController
                 }
             } catch (DoNotCareException $e) {
                 $this->addFlash('danger', $e->getMessage());
-            }
-        }
-    }
-
-    /**
-     * Handle form submit for simple core branch without applied patch set
-     *
-     * @param FormInterface $form
-     * @param BambooService $bambooService
-     */
-    private function handleTriggerForm(FormInterface $form, BambooService $bambooService): void
-    {
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->denyAccessUnlessGranted('ROLE_USER');
-            $branch = $form->getClickedButton()->getName();
-            $bambooProject = BranchUtility::resolveBambooProjectKey($branch, false);
-            $bambooTriggered = $bambooService->triggerNewCoreBuildWithoutPatch($bambooProject);
-            if (!empty($bambooTriggered->buildResultKey)) {
-                $this->addFlash(
-                    'success',
-                    'Triggered bamboo build'
-                    . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
-                    . ' to plan key "' . $bambooProject . '".'
-                );
-                $this->logger->info(
-                    'Triggered bamboo core build "' . $bambooTriggered->buildResultKey . '"'
-                    . ' on branch "' . $bambooProject . '".',
-                    [
-                        'type' => 'triggerBamboo',
-                        'branch' => $branch,
-                        'isSecurity' => false,
-                        'bambooKey' => $bambooTriggered->buildResultKey,
-                        'triggeredBy' => 'interface',
-                    ]
-                );
-            } else {
-                $this->addFlash(
-                    'danger',
-                    'Bamboo trigger not successful to plan key "' . $bambooProject . '".'
-                );
             }
         }
     }

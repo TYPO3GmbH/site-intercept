@@ -8,11 +8,11 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Functional;
+namespace App\Tests\Functional\AdminInterface;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class AdminInterfaceHomeControllerTest extends WebTestCase
+class HomeControllerTest extends WebTestCase
 {
     /**
      * @test

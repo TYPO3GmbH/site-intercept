@@ -8,7 +8,7 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Controller;
+namespace App\Controller\AdminInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @Route("/page", defaults={"_format"="html"})
  */
-class AdminInterfacePageController extends AbstractController
+class PageController extends AbstractController
 {
     /**
      * @Route("/privacy-policy", methods={"GET"}, name="admin_page_privacy")

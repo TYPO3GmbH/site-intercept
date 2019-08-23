@@ -7,14 +7,14 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Functional\Fixtures;
+namespace App\Tests\Functional\Fixtures\AdminInterface\Docs;
 
 use App\Entity\DocsServerRedirect;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class AdminInterfaceDocsRedirectControllerTestData extends Fixture implements OrderedFixtureInterface
+class RedirectControllerTestData extends Fixture implements OrderedFixtureInterface
 {
     public function load(ObjectManager $manager)
     {

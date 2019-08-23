@@ -8,7 +8,7 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Controller;
+namespace App\Controller\AdminInterface\Docs;
 
 use App\Form\BambooDocsFluidVhTriggerFormType;
 use App\Form\BambooDocsSurf20TriggerFormType;
@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * "Documentation" menu entry of the web admin interface.
  * Allows to trigger rendering and deployment of documentation repositories
  */
-class AdminInterfaceDocsController extends AbstractController
+class DocsController extends AbstractController
 {
     /**
      * @var LoggerInterface

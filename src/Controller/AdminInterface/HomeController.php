@@ -8,7 +8,7 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Controller;
+namespace App\Controller\AdminInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Handle the web admin interface
  */
-class AdminInterfaceHomeController extends AbstractController
+class HomeController extends AbstractController
 {
     /**
      * @Route("/admin", name="admin_index")

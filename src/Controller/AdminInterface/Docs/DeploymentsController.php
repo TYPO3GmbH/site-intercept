@@ -8,7 +8,7 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Controller;
+namespace App\Controller\AdminInterface\Docs;
 
 use App\Entity\DocumentationJar;
 use App\Entity\RepositoryBlacklistEntry;
@@ -42,7 +42,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Show and manipulate all docs deployments managed by intercept
  */
-class AdminInterfaceDocsDeploymentsController extends AbstractController
+class DeploymentsController extends AbstractController
 {
     /**
      * @Route("/admin/docs/deployments", name="admin_docs_deployments")

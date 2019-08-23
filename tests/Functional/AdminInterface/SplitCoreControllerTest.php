@@ -8,11 +8,12 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Functional;
+namespace App\Tests\Functional\AdminInterface;
 
 use App\Bundle\TestDoubleBundle;
 use App\Client\GraylogClient;
 use App\Client\RabbitManagementClient;
+use App\Tests\Functional\AbstractFunctionalWebTestCase;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -20,7 +21,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Prophecy\Argument;
 
-class AdminInterfaceSplitCoreControllerTest extends AbstractFunctionalWebTestCase
+class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @test

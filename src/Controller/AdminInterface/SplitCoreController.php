@@ -8,7 +8,7 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Controller;
+namespace App\Controller\AdminInterface;
 
 use App\Extractor\GithubPushEventForCore;
 use App\Form\SplitCoreSplitFormType;
@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Handle the web admin interface
  */
-class AdminInterfaceSplitCoreController extends AbstractController
+class SplitCoreController extends AbstractController
 {
     /**
      * @Route("/admin/split/core", name="admin_split_core");

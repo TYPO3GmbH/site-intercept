@@ -7,9 +7,19 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Functional;
+namespace App\Tests\Functional\AdminInterface;
 
-class AdminInterfaceDiscordControllerTest extends AbstractFunctionalWebTestCase
+/*
+ * This file is part of the package t3g/intercept.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
+use App\Tests\Functional\AbstractFunctionalWebTestCase;
+use App\Tests\Functional\DatabasePrimer;
+
+class DiscordControllerTest extends AbstractFunctionalWebTestCase
 {
     public function setUp()
     {

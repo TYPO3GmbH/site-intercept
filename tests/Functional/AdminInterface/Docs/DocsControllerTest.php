@@ -8,11 +8,12 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Functional;
+namespace App\Tests\Functional\AdminInterface\Docs;
 
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
 use App\Client\GraylogClient;
+use App\Tests\Functional\AbstractFunctionalWebTestCase;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
@@ -20,7 +21,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 
-class AdminInterfaceDocsControllerTest extends AbstractFunctionalWebTestCase
+class DocsControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @test

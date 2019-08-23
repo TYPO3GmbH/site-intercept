@@ -7,7 +7,7 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Controller;
+namespace App\Controller\AdminInterface\Docs;
 
 use App\Entity\DocsServerRedirect;
 use App\Form\DocsServerRedirectType;
@@ -27,7 +27,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/redirect")
  */
-class AdminInterfaceDocsRedirectController extends AbstractController
+class RedirectController extends AbstractController
 {
     /**
      * @var DocsServerNginxService

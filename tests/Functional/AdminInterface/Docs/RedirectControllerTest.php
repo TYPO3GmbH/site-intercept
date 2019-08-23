@@ -8,16 +8,18 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Functional;
+namespace App\Tests\Functional\AdminInterface\Docs;
 
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
-use App\Tests\Functional\Fixtures\AdminInterfaceDocsRedirectControllerTestData;
+use App\Tests\Functional\AbstractFunctionalWebTestCase;
+use App\Tests\Functional\DatabasePrimer;
+use App\Tests\Functional\Fixtures\AdminInterface\Docs\RedirectControllerTestData;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Symfony\Component\DomCrawler\Crawler;
 
-class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTestCase
+class RedirectControllerTest extends AbstractFunctionalWebTestCase
 {
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Client
@@ -31,7 +33,7 @@ class AdminInterfaceDocsRedirectControllerTest extends AbstractFunctionalWebTest
         DatabasePrimer::prime(self::$kernel);
 
         $this->client = static::createClient();
-        (new AdminInterfaceDocsRedirectControllerTestData())->load(
+        (new RedirectControllerTestData())->load(
             self::$kernel->getContainer()->get('doctrine')->getManager()
         );
     }
