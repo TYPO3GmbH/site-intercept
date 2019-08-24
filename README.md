@@ -235,3 +235,9 @@ based graylog instance, those would be within that dump!
 * $ docker cp ddev-intercept-graylogmongo:/dump . 
 * $ ddev exec -s graylogmongo rm -rf /dump
 * commit stuff to git
+
+### BlackfireIo
+
+If the instance runs with ddev, a .env.local file inside `.ddev` is mandatory. It can be copied from the existing .env.example
+file.
+For no performance profiling tasks, the values may be empty. Else, put your account data here. If in doubt, reach out to Susi.
