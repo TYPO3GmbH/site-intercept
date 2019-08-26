@@ -45,6 +45,7 @@ class RenderDocumentationService
      * @param string $scope
      * @return DeploymentInformation
      * @throws DocsPackageDoNotCareBranch
+     * @throws \App\Exception\DuplicateDocumentationRepositoryException
      */
     public function renderDocumentationByDocumentationJar(DocumentationJar $documentationJar, string $scope): DeploymentInformation
     {

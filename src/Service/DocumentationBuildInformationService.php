@@ -17,6 +17,7 @@ use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
+use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
@@ -158,6 +159,7 @@ class DocumentationBuildInformationService
      * @param DocumentationJar $documentationJar
      * @return DeploymentInformation
      * @throws \App\Exception\DocsPackageDoNotCareBranch
+     * @throws \App\Exception\ComposerJsonInvalidException
      */
     public function generateBuildInformationFromDocumentationJar(DocumentationJar $documentationJar): DeploymentInformation
     {
@@ -219,6 +221,7 @@ class DocumentationBuildInformationService
      *
      * @param DeploymentInformation $deploymentInformation
      * @return DocumentationJar
+     * @throws \App\Exception\DuplicateDocumentationRepositoryException
      */
     public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): DocumentationJar
     {
@@ -228,7 +231,7 @@ class DocumentationBuildInformationService
             'targetBranchDirectory' => $deploymentInformation->targetBranchDirectory,
         ]);
         if (count($records) > 1) {
-            throw new \RuntimeException(
+            throw new DuplicateDocumentationRepositoryException(
                 'Inconsistent database, there should be only one entry for'
                 . ' repository ' . $deploymentInformation->repositoryUrl
                 . ' package ' . $deploymentInformation->packageName

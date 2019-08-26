@@ -11,6 +11,7 @@ namespace App\Command;
 
 use App\Entity\DocumentationJar;
 use App\Exception\DocsPackageDoNotCareBranch;
+use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Repository\DocumentationJarRepository;
 use App\Service\RenderDocumentationService;
 use InvalidArgumentException;
@@ -69,10 +70,15 @@ class DocsRenderCommand extends Command
             if ($all) {
                 if ($io->confirm('Are you really sure, you want to render ALL docs?', false)) {
                     foreach ($this->documentationJarRepository->findAll() as $documentationJar) {
-                        $this->renderDocumentation($documentationJar);
-                        $io->success('Triggered package "' . $documentationJar->getPackageName() . '" with target branch "' . $documentationJar->getTargetBranchDirectory() . '"');
-                        // sleep a second to not hammer bamboo too heavily, otherwise builds may be lost
-                        sleep(1);
+                        try {
+                            $this->renderDocumentation($documentationJar);
+                            $io->success('Triggered package "' . $documentationJar->getPackageName() . '" with target branch "' . $documentationJar->getTargetBranchDirectory() . '"');
+                            // avoid stopping the whole queue because of a broken / irrelevant package
+                        } catch (DuplicateDocumentationRepositoryException | DocsPackageDoNotCareBranch $exception) {
+                            $io->error($exception->getMessage());
+                        }
+                        // sleep half a second to not hammer bamboo too heavily, otherwise builds may be lost
+                        usleep(500000);
                     }
                     $io->success('Triggered re-rendering of all docs.');
                 } else {
@@ -95,6 +101,7 @@ class DocsRenderCommand extends Command
     /**
      * @param int $id
      * @throws DocsPackageDoNotCareBranch
+     * @throws \App\Exception\DuplicateDocumentationRepositoryException
      */
     protected function renderConfiguration(int $id): void
     {
@@ -108,6 +115,7 @@ class DocsRenderCommand extends Command
     /**
      * @param string $package
      * @throws DocsPackageDoNotCareBranch
+     * @throws \App\Exception\DuplicateDocumentationRepositoryException
      */
     protected function renderPackage(string $package): void
     {
@@ -125,6 +133,7 @@ class DocsRenderCommand extends Command
     /**
      * @param DocumentationJar $documentationJar
      * @throws DocsPackageDoNotCareBranch
+     * @throws \App\Exception\DuplicateDocumentationRepositoryException
      */
     protected function renderDocumentation(DocumentationJar $documentationJar): void
     {
