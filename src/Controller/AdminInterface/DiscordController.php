@@ -9,6 +9,7 @@
 
 namespace App\Controller\AdminInterface;
 
+use App\Entity\DiscordChannel;
 use App\Entity\DiscordScheduledMessage;
 use App\Repository\DiscordChannelRepository;
 use App\Repository\DiscordScheduledMessageRepository;
@@ -96,21 +97,10 @@ class DiscordController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $channel = $discordChannelRepository->findOneBy(['channelId' => $request->get('discord_webhook')['channelId']]);
+            $discordWebHook = $request->get('discord_webhook');
+            $channel = $discordChannelRepository->findOneBy(['channelId' => $discordWebHook['channelId']]);
             if (null !== $channel) {
-                $hook->setName($request->get('discord_webhook')['name'])
-                    ->setChannel($channel)
-                    ->setType($request->get('discord_webhook')['type']);
-
-                if (!empty($request->get('discord_webhook')['username'])) {
-                    $hook->setUsername($request->get('discord_webhook')['username']);
-                }
-                if (!empty($request->get('discord_webhook')['avatarUrl'])) {
-                    $hook->setAvatarUrl($request->get('discord_webhook')['avatarUrl']);
-                }
-                if (!empty($request->get('discord_webhook')['loglevel'])) {
-                    $hook->setLogLevel($request->get('discord_webhook')['loglevel']);
-                }
+                $this->setHookPropertiesFromRequest($hook, $discordWebHook, $channel);
                 $hook->setIdentifier(sha1(random_bytes(25)));
 
                 // Prevent duplicates in the very rare case it might happen
@@ -171,21 +161,10 @@ class DiscordController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $channel = $discordChannelRepository->findOneBy(['channelId' => $request->get('discord_webhook')['channelId']]);
+            $hookFromRequest = $request->get('discord_webhook');
+            $channel = $discordChannelRepository->findOneBy(['channelId' => $hookFromRequest['channelId']]);
             if (null !== $channel) {
-                $hook->setName($request->get('discord_webhook')['name'])
-                    ->setChannel($channel)
-                    ->setType($request->get('discord_webhook')['type']);
-
-                if (!empty($request->get('discord_webhook')['username'])) {
-                    $hook->setUsername($request->get('discord_webhook')['username']);
-                }
-                if (!empty($request->get('discord_webhook')['avatarUrl'])) {
-                    $hook->setAvatarUrl($request->get('discord_webhook')['avatarUrl']);
-                }
-                if (!empty($request->get('discord_webhook')['loglevel'])) {
-                    $hook->setLogLevel($request->get('discord_webhook')['loglevel']);
-                }
+                $this->setHookPropertiesFromRequest($hook, $hookFromRequest, $channel);
 
                 $entityManager->persist($hook);
                 $entityManager->flush();
@@ -317,37 +296,16 @@ class DiscordController extends AbstractController
         EntityManagerInterface $entityManager,
         DiscordChannelRepository $discordChannelRepository
     ): Response {
+        $response = null;
         $message = new DiscordScheduledMessage();
         $form = $this->createForm(\App\Form\DiscordScheduledMessage::class, $message, ['entity_manager' => $this->getDoctrine()->getManager()]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $channel = $discordChannelRepository->findOneBy(['channelId' => $request->get('discord_scheduled_message')['channelId']]);
-            if (null !== $channel) {
-                $transformer = new CronExpressionToPartsTransformer();
-                $cronArray = ['minutes' => [], 'hours' => [], 'days' => [], 'weekdays' => [], 'months' => []];
-                $message->setName($request->get('discord_scheduled_message')['name'])
-                    ->setChannel($channel)
-                    ->setMessage($request->get('discord_scheduled_message')['message'])
-                    ->setSchedule($transformer->reverseTransform(array_merge($cronArray, $request->get('discord_scheduled_message')['schedule'])))
-                    ->setTimezone($request->get('discord_scheduled_message')['timezone']);
-
-                if (!empty($request->get('discord_scheduled_message')['username'])) {
-                    $message->setUsername($request->get('discord_scheduled_message')['username']);
-                }
-                if (!empty($request->get('discord_scheduled_message')['avatarUrl'])) {
-                    $message->setAvatarUrl($request->get('discord_scheduled_message')['avatarUrl']);
-                }
-
-                $entityManager->persist($message);
-                $entityManager->flush();
-                $this->addFlash('success', 'Discord message created for channel: #' . $channel->getChannelName());
-
-                return $this->redirectToRoute('admin_discord_scheduled_messages');
-            }
+            $response = $this->handleFormSubmit($request->get('discord_scheduled_message'), $entityManager, $discordChannelRepository, $message);
         }
 
-        return $this->render(
+        return $response ?? $this->render(
             'discord_scheduled_messages/addMessage.html.twig',
             [
                 'form' => $form->createView(),
@@ -383,28 +341,9 @@ class DiscordController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $channel = $discordChannelRepository->findOneBy(['channelId' => $request->get('discord_scheduled_message')['channelId']]);
-            if (null !== $channel) {
-                $transformer = new CronExpressionToPartsTransformer();
-                $cronArray = ['minutes' => [], 'hours' => [], 'days' => [], 'weekdays' => [], 'months' => []];
-                $message->setName($request->get('discord_scheduled_message')['name'])
-                    ->setChannel($channel)
-                    ->setMessage($request->get('discord_scheduled_message')['message'])
-                    ->setSchedule($transformer->reverseTransform(array_merge($cronArray, $request->get('discord_scheduled_message')['schedule'])))
-                    ->setTimezone($request->get('discord_scheduled_message')['timezone']);
-
-                if (!empty($request->get('discord_scheduled_message')['username'])) {
-                    $message->setUsername($request->get('discord_scheduled_message')['username']);
-                }
-                if (!empty($request->get('discord_scheduled_message')['avatarUrl'])) {
-                    $message->setAvatarUrl($request->get('discord_scheduled_message')['avatarUrl']);
-                }
-
-                $entityManager->persist($message);
-                $entityManager->flush();
-                $this->addFlash('success', 'Discord message created for channel: #' . $channel->getChannelName());
-
-                return $this->redirectToRoute('admin_discord_scheduled_messages');
+            $response = $this->handleFormSubmit($request->get('discord_scheduled_message'), $entityManager, $discordChannelRepository, $message);
+            if ($response !== null) {
+                return $response;
             }
         }
 
@@ -443,5 +382,57 @@ class DiscordController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_discord_scheduled_messages');
+    }
+
+    /**
+     * @param array $discordScheduledMessage
+     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+     * @param \App\Repository\DiscordChannelRepository $discordChannelRepository
+     * @param \App\Entity\DiscordScheduledMessage|null $message
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+     */
+    protected function handleFormSubmit(array $discordScheduledMessage, EntityManagerInterface $entityManager, DiscordChannelRepository $discordChannelRepository, DiscordScheduledMessage $message): ?Response
+    {
+        $channel = $discordChannelRepository->findOneBy(['channelId' => $discordScheduledMessage['channelId']]);
+        if (null !== $channel) {
+            $transformer = new CronExpressionToPartsTransformer();
+            $cronArray = ['minutes' => [], 'hours' => [], 'days' => [], 'weekdays' => [], 'months' => []];
+            $message->setName($discordScheduledMessage['name'])
+                ->setChannel($channel)
+                ->setMessage($discordScheduledMessage['message'])
+                ->setSchedule($transformer->reverseTransform(array_merge($cronArray, $discordScheduledMessage['schedule'])))
+                ->setTimezone($discordScheduledMessage['timezone']);
+
+            if (!empty($discordScheduledMessage['username'])) {
+                $message->setUsername($discordScheduledMessage['username']);
+            }
+            if (!empty($discordScheduledMessage['avatarUrl'])) {
+                $message->setAvatarUrl($discordScheduledMessage['avatarUrl']);
+            }
+
+            $entityManager->persist($message);
+            $entityManager->flush();
+            $this->addFlash('success', 'Discord message created for channel: #' . $channel->getChannelName());
+
+            return $this->redirectToRoute('admin_discord_scheduled_messages');
+        }
+        return null;
+    }
+
+    protected function setHookPropertiesFromRequest(\App\Entity\DiscordWebhook $hook, $discordWebHook, ?DiscordChannel $channel): void
+    {
+        $hook->setName($discordWebHook['name'])
+            ->setChannel($channel)
+            ->setType($discordWebHook['type']);
+
+        if (!empty($discordWebHook['username'])) {
+            $hook->setUsername($discordWebHook['username']);
+        }
+        if (!empty($discordWebHook['avatarUrl'])) {
+            $hook->setAvatarUrl($discordWebHook['avatarUrl']);
+        }
+        if (!empty($discordWebHook['loglevel'])) {
+            $hook->setLogLevel($discordWebHook['loglevel']);
+        }
     }
 }
