@@ -19,6 +19,7 @@ use App\Service\BambooService;
 use App\Service\GerritService;
 use App\Service\GraylogService;
 use Psr\Log\LoggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +38,7 @@ class BambooCoreSecurityController extends AbstractController
 
     /**
      * @Route("/admin/bamboo/core/security", name="admin_bamboo_core_security")
+     * @IsGranted("ROLE_ADMIN")
      * @param Request $request
      * @param LoggerInterface $logger
      * @param BambooService $bambooService
@@ -82,7 +84,6 @@ class BambooCoreSecurityController extends AbstractController
      */
     private function handleUrlForm(FormInterface $form, BambooService $bambooService, GerritService $gerritService): void
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
             try {
@@ -142,7 +143,6 @@ class BambooCoreSecurityController extends AbstractController
      */
     private function handlePatchForm(FormInterface $form, BambooService $bambooService): void
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
             try {

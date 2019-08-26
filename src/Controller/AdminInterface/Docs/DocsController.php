@@ -16,6 +16,7 @@ use App\Form\BambooDocsSurfMasterTriggerFormType;
 use App\Service\BambooService;
 use App\Service\GraylogService;
 use Psr\Log\LoggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +36,7 @@ class DocsController extends AbstractController
 
     /**
      * @Route("/admin/docs", name="admin_docs_third_party")
+     * @IsGranted("ROLE_USER")
      *
      * @param Request $request
      * @param LoggerInterface $logger
@@ -77,7 +79,6 @@ class DocsController extends AbstractController
         $fluidVhForm = $this->createForm(BambooDocsFluidVhTriggerFormType::class);
         $fluidVhForm->handleRequest($request);
         if ($fluidVhForm->isSubmitted() && $fluidVhForm->isValid()) {
-            $this->denyAccessUnlessGranted('ROLE_USER');
             $bambooTriggered = $bambooService->triggerDocumentationFluidVhPlan();
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
@@ -115,7 +116,6 @@ class DocsController extends AbstractController
         $surfForm = $this->createForm(BambooDocsSurf20TriggerFormType::class);
         $surfForm->handleRequest($request);
         if ($surfForm->isSubmitted() && $surfForm->isValid()) {
-            $this->denyAccessUnlessGranted('ROLE_USER');
             $bambooTriggered = $bambooService->triggerDocumentationSurf20Plan();
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
@@ -153,7 +153,6 @@ class DocsController extends AbstractController
         $surfForm = $this->createForm(BambooDocsSurfMasterTriggerFormType::class);
         $surfForm->handleRequest($request);
         if ($surfForm->isSubmitted() && $surfForm->isValid()) {
-            $this->denyAccessUnlessGranted('ROLE_USER');
             $bambooTriggered = $bambooService->triggerDocumentationSurfMasterPlan();
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(

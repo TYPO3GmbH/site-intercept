@@ -19,6 +19,7 @@ use App\Service\GraylogService;
 use Doctrine\Common\Collections\Criteria;
 use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,6 +54,7 @@ class RedirectController extends AbstractController
 
     /**
      * @Route("/", name="admin_redirect_index", methods={"GET"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param DocsServerRedirectRepository $redirectRepository
      * @param GraylogService $graylogService
      * @return Response
@@ -100,12 +102,12 @@ class RedirectController extends AbstractController
 
     /**
      * @Route("/new", name="admin_redirect_new", methods={"GET","POST"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @return Response
      */
     public function new(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $redirect = new DocsServerRedirect();
         $form = $this->createForm(DocsServerRedirectType::class, $redirect);
         $form->handleRequest($request);
@@ -127,24 +129,24 @@ class RedirectController extends AbstractController
 
     /**
      * @Route("/{id}", name="admin_redirect_show", methods={"GET"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param DocsServerRedirect $redirect
      * @return Response
      */
     public function show(DocsServerRedirect $redirect): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         return $this->render('redirect/show.html.twig', ['redirect' => $redirect]);
     }
 
     /**
      * @Route("/{id}/edit", name="admin_redirect_edit", methods={"GET","POST"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @param DocsServerRedirect $redirect
      * @return Response
      */
     public function edit(Request $request, DocsServerRedirect $redirect): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $form = $this->createForm(DocsServerRedirectType::class, $redirect);
         $form->handleRequest($request);
 
@@ -163,13 +165,13 @@ class RedirectController extends AbstractController
 
     /**
      * @Route("/{id}", name="admin_redirect_delete", methods={"DELETE"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @param DocsServerRedirect $redirect
      * @return Response
      */
     public function delete(Request $request, DocsServerRedirect $redirect): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         if ($this->isCsrfTokenValid('delete' . $redirect->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($redirect);

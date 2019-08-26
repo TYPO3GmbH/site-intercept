@@ -50,6 +50,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         );
 
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/docs');
         $response = $client->getResponse()->getContent();
         $this->assertRegExp('/12345/', $response);
@@ -67,6 +68,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         );
 
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/docs');
     }
 
@@ -82,6 +84,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         );
 
         $client = static::createClient();
+        $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/docs');
     }
 
