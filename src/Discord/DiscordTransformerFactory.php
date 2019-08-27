@@ -20,10 +20,13 @@ final class DiscordTransformerFactory
 
     public const TYPE_CUSTOM_ERROR_HANDLER = 3;
 
+    public const TYPE_DISCORD = 4;
+
     public const TYPES = [
         self::TYPE_BAMBOO => 'Bamboo',
         self::TYPE_GRAYLOG => 'Graylog',
         self::TYPE_CUSTOM_ERROR_HANDLER => 'Custom error handler',
+        self::TYPE_DISCORD => 'Discord',
     ];
 
     /**
@@ -40,6 +43,8 @@ final class DiscordTransformerFactory
                 return new GraylogTransformer();
             case self::TYPE_CUSTOM_ERROR_HANDLER:
                 return new CustomErrorHandlerTransformer();
+            case self::TYPE_DISCORD:
+                return new DiscordTransformer();
             default:
                 throw new DiscordTransformerTypeNotFoundException('Transformer class not found for type ' . $type, 1563359524);
         }
