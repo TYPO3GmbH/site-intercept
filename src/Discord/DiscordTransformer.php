@@ -25,42 +25,45 @@ class DiscordTransformer extends AbstractDiscordTransformer
         if (isset($payload['content'])) {
             $message->setContent($payload['content']);
         }
-        if (isset($payload['embeds']['title'])) {
-            $message->setTitle($payload['embeds']['title']);
-        }
-        if (isset($payload['embeds']['description'])) {
-            $message->setDescription($payload['embeds']['description']);
-        }
-        if (isset($payload['embeds']['color'])) {
-            $message->setColor($payload['embeds']['color']);
-        }
-        if (isset($payload['embeds']['author'])) {
-            if (isset($payload['embeds']['author']['name'])) {
-                $message->setAuthorName($payload['embeds']['author']['name']);
+        if (isset($payload['embeds'])) {
+            $embed = array_pop($payload['embeds']);
+            if (isset($embed['title'])) {
+                $message->setTitle($embed['title']);
             }
-            if (isset($payload['embeds']['author']['url'])) {
-                $message->setAuthorUrl($payload['embeds']['author']['url']);
+            if (isset($embed['description'])) {
+                $message->setDescription($embed['description']);
             }
-            if (isset($payload['embeds']['author']['icon_url'])) {
-                $message->setAuthorIcon($payload['embeds']['author']['icon_url']);
+            if (isset($embed['color'])) {
+                $message->setColor($embed['color']);
             }
-        }
-        if (isset($payload['embeds']['image'])) {
-            if (isset($payload['embeds']['image']['url'])) {
-                $message->setImage($payload['embeds']['image']['url']);
+            if (isset($embed['author'])) {
+                if (isset($embed['author']['name'])) {
+                    $message->setAuthorName($embed['author']['name']);
+                }
+                if (isset($embed['author']['url'])) {
+                    $message->setAuthorUrl($embed['author']['url']);
+                }
+                if (isset($embed['author']['icon_url'])) {
+                    $message->setAuthorIcon($embed['author']['icon_url']);
+                }
             }
-        }
-        if (isset($payload['embeds']['thumbnail'])) {
-            if (isset($payload['embeds']['thumbnail']['url'])) {
-                $message->setThumbnail($payload['embeds']['thumbnail']['url']);
+            if (isset($embed['image'])) {
+                if (isset($embed['image']['url'])) {
+                    $message->setImage($embed['image']['url']);
+                }
             }
-        }
-        if (isset($payload['embeds']['footer'])) {
-            if (isset($payload['embeds']['footer']['text'])) {
-                $message->setFooterText($payload['embeds']['footer']['text']);
+            if (isset($embed['thumbnail'])) {
+                if (isset($embed['thumbnail']['url'])) {
+                    $message->setThumbnail($embed['thumbnail']['url']);
+                }
             }
-            if (isset($payload['embeds']['footer']['icon_url'])) {
-                $message->setFooterIcon($payload['embeds']['footer']['icon_url']);
+            if (isset($embed['footer'])) {
+                if (isset($embed['footer']['text'])) {
+                    $message->setFooterText($embed['footer']['text']);
+                }
+                if (isset($embed['footer']['icon_url'])) {
+                    $message->setFooterIcon($embed['footer']['icon_url']);
+                }
             }
         }
 
