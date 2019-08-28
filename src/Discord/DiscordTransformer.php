@@ -65,6 +65,11 @@ class DiscordTransformer extends AbstractDiscordTransformer
                     $message->setFooterIcon($embed['footer']['icon_url']);
                 }
             }
+            if (isset($embed['fields'])) {
+                foreach ($embed['fields'] as $field) {
+                    $message->addField($field['name'], $field['value'], $field['inline'] ?? false);
+                }
+            }
         }
 
         return $message;
