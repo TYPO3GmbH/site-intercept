@@ -71,6 +71,12 @@ services:
             $serverId: '%env(DISCORD_SERVER_ID)%'
             $botToken: '%env(DISCORD_BOT_TOKEN)%'
 
+    App\Service\SlackService:
+        class: App\Service\SlackService
+        public: true
+        arguments:
+            $hook: '%env(SLACK_HOOK)%'
+
     App\Service\DiscordWebhookService:
         class: App\Service\DiscordWebhookService
         public: true

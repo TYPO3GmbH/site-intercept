@@ -14,6 +14,7 @@ use App\Bundle\ClockMockBundle;
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
 use App\Client\GeneralClient;
+use App\Client\SlackClient;
 use App\Entity\DocumentationJar;
 use App\Extractor\DeploymentInformation;
 use Doctrine\ORM\EntityManagerInterface;
@@ -75,6 +76,9 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->shouldBeCalled()
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+        $slackClientProphecy = $this->prophesize(SlackClient::class);
+        $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
+        TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
@@ -130,6 +134,9 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->shouldBeCalled()
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+        $slackClientProphecy = $this->prophesize(SlackClient::class);
+        $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
+        TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
@@ -224,6 +231,9 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->shouldBeCalled()
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+        $slackClientProphecy = $this->prophesize(SlackClient::class);
+        $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
+        TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);

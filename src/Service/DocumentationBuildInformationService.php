@@ -63,6 +63,11 @@ class DocumentationBuildInformationService
     private $client;
 
     /**
+     * @var SlackService
+     */
+    private $slackService;
+
+    /**
      * Constructor
      *
      * @param string $privateDir
@@ -76,7 +81,8 @@ class DocumentationBuildInformationService
         string $subDir,
         EntityManagerInterface $entityManager,
         Filesystem $fileSystem,
-        GeneralClient $client
+        GeneralClient $client,
+        SlackService $slackService
     ) {
         $this->privateDir = $privateDir;
         $this->subDir = $subDir;
@@ -84,6 +90,7 @@ class DocumentationBuildInformationService
         $this->fileSystem = $fileSystem;
         $this->documentationJarRepository = $this->entityManager->getRepository(DocumentationJar::class);
         $this->client = $client;
+        $this->slackService = $slackService;
     }
 
     /**
@@ -304,6 +311,7 @@ class DocumentationBuildInformationService
             if (null === $branchExists) {
                 $documentationJar->setNew(true);
                 $documentationJar->setApproved(false);
+                $this->slackService->sendRepositoryDiscoveryMessage($documentationJar);
             } else {
                 $documentationJar->setNew(false);
                 $documentationJar->setApproved($branchExists->isApproved());

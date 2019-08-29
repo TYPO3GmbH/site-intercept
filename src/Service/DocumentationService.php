@@ -57,13 +57,19 @@ class DocumentationService
      */
     protected $logger;
 
+    /**
+     * @var SlackService
+     */
+    protected $slackService;
+
     public function __construct(
         RenderDocumentationService $renderDocumentationService,
         DocumentationJarRepository $documentationJarRepository,
         EntityManagerInterface $entityManager,
         DocumentationBuildInformationService $documentationBuildInformationService,
         BambooService $bambooService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        SlackService $slackService
     ) {
         $this->renderDocumentationService = $renderDocumentationService;
         $this->docsRepository = $documentationJarRepository;
@@ -71,6 +77,7 @@ class DocumentationService
         $this->documentationBuildInformationService = $documentationBuildInformationService;
         $this->bambooService = $bambooService;
         $this->logger = $logger;
+        $this->slackService = $slackService;
     }
 
     /**
@@ -219,7 +226,12 @@ class DocumentationService
             'packageName' => $deploymentInformation->packageName,
         ]);
 
-        $doc->setNew(count($existingDocs) === 0);
+        if (count($existingDocs) === 0) {
+            $doc->setNew(true);
+            $this->slackService->sendRepositoryDiscoveryMessage($doc);
+        } else {
+            $doc->setNew(false);
+        }
 
         $approved = false;
         foreach ($existingDocs as $existingDoc) {
@@ -236,9 +248,8 @@ class DocumentationService
                 ->setStatus(DocumentationStatus::STATUS_AWAITING_APPROVAL);
         }
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($doc);
-        $entityManager->flush();
+        $this->entityManager->persist($doc);
+        $this->entityManager->flush();
     }
 
     /**
