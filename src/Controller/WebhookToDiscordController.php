@@ -75,9 +75,8 @@ class WebhookToDiscordController extends AbstractController
         if (null !== $hook->getUsername()) {
             $message->setUsername($hook->getUsername());
         }
-        if (null !== $hook->getAvatarUrl()) {
-            $message->setAvatar($hook->getAvatarUrl());
-        }
+
+        $message->setAvatar($hook->getAvatarUrl() ?? 'https://intercept.typo3.com/build/images/webhookavatars/default.png');
 
         try {
             $discordWebhookService->sendMessage($message, $channel->getWebhookUrl());

@@ -71,9 +71,9 @@ class SendDiscordScheduledMessagesCommand extends Command
                 if (null !== $message->getUsername()) {
                     $discordMessage->setUsername($message->getUsername());
                 }
-                if (null !== $message->getAvatarUrl()) {
-                    $discordMessage->setAvatar($message->getAvatarUrl());
-                }
+
+                $discordMessage->setAvatar($message->getAvatarUrl() ?? 'https://intercept.typo3.com/build/images/webhookavatars/default.png');
+
                 $discordMessage->setContent($message->getMessage());
 
                 try {
