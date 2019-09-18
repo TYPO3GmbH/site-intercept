@@ -9,23 +9,16 @@
 
 namespace App\Discord;
 
+use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
+use Woeler\DiscordPhp\Message\DiscordTextMessage;
 
 class DiscordTransformer extends AbstractDiscordTransformer
 {
-    protected function transformPayloadToDiscordMessage(array $payload): DiscordEmbedsMessage
+    protected function transformPayloadToDiscordMessage(array $payload): AbstractDiscordMessage
     {
-        $message = new DiscordEmbedsMessage();
-        if (isset($payload['username'])) {
-            $message->setUsername($payload['username']);
-        }
-        if (isset($payload['avatar_url'])) {
-            $message->setAvatar($payload['avatar_url']);
-        }
-        if (isset($payload['content'])) {
-            $message->setContent($payload['content']);
-        }
         if (isset($payload['embeds'])) {
+            $message = new DiscordEmbedsMessage();
             $embed = array_pop($payload['embeds']);
             if (isset($embed['title'])) {
                 $message->setTitle($embed['title']);
@@ -70,6 +63,18 @@ class DiscordTransformer extends AbstractDiscordTransformer
                     $message->addField($field['name'], $field['value'], $field['inline'] ?? false);
                 }
             }
+        } else {
+            $message = new DiscordTextMessage();
+        }
+
+        if (isset($payload['username'])) {
+            $message->setUsername($payload['username']);
+        }
+        if (isset($payload['avatar_url'])) {
+            $message->setAvatar($payload['avatar_url']);
+        }
+        if (isset($payload['content'])) {
+            $message->setContent($payload['content']);
         }
 
         return $message;

@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace App\Discord;
 
 use App\Entity\DiscordWebhook;
+use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
 
 abstract class AbstractDiscordTransformer
@@ -19,7 +20,7 @@ abstract class AbstractDiscordTransformer
      * @param array $payload
      * @return DiscordEmbedsMessage
      */
-    public function getDiscordMessage(array $payload): DiscordEmbedsMessage
+    public function getDiscordMessage(array $payload): AbstractDiscordMessage
     {
         return $this->transformPayloadToDiscordMessage($payload);
     }
@@ -34,5 +35,5 @@ abstract class AbstractDiscordTransformer
         return true;
     }
 
-    abstract protected function transformPayloadToDiscordMessage(array $payload): DiscordEmbedsMessage;
+    abstract protected function transformPayloadToDiscordMessage(array $payload): AbstractDiscordMessage;
 }

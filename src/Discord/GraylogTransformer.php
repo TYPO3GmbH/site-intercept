@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Discord;
 
+use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
 
 class GraylogTransformer extends AbstractDiscordTransformer
@@ -18,7 +19,7 @@ class GraylogTransformer extends AbstractDiscordTransformer
      * @param array $payload
      * @return DiscordEmbedsMessage
      */
-    protected function transformPayloadToDiscordMessage(array $payload): DiscordEmbedsMessage
+    protected function transformPayloadToDiscordMessage(array $payload): AbstractDiscordMessage
     {
         $message = (new DiscordEmbedsMessage())
             ->setTitle('Stream had 1 messages in the last 5 minutes with trigger condition more than 0 messages. (Current grace time: 0 minutes)')

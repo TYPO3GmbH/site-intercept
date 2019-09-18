@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace App\Discord;
 
 use App\Utility\SlackWebhookUtility;
+use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
 
 class BambooTransformer extends AbstractDiscordTransformer
@@ -19,7 +20,7 @@ class BambooTransformer extends AbstractDiscordTransformer
      * @param array $payload
      * @return DiscordEmbedsMessage
      */
-    protected function transformPayloadToDiscordMessage(array $payload): DiscordEmbedsMessage
+    protected function transformPayloadToDiscordMessage(array $payload): AbstractDiscordMessage
     {
         $text = SlackWebhookUtility::transformUrls($payload['attachments'][0]['text']);
         $text = explode('. ', $text);

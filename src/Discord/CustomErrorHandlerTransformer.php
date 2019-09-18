@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace App\Discord;
 
 use App\Entity\DiscordWebhook;
+use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
 
 class CustomErrorHandlerTransformer extends AbstractDiscordTransformer
@@ -30,7 +31,7 @@ class CustomErrorHandlerTransformer extends AbstractDiscordTransformer
      * @param array $payload
      * @return DiscordEmbedsMessage
      */
-    protected function transformPayloadToDiscordMessage(array $payload): DiscordEmbedsMessage
+    protected function transformPayloadToDiscordMessage(array $payload): AbstractDiscordMessage
     {
         $message = (new DiscordEmbedsMessage())
             ->setDescription('```' . $payload['message'] . '```')
