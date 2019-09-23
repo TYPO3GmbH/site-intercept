@@ -50,15 +50,6 @@ class GerritToBambooController extends AbstractController
                 $branch,
                 $project
             );
-
-            if (!$gerritService->hasRstChanges(
-                (int)$gerritService->resolvePatchIdFromUrl($request->get('changeUrl')),
-                (int)$request->get('patchset')
-            )
-            ) {
-                throw new DoNotCareException('Patch has no RST changes', 1568797498);
-            }
-
             $bambooBuild = $bambooService->triggerNewCoreBuild($bambooData);
             $logger->info(
                 'Triggered bamboo core build "' . $bambooBuild->buildResultKey . '"'

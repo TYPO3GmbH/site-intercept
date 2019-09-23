@@ -120,49 +120,6 @@ class GerritService
     }
 
     /**
-     * Checks if a patch has RST file changes
-     *
-     * @param int $changeId
-     * @param int $patchSet
-     * @return bool
-     */
-    public function hasRstChanges(int $changeId, int $patchSet = 1): bool
-    {
-        $path = 'changes/' . $changeId . '/revisions/' . $patchSet . '/files';
-
-        try {
-            $response = $this->sendGerritGet($path);
-        } catch (ClientException $e) {
-            return false;
-        }
-
-        $json = json_decode(str_replace(")]}'\n", '', (string)$response->getBody()), true);
-
-        if (!empty($json)) {
-            foreach ($json as $fileName => $changeInfo) {
-                if (substr($fileName, -4) === '.rst') {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Resolve patch ID from URL
-     *
-     * @param string $url
-     * @return string
-     */
-    public function resolvePatchIdFromUrl(string $url): string
-    {
-        $re = '@https://review\.typo3\.org/([0-9]*)@m';
-        preg_match_all($re, $url, $matches, PREG_SET_ORDER, 0);
-        return $matches[0][1];
-    }
-
-    /**
      * Checks if a request from Gerrit has the correct token
      *
      * @param Request $request
