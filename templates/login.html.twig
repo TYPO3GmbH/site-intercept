@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+{% block title %}Login{% endblock %}
+{% block body %}
+
+    <div class="content-section content-section-valign content-section-centered">
+        <div class="container">
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Login</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ path('admin_login') }}" method="post">
+                        <input type="hidden" name="_target_path" value="{{ path('admin_index') }}"/>
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        <div class="form-group">
+                            <label for="username">Username:</label>
+                            <input class="form-control" id="username" name="_username" value="{{ last_username }}"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <input type="password" class="form-control" id="password" name="_password"/>
+                        </div>
+                        <div class="form-buttons">
+                            <button class="btn btn-primary">
+                                <span class="btn-icon"><i class="fa fa-unlock"></i></span>
+                                <span class="btn-text">Login</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <p class="text-center">
+                Please log in with your <a href="https://typo3.org" target="_blank" rel="noopener">typo3.org</a> credentials for extended access permissions.
+            </p>
+
+        </div>
+    </div>
+
+{% endblock %}

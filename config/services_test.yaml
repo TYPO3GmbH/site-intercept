@@ -1,0 +1,22 @@
+services:
+    App\Client\BambooClient:
+        tags:
+            - testDouble
+    App\Client\GerritClient:
+        tags:
+            - testDouble
+    App\Client\GeneralClient:
+        tags:
+            - testDouble
+    App\Client\GraylogClient:
+        tags:
+            - testDouble
+    App\Client\RabbitManagementClient:
+        tags:
+            - testDouble
+    App\Client\SlackClient:
+        tags:
+            - testDouble
+    App\Client\PackagistClient:
+        tags:
+            - testDouble

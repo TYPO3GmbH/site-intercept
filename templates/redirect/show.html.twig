@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Redirect{% endblock %}
+{% block headline %}Redirect{% endblock %}
+{% block body %}
+
+    <div class="content-section">
+        <div class="container">
+
+            <div class="datatable">
+                <table class="datatable-table">
+                    <tbody>
+                        <tr>
+                            <th>Id</th>
+                            <td>{{ redirect.id }}</td>
+                        </tr>
+                        <tr>
+                            <th>CreatedAt</th>
+                            <td>{{ redirect.createdAt ? intercept_date_time(redirect.createdAt) : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>UpdatedAt</th>
+                            <td>{{ redirect.updatedAt ? intercept_date_time(redirect.updatedAt) : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Source</th>
+                            <td>{{ redirect.source }}</td>
+                        </tr>
+                        <tr>
+                            <th>Target</th>
+                            <td>{{ redirect.target }}</td>
+                        </tr>
+                        <tr>
+                            <th>StatusCode</th>
+                            <td>{{ redirect.statusCode }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row mt-4 justify-content-between">
+                <div class="col-auto">
+                    {{ 
+                        macros.linkbutton(
+                            path('admin_redirect_index'),
+                            'back to list',
+                            'outline-secondary',
+                            'arrow-left'
+                        )
+                    }}
+                    {{
+                        macros.linkbutton(
+                            path('admin_redirect_edit', {'id': redirect.id}),
+                            'edit',
+                            'primary',
+                            'pencil-alt'
+                        )
+                    }}
+                </div>
+                <div class="col-auto">
+                    {{ include('redirect/_delete_form.html.twig') }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

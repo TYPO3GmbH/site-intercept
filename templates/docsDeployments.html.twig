@@ -1,0 +1,240 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Documentation deployments{% endblock %}
+{% block headline %}Documentation deployments{% endblock %}
+{% block body %}
+
+    <div class="content-section">
+        <div class="container">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <div class="card-header-bar">
+                        <div class="card-header-form">
+                            {{ form(filter, {'attr': {'novalidate': 'novalidate'}}) }}
+                        </div>
+                        {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                            <div class="card-header-actions">
+                                {{
+                                    macros.linkbutton(
+                                        path('admin_docs_deployments_add'),
+                                        'Add configuration',
+                                        'secondary'
+                                    )
+                                }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="datatable">
+                    <table class="datatable-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" colspan="3">
+                                    Package
+                                    {{ knp_pagination_sortable(pagination, 'Package', 'packageName') }}
+                                </th>
+                                <th scope="col">
+                                    Type
+                                    {{ knp_pagination_sortable(pagination, 'Type', 'typeLong') }}
+                                </th>
+                                <th scope="col">Branch</th>
+                                <th scope="col" data-type="localdate">
+                                    Last rendered
+                                    {{ knp_pagination_sortable(pagination, 'Last rendered', 'lastRenderedAt') }}
+                                </th>
+                                <th scope="col">Support</th>
+                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                    <th scope="col">Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for deployment in pagination %}
+                            <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('m/d/y, H:i', "UTC") }}">
+                                <th data-type="icon">
+                                    <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
+                                        <i class="fab fa-fw fa-git-alt"></i>
+                                    </a>
+                                </th>
+                                <th data-type="title">
+                                    <strong>{{ deployment.packageName }}</strong><br>
+                                    {% if deployment.extensionKey %}
+                                        <small>ext key: {{ deployment.extensionKey }}</small>
+                                    {% endif %}
+                                </th>
+                                <th data-type="badge">
+                                    {% if deployment.status == "0" %}
+                                        <span class="badge badge-info">Rendering</span>
+                                    {% elseif deployment.status == "1" %}
+                                        <span class="badge badge-success">Rendered</span>
+                                    {% elseif deployment.status == "2" %}
+                                        <span class="badge badge-warning">Deleting</span>
+                                    {% elseif deployment.status == "3" %}
+                                        <span class="badge badge-danger">Failed</span>
+                                    {% elseif deployment.status == "4" %}
+                                        <span class="badge badge-warning">Awaiting Approval</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Unknown</span>
+                                    {% endif %}
+                                </th>
+                                <td>{{ deployment.typeLong }}</td>
+                                <td>
+                                    {% if deployment.branch != deployment.targetBranchDirectory %}
+                                        {{ deployment.branch }} &raquo;
+                                    {% endif %}
+                                    <a href="{{ deployment|intercept_link_to_docs }}">{{ deployment.targetBranchDirectory }}</a>
+                                </td>
+                                <td data-type="localdate">
+                                    {% if deployment.buildKey %}
+                                        <a href="https://bamboo.typo3.com/browse/{{ deployment.buildKey }}">
+                                            {{ intercept_date_time(deployment.lastRenderedAt) }}
+                                        </a>
+                                    {% else %}
+                                        {{ intercept_date_time(deployment.lastRenderedAt) }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if deployment.minimumTypoVersion == deployment.maximumTypoVersion %}
+                                        {{ deployment.minimumTypoVersion }}
+                                    {% else %}
+                                        {{ deployment.minimumTypoVersion }} - {{ deployment.maximumTypoVersion }}
+                                    {% endif %}
+                                </td>
+                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                    <td data-type="actions" data-label="Actions">
+                                        {% if deployment.isRenderable() %}
+                                            <a class="datatable-action" title="Re-render documentation" href="{{ path('admin_docs_render', {documentation: deployment.id}) }}">
+                                                <span class="datatable-action-icon"><i class="fas fa-sync"></i></span>
+                                                <span class="datatable-action-label datatable-visually-hidden">Re-render documentation</span>
+                                            </a>
+                                        {% endif %}
+
+                                        {% if deployment.getStatus() == "4" %}
+                                            <a class="datatable-action" title="Approve documentation" href="{{ path('admin_docs_deployments_approve_action', {documentationJarId: deployment.id}) }}">
+                                                <span class="datatable-action-icon"><i class="fas fa-check"></i></span>
+                                                <span class="datatable-action-label datatable-visually-hidden">Approve documentation</span>
+                                            </a>
+                                            <a class="datatable-action" title="Blacklist repository" href="{{ path('admin_docs_deployments_blacklist_action', {documentationJarId: deployment.id}) }}">
+                                                <span class="datatable-action-icon"><i class="fas fa-ban"></i></span>
+                                                <span class="datatable-action-label datatable-visually-hidden">Blacklist repository</span>
+                                            </a>
+                                        {% endif %}
+
+                                        {% if deployment.isDeletable() %}
+                                            <a class="datatable-action" title="Delete" href="{{ path('admin_docs_deployments_delete_view', {'documentationJarId': deployment.getId()}) }}">
+                                                <span class="datatable-action-icon"><i class="fa fa-trash"></i></span>
+                                                <span class="datatable-action-label datatable-visually-hidden">Delete</span>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% else %}
+                            <tr>
+                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                    <td colspan="9">no records found</td>
+                                {% else %}
+                                    <td colspan="8">no records found</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if pagination.getTotalItemCount > 10 %}
+                    <div class="card-footer">
+                        {{ knp_pagination_render(pagination) }}
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if logMessages %}
+                <div class="content-spacer"></div>
+                <h2>Recent actions</h2>
+                <div class="card">
+                    <div class="message-list">
+                        {% for log in logMessages %}
+                            <div class="message {% if log.level == '6' %}message-success{% else %}message-warning{% endif %}">
+                                <div class="message-badge">
+                                    {% if log.triggeredBy == 'api' %}
+                                        <span class="badge badge-secondary">API</span>
+                                    {% elseif log.triggeredBy == 'interface' %}
+                                        <span class="badge badge-secondary">WEB</span>
+                                    {% elseif log.triggeredBy == 'CLI' %}
+                                        <span class="badge badge-secondary">CLI</span>
+                                    {% endif %}
+                                </div>
+                                <div class="message-body">
+                                    <div class="message-meta">
+                                        <span class="message-date">
+                                            {{ intercept_date_time(log.time) }}
+                                        </span>
+                                        {% if log.userDisplayName %}
+                                            <span class="message-user">- by {{ log.userDisplayName }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-text">
+                                        {% if log.status == 'triggered' %}
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">{{ log.message }}</a>
+                                        {% else %}
+                                            {{ log.message }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-detail">
+                                        {% if log.bambooKey %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Bamboo key</span>
+                                                <span class="message-detail-value">{{ log.bambooKey }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.package %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Package</span>
+                                                <span class="message-detail-value">{{ log.package }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.sourceBranch %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Branch</span>
+                                                <span class="message-detail-value">{{ log.sourceBranch }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.targetBranch %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Target directory</span>
+                                                <span class="message-detail-value">{{ log.targetBranch }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.repository %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Repository</span>
+                                                <span class="message-detail-value">{{ log.repository }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.composerFile %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Composer file</span>
+                                                <span class="message-detail-value">{{ log.composerFile }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.exceptionCode %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Exception Code</span>
+                                                <span class="message-detail-value">{{ log.exceptionCode }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+{% endblock %}

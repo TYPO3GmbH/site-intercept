@@ -1,0 +1,33 @@
+security:
+    providers:
+        typo3_org_ldap:
+            # Use an own user provider defined as service
+            id: ldap.typo3.org.user.provider
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            anonymous: true
+
+            form_login_ldap:
+                login_path: admin_login
+                check_path: admin_login
+                csrf_token_generator: security.csrf.token_manager
+                service: Symfony\Component\Ldap\Ldap
+                dn_string: 'ou=people,dc=typo3,dc=org'
+                query_string: '(&(objectClass=inetOrgPerson)(uid={username}))'
+                success_handler: App\Security\AuthenticationSuccessHandler
+            logout:
+                path: /logout
+                target: admin_index
+
+    role_hierarchy:
+        # Admin role has documentation maintainer automatically
+        ROLE_ADMIN: ROLE_DOCUMENTATION_MAINTAINER
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/admin/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }

@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"graylog.sessions"},{"v":2,"key":{"session_id":1},"name":"session_id_1","ns":"graylog.sessions"}],"uuid":"9130b09d07fa4dacb64e9311ac248993"}

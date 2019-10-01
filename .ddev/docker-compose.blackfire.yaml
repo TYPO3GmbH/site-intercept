@@ -1,0 +1,11 @@
+version: '3.6'
+services:
+  blackfire:
+    container_name: ddev-${DDEV_SITENAME}-blackfire
+    image: blackfire/blackfire
+    ports: ['8707']
+    env_file:
+      - .env.local
+  web:
+    links:
+      - blackfire:$DDEV_HOSTNAME
