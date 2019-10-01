@@ -97,6 +97,15 @@ class BambooPostBuildController extends AbstractController
                         ]
                     );
                 }
+            } else {
+                $message = new SlackCoreNightlyBuildMessage(
+                    SlackCoreNightlyBuildMessage::BUILD_SUCCESSFUL,
+                    $buildDetails->buildKey,
+                    $buildDetails->projectName,
+                    $buildDetails->planName,
+                    $buildDetails->buildNumber
+                );
+                $slackService->sendNightlyBuildMessage($message);
             }
         } elseif (!empty($buildDetails->change) && !empty($buildDetails->patchSet)) {
             // Vote on gerrit if this build has been triggered by a gerrit push
