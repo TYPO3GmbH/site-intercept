@@ -15,6 +15,7 @@ use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
+use App\Exception\DocsNoRstChangesException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\GitBranchDeletedException;
@@ -286,6 +287,18 @@ class DocsToBambooController extends AbstractController
                 ]
             );
             return Response::create('The branch in this push event has been deleted.', 412);
+        } catch (DocsNoRstChangesException $e) {
+            $logger->warning(
+                'Can not render documentation: ' . $e->getMessage(),
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'branchNoRstChanges',
+                    'triggeredBy' => 'api',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                ]
+            );
+            return Response::create('The branch has no RST changes.', 204);
         }
     }
 }

@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Exception\DocsNoRstChangesException;
 use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
@@ -114,6 +115,24 @@ class WebHookService
                 'Webhook was triggered on a deleted branch for repository ' . $payload->repository->clone_url . '.',
                 1564408696
             );
+        }
+
+        // Only for actual push events, not releases
+        if (!empty($payload->commits)) {
+            $rstChanges = false;
+            foreach ($payload->commits as $commit) {
+                $files = array_merge($commit->added ?? [], $commit->modified ?? [], $commit->removed ?? []);
+                foreach ($files as $file) {
+                    if (substr($file, -4) === '.rst') {
+                        $rstChanges = true;
+                        break 2;
+                    }
+                }
+            }
+
+            if (!$rstChanges) {
+                throw new DocsNoRstChangesException('Branch has no RST changes.', 1570011098);
+            }
         }
 
         $repositoryUrl = (string)$payload->repository->clone_url;
