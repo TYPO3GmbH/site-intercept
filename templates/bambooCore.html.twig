@@ -132,15 +132,15 @@
                                     </div>
                                     <div class="message-text">
                                         {% if log.type == 'voteGerrit' %}
-                                            <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Voted on gerrit</a> 
+                                            <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}" rel="noopener noreferrer" target="_blank">Voted on gerrit</a>
                                             by <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">bamboo result</a>
                                         {% elseif log.type == 'triggerBamboo' and log.bambooKey != '' %}
-                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a>
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}" rel="noopener noreferrer" target="_blank">Triggered bamboo</a>
                                             {% if log.change and log.patch %}for <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">gerrit patch</a>{% endif %}
                                         {% elseif log.type == 'rebuildNightly' and log.bambooKey != '' %}
-                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Re-triggered failed bamboo nightly</a>
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}" rel="noopener noreferrer" target="_blank">Re-triggered failed bamboo nightly</a>
                                         {% elseif log.type == 'reportBrokenNightly' and log.bambooKey != '' %}
-                                            Reported <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">broken nightly</a> to slack
+                                            Reported <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}" rel="noopener noreferrer" target="_blank">broken nightly</a> to slack
                                         {% endif %}
                                     </div>
                                     <div class="message-detail">

@@ -55,7 +55,7 @@
                         {% for deployment in pagination %}
                             <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('m/d/y, H:i', "UTC") }}">
                                 <th data-type="icon">
-                                    <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
+                                    <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener noreferrer" target="_blank">
                                         <i class="fab fa-fw fa-git-alt"></i>
                                     </a>
                                 </th>
@@ -85,11 +85,11 @@
                                     {% if deployment.branch != deployment.targetBranchDirectory %}
                                         {{ deployment.branch }} &raquo;
                                     {% endif %}
-                                    <a href="{{ deployment|intercept_link_to_docs }}">{{ deployment.targetBranchDirectory }}</a>
+                                    <a href="{{ deployment|intercept_link_to_docs }}" rel="noopener noreferrer" target="_blank">{{ deployment.targetBranchDirectory }}</a>
                                 </td>
                                 <td data-type="localdate">
                                     {% if deployment.buildKey %}
-                                        <a href="https://bamboo.typo3.com/browse/{{ deployment.buildKey }}">
+                                        <a href="https://bamboo.typo3.com/browse/{{ deployment.buildKey }}" rel="noopener noreferrer" target="_blank">
                                             {{ intercept_date_time(deployment.lastRenderedAt) }}
                                         </a>
                                     {% else %}
@@ -178,7 +178,7 @@
                                     </div>
                                     <div class="message-text">
                                         {% if log.status == 'triggered' %}
-                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">{{ log.message }}</a>
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}" rel="noopener noreferrer" target="_blank">{{ log.message }}</a>
                                         {% else %}
                                             {{ log.message }}
                                         {% endif %}

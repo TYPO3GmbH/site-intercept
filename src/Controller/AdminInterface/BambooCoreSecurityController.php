@@ -98,7 +98,7 @@ class BambooCoreSecurityController extends AbstractController
                     $this->addFlash(
                         'success',
                         'Triggered bamboo build'
-                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
+                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                         . ' of change "' . $bambooData->changeId . '"'
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'
@@ -157,7 +157,7 @@ class BambooCoreSecurityController extends AbstractController
                     $this->addFlash(
                         'success',
                         'Triggered bamboo security build'
-                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '">' . $bambooTriggered->buildResultKey . '</a>'
+                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                         . ' of change "' . $bambooData->changeId . '"'
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'
