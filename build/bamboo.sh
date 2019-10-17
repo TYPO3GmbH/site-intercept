@@ -23,7 +23,7 @@ runLint
 runComposer install --no-interaction --no-progress
 
 # CGL Checks
-runPhpCsFixer fix --config build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml
+runPhpCsFixer fix --dry-run --verbose --diff --config build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml
 
 # yarn install and encore
 runYarn install
