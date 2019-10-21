@@ -19,7 +19,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class RabbitConsumerService
 {
@@ -54,7 +53,6 @@ class RabbitConsumerService
      * @param LoggerInterface $logger
      * @param AMQPStreamConnection $rabbitConnection
      * @param CoreSplitService $coreSplitService
-     * @param SerializerInterface $serializer
      * @param string $rabbitSplitQueue
      */
     public function __construct(
@@ -99,9 +97,9 @@ class RabbitConsumerService
      */
     public function handleWorkerJob(AMQPMessage $message): void
     {
-        $serializer = new Serializer([new PropertyNormalizer()], [new JsonEncoder()]);
         /** @var GithubPushEventForCore $event */
-        $event = $serializer->deserialize($message->getBody(), GithubPushEventForCore::class, 'json');
+        $event = (new Serializer([new PropertyNormalizer()], [new JsonEncoder()]))
+            ->deserialize($message->getBody(), GithubPushEventForCore::class, 'json');
         if (empty($event->jobUuid)) {
             throw new \RuntimeException('Required job uuid missing');
         }

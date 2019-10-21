@@ -16,6 +16,7 @@ use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
+use App\Exception\DocsPackageDoNotCareBranch as DocsPackageDoNotCareBranchAlias;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Extractor\ComposerJson;
@@ -75,6 +76,7 @@ class DocumentationBuildInformationService
      * @param EntityManagerInterface $entityManager
      * @param Filesystem $fileSystem
      * @param GeneralClient $client
+     * @param SlackService $slackService
      */
     public function __construct(
         string $privateDir,
@@ -137,8 +139,8 @@ class DocumentationBuildInformationService
      * @param PushEvent $pushEvent
      * @param ComposerJson $composerJson
      * @return DeploymentInformation
-     * @throws \App\Exception\ComposerJsonInvalidException
-     * @throws \App\Exception\DocsPackageDoNotCareBranch
+     * @throws ComposerJsonInvalidException
+     * @throws DocsPackageDoNotCareBranchAlias
      * @throws DocsComposerDependencyException
      * @throws \App\Exception\Composer\DocsComposerMissingValueException
      */
@@ -165,8 +167,8 @@ class DocumentationBuildInformationService
      *
      * @param DocumentationJar $documentationJar
      * @return DeploymentInformation
-     * @throws \App\Exception\DocsPackageDoNotCareBranch
-     * @throws \App\Exception\ComposerJsonInvalidException
+     * @throws DocsPackageDoNotCareBranchAlias
+     * @throws ComposerJsonInvalidException
      */
     public function generateBuildInformationFromDocumentationJar(DocumentationJar $documentationJar): DeploymentInformation
     {
@@ -228,7 +230,7 @@ class DocumentationBuildInformationService
      *
      * @param DeploymentInformation $deploymentInformation
      * @return DocumentationJar
-     * @throws \App\Exception\DuplicateDocumentationRepositoryException
+     * @throws DuplicateDocumentationRepositoryException
      */
     public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): DocumentationJar
     {

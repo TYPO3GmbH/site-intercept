@@ -40,15 +40,11 @@ class DiscordTransformer extends AbstractDiscordTransformer
                     $message->setAuthorIcon($embed['author']['icon_url']);
                 }
             }
-            if (isset($embed['image'])) {
-                if (isset($embed['image']['url'])) {
-                    $message->setImage($embed['image']['url']);
-                }
+            if (isset($embed['image']['url'])) {
+                $message->setImage($embed['image']['url']);
             }
-            if (isset($embed['thumbnail'])) {
-                if (isset($embed['thumbnail']['url'])) {
-                    $message->setThumbnail($embed['thumbnail']['url']);
-                }
+            if (isset($embed['thumbnail']['url'])) {
+                $message->setThumbnail($embed['thumbnail']['url']);
             }
             if (isset($embed['footer'])) {
                 if (isset($embed['footer']['text'])) {

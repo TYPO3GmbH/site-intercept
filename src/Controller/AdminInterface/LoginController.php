@@ -25,11 +25,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class LoginController extends AbstractController
 {
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @Route("/admin/login", name="admin_login")
      * @param Request $request
      * @param LoggerInterface $logger
@@ -43,8 +38,6 @@ class LoginController extends AbstractController
         AuthenticationUtils $authUtils,
         TokenStorageInterface $tokenStorage
     ): Response {
-        $this->logger = $logger;
-
         if ($tokenStorage->getToken()->getUser() instanceof User) {
             // @codeCoverageIgnoreStart
             // Successful login can't be tested directly
@@ -59,7 +52,7 @@ class LoginController extends AbstractController
                 'danger',
                 'Login not successful: ' . $error->getMessage()
             );
-            $this->logger->warning(
+            $logger->warning(
                 'Failed user login, username: "' . $authUtils->getLastUsername() . '"',
                 [
                     'type' => 'loginFailed',

@@ -96,8 +96,7 @@ class BambooCoreController extends AbstractController
                 $gerritUrl = new GerritUrl($formData['url']);
                 $bambooData = $gerritService->getChangeDetails($gerritUrl->changeId, $gerritUrl->patchSet);
                 if ($bambooData->isSecurity) {
-                    // Never trigger security builds from "normal" core build interface
-                    throw new DoNotCareException();
+                    throw new DoNotCareException('Never trigger security builds from "normal" core build interface');
                 }
                 $bambooTriggered = $bambooService->triggerNewCoreBuild($bambooData);
                 if (!empty($bambooTriggered->buildResultKey)) {
@@ -208,6 +207,7 @@ class BambooCoreController extends AbstractController
      *
      * @param FormInterface $form
      * @param BambooService $bambooService
+     * @throws DoNotCareException
      */
     private function handleTriggerForm(FormInterface $form, BambooService $bambooService): void
     {

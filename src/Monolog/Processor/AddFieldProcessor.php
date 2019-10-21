@@ -32,15 +32,12 @@ class AddFieldProcessor
         foreach ($this->fieldValues as $fieldName => $fieldValue) {
             if (!is_object($fieldValue)) {
                 $record['extra'][$fieldName] = $fieldValue;
-            } else {
-                // One field can be the security object of symfony
-                if ($fieldValue instanceof Security) {
-                    $user = $fieldValue->getUser();
-                    if ($user instanceof User) {
-                        // If we have a logged in user, automatically log username and display name
-                        $record['extra']['username'] = $user->getUsername();
-                        $record['extra']['userDisplayName'] = $user->getDisplayName();
-                    }
+            } elseif ($fieldValue instanceof Security) {
+                $user = $fieldValue->getUser();
+                if ($user instanceof User) {
+                    // If we have a logged in user, automatically log username and display name
+                    $record['extra']['username'] = $user->getUsername();
+                    $record['extra']['userDisplayName'] = $user->getDisplayName();
                 }
             }
         }

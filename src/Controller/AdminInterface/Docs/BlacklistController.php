@@ -15,6 +15,7 @@ use App\Repository\DocumentationJarRepository;
 use App\Repository\RepositoryBlacklistEntryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,7 @@ class BlacklistController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/blacklist/{documentationJarId}", name="admin_docs_deployments_blacklist_action", requirements={"documentationJarId"="\d+"})
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param int $documentationJarId
      * @param DocumentationJarRepository $documentationJarRepository
      * @param EntityManagerInterface $entityManager
@@ -35,7 +37,6 @@ class BlacklistController extends AbstractController
         DocumentationJarRepository $documentationJarRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $originalJar = $documentationJarRepository->find($documentationJarId);
         $jars = $documentationJarRepository->findBy(['repositoryUrl' => $originalJar->getRepositoryUrl()]);
 
@@ -54,6 +55,7 @@ class BlacklistController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/blacklist", name="admin_docs_deployments_blacklist_index")
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param Request $request
      * @param PaginatorInterface $paginator
      * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
@@ -64,7 +66,6 @@ class BlacklistController extends AbstractController
         PaginatorInterface $paginator,
         RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $entries = $repositoryBlacklistEntryRepository->findAll();
 
         $pagination = $paginator->paginate(
@@ -77,6 +78,7 @@ class BlacklistController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/blacklist/delete/{entryId}", name="admin_docs_deployments_blacklist_delete_action", requirements={"entryId"="\d+"})
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param int $entryId
      * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
      * @param EntityManagerInterface $entityManager
@@ -87,7 +89,6 @@ class BlacklistController extends AbstractController
         RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $entry = $repositoryBlacklistEntryRepository->find($entryId);
 
         if (null !== $entry) {

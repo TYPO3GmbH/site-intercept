@@ -57,8 +57,8 @@ class RabbitPublisherService
      */
     public function pushNewCoreSplitJob(GithubPushEventForCore $message, string $trigger): void
     {
-        $serializer = new Serializer([new PropertyNormalizer()], [new JsonEncoder()]);
-        $jsonMessage = $serializer->serialize($message, 'json');
+        $jsonMessage = (new Serializer([new PropertyNormalizer()], [new JsonEncoder()]))
+            ->serialize($message, 'json');
         $rabbitMessage = new AMQPMessage($jsonMessage, ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]);
         $rabbitChannel = $this->rabbitConnection->channel();
         $rabbitChannel->queue_declare($this->queueName, false, true, false, false);

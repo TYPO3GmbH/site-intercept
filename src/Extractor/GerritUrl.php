@@ -44,7 +44,7 @@ class GerritUrl
             $this->patchSet = (int)$matches[6];
         }
         if (empty($this->changeId)) {
-            throw new DoNotCareException();
+            throw new DoNotCareException('No Change ID found, it\'s not my job');
         }
     }
 }

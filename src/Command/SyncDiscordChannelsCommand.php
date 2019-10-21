@@ -106,7 +106,7 @@ class SyncDiscordChannelsCommand extends Command
         $channelIds = [];
 
         // Sort the parent categories at the top
-        usort($channels, function ($a, $b) {
+        usort($channels, static function ($a, $b) {
             if ($a['parent_id'] === $b['parent_id']) {
                 return 0;
             }

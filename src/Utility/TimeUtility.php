@@ -63,8 +63,7 @@ class TimeUtility
 
         $timezoneOffsets = [];
         foreach ($timezones as $timezone) {
-            $tz                          = new DateTimeZone($timezone);
-            $timezoneOffsets[$timezone] = $tz->getOffset(new DateTime());
+            $timezoneOffsets[$timezone] = (new DateTimeZone($timezone))->getOffset(new DateTime());
         }
 
         // sort timezone by offset

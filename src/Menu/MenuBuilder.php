@@ -79,6 +79,7 @@ class MenuBuilder
 
     /**
      * @param array $options
+     * @return \Knp\Menu\ItemInterface|\Knp\Menu\MenuItem
      */
     public function mainDefault(array $options)
     {
@@ -212,6 +213,7 @@ class MenuBuilder
 
     /**
      * @param array $options
+     * @return \Knp\Menu\ItemInterface|\Knp\Menu\MenuItem
      */
     public function mainProfile(array $options)
     {
@@ -254,6 +256,7 @@ class MenuBuilder
 
     /**
      * @param array $options
+     * @return \Knp\Menu\ItemInterface|\Knp\Menu\MenuItem
      */
     public function mainFooter(array $options)
     {

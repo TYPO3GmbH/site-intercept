@@ -28,7 +28,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class BitbucketToPackagistController extends AbstractController
 {
     /**
-     * @var \App\Service\PackagistService
+     * @var PackagistService
      */
     private $packagistService;
 

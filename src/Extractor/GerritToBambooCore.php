@@ -58,7 +58,7 @@ class GerritToBambooCore
     {
         if ($change === (string)(int)$change) {
             $this->changeId = (int)$change;
-        } elseif (preg_match('/.*\/([0-9].*?)/U', $change, $matches)) {
+        } elseif (preg_match('/.*\/([\d].*?)/U', $change, $matches)) {
             $this->changeId = (int)$matches[1];
         } else {
             throw new DoNotCareException('Could not determine a changeId from "' . $change . '"');

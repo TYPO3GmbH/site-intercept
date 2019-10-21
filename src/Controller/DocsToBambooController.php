@@ -21,7 +21,6 @@ use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
-use App\Extractor\PushEvent;
 use App\Repository\RepositoryBlacklistEntryRepository;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
@@ -65,7 +64,6 @@ class DocsToBambooController extends AbstractController
             $erroredPushes = 0;
             $errorMessage = '';
 
-            /** @var PushEvent $pushEvent */
             foreach ($pushEvents as $pushEvent) {
                 try {
                     if ($repositoryBlacklistEntryRepository->isBlacklisted($pushEvent->getRepositoryUrl())) {
@@ -107,7 +105,7 @@ class DocsToBambooController extends AbstractController
                             ]
                         );
                     } elseif (!$documentationJar->isApproved()) {
-                        // Repository present, but not approved. Do nothing.
+                        $logger->info('Repository present, but not approved. Do nothing.', [$documentationJar]);
                     } else {
                         $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
                         if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'

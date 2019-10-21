@@ -90,8 +90,7 @@ class BambooCoreSecurityController extends AbstractController
                 $gerritUrl = new GerritUrl($formData['url']);
                 $bambooData = $gerritService->getChangeDetails($gerritUrl->changeId, $gerritUrl->patchSet);
                 if (!$bambooData->isSecurity) {
-                    // Only trigger security builds from core security build interface
-                    throw new DoNotCareException();
+                    throw new DoNotCareException('Only trigger security builds from core security build interface');
                 }
                 $bambooTriggered = $bambooService->triggerNewCoreBuild($bambooData);
                 if (!empty($bambooTriggered->buildResultKey)) {

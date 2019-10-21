@@ -60,8 +60,8 @@ class GithubPushEventForCore
     public function __construct(array $fullPullRequestInformation = [])
     {
         if (!empty($fullPullRequestInformation)) {
-            if (!is_array($fullPullRequestInformation) || empty($fullPullRequestInformation['ref'])) {
-                throw new DoNotCareException();
+            if (empty($fullPullRequestInformation['ref'])) {
+                throw new DoNotCareException('ref is empty, it\'s not my job');
             }
             if ($this->isPushedPatch($fullPullRequestInformation)) {
                 $this->type = self::TYPE_PATCH;
@@ -71,7 +71,7 @@ class GithubPushEventForCore
                 $this->type = self::TYPE_TAG;
                 $this->tag = $this->getTag($fullPullRequestInformation['ref']);
             } else {
-                throw new DoNotCareException();
+                throw new DoNotCareException('no pushed patch, no pushed tag, it\'s not my job');
             }
             $this->jobUuid = Uuid::uuid4()->toString();
         }
@@ -111,11 +111,11 @@ class GithubPushEventForCore
      */
     private function getTag(string $ref): string
     {
-        $tag = str_replace('refs/tags/', '', $ref);
-        if (empty($tag)) {
-            throw new DoNotCareException();
+        $tagFromRef = str_replace('refs/tags/', '', $ref);
+        if (empty($tagFromRef)) {
+            throw new DoNotCareException('no tag found in ref');
         }
-        return $tag;
+        return $tagFromRef;
     }
 
     /**
@@ -127,10 +127,10 @@ class GithubPushEventForCore
      */
     private function getSourceBranch(string $ref): string
     {
-        $sourceBranch = str_replace('refs/heads/', '', $ref);
-        if (empty($sourceBranch)) {
-            throw new DoNotCareException();
+        $sourceBranchFromRef = str_replace('refs/heads/', '', $ref);
+        if (empty($sourceBranchFromRef)) {
+            throw new DoNotCareException('not source branch found');
         }
-        return BranchUtility::resolveCoreMonoRepoBranch($sourceBranch);
+        return BranchUtility::resolveCoreMonoRepoBranch($sourceBranchFromRef);
     }
 }

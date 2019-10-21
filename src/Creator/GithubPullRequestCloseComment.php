@@ -37,9 +37,9 @@ class GithubPullRequestCloseComment
         $this->comment = 'Thank you for your contribution to TYPO3.'
             . ' We are using Gerrit Code Review for our contributions and'
             . ' took the liberty to convert your pull request to a review in our review system.'
-            . "\n"
+            . chr(10)
             . 'You can find your patch at: ' . $gitPushOutput->reviewUrl
-            . "\n"
+            . chr(10)
             . 'For further information on how to contribute have a look at ' . self::CONTRIB_GUIDE;
     }
 }

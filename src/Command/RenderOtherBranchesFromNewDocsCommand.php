@@ -19,11 +19,11 @@ class RenderOtherBranchesFromNewDocsCommand extends Command
 {
     protected static $defaultName = 'app:docs-render-new';
     /**
-     * @var \App\Repository\DocumentationJarRepository
+     * @var DocumentationJarRepository
      */
     private $documentationJarRepository;
     /**
-     * @var \App\Service\DocumentationService
+     * @var DocumentationService
      */
     private $documentationService;
 

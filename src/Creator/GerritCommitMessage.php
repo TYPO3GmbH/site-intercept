@@ -73,7 +73,7 @@ class GerritCommitMessage
      */
     private function formatBody(string $body): string
     {
-        return wordwrap($body, self::MAX_CHARS_PER_LINE, "\n", true);
+        return wordwrap($body, self::MAX_CHARS_PER_LINE, chr(10), true);
     }
 
     /**

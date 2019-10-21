@@ -12,6 +12,7 @@ namespace App\Controller\AdminInterface\Docs;
 
 use App\Entity\DocumentationJar;
 use App\Exception\Composer\DocsComposerDependencyException;
+use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
@@ -22,6 +23,7 @@ use App\Repository\RepositoryBlacklistEntryRepository;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\DocumentationService;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,13 +34,13 @@ class ConfigurationController extends AbstractController
 {
     /**
      * @Route("/admin/docs/deployments/add", name="admin_docs_deployments_add")
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param Request $request
      * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
      * @return Response
      */
     public function addConfiguration(Request $request, RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $documentationJar = new DocumentationJar();
         $repositoryUrl = $request->get('documentation_deployment')['repositoryUrl'] ?? '';
         $documentationJar->setRepositoryUrl($repositoryUrl);
@@ -67,12 +69,12 @@ class ConfigurationController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/add/step2", name="admin_docs_deployments_add_step2")
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param Request $request
      * @return Response
      */
     public function addConfigurationStep2(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $documentationJar = new DocumentationJar();
 
         $repositoryUrl = $request->get('documentation_deployment')['repositoryUrl'] ?? '';
@@ -96,13 +98,15 @@ class ConfigurationController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/add/step3", name="admin_docs_deployments_add_step3")
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param Request $request
      * @param DocumentationBuildInformationService $docBuildInfoService
      * @param BambooService $bambooService
-     * @param \App\Repository\DocumentationJarRepository $docsRepository
-     * @param \App\Service\DocumentationService $docService
+     * @param DocumentationJarRepository $docsRepository
+     * @param DocumentationService $docService
      * @return Response
-     * @throws \App\Exception\Composer\DocsComposerMissingValueException
+     * @throws DocsPackageDoNotCareBranch
+     * @throws DocsComposerMissingValueException
      */
     public function addConfigurationStep3(
         Request $request,
@@ -111,7 +115,6 @@ class ConfigurationController extends AbstractController
         DocumentationJarRepository $docsRepository,
         DocumentationService $docService
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $deploymentParams = $request->get('documentation_deployment');
         $repositoryUrl = $deploymentParams['repositoryUrl'];
         $branch = $deploymentParams['branch'] ?? '';

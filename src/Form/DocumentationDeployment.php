@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Form;
 
 use App\Entity\DocumentationJar;
+use App\Repository\DocumentationJarRepository;
 use App\Service\GitRepositoryService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -47,7 +48,7 @@ class DocumentationDeployment extends AbstractType
                 [
                     'mapped' => false,
                     'choices' => ['Please select a repository type' => ''] + array_flip(GitRepositoryService::SERVICE_NAMES),
-                    'choice_attr' => function ($key, $val, $index) {
+                    'choice_attr' => static function ($key, $val, $index) {
                         if ($val === '') {
                             return ['disabled' => 'disabled'];
                         }
@@ -72,6 +73,7 @@ class DocumentationDeployment extends AbstractType
             if ($options['step2']) {
                 $repositoryUrl = $event->getData()->getRepositoryUrl();
                 $branches = (new GitRepositoryService())->getBranchesFromRepositoryUrl($repositoryUrl);
+                /** @var DocumentationJarRepository $documentationJarRepository */
                 $documentationJarRepository = $options['entity_manager']->getRepository(DocumentationJar::class);
                 foreach ($branches as $key => $branch) {
                     $jar = $documentationJarRepository

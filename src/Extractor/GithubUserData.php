@@ -43,9 +43,8 @@ class GithubUserData
         $this->user = $userInformation['name'] ?? $userInformation['login'] ?? '';
         $this->email = $userInformation['email'] ?? 'noreply@example.com';
 
-        // Do not care if user information does not contain minimal data
         if (empty($this->user)) {
-            throw new DoNotCareException();
+            throw new DoNotCareException('Do not care if user information does not contain minimal data');
         }
     }
 }

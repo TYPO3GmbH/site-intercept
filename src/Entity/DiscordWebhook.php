@@ -135,7 +135,7 @@ class DiscordWebhook
     }
 
     /**
-     * @return string
+     * @return int|null
      */
     public function getType(): ?int
     {

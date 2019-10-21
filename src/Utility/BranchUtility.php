@@ -51,21 +51,18 @@ class BranchUtility
      */
     public static function resolveBambooProjectKey(string $identifier, bool $isSecurity): string
     {
-        $identifier = str_replace('branch', '', $identifier);
-        $identifier = str_replace('TYPO3_', '', $identifier);
-        $identifier = str_replace('_', '.', $identifier);
-        $identifier = str_replace('-', '.', $identifier);
+        $identifier = str_replace(['branch', 'TYPO3_', '_', '-'], ['', '', '.', '.'], $identifier);
         if (!$isSecurity) {
             if (!array_key_exists($identifier, static::$branchToProjectKeys)) {
                 throw new DoNotCareException('Did not find bamboo project for key "' . $identifier . '"');
             }
             return static::$branchToProjectKeys[$identifier];
-        } else {
-            if (!array_key_exists($identifier, static::$securityBranchToProjectKeys)) {
-                throw new DoNotCareException('Did not find bamboo security project for key "' . $identifier . '"');
-            }
-            return static::$securityBranchToProjectKeys[$identifier];
         }
+
+        if (!array_key_exists($identifier, static::$securityBranchToProjectKeys)) {
+            throw new DoNotCareException('Did not find bamboo security project for key "' . $identifier . '"');
+        }
+        return static::$securityBranchToProjectKeys[$identifier];
     }
 
     /**
@@ -77,16 +74,11 @@ class BranchUtility
      */
     public static function resolveCoreMonoRepoBranch(string $identifier): string
     {
-        $identifier = str_replace('branch', '', $identifier);
-        $identifier = str_replace('nightly', '', $identifier);
-        $identifier = str_replace('TYPO3_', '', $identifier);
-        $identifier = str_replace('_', '.', $identifier);
-        $identifier = str_replace('-', '.', $identifier);
-        $identifier = mb_strtolower($identifier);
+        $identifier = mb_strtolower(str_replace(['branch', 'nightly', 'TYPO3_', '_', '-'], ['', '', '', '.', '.'], $identifier));
         if ($identifier !== 'master') {
             $sanityCheck = explode('.', $identifier);
             if (count($sanityCheck) !== 2 || (int)$sanityCheck[0] < 7 || (int)$sanityCheck < 0) {
-                throw new DoNotCareException();
+                throw new DoNotCareException('I do not care');
             }
             $identifier = (int)$sanityCheck[0] . '.' . (int)$sanityCheck[1];
         }
@@ -113,7 +105,7 @@ class BranchUtility
         if ($splitBranch !== 'master') {
             $sanityCheck = explode('.', $splitBranch);
             if (count($sanityCheck) !== 2 || (int)$sanityCheck[0] < 8 || (int)$sanityCheck < 0) {
-                throw new DoNotCareException();
+                throw new DoNotCareException('I do not care');
             }
             $splitBranch = (int)$sanityCheck[0] . '.' . (int)$sanityCheck[1];
         }
@@ -166,7 +158,8 @@ class BranchUtility
         } elseif ($project === 'Packages/TYPO3.CMS') {
             return false;
         } else {
-            throw new DoNotCareException();
+            // @TODO: Why this exception? IMHO this method could be a one-liner
+            throw new DoNotCareException('I do not care');
         }
     }
 }

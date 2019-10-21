@@ -79,8 +79,7 @@ class BambooBuildStatus
     public function __construct(string $payload)
     {
         $response = json_decode($payload, true);
-        $labels = $response['labels']['label'] ?? [];
-        foreach ($labels as $label) {
+        foreach ($response['labels']['label'] ?? [] as $label) {
             // A hack to cope with a bamboo hack which prefixes
             // or suffixes keys with underscore '_'
             $keyValue = trim($label['name'], '_'); // patchset-5 or change-12345

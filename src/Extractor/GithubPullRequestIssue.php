@@ -45,13 +45,12 @@ class GithubPullRequestIssue
     {
         $responseBody = (string)$response->getBody();
         $issueInformation = json_decode($responseBody, true);
-        $this->title = (string)$issueInformation['title'] ?? '';
-        $this->body = (string)$issueInformation['body'] ?? '';
-        $this->url = (string)$issueInformation['html_url'] ?? '';
+        $this->title = (string)($issueInformation['title'] ?? '');
+        $this->body = (string)($issueInformation['body'] ?? '');
+        $this->url = (string)($issueInformation['html_url'] ?? '');
 
-        // Do not care if issue information is not complete for whatever reason
         if (empty($this->title) || empty($this->url)) {
-            throw new DoNotCareException();
+            throw new DoNotCareException('Do not care if issue information is not complete for whatever reason');
         }
     }
 }

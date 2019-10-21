@@ -50,7 +50,7 @@ class GithubPushEventForDocs
         $repositoryName = $this->extractRepositoryNameFromUrl($this->repositoryUrl);
         $this->composerFile = 'https://raw.githubusercontent.com/' . $repositoryName . '/' . $this->tagOrBranchName . '/composer.json';
         if (empty($this->tagOrBranchName) || empty($this->repositoryUrl)) {
-            throw new DoNotCareException();
+            throw new DoNotCareException('tag, branch or repository url are empty');
         }
     }
 
@@ -69,7 +69,7 @@ class GithubPushEventForDocs
         if (strpos($ref, 'refs/heads/') === 0) {
             return str_replace('refs/heads/', '', $ref);
         }
-        throw new DoNotCareException();
+        throw new DoNotCareException('no tags, no heads in ref');
     }
 
     /**

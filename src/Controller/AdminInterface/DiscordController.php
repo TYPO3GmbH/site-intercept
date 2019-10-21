@@ -386,9 +386,9 @@ class DiscordController extends AbstractController
 
     /**
      * @param array $discordScheduledMessage
-     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
-     * @param \App\Repository\DiscordChannelRepository $discordChannelRepository
-     * @param \App\Entity\DiscordScheduledMessage|null $message
+     * @param EntityManagerInterface $entityManager
+     * @param DiscordChannelRepository $discordChannelRepository
+     * @param DiscordScheduledMessage|null $message
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
      */
     protected function handleFormSubmit(array $discordScheduledMessage, EntityManagerInterface $entityManager, DiscordChannelRepository $discordChannelRepository, DiscordScheduledMessage $message): ?Response

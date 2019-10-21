@@ -25,12 +25,13 @@ class PackagistService
      */
     private $client;
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var LoggerInterface
      */
     private $logger;
 
     /**
      * @param PackagistClient $client
+     * @param LoggerInterface $logger
      */
     public function __construct(PackagistClient $client, LoggerInterface $logger)
     {
@@ -41,7 +42,7 @@ class PackagistService
     /**
      * Send a nightly build status message to slack
      *
-     * @param \App\Extractor\PackagistUpdateRequest $packagistUpdateRequest
+     * @param PackagistUpdateRequest $packagistUpdateRequest
      * @return ResponseInterface
      */
     public function sendUpdateRequest(PackagistUpdateRequest $packagistUpdateRequest): ResponseInterface

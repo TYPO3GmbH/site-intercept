@@ -11,7 +11,9 @@ declare(strict_types = 1);
 namespace App\Controller\AdminInterface\Docs;
 
 use App\Enum\DocumentationStatus;
+use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
+use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Form\DocsDeploymentFilterType;
 use App\Repository\DocumentationJarRepository;
@@ -23,6 +25,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -94,15 +97,13 @@ class DeploymentsController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/delete/{documentationJarId}/confirm", name="admin_docs_deployments_delete_view", requirements={"documentationJarId"="\d+"}, methods={"GET"})
-     *
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param int $documentationJarId
      * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
      */
     public function deleteConfirm(int $documentationJarId, DocumentationJarRepository $documentationJarRepository): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
-
         $jar = $documentationJarRepository->find($documentationJarId);
         if (null === $jar || !$jar->isDeletable()) {
             return $this->redirectToRoute('admin_docs_deployments');
@@ -119,7 +120,7 @@ class DeploymentsController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/delete/{documentationJarId}", name="admin_docs_deployments_delete_action", requirements={"documentationJarId"="\d+"}, methods={"DELETE"})
-     *
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param int $documentationJarId
      * @param LoggerInterface $logger
      * @param DocumentationJarRepository $documentationJarRepository
@@ -128,6 +129,7 @@ class DeploymentsController extends AbstractController
      * @param BambooService $bambooService
      * @return Response
      * @throws DocsPackageDoNotCareBranch
+     * @throws ComposerJsonInvalidException
      */
     public function delete(
         int $documentationJarId,
@@ -137,8 +139,6 @@ class DeploymentsController extends AbstractController
         DocumentationBuildInformationService $documentationBuildInformationService,
         BambooService $bambooService
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
-
         $jar = $documentationJarRepository->find($documentationJarId);
 
         if (null !== $jar && $jar->isDeletable()) {
@@ -170,13 +170,14 @@ class DeploymentsController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/approve/{documentationJarId}", name="admin_docs_deployments_approve_action", requirements={"documentationJarId"="\d+"})
-     *
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param int $documentationJarId
      * @param DocumentationJarRepository $documentationJarRepository
      * @param EntityManagerInterface $entityManager
      * @param RenderDocumentationService $renderDocumentationService
      * @return Response
      * @throws DocsPackageDoNotCareBranch
+     * @throws DuplicateDocumentationRepositoryException
      */
     public function approve(
         int $documentationJarId,
@@ -184,7 +185,6 @@ class DeploymentsController extends AbstractController
         EntityManagerInterface $entityManager,
         RenderDocumentationService $renderDocumentationService
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
         $originalJar = $documentationJarRepository->find($documentationJarId);
         $jars = $documentationJarRepository->findBy(['repositoryUrl' => $originalJar->getRepositoryUrl()]);
 
@@ -202,11 +202,13 @@ class DeploymentsController extends AbstractController
 
     /**
      * @Route("/admin/docs/render", name="admin_docs_render")
+     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
      * @param Request $request
      * @param LoggerInterface $logger
      * @param DocumentationJarRepository $documentationJarRepository
      * @param RenderDocumentationService $renderDocumentationService
      * @return Response
+     * @throws DuplicateDocumentationRepositoryException
      */
     public function renderDocs(
         Request $request,
@@ -214,8 +216,6 @@ class DeploymentsController extends AbstractController
         DocumentationJarRepository $documentationJarRepository,
         RenderDocumentationService $renderDocumentationService
     ): Response {
-        $this->denyAccessUnlessGranted('ROLE_DOCUMENTATION_MAINTAINER');
-
         try {
             $documentationJarId = (int)$request->get('documentation');
             $documentationJar = $documentationJarRepository->find($documentationJarId);

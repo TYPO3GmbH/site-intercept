@@ -57,6 +57,8 @@ class RedirectController extends AbstractController
      * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param DocsServerRedirectRepository $redirectRepository
      * @param GraylogService $graylogService
+     * @param Request $request
+     * @param PaginatorInterface $paginator
      * @return Response
      */
     public function index(DocsServerRedirectRepository $redirectRepository, GraylogService $graylogService, Request $request, PaginatorInterface $paginator): Response

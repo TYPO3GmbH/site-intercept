@@ -101,7 +101,7 @@ class DocsRenderCommand extends Command
     /**
      * @param int $id
      * @throws DocsPackageDoNotCareBranch
-     * @throws \App\Exception\DuplicateDocumentationRepositoryException
+     * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderConfiguration(int $id): void
     {
@@ -115,7 +115,7 @@ class DocsRenderCommand extends Command
     /**
      * @param string $package
      * @throws DocsPackageDoNotCareBranch
-     * @throws \App\Exception\DuplicateDocumentationRepositoryException
+     * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderPackage(string $package): void
     {
@@ -133,7 +133,7 @@ class DocsRenderCommand extends Command
     /**
      * @param DocumentationJar $documentationJar
      * @throws DocsPackageDoNotCareBranch
-     * @throws \App\Exception\DuplicateDocumentationRepositoryException
+     * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderDocumentation(DocumentationJar $documentationJar): void
     {

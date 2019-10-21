@@ -32,6 +32,11 @@ class ForgeService
     private $projectId = 27;
 
     /**
+     * @var ForgeClient
+     */
+    private $client;
+
+    /**
      * BambooService constructor.
      *
      * @param ForgeClient $client

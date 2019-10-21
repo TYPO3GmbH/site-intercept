@@ -119,7 +119,7 @@ class CoreSplitService
         // Add remotes per extension if needed and fetch them. Note this is
         // different in the tagger: The splitter works on additional remotes in
         // main directory, the tagger works on clones of the extensions in own directories
-        $existingRemotes = explode("\n", $this->gitCommand($workingCopy, true, 'remote'));
+        $existingRemotes = explode(chr(10), $this->gitCommand($workingCopy, true, 'remote'));
         foreach ($extensions as $extension) {
             $fullRemotePath = $this->splitSingleRepoBase . $extension . '.git';
             $this->log('Fetching extension ' . $extension . ' from ' . $fullRemotePath);
@@ -190,7 +190,7 @@ class CoreSplitService
             $this->log('Job ignored: No branch contains given tag "' . $event->tag . '"', 'WARNING');
             return;
         }
-        $branchesContainTag = explode("\n", $branchesContainTag);
+        $branchesContainTag = explode(chr(10), $branchesContainTag);
         $responsibleForBranch = false;
         foreach ($branchesContainTag as $branch) {
             $branch = trim($branch);
@@ -220,14 +220,16 @@ class CoreSplitService
         $rabbitIO->read(0);
 
         // Make sure base extension path exists
-        @mkdir($this->splitSingleRepoPath);
+        if (!mkdir($concurrentDirectory = $this->splitSingleRepoPath) && !is_dir($concurrentDirectory)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+        }
 
         foreach ($extensions as $extension) {
             $extensionWorkingCopy = $this->initialExtensionWorkingCopyOrUpdate($extension);
 
             // Resolve tree-hashes of main repository
             $revListOfTagInMainRepoForExtension = $this->gitCommand($coreWorkingCopy, true, 'rev-list', $event->tag, 'typo3/sysext/' . $extension);
-            $revListOfTagInMainRepoForExtension = explode("\n", $revListOfTagInMainRepoForExtension);
+            $revListOfTagInMainRepoForExtension = explode(chr(10), $revListOfTagInMainRepoForExtension);
             $mainRepoTreeHashes = [];
             foreach ($revListOfTagInMainRepoForExtension as $rev) {
                 if (empty($rev)) {
@@ -257,7 +259,7 @@ class CoreSplitService
 
             // Get commit and tree hashes of extension repo
             $extensionCommitsAndTreeHashesRaw = $this->gitCommand($extensionWorkingCopy, true, 'rev-list', '--all', '--pretty=%H %T');
-            $extensionCommitsAndTreeHashesRaw = explode("\n", $extensionCommitsAndTreeHashesRaw);
+            $extensionCommitsAndTreeHashesRaw = explode(chr(10), $extensionCommitsAndTreeHashesRaw);
             $extensionCommitsAndTreeHashes = [];
             foreach ($extensionCommitsAndTreeHashesRaw as $commitAndTreeHash) {
                 if (empty($commitAndTreeHash) || strpos($commitAndTreeHash, 'commit ') === 0) {

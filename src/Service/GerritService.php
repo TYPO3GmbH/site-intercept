@@ -91,14 +91,13 @@ class GerritService
         try {
             $response = $this->sendGerritGet($apiPath);
         } catch (ClientException $e) {
-            // Usually: 404, No such change ...
-            throw new DoNotCareException();
+            throw new DoNotCareException('Usually: 404, No such change ...');
         }
         // gerrit responses prefix their json with ")]}'\n" which has to be removed first
         $json = json_decode(str_replace(")]}'\n", '', (string)$response->getBody()), true);
         $project = $json['project'];
         if ($project !== 'Packages/TYPO3.CMS' && $project !== 'Teams/Security/TYPO3v4-Core') {
-            throw new DoNotCareException();
+            throw new DoNotCareException('no interesting project, next please...');
         }
         $branch = $json['branch'];
         if (empty($patchSet)) {
@@ -113,7 +112,7 @@ class GerritService
                 }
             }
             if (!$found) {
-                throw new DoNotCareException();
+                throw new DoNotCareException('simply not found');
             }
         }
         return new GerritToBambooCore((string)$changeId, $patchSet, $branch, $project);

@@ -63,6 +63,7 @@ location ~ ^%s(.*) {
      * @param Filesystem $fileSystem
      * @param string $privateDir
      * @param string $subDir
+     * @param $staticDir
      */
     public function __construct(DocsServerRedirectRepository $redirectRepository, Filesystem $fileSystem, string $privateDir, string $subDir, $staticDir)
     {

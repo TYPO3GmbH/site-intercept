@@ -43,6 +43,7 @@ class SendDiscordScheduledMessagesCommand extends Command
      * SyncDiscordChannelsCommand constructor.
      * @param DiscordScheduledMessageRepository $discordScheduledMessageRepository
      * @param LoggerInterface $logger
+     * @param DiscordWebhookService $discordWebhookService
      */
     public function __construct(DiscordScheduledMessageRepository $discordScheduledMessageRepository, LoggerInterface $logger, DiscordWebhookService $discordWebhookService)
     {

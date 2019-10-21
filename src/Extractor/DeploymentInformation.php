@@ -217,8 +217,7 @@ class DeploymentInformation
 
         if ($type === 'core-extension' || $type === 'manual') {
             // Rules for manuals and core extensions - render branches like '8.5' as '8.5' and '8' as '8'
-            $result = str_replace('_', '.', $result);
-            $result = str_replace('-', '.', $result);
+            $result = str_replace(['_', '-'], '.', $result);
             if (!preg_match('/^(\d+.\d+)$/', $result) && !preg_match('/^(\d+)$/', $result)) {
                 throw new DocsPackageDoNotCareBranch(
                     'Branch / tag named \'' . $branch . '\' is ignored, only branches named \'major.minor\' or \'major\' (eg. \'5.7\') are considered.',

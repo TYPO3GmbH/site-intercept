@@ -54,7 +54,7 @@ class SlackCoreNightlyBuildMessage implements \JsonSerializable
      */
     public function __construct(int $status, string $buildKey, string $projectName, string $planName, int $buildNumber)
     {
-        if (!in_array($status, [self::BUILD_FAILED, self::BUILD_SUCCESSFUL])) {
+        if (!in_array($status, [self::BUILD_FAILED, self::BUILD_SUCCESSFUL], true)) {
             throw new \RuntimeException('Broken status ' . $status);
         }
         $this->status = $status;

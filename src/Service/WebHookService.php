@@ -31,6 +31,12 @@ class WebHookService
      * Entry method that creates a push event object from an incoming
      * github / gitlab / bitbucket repository hook. Used to trigger documentation
      * rendering.
+     *
+     * @param Request $request
+     * @return PushEvent[]
+     * @throws DocsNoRstChangesException
+     * @throws GitBranchDeletedException
+     * @throws GithubHookPingException
      */
     public function createPushEvent(Request $request): array
     {
@@ -50,6 +56,10 @@ class WebHookService
         throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1553256930);
     }
 
+    /**
+     * @param Request $request
+     * @return PushEvent[]
+     */
     protected function getPushEventFromBitbucket(Request $request): array
     {
         $payload = json_decode($request->getContent(), false);
@@ -85,6 +95,10 @@ class WebHookService
         return $events;
     }
 
+    /**
+     * @param Request $request
+     * @return PushEvent[]
+     */
     protected function getPushEventFromGitlab(Request $request): array
     {
         $payload = json_decode($request->getContent(), false);
@@ -96,6 +110,13 @@ class WebHookService
         return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile)];
     }
 
+    /**
+     * @param Request $request
+     * @param string $eventType
+     * @return PushEvent[]
+     * @throws DocsNoRstChangesException
+     * @throws GitBranchDeletedException
+     */
     protected function getPushEventFromGithub(Request $request, string $eventType): array
     {
         $content = $request->getContent();
@@ -153,7 +174,7 @@ class WebHookService
         $repositoryUrl = (string)$change->new->target->links->html->href;
         // Add .git at end if it misses. This must be aligned, otherwise manual adding of configuration will go wrong.
         if (substr($repositoryUrl, -4) !== '.git') {
-            $repositoryUrl = $repositoryUrl . '.git';
+            $repositoryUrl .= '.git';
         }
         if (is_int(strpos($repositoryUrl, '/commits/'))) {
             $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));

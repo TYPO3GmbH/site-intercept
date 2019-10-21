@@ -62,7 +62,7 @@ class GithubCorePullRequest
         $payload = json_decode($payload, true);
         $action = $payload['action'] ?? '';
         if ($action !== 'opened') {
-            throw new DoNotCareException();
+            throw new DoNotCareException('action is not opened, it\'s not my job');
         }
 
         $this->branch = $payload['pull_request']['base']['ref'] ?? '';
@@ -72,11 +72,10 @@ class GithubCorePullRequest
         $this->pullRequestUrl = $payload['pull_request']['url'] ?? '';
         $this->commentsUrl = $payload['pull_request']['comments_url'];
 
-        // Do not care if pr information is not complete for whatever reason
         if (empty($this->branch) || empty($this->diffUrl) || empty($this->userUrl)
             || empty($this->issueUrl) || empty($this->pullRequestUrl) || empty($this->commentsUrl)
         ) {
-            throw new DoNotCareException();
+            throw new DoNotCareException('Do not care if pr information is not complete for whatever reason');
         }
     }
 }

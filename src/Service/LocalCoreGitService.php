@@ -113,8 +113,7 @@ class LocalCoreGitService
      */
     public function pushToGerrit(GithubCorePullRequest $pullRequest): GitPushOutput
     {
-        $workingCopy = $this->workingCopy;
-        $wrapper = $workingCopy->getWrapper();
+        $wrapper = $this->workingCopy->getWrapper();
         $wrapper->addOutputListener($this->listener);
         $this->workingCopy->push('origin', 'HEAD:refs/for/' . $pullRequest->branch);
         $wrapper->removeOutputListener($this->listener);

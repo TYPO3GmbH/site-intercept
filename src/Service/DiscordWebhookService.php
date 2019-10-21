@@ -56,11 +56,7 @@ class DiscordWebhookService
             }
 
             $result = json_decode((string)$response->getBody(), true);
-            if (isset($result['retry_after'])) {
-                $sleep = $result['retry_after'];
-            } else {
-                $sleep = null;
-            }
+            $sleep = $result['retry_after'] ?? null;
         }
     }
 }

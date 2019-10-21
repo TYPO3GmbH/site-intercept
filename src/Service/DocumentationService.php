@@ -83,7 +83,7 @@ class DocumentationService
     /**
      * @param string $repositoryUrl
      * @param string $packageName
-     * @throws \App\Exception\DocsPackageRegisteredWithDifferentRepositoryException
+     * @throws DocsPackageRegisteredWithDifferentRepositoryException
      */
     public function assertUrlIsUnique(string $repositoryUrl, string $packageName): void
     {
@@ -101,13 +101,12 @@ class DocumentationService
     }
 
     /**
-     * @param \App\Entity\DocumentationJar $doc
+     * @param DocumentationJar $doc
      * @param $branchName
-     * @throws \App\Exception\ComposerJsonInvalidException
-     * @throws \App\Exception\ComposerJsonNotFoundException
-     * @throws \App\Exception\Composer\DocsComposerDependencyException
-     * @throws \App\Exception\Composer\DocsComposerMissingValueException
-     * @throws \App\Exception\DocsPackageRegisteredWithDifferentRepositoryException
+     * @throws ComposerJsonInvalidException
+     * @throws ComposerJsonNotFoundException
+     * @throws DocsComposerDependencyException
+     * @throws DocsComposerMissingValueException
      */
     public function enrichWithComposerInformation(DocumentationJar $doc, $branchName): void
     {
@@ -127,10 +126,10 @@ class DocumentationService
     }
 
     /**
-     * @param \App\Entity\DocumentationJar $doc
-     * @param \App\Extractor\DeploymentInformation $deploymentInformation
+     * @param DocumentationJar $doc
+     * @param DeploymentInformation $deploymentInformation
      */
-    public function enrichWithDeploymentInformation(DocumentationJar $doc, \App\Extractor\DeploymentInformation $deploymentInformation): void
+    public function enrichWithDeploymentInformation(DocumentationJar $doc, DeploymentInformation $deploymentInformation): void
     {
         $doc
             ->setStatus(DocumentationStatus::STATUS_RENDERING)
@@ -149,8 +148,8 @@ class DocumentationService
 
     /**
      * @param array $branches
-     * @param \App\Entity\DocumentationJar $documentationJar
-     * @throws \App\Exception\DocsPackageDoNotCareBranch
+     * @param DocumentationJar $documentationJar
+     * @throws DocsPackageDoNotCareBranch
      */
     protected function handleBranches(array $branches, DocumentationJar $documentationJar): void
     {
@@ -210,9 +209,9 @@ class DocumentationService
     /**
      * Adds documentationJar to database and triggers build
      *
-     * @param \App\Entity\DocumentationJar $doc
-     * @param \App\Extractor\DeploymentInformation $deploymentInformation
-     * @throws \App\Exception\DocsPackageDoNotCareBranch
+     * @param DocumentationJar $doc
+     * @param DeploymentInformation $deploymentInformation
+     * @throws DocsPackageDoNotCareBranch
      */
     public function addNewDocumentationBuild(DocumentationJar $doc, DeploymentInformation $deploymentInformation): void
     {
@@ -253,8 +252,8 @@ class DocumentationService
     }
 
     /**
-     * @param \App\Entity\DocumentationJar $documentationJar
-     * @throws \App\Exception\DocsPackageDoNotCareBranch
+     * @param DocumentationJar $documentationJar
+     * @throws DocsPackageDoNotCareBranch
      */
     public function handleNewRepository(DocumentationJar $documentationJar): void
     {
@@ -269,9 +268,9 @@ class DocumentationService
     }
 
     /**
-     * @param \App\Entity\DocumentationJar $doc
+     * @param DocumentationJar $doc
      * @return \App\Extractor\BambooBuildTriggered
-     * @throws \App\Exception\DocsPackageDoNotCareBranch
+     * @throws DocsPackageDoNotCareBranch
      */
     public function triggerBuild(DocumentationJar $doc): \App\Extractor\BambooBuildTriggered
     {

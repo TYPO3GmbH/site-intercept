@@ -87,9 +87,7 @@ class DiscordServerService
      */
     public function createOrGetInterceptHook(string $channelId): array
     {
-        $hooks = $this->getWebhooks($channelId);
-
-        foreach ($hooks as $hook) {
+        foreach ($this->getWebhooks($channelId) as $hook) {
             if ($hook['name'] === 'Intercept') {
                 return $hook;
             }
@@ -164,11 +162,7 @@ class DiscordServerService
                 }
             }
             $result = json_decode((string)$response->getBody(), true);
-            if (isset($result['retry_after'])) {
-                $sleep = $result['retry_after'];
-            } else {
-                $sleep = null;
-            }
+            $sleep = $result['retry_after'] ?? null;
         }
 
         if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 400) {

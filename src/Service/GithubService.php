@@ -85,7 +85,9 @@ class GithubService
     {
         $response = $this->client->get($pullRequest->diffUrl);
         $diff = (string)$response->getBody();
-        @mkdir($this->pullRequestPatchPath);
+        if (!mkdir($concurrentDirectory = $this->pullRequestPatchPath) && !is_dir($concurrentDirectory)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+        }
         $filePath = $this->pullRequestPatchPath . sha1($pullRequest->diffUrl);
         $patch = fopen($filePath, 'w+');
         fwrite($patch, $diff);

@@ -51,6 +51,7 @@ class DiscordChannelRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array $channelIds
      * @return DiscordChannel[]
      */
     public function findWhereChannelIdNotIn(array $channelIds): array

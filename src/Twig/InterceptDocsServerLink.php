@@ -28,7 +28,7 @@ class InterceptDocsServerLink extends AbstractExtension
     public function render(string $value): string
     {
         $server = getenv('DOCS_LIVE_SERVER');
-        $path = substr($value, 0, 1) === '/' ? substr($value, 1) : $value;
+        $path = strpos($value, '/') === 0 ? substr($value, 1) : $value;
         return $server . $path;
     }
 

@@ -83,12 +83,12 @@ class BambooService
     {
         $url = 'latest/queue/'
             . $pushEvent->bambooProject . '?'
-            . implode('&', [
-                'stage=',
-                'os_authType=basic',
-                'executeAllStages=',
-                'bamboo.variable.changeUrl=' . (string)$pushEvent->changeId,
-                'bamboo.variable.patchset=' . (string)$pushEvent->patchSet
+            . http_build_query([
+                'stage' => '',
+                'os_authType' => 'basic',
+                'executeAllStages' => '',
+                'bamboo.variable.changeUrl' => $pushEvent->changeId,
+                'bamboo.variable.patchset' => $pushEvent->patchSet,
             ]);
         $response = $this->sendBamboo('post', $url);
         return new BambooBuildTriggered((string)$response->getBody());
@@ -104,10 +104,10 @@ class BambooService
     {
         $url = 'latest/queue/'
             . $bambooProject . '?'
-            . implode('&', [
-                'stage=',
-                'os_authType=basic',
-                'executeAllStages=',
+            . http_build_query([
+                'stage' => '',
+                'os_authType' => 'basic',
+                'executeAllStages' => ''
             ]);
         $response = $this->sendBamboo('post', $url);
         return new BambooBuildTriggered((string)$response->getBody());
@@ -122,10 +122,7 @@ class BambooService
     public function reTriggerFailedBuild(string $buildKey): BambooBuildTriggered
     {
         $url = 'latest/queue/'
-            . $buildKey . '?'
-            . implode('&', [
-                'os_authType=basic',
-            ]);
+            . $buildKey . '?os_authType=basic';
         $response = $this->sendBamboo('put', $url);
         return new BambooBuildTriggered((string)$response->getBody());
     }
@@ -140,11 +137,11 @@ class BambooService
     {
         $uri = 'latest/queue/'
             . 'CORE-DDEL?'
-            . implode('&', [
-                'stage=',
-                'executeAllStages=',
-                'os_authType=basic',
-                'bamboo.variable.BUILD_INFORMATION_FILE=' . urlencode($deploymentInformation->relativeDumpFile),
+            . http_build_query([
+                'stage' => '',
+                'executeAllStages' => '',
+                'os_authType' => 'basic',
+                'bamboo.variable.BUILD_INFORMATION_FILE' => $deploymentInformation->relativeDumpFile,
             ]);
         $response = $this->sendBamboo('post', $uri);
         return new BambooBuildTriggered((string)$response->getBody());
@@ -160,13 +157,13 @@ class BambooService
     {
         $uri = 'latest/queue/'
             . 'CORE-DR?'
-            . implode('&', [
-                'stage=',
-                'executeAllStages=',
-                'os_authType=basic',
-                'bamboo.variable.BUILD_INFORMATION_FILE=' . urlencode($deploymentInformation->relativeDumpFile),
-                'bamboo.variable.PACKAGE=' . urlencode($deploymentInformation->packageName),
-                'bamboo.variable.DIRECTORY=' . urlencode($deploymentInformation->targetBranchDirectory),
+            . http_build_query([
+                'stage' => '',
+                'executeAllStages' => '',
+                'os_authType' => 'basic',
+                'bamboo.variable.BUILD_INFORMATION_FILE' => $deploymentInformation->relativeDumpFile,
+                'bamboo.variable.PACKAGE' => $deploymentInformation->packageName,
+                'bamboo.variable.DIRECTORY' => $deploymentInformation->targetBranchDirectory,
             ]);
         $response = $this->sendBamboo('post', $uri);
         return new BambooBuildTriggered((string)$response->getBody());
@@ -181,10 +178,10 @@ class BambooService
     {
         $uri = 'latest/queue/'
             . 'CORE-DRF?'
-            . implode('&', [
-                'stage=',
-                'executeAllStages=',
-                'os_authType=basic',
+            . http_build_query([
+                'stage' => '',
+                'executeAllStages' => '',
+                'os_authType' => 'basic',
             ]);
         $response = $this->sendBamboo('post', $uri);
         return new BambooBuildTriggered((string)$response->getBody());
@@ -199,10 +196,10 @@ class BambooService
     {
         $uri = 'latest/queue/'
             . 'CORE-DRS?'
-            . implode('&', [
-                'stage=',
-                'executeAllStages=',
-                'os_authType=basic',
+            . http_build_query([
+                'stage' => '',
+                'executeAllStages' => '',
+                'os_authType' => 'basic',
             ]);
         $response = $this->sendBamboo('post', $uri);
         return new BambooBuildTriggered((string)$response->getBody());
@@ -217,10 +214,10 @@ class BambooService
     {
         $uri = 'latest/queue/'
             . 'CORE-DRSM?'
-            . implode('&', [
-                'stage=',
-                'executeAllStages=',
-                'os_authType=basic',
+            . http_build_query([
+                'stage' => '',
+                'executeAllStages' => '',
+                'os_authType' => 'basic',
             ]);
         $response = $this->sendBamboo('post', $uri);
         return new BambooBuildTriggered((string)$response->getBody());

@@ -35,6 +35,6 @@ class GerritBuildStatusMessage
             . ' on ' . $buildInformation->prettyBuildCompletedTime;
         $messageParts[] = 'Test Summary: ' . $buildInformation->testSummary;
         $messageParts[] = 'Find logs and detail information at ' . $buildInformation->buildUrl;
-        $this->message = implode("\n", $messageParts);
+        $this->message = implode(chr(10), $messageParts);
     }
 }

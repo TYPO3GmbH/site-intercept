@@ -42,7 +42,7 @@ class PackagistUpdateRequest
      * @param array $payload
      * @param string $apiToken
      * @param string $userName
-     * @throws \App\Exception\DoNotCareException
+     * @throws DoNotCareException
      */
     public function __construct(array $payload, string $apiToken, string $userName)
     {
