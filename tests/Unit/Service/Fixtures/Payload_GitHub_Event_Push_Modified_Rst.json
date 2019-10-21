@@ -9,8 +9,8 @@
   "compare": "https://github.com/Codertocat/Hello-World/compare/a10867b14bb7...000000000000",
   "commits": [
       {
-          "added": [
-              "Documentation/bla.rst"
+          "modified": [
+              "Documentation/index.rst"
           ]
       }
   ],

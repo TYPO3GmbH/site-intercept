@@ -10,7 +10,7 @@
   "commits": [
       {
           "added": [
-              "Documentation/bla.rst"
+              "Documentation/index.rst"
           ]
       }
   ],

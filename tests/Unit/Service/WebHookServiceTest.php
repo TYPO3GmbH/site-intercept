@@ -123,4 +123,30 @@ class WebHookServiceTest extends TestCase
         $this->assertSame($pushEvents[1]->getRepositoryUrl(), $createdPushEvent[1]->getRepositoryUrl());
         $this->assertSame($pushEvents[1]->getUrlToComposerFile(), $createdPushEvent[1]->getUrlToComposerFile());
     }
+
+    public function createPushEventsWithDocFiles(): array
+    {
+        return [
+            'File added' => [
+                'request' => new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Added_Rst.json')),
+            ],
+            'File modified' => [
+                'request' => new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Modified_Rst.json')),
+            ],
+            'File removed' => [
+                'request' => new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Removed_Rst.json')),
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider createPushEventsWithDocFiles
+     */
+    public function doesNotTriggersExceptionWhenDocFileWasTouched(Request $request)
+    {
+        $createdPushEvent = $this->subject->createPushEvent($request);
+        // Plain assertion, we ensure that no exception is thrown
+        $this->assertTrue(true);
+    }
 }

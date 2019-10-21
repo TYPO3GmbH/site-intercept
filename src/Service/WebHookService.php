@@ -119,18 +119,18 @@ class WebHookService
 
         // Only for actual push events, not releases
         if (!empty($payload->commits)) {
-            $rstChanges = false;
+            $triggeringChange = false;
             foreach ($payload->commits as $commit) {
                 $files = array_merge($commit->added ?? [], $commit->modified ?? [], $commit->removed ?? []);
                 foreach ($files as $file) {
-                    if (substr($file, -4) === '.rst') {
-                        $rstChanges = true;
+                    if (substr($file, 0, 14) === 'Documentation/') {
+                        $triggeringChange = true;
                         break 2;
                     }
                 }
             }
 
-            if (!$rstChanges) {
+            if (!$triggeringChange) {
                 throw new DocsNoRstChangesException('Branch has no RST changes.', 1570011098);
             }
         }
