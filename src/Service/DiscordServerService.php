@@ -158,7 +158,7 @@ class DiscordServerService
             } catch (BadResponseException $e) {
                 // We don't want to break on 429 too many requests
                 if ($e->getResponse()->getStatusCode() !== Response::HTTP_TOO_MANY_REQUESTS) {
-                    throw $e;
+                    throw new UnexpectedDiscordApiResponseException('Discord API responded with code ' . $e->getResponse()->getStatusCode(), 1561556560);
                 }
             }
             $result = json_decode((string)$response->getBody(), true);
