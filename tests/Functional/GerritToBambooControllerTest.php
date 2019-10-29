@@ -24,6 +24,14 @@ class GerritToBambooControllerTest extends TestCase
     public function bambooBuildIsTriggered()
     {
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy->get(
+            'latest/queue/CORE-GTC?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=58920&bamboo.variable.patchset=1',
+            require __DIR__ . '/Fixtures/GerritToBambooGoodBambooPostData.php'
+        )->willReturn(new Response());
+        $bambooClientProphecy->get(
+            'latest/result?includeAllStates=true&buildstate=Unknown&label=change-58920',
+            require __DIR__ . '/Fixtures/GerritToBambooGoodBambooPostData.php'
+        )->willReturn(new Response());
         $bambooClientProphecy
             ->post(
                 file_get_contents(__DIR__ . '/Fixtures/GerritToBambooGoodBambooPostUrl.txt'),

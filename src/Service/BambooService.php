@@ -95,6 +95,31 @@ class BambooService
     }
 
     /**
+     * Triggers a new build in one of the bamboo core pre-merge branch projects
+     *
+     * @param GerritToBambooCore $pushEvent
+     */
+    public function stopCoreBuildByChangeId(GerritToBambooCore $pushEvent): void
+    {
+        $url = 'latest/result?'
+            . http_build_query([
+                'includeAllStates' => 'true',
+                'buildstate' => 'Unknown',
+                'label' => 'change-' . $pushEvent->changeId
+            ]);
+        $response = $this->sendBamboo('get', $url);
+        $response = json_decode((string)$response->getBody(), true);
+        foreach ($response->results->result ?? [] as $result) {
+            if (!in_array($result->state, ['Successful', 'Failed'], true)) {
+                $this->sendBamboo(
+                    'delete',
+                    'latest/queue/' . $result->buildResultKey
+                );
+            }
+        }
+    }
+
+    /**
      * Triggers a new build in one of the bamboo core branches without a specific patch
      *
      * @param string $bambooProject

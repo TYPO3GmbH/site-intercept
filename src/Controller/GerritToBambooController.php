@@ -50,6 +50,7 @@ class GerritToBambooController extends AbstractController
                 $branch,
                 $project
             );
+            $bambooService->stopCoreBuildByChangeId($bambooData);
             $bambooBuild = $bambooService->triggerNewCoreBuild($bambooData);
             $logger->info(
                 'Triggered bamboo core build "' . $bambooBuild->buildResultKey . '"'
