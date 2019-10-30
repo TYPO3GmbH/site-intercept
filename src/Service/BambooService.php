@@ -17,6 +17,7 @@ use App\Extractor\BambooSlackMessage;
 use App\Extractor\BambooStatus;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\GerritToBambooCore;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 
@@ -101,21 +102,25 @@ class BambooService
      */
     public function stopCoreBuildByChangeId(GerritToBambooCore $pushEvent): void
     {
-        $url = 'latest/result?'
-            . http_build_query([
-                'includeAllStates' => 'true',
-                'buildstate' => 'Unknown',
-                'label' => 'change-' . $pushEvent->changeId
-            ]);
-        $response = $this->sendBamboo('get', $url);
-        $response = json_decode((string)$response->getBody(), true);
-        foreach ($response->results->result ?? [] as $result) {
-            if (!in_array($result->state, ['Successful', 'Failed'], true)) {
-                $this->sendBamboo(
-                    'delete',
-                    'latest/queue/' . $result->buildResultKey
-                );
+        try {
+            $url = 'latest/result?'
+                   . http_build_query([
+                    'includeAllStates' => 'true',
+                    'buildstate' => 'Unknown',
+                    'label' => 'change-' . $pushEvent->changeId
+                ]);
+            $response = $this->sendBamboo('get', $url);
+            $response = json_decode((string)$response->getBody(), true);
+            foreach ($response->results->result ?? [] as $result) {
+                if (!in_array($result->state, ['Successful', 'Failed'], true)) {
+                    $this->sendBamboo(
+                        'delete',
+                        'latest/queue/' . $result->buildResultKey
+                    );
+                }
             }
+        } catch (ClientException $e) {
+            // no existing builds found
         }
     }
 
