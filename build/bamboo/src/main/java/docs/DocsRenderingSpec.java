@@ -83,7 +83,7 @@ public class DocsRenderingSpec {
                                     .shared(true))
                             .tasks(new ScriptTask()
                                     .description("Render documentation")
-                                    .inlineBody("if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n    bash \"$0\" \"$@\"\n    exit \"$?\"\nfi\n\nset -e\nset -x\n\n# fetch build information file and source it\ncurl https://intercept.typo3.com/${bamboo_BUILD_INFORMATION_FILE} --output deployment_infos.sh\nsource deployment_infos.sh || (echo \"No valid deployment_infos.sh file found\"; exit 1)\n\n# clone repo to project/ and checkout requested branch / tag\nmkdir project\ngit clone ${repository_url} project\ncd project && git checkout ${source_branch}\ncd ..\n\ntouch project/jobfile.json\ncat << EOF > project/jobfile.json\n{\n    \"Overrides_cfg\": {\n        \"general\": {\n            \"release\": \"$target_branch_directory\"\n        },\n        \"html_theme_options\": {\n            \"docstypo3org\": \"yes\",\n            \"add_piwik\": \"yes\",\n            \"show_legalinfo\": \"yes\"\n        }\n    }\n}\nEOF\n\nfunction renderDocs() {\n    docker run \\\n        -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/project:/PROJECT \\\n        -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/RenderedDocumentation/:/RESULT \\\n        --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n        --rm \\\n        --entrypoint bash \\\n        t3docs/render-documentation:v2.2.6 \\\n        -c \"/ALL/Menu/mainmenu.sh makehtml -c replace_static_in_html 1 -c make_singlehtml 1 -c jobfile /PROJECT/jobfile.json; chown ${HOST_UID} -R /PROJECT /RESULT\"\n}\nmkdir -p RenderedDocumentation\nmkdir -p FinalDocumentation\n\n# main render call - will render main documentation and localizations\nrenderDocs\n\n# test if rendering failed for whatever reason\nls RenderedDocumentation/Result || exit 1\n\n# if a result has been rendered for the main directory, we treat that as the 'en_us' version\nif [ -d RenderedDocumentation/Result/project/0.0.0/ ]; then\n        echo \"Handling main doc result as en-us version\"\n        mkdir FinalDocumentation/en-us\n        # Move en-us files to target dir, including dot files\n        (shopt -s dotglob; mv RenderedDocumentation/Result/project/0.0.0/* FinalDocumentation/en-us)\n        # evil hack to get rid of hardcoded docs.typo3.org domain name in version selector js side\n        # not needed with replace_static_in_html at the moment\n        # sed -i 's%https://docs.typo3.org%%' FinalDocumentation/en-us/_static/js/theme.js\n        # Remove the directory, all content has been moved\n        rmdir RenderedDocumentation/Result/project/0.0.0/\n        # Remove a possibly existing Localization.en_us directory, if it exists\n        rm -rf RenderedDocumentation/Result/project/en-us/\nfi\n\n# now see if other localization versions have been rendered. if so, move them to FinalDocumentation/, too\nif [ \"$(ls -A RenderedDocumentation/Result/project/)\" ]; then\n    for LOCALIZATIONDIR in RenderedDocumentation/Result/project/*; do\n            LOCALIZATION=`basename $LOCALIZATIONDIR`\n            echo \"Handling localized documentation version ${LOCALIZATION:?Localization could not be determined}\"\n            mkdir FinalDocumentation/${LOCALIZATION}\n            (shopt -s dotglob; mv ${LOCALIZATIONDIR}/0.0.0/* FinalDocumentation/${LOCALIZATION})\n            # Remove the localization dir, it should be empty now\n            rmdir ${LOCALIZATIONDIR}/0.0.0/\n            rmdir ${LOCALIZATIONDIR}\n            # evil hack to get rid of hardcoded docs.typo3.org domain name in version selector js side\n            # not needed with replace_static_in_html at the moment\n            # sed -i 's%https://docs.typo3.org%%' FinalDocumentation/${LOCALIZATION}/_static/js/theme.js\n    done\nfi\n\nrm -rf RenderedDocumentation"),
+                                    .inlineBody(getInlineBodyContent()),
                                 new CommandTask()
                                     .description("archive rendered docs")
                                     .executable("tar")
@@ -152,6 +152,91 @@ public class DocsRenderingSpec {
             .forceStopHungBuilds();
         return plan;
     }
+
+	/**
+	 * @return
+	 */
+	private String getInlineBodyContent() {
+		final String inlineBody = "if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n"
+				+"bash \"$0\" \"$@\"\n"
+				+"exit \"$?\"\n"
+				+"fi\n\n"
+				+"set -e\n"
+				+"set -x\n\n"
+				+"# fetch build information file and source it\n"
+				+"curl https://intercept.typo3.com/${bamboo_BUILD_INFORMATION_FILE} --output deployment_infos.sh\n"
+				+"source deployment_infos.sh || (echo \"No valid deployment_infos.sh file found\"; exit 1)\n\n"
+				+"# clone repo to project/ and checkout requested branch / tag\n"
+				+"mkdir project\n"
+				+"git clone ${repository_url} project\n"
+				+"cd project && git checkout ${source_branch}\n"
+				+"cd ..\n\n"
+				+createJobFile()
+				+"function renderDocs() {\n"
+				+"    docker run \\\n"
+				+"        -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/project:/PROJECT \\\n"
+				+"        -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/RenderedDocumentation/:/RESULT \\\n"
+				+"        --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n"
+				+"        --rm \\\n"
+				+"        --entrypoint bash \\\n"
+				+"        t3docs/render-documentation\\\n"
+				+"        -c \"/ALL/Menu/mainmenu.sh makehtml -c replace_static_in_html 1 -c make_singlehtml 1 -c jobfile /PROJECT/jobfile.json; chown ${HOST_UID} -R /PROJECT /RESULT\"\n"
+				+"}\n"
+				+"mkdir -p RenderedDocumentation\nmkdir -p FinalDocumentation\n\n"
+				+"# main render call - will render main documentation and localizations\n"
+				+"renderDocs\n\n"
+				+"# test if rendering failed for whatever reason\n"
+				+"ls RenderedDocumentation/Result || exit 1\n\n"
+				+"# if a result has been rendered for the main directory, we treat that as the 'en_us' version\n"
+				+"if [ -d RenderedDocumentation/Result/project/0.0.0/ ]; then\n"
+				+"        echo \"Handling main doc result as en-us version\"\n"
+				+"        mkdir FinalDocumentation/en-us\n"
+				+"        # Move en-us files to target dir, including dot files\n"
+				+"        (shopt -s dotglob; mv RenderedDocumentation/Result/project/0.0.0/* FinalDocumentation/en-us)\n"
+				+"        # evil hack to get rid of hardcoded docs.typo3.org domain name in version selector js side\n"
+				+"        # not needed with replace_static_in_html at the moment\n"
+				+"        # sed -i 's%https://docs.typo3.org%%' FinalDocumentation/en-us/_static/js/theme.js\n"
+				+"        # Remove the directory, all content has been moved\n"
+				+"        rmdir RenderedDocumentation/Result/project/0.0.0/\n"
+				+"        # Remove a possibly existing Localization.en_us directory, if it exists\n"
+				+"        rm -rf RenderedDocumentation/Result/project/en-us/\n"
+				+"fi\n\n"
+				+"# now see if other localization versions have been rendered. if so, move them to FinalDocumentation/, too\n"
+				+"if [ \"$(ls -A RenderedDocumentation/Result/project/)\" ]; then\n"
+				+"    for LOCALIZATIONDIR in RenderedDocumentation/Result/project/*; do\n"
+				+"            LOCALIZATION=`basename $LOCALIZATIONDIR`\n"
+				+"            echo \"Handling localized documentation version ${LOCALIZATION:?Localization could not be determined}\"\n"
+				+"            mkdir FinalDocumentation/${LOCALIZATION}\n"
+				+"            (shopt -s dotglob; mv ${LOCALIZATIONDIR}/0.0.0/* FinalDocumentation/${LOCALIZATION})\n"
+				+"            # Remove the localization dir, it should be empty now\n"
+				+"            rmdir ${LOCALIZATIONDIR}/0.0.0/\n"
+				+"            rmdir ${LOCALIZATIONDIR}\n"
+				+"            # evil hack to get rid of hardcoded docs.typo3.org domain name in version selector js side\n"
+				+"            # not needed with replace_static_in_html at the moment\n"
+				+"            # sed -i 's%https://docs.typo3.org%%' FinalDocumentation/${LOCALIZATION}/_static/js/theme.js\n"
+				+"    done\n"
+				+"fi\n\n"
+				+"rm -rf RenderedDocumentation";
+		return inlineBody;
+	}
+	
+	private String createJobFile() {
+		return "touch project/jobfile.json\n"
+				+"cat << EOF > project/jobfile.json\n"
+				+"{\n"
+				+"    \"Overrides_cfg\": {\n"
+				+"        \"general\": {\n"
+				+"            \"release\": \"$target_branch_directory\"\n"
+				+"        },\n"
+				+"        \"html_theme_options\": {\n"
+				+"            \"docstypo3org\": \"yes\",\n"
+				+"            \"add_piwik\": \"yes\",\n"
+				+"            \"show_legalinfo\": \"yes\"\n"
+				+"        }\n"
+				+"    }\n"
+				+"}\n"
+				+"EOF\n\n";
+	}
 
     public PlanPermissions planPermission() {
         final PlanPermissions planPermission = new PlanPermissions(new PlanIdentifier("CORE", "DR"))
