@@ -56,6 +56,10 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
+        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy->post(Argument::cetera())->shouldNotBeCalled();
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);
