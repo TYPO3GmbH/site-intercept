@@ -37,7 +37,7 @@ class GitRepositoryService
 
     protected $allowedBranches = ['master', 'documentation-draft'];
 
-    public function resolvePublicComposerJsonUrlByPayload(stdClass $payload, string $repoService, string $eventType = null): string
+    public function resolvePublicComposerJsonUrlByPayload(stdClass $payload, string $repoService): string
     {
         switch ($repoService) {
             case self::SERVICE_BITBUCKET_SERVER:
@@ -45,7 +45,7 @@ class GitRepositoryService
                 return $this->getPublicComposerUrlForBitbucket($payload);
                 break;
             case self::SERVICE_GITHUB:
-                return $this->getPublicComposerUrlForGithub($payload, $eventType);
+                return $this->getPublicComposerUrlForGithub($payload);
                 break;
             case self::SERVICE_GITLAB:
                 return $this->getPublicComposerUrlForGitlab($payload);
@@ -149,11 +149,9 @@ class GitRepositoryService
         ]);
     }
 
-    protected function getPublicComposerUrlForGithub(stdClass $payload, string $eventType): string
+    protected function getPublicComposerUrlForGithub(stdClass $payload): string
     {
-        $version = ($eventType === 'release')
-            ? (string)$payload->release->tag_name
-            : str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
+        $version = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
 
         return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_GITHUB], [
             '{repoName}' => (string)$payload->repository->full_name,

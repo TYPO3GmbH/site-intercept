@@ -50,10 +50,6 @@ class WebHookServiceTest extends TestCase
                 new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Tag.json')),
                 new PushEvent('https://github.com/Codertocat/Hello-World.git', 'simple-tag', 'https://raw.githubusercontent.com/Codertocat/Hello-World/simple-tag/composer.json')
             ],
-            'Payload_GitHub_Event_Release' => [
-                new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'release'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Release.json')),
-                new PushEvent('https://github.com/Codertocat/Hello-World.git', '0.0.1', 'https://raw.githubusercontent.com/Codertocat/Hello-World/0.0.1/composer.json')
-            ],
             'Payload_Gitlab_Event_Push_Branch' => [
                 new Request([], [], [], [], [], ['HTTP_X-Gitlab-Event' => 'Push Hook'], file_get_contents(__DIR__ . '/Fixtures/Payload_Gitlab_Event_Push_Branch.json')),
                 new PushEvent('http://example.com/mike/diaspora.git', 'master', 'http://example.com/mike/diaspora/raw/master/composer.json')

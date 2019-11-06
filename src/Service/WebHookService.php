@@ -46,8 +46,8 @@ class WebHookService
         if (in_array($request->headers->get('X-Gitlab-Event', ''), ['Push Hook', 'Tag Push Hook'], true)) {
             return $this->getPushEventFromGitlab($request);
         }
-        if (in_array($request->headers->get('X-GitHub-Event', ''), ['push', 'release'], true)) {
-            return $this->getPushEventFromGithub($request, $request->headers->get('X-GitHub-Event'));
+        if ($request->headers->get('X-GitHub-Event', '') === 'push') {
+            return $this->getPushEventFromGithub($request);
         }
         if ($request->headers->get('X-GitHub-Event', '') === 'ping') {
             $payload = json_decode($request->getContent(), false);
@@ -112,12 +112,11 @@ class WebHookService
 
     /**
      * @param Request $request
-     * @param string $eventType
      * @return PushEvent[]
      * @throws DocsNoRstChangesException
      * @throws GitBranchDeletedException
      */
-    protected function getPushEventFromGithub(Request $request, string $eventType): array
+    protected function getPushEventFromGithub(Request $request): array
     {
         $content = $request->getContent();
         $payload = json_decode($content, false);
@@ -144,7 +143,7 @@ class WebHookService
             foreach ($payload->commits as $commit) {
                 $files = array_merge($commit->added ?? [], $commit->modified ?? [], $commit->removed ?? []);
                 foreach ($files as $file) {
-                    if (substr($file, 0, 14) === 'Documentation/') {
+                    if (strpos($file, 'Documentation/') === 0) {
                         $triggeringChange = true;
                         break 2;
                     }
@@ -157,11 +156,9 @@ class WebHookService
         }
 
         $repositoryUrl = (string)$payload->repository->clone_url;
-        $versionString = ($eventType === 'release')
-            ? (string)$payload->release->tag_name
-            : str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
+        $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
         $urlToComposerFile = (new GitRepositoryService())
-            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITHUB, $eventType);
+            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITHUB);
 
         return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile)];
     }
