@@ -113,21 +113,6 @@ services:
         arguments:
             $gerritToken: '%env(GERRIT_TOKEN)%'
 
-    App\Menu\MenuBuilder:
-        tags:
-            -
-                name: 'knp_menu.menu_builder'
-                method: 'mainDefault'
-                alias: 'main-default'
-            -
-                name: 'knp_menu.menu_builder'
-                method: 'mainProfile'
-                alias: 'main-profile'
-            -
-                name: 'knp_menu.menu_builder'
-                method: 'mainFooter'
-                alias: 'main-footer'
-
     App\Service\RabbitPublisherService:
         class: App\Service\RabbitPublisherService
         arguments:

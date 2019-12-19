@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 {% import 'macros/macros.html.twig' as macros %}
 {% block title %}Documentation deployments{% endblock %}
 {% block headline %}Deployed documentation{% endblock %}
@@ -55,7 +55,7 @@
                                     </a>
                                 </td>
                                 <td data-type="localdate">
-                                    {{ intercept_date_time(deployment.lastRenderedAt) }}
+                                    {{ template_date_time(deployment.lastRenderedAt) }}
                                 </td>
                             </tr>
                         </tbody>

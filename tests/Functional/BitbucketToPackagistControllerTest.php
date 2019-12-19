@@ -14,7 +14,7 @@ use App\Bundle\TestDoubleBundle;
 use App\Client\PackagistClient;
 use App\Kernel;
 use GuzzleHttp\Psr7\Response;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 class BitbucketToPackagistControllerTest extends TestCase
@@ -35,7 +35,6 @@ class BitbucketToPackagistControllerTest extends TestCase
                         ],
                     ],
                 ]
-
             )->shouldBeCalled()
             ->willReturn(new Response());
         TestDoubleBundle::addProphecy('App\Client\PackagistClient', $packagistClientProphecy);
@@ -63,7 +62,6 @@ class BitbucketToPackagistControllerTest extends TestCase
                         ],
                     ],
                 ]
-
             )->shouldBeCalled()
             ->willReturn(new Response(406));
         TestDoubleBundle::addProphecy('App\Client\PackagistClient', $packagistClientProphecy);

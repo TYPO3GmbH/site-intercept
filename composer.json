@@ -8,6 +8,8 @@
             "email": "susanne.moog@typo3.com"
         }
     ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": "^7.2",
         "ext-SimpleXML": "*",
@@ -68,6 +70,8 @@
         "symfony/validator": "^4.2",
         "symfony/webpack-encore-bundle": "^1.0",
         "symfony/yaml": "^4.2",
+        "t3g/symfony-template-bundle": "dev-master",
+        "t3g/symfony-usercentrics-bundle": "dev-master",
         "twig/twig": "^2.10",
         "woeler/phpdiscord": "^1.1"
     },
@@ -88,10 +92,21 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "preferred-install": {
-            "*": "dist"
+            "*": "dist",
+            "t3g/symfony-template-bundle": "source"
         }
     },
     "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
         "t3g:test:php:unit": [
             "mkdir -p var/phpunit/; phpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml --testsuite \"Unit Test Suite\""
         ],

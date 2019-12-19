@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 {% import 'macros/macros.html.twig' as macros %}
 {% block title %}Redirect{% endblock %}
 {% block headline %}Redirect{% endblock %}
@@ -16,11 +16,11 @@
                         </tr>
                         <tr>
                             <th>CreatedAt</th>
-                            <td>{{ redirect.createdAt ? intercept_date_time(redirect.createdAt) : '' }}</td>
+                            <td>{{ redirect.createdAt ? template_date_time(redirect.createdAt) : '' }}</td>
                         </tr>
                         <tr>
                             <th>UpdatedAt</th>
-                            <td>{{ redirect.updatedAt ? intercept_date_time(redirect.updatedAt) : '' }}</td>
+                            <td>{{ redirect.updatedAt ? template_date_time(redirect.updatedAt) : '' }}</td>
                         </tr>
                         <tr>
                             <th>Source</th>

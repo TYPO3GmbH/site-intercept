@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 {% import 'macros/macros.html.twig' as macros %}
 {% block title %}Documentation deployments{% endblock %}
 {% block headline %}Documentation deployments{% endblock %}
@@ -90,10 +90,10 @@
                                 <td data-type="localdate">
                                     {% if deployment.buildKey %}
                                         <a href="https://bamboo.typo3.com/browse/{{ deployment.buildKey }}" rel="noopener noreferrer" target="_blank">
-                                            {{ intercept_date_time(deployment.lastRenderedAt) }}
+                                            {{ template_date_time(deployment.lastRenderedAt) }}
                                         </a>
                                     {% else %}
-                                        {{ intercept_date_time(deployment.lastRenderedAt) }}
+                                        {{ template_date_time(deployment.lastRenderedAt) }}
                                     {% endif %}
                                 </td>
                                 <td>
@@ -170,7 +170,7 @@
                                 <div class="message-body">
                                     <div class="message-meta">
                                         <span class="message-date">
-                                            {{ intercept_date_time(log.time) }}
+                                            {{ template_date_time(log.time) }}
                                         </span>
                                         {% if log.userDisplayName %}
                                             <span class="message-user">- by {{ log.userDisplayName }}</span>

@@ -10,73 +10,13 @@ declare(strict_types=1);
 
 namespace App\Menu;
 
-use Knp\Menu\FactoryInterface;
-use Knp\Menu\Matcher\MatcherInterface;
-use Knp\Menu\MenuFactory;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use T3G\Bundle\TemplateBundle\Menu\MenuBuilder as TemplateMenuBuider;
 
 /**
  * MenuBuilder
  */
-class MenuBuilder
+class MenuBuilder extends TemplateMenuBuider
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @var MenuFactory
-     */
-    private $factory;
-
-    /**
-     * @var MatcherInterface
-     */
-    private $matcher;
-
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    private $authorizationChecker;
-
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @param ContainerInterface $container
-     * @param FactoryInterface $factory
-     * @param MatcherInterface $matcher
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenStorageInterface $tokenStorage
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(
-        ContainerInterface $container,
-        FactoryInterface $factory,
-        MatcherInterface $matcher,
-        AuthorizationCheckerInterface $authorizationChecker,
-        TokenStorageInterface $tokenStorage,
-        TranslatorInterface $translator
-    ) {
-        $this->container = $container;
-        $this->factory = $factory;
-        $this->matcher = $matcher;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->tokenStorage = $tokenStorage;
-        $this->translator = $translator;
-    }
-
     /**
      * @param array $options
      * @return \Knp\Menu\ItemInterface|\Knp\Menu\MenuItem
@@ -251,30 +191,6 @@ class MenuBuilder
                 ]
             )->setLinkAttribute('class', 'btn btn-primary');
         }
-        return $menu;
-    }
-
-    /**
-     * @param array $options
-     * @return \Knp\Menu\ItemInterface|\Knp\Menu\MenuItem
-     */
-    public function mainFooter(array $options)
-    {
-        $menu = $this->factory->createItem('root');
-        $menu->addChild(
-            'privacy',
-            [
-                'label' => 'Privacy Policy',
-                'route' => 'admin_page_privacy',
-            ]
-        );
-        $menu->addChild(
-            'legal',
-            [
-                'label' => 'Legal Information',
-                'route' => 'admin_page_legal',
-            ]
-        );
         return $menu;
     }
 }

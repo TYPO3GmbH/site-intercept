@@ -20,4 +20,6 @@ return [
     Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle::class => ['all' => true],
     Knp\Bundle\PaginatorBundle\KnpPaginatorBundle::class => ['all' => true],
     Setono\CronExpressionBundle\SetonoCronExpressionBundle::class => ['all' => true],
+    T3G\Bundle\TemplateBundle\TemplateBundle::class => ['all' => true],
+    T3G\Bundle\UsercentricsBundle\UsercentricsBundle::class => ['all' => true],
 ];

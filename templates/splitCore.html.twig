@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 {% block title %}Split Core{% endblock %}
 {% block headline %}Split Core{% endblock %}
 {% block body %}
@@ -61,7 +61,7 @@
                     <div class="card">
                         <div class="card-header" id="headingOne">
                             <button class="btn btn-link" data-toggle="collapse" data-target="#uuid{{ log.queueLog.uuid }}" aria-expanded="false" aria-controls="uuid{{ log.queueLog.uuid }}">
-                                <span>{{ intercept_date_time(log.queueLog.time) }} - </span>
+                                <span>{{ template_date_time(log.queueLog.time) }} - </span>
                                 {% if log.queueLog.type == 'patch' %}
                                     <span>Split sub tree</span>
                                 {% elseif log.queueLog.type == 'tag' %}
@@ -96,7 +96,7 @@
                             <div class="card-body">
                                 {% for detailLog in log.detailLogs %}
                                     <div class="alert graylog-log alert-info">
-                                        <span>{{ intercept_date_time(detailLog.time) }} - </span>
+                                        <span>{{ template_date_time(detailLog.time) }} - </span>
                                         <span>Message: {{ detailLog.message }}</span>
                                     </div>
                                 {% endfor %}

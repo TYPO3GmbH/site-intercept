@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 {% import 'macros/macros.html.twig' as macros %}
 {% block title %}Redirects{% endblock %}
 {% block headline %}Redirects{% endblock %}
@@ -168,7 +168,7 @@
                                 <div class="message-body">
                                     <div class="message-meta">
                                         <span class="message-date">
-                                            {{ intercept_date_time(log.time) }}
+                                            {{ template_date_time(log.time) }}
                                         </span>
                                         {% if log.userDisplayName %}
                                             <span class="message-user">- by {{ log.userDisplayName }}</span>

@@ -1,78 +1,70 @@
-// Load the CSS stuff
-require('@fortawesome/fontawesome-free/css/fontawesome.min.css');
-require('@fortawesome/fontawesome-free/css/brands.min.css');
-require('@fortawesome/fontawesome-free/css/solid.min.css');
-require('../css/app.scss');
+document.addEventListener('DOMContentLoaded', function() {
 
-// Load the JS stuff
-let $ = require('jquery');
-require('bootstrap');
-require('./libs/navbar.js');
-
-// Syntax Highlighter
-require('prismjs');
-require('prismjs/components/prism-nginx');
-require('prismjs/components/prism-json');
-
-var {DateTime} = require('luxon');
-
-$(document).ready(function () {
-    convertDates();
-    $("#documentation_deployment_repositoryUrl").change(function () {
-        const value = $("#documentation_deployment_repositoryUrl").val();
-        if (value.indexOf('https://github.com') === 0) {
-            $("#documentation_deployment_repositoryType option[value=github]").removeAttr('disabled');
-            $("#documentation_deployment_repositoryType").val('github').attr('readonly', true);
-            $("#documentation_deployment_repositoryType option:selected").siblings().attr('disabled', 'disabled');
-        } else if (value.indexOf('https://gitlab.com') === 0) {
-            $("#documentation_deployment_repositoryType option[value=gitlab]").removeAttr('disabled');
-            $("#documentation_deployment_repositoryType").val('gitlab').attr('readonly', true);
-            $("#documentation_deployment_repositoryType option:selected").siblings().attr('disabled', 'disabled');
-        } else if (value.indexOf('https://bitbucket.org') === 0) {
-            $("#documentation_deployment_repositoryType option[value=bitbucket-cloud]").removeAttr('disabled');
-            $("#documentation_deployment_repositoryType").val('bitbucket-cloud').attr('readonly', true);
-            $("#documentation_deployment_repositoryType option:selected").siblings().attr('disabled', 'disabled');
-        } else {
-            $("#documentation_deployment_repositoryType").removeAttr('readonly');
-            $("#documentation_deployment_repositoryType option").filter(function () {
-                return this.value.length !== 0;
-            }).removeAttr('disabled');
-        }
-    });
-
-    $("#discord_webhook_type").change(function () {
-        const value = $("#discord_webhook_type").val();
-        if (value === "3") {
-            $("#discord_webhook_loglevel").removeAttr('disabled');
-            $("#discord_webhook_loglevel").show();
-            $("#discord_webhook_loglevel_label").show();
-            $("#log_level_info_text").show();
-        } else {
-            $("#discord_webhook_loglevel").prop('disabled');
-            $("#discord_webhook_loglevel").hide();
-            $("#discord_webhook_loglevel_label").hide();
-            $("#log_level_info_text").hide();
-        }
-    });
-    if ($("#discord_webhook_type").val() !== "3") {
-        $("#discord_webhook_loglevel").prop('disabled');
-        $("#discord_webhook_loglevel").hide();
-        $("#discord_webhook_loglevel_label").hide();
-        $("#log_level_info_text").hide();
-    }
-});
-
-function convertDates() {
-    Array.from(document.querySelectorAll('[data-processor="localdate"]')).forEach(function (element) {
-        const value = element.dataset.value;
-        element.textContent = DateTime.fromISO(value).toLocaleString({
-            month: '2-digit',
-            day: '2-digit',
-            year: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
+    var documentationDeploymentRepositoryUrl = document.getElementById('documentation_deployment_repositoryUrl');
+    if (documentationDeploymentRepositoryUrl) {
+        documentationDeploymentRepositoryUrl.addEventListener('change', function() {
+            const value = documentationDeploymentRepositoryUrl.value;
+            const documentationRepositoryType = document.getElementById('documentation_deployment_repositoryType');
+            if (value.indexOf('https://github.com') === 0) {
+                documentationRepositoryType.setAttribute('readonly', true);
+                for(i = 0; i < documentationRepositoryType.options.length; i++) {
+                    if (documentationRepositoryType.options[i].value === 'github') {
+                        documentationRepositoryType.selectedIndex = i;
+                        documentationRepositoryType.options[i].disabled = false;
+                    } else {
+                        documentationRepositoryType.options[i].disabled = true;
+                    }
+                }
+            } else if (value.indexOf('https://gitlab.com') === 0) {
+                documentationRepositoryType.setAttribute('readonly', true);
+                for(i = 0; i < documentationRepositoryType.options.length; i++) {
+                    if (documentationRepositoryType.options[i].value === 'gitlab') {
+                        documentationRepositoryType.selectedIndex = i;
+                        documentationRepositoryType.options[i].disabled = false;
+                    } else {
+                        documentationRepositoryType.options[i].disabled = true;
+                    }
+                }
+            } else if (value.indexOf('https://bitbucket.org') === 0) {
+                documentationRepositoryType.setAttribute('readonly', true);
+                for(i = 0; i < documentationRepositoryType.options.length; i++) {
+                    if (documentationRepositoryType.options[i].value === 'bitbucket-cloud') {
+                        documentationRepositoryType.selectedIndex = i;
+                        documentationRepositoryType.options[i].disabled = false;
+                    } else {
+                        documentationRepositoryType.options[i].disabled = true;
+                    }
+                }
+            } else {
+                documentationRepositoryType.removeAttribute('readonly');
+                for(i = 0; i < documentationRepositoryType.options.length; i++) {
+                    documentationRepositoryType.options[i].disabled = false
+                }
+            }
         });
-    });
-}
+    }
 
+    var discordWebhookType = document.getElementById('discord_webhook_type');
+    if (discordWebhookType) {
+        discordWebhookType.addEventListener('change', function() {
+            if (discordWebhookType.options[discordWebhookType.selectedIndex].value === "3") {
+                document.getElementById('discord_webhook_loglevel').disabled = false;
+                document.getElementById('discord_webhook_loglevel').style.display = null;
+                document.getElementById('discord_webhook_loglevel_label').style.display = null;
+                document.getElementById('log_level_info_text').style.display = null;
+            } else {
+                document.getElementById('discord_webhook_loglevel').disabled = true;
+                document.getElementById('discord_webhook_loglevel').style.display = 'none';
+                document.getElementById('discord_webhook_loglevel_label').style.display = 'none';
+                document.getElementById('log_level_info_text').style.display = 'none';
+            }
+        });
+        if (discordWebhookType.options[discordWebhookType.selectedIndex].value !== "3") {
+            document.getElementById('discord_webhook_loglevel').disabled = true;
+            document.getElementById('discord_webhook_loglevel').style.display = 'none';
+            document.getElementById('discord_webhook_loglevel_label').style.display = 'none';
+            document.getElementById('log_level_info_text').style.display = 'none';
+        }
+    }
+
+});

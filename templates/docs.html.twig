@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 {% block title %}Documentation{% endblock %}
 {% block headline %}Trigger documentation rendering{% endblock %}
 {% block body %}
@@ -70,7 +70,7 @@
                                 <div class="message-body">
                                     <div class="message-meta">
                                         <span class="message-date">
-                                            {{ intercept_date_time(log.time) }}
+                                            {{ template_date_time(log.time) }}
                                         </span>
                                         {% if log.userDisplayName %}
                                             <span class="message-user">- by {{ log.userDisplayName }}</span>

@@ -7,7 +7,7 @@ It contains some meta scripts to keep compatibility with the old documentation s
 
 This script is called when clicking the 'Versions' selector in the lower
 left of a rendered documentation. It returns a list of existing "other versions"
-of that documentation. 
+of that documentation.
 
 ## ajaxdownloads.php
 
@@ -18,7 +18,7 @@ of the given rendered repository.
 
 This php file is registered as nginx services/404.php 404 error handler. It traverses
 the document root path up from the orgininally requested file until it find the first
-404.html. Documentation repositories can have own 404.rst files this way. 
+404.html. Documentation repositories can have own 404.rst files this way.
 
 
 ## Hook for documentation rendering

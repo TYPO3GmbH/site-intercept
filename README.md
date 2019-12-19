@@ -154,9 +154,9 @@ Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` o
 
 ### URL's
 
-* http://intercept.ddev.local/admin/ - intercept web interface
-* http://intercept.ddev.local:9101/ - graylog interface, user: admin, password: foo
-* http://intercept.ddev.local:15672/ - rabbitmq interface, user: admin, password: foo
+* http://intercept.ddev.site/admin/ - intercept web interface
+* http://intercept.ddev.site:9101/ - graylog interface, user: admin, password: foo
+* http://intercept.ddev.site:15672/ - rabbitmq interface, user: admin, password: foo
 
 ### Upgrading ddev based
 
@@ -196,6 +196,11 @@ You also need to make sure the bot you are using is a member of the server you a
 
 Once set up you must run the command `bin/console app:discord-sync`. This commend will fetch a list of Discord channels to your Intercept installation.
 In a production environment, this command should be set as a cronjob for roughly every 10 minutes.
+
+### Usercentrics
+
+To use Usercentrics you must set these variables in your `.env.local` file
+* USERCENTRICS_ID
 
 ### Test execution
 
