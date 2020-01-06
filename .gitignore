@@ -15,6 +15,7 @@ atlassian-ide-plugin.xml
 .env.local
 /.env.*.local
 /public/bundles/
+/public/.htaccess
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
