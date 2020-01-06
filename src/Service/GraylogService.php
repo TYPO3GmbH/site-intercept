@@ -14,6 +14,8 @@ use App\Client\GraylogClient;
 use App\Extractor\GraylogLogEntry;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ServerException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Get various log messages
@@ -26,11 +28,17 @@ class GraylogService
     private $client;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param GraylogClient $client
      */
-    public function __construct(GraylogClient $client)
+    public function __construct(GraylogClient $client, LoggerInterface $logger)
     {
         $this->client = $client;
+        $this->logger = $logger;
     }
 
     /**
@@ -190,9 +198,15 @@ class GraylogService
             return $messages;
         } catch (ClientException $e) {
             // Silent fail if graylog is broken
+            $this->logger->critical($e->getMessage(), [$e]);
             return [];
         } catch (ConnectException $e) {
             // Silent fail if graylog is down
+            $this->logger->critical($e->getMessage(), [$e]);
+            return [];
+        } catch (ServerException $e) {
+            // Silent fail if graylog is down
+            $this->logger->critical($e->getMessage(), [$e]);
             return [];
         }
     }
