@@ -198,15 +198,15 @@ class GraylogService
             return $messages;
         } catch (ClientException $e) {
             // Silent fail if graylog is broken
-            $this->logger->critical($e->getMessage(), [$e]);
+            $this->logger->critical($e->getMessage(), ['exception' => $e]);
             return [];
         } catch (ConnectException $e) {
             // Silent fail if graylog is down
-            $this->logger->critical($e->getMessage(), [$e]);
+            $this->logger->critical($e->getMessage(), ['exception' => $e]);
             return [];
         } catch (ServerException $e) {
             // Silent fail if graylog is down
-            $this->logger->critical($e->getMessage(), [$e]);
+            $this->logger->critical($e->getMessage(), ['exception' => $e]);
             return [];
         }
     }
