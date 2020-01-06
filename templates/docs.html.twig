@@ -42,7 +42,7 @@
                     </div>
                     {{ form_widget(surfMasterForm._token) }}
                     {{ form_end(surfMasterForm, {'render_rest': false}) }}
-                    
+
                     {{ form_start(surf20Form) }}
                     {{ form_errors(surf20Form) }}
                     <div class="form-group">
@@ -70,7 +70,7 @@
                                 <div class="message-body">
                                     <div class="message-meta">
                                         <span class="message-date">
-                                            {{ template_date_time(log.time) }}
+                                            {{ localtime(log.time) }}
                                         </span>
                                         {% if log.userDisplayName %}
                                             <span class="message-user">- by {{ log.userDisplayName }}</span>

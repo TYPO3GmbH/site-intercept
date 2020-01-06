@@ -70,8 +70,8 @@
         "symfony/validator": "^4.2",
         "symfony/webpack-encore-bundle": "^1.0",
         "symfony/yaml": "^4.2",
-        "t3g/symfony-template-bundle": "dev-master",
-        "t3g/symfony-usercentrics-bundle": "dev-master",
+        "t3g/symfony-template-bundle": "^1.0",
+        "t3g/symfony-usercentrics-bundle": "^1.0",
         "twig/twig": "^2.10",
         "woeler/phpdiscord": "^1.1"
     },

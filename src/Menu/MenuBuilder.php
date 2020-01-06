@@ -137,17 +137,6 @@ class MenuBuilder extends TemplateMenuBuider
                 ]
             );
         }
-        $menu->addChild(
-            'help',
-            [
-                'route' => 'admin_index',
-                'label' => 'Help',
-                'extras' => [
-                    'icon' => 'question-circle',
-                ],
-            ]
-        );
-
         return $menu;
     }
 
@@ -158,6 +147,16 @@ class MenuBuilder extends TemplateMenuBuider
     public function mainProfile(array $options)
     {
         $menu = $this->factory->createItem('root');
+        $menu->addChild(
+            'help',
+            [
+                'route' => 'admin_index',
+                'label' => 'Help',
+                'extras' => [
+                    'icon' => 'question-circle',
+                ],
+            ]
+        );
         if ($this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
             $menu->addChild(
                 'username',

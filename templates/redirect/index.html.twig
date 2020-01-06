@@ -14,7 +14,7 @@
                             {{ form(filter, {'attr': {'novalidate': 'novalidate'}}) }}
                         </div>
                         <div class="card-header-actions">
-                            {{ 
+                            {{
                                 macros.linkbutton(
                                     path('admin_redirect_new'),
                                     'Create new',
@@ -42,9 +42,9 @@
                         {% for redirect in pagination %}
                             <tr data-id="{{ redirect.id }}">
                                 <th scope="row">
-                                    <span class="datatable-text"><i class="fa fa-size-small fa-style-fade fa-arrow-left"></i></span> 
+                                    <span class="datatable-text"><i class="fa fa-size-small fa-style-fade fa-arrow-left"></i></span>
                                     <span class="datatable-text">{{ redirect.source }}</span><br>
-                                    <span class="datatable-text"><i class="fa fa-size-small fa-style-fade fa-arrow-right"></i></span> 
+                                    <span class="datatable-text"><i class="fa fa-size-small fa-style-fade fa-arrow-right"></i></span>
                                     <span class="datatable-text"><a class="datatable-link-highlight" href="{{ redirect.target|intercept_docs_server_link }}" target="_blank">{{ redirect.target }}</a></span>
                                 </th>
                                 <th scope="row">
@@ -168,7 +168,7 @@
                                 <div class="message-body">
                                     <div class="message-meta">
                                         <span class="message-date">
-                                            {{ template_date_time(log.time) }}
+                                            {{ localtime(log.time) }}
                                         </span>
                                         {% if log.userDisplayName %}
                                             <span class="message-user">- by {{ log.userDisplayName }}</span>

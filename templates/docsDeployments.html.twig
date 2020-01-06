@@ -90,10 +90,10 @@
                                 <td data-type="localdate">
                                     {% if deployment.buildKey %}
                                         <a href="https://bamboo.typo3.com/browse/{{ deployment.buildKey }}" rel="noopener noreferrer" target="_blank">
-                                            {{ template_date_time(deployment.lastRenderedAt) }}
+                                            {{ localtime(deployment.lastRenderedAt) }}
                                         </a>
                                     {% else %}
-                                        {{ template_date_time(deployment.lastRenderedAt) }}
+                                        {{ localtime(deployment.lastRenderedAt) }}
                                     {% endif %}
                                 </td>
                                 <td>
@@ -170,7 +170,7 @@
                                 <div class="message-body">
                                     <div class="message-meta">
                                         <span class="message-date">
-                                            {{ template_date_time(log.time) }}
+                                            {{ localtime(log.time) }}
                                         </span>
                                         {% if log.userDisplayName %}
                                             <span class="message-user">- by {{ log.userDisplayName }}</span>

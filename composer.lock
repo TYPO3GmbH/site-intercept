@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "877bdedd05a205f62e8babefe53e1b0b",
+    "content-hash": "369cf225f40f0d840fb503552d5da1e3",
     "packages": [
         {
             "name": "brick/reflection",
@@ -6811,16 +6811,16 @@
         },
         {
             "name": "t3g/symfony-template-bundle",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TYPO3GmbH/symfony-template-bundle.git",
-                "reference": "8272a5906199203b45f1ecac8c6f74da955a3a7b"
+                "reference": "bf7c92a81b637086d9b5b31a9289679e0333f01f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TYPO3GmbH/symfony-template-bundle/zipball/8272a5906199203b45f1ecac8c6f74da955a3a7b",
-                "reference": "8272a5906199203b45f1ecac8c6f74da955a3a7b",
+                "url": "https://api.github.com/repos/TYPO3GmbH/symfony-template-bundle/zipball/bf7c92a81b637086d9b5b31a9289679e0333f01f",
+                "reference": "bf7c92a81b637086d9b5b31a9289679e0333f01f",
                 "shasum": ""
             },
             "require": {
@@ -6863,11 +6863,11 @@
                 "templates",
                 "typo3"
             ],
-            "time": "2019-12-18T13:33:07+00:00"
+            "time": "2019-12-20T11:23:53+00:00"
         },
         {
             "name": "t3g/symfony-usercentrics-bundle",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TYPO3GmbH/symfony-usercentrics-bundle.git",
@@ -9293,8 +9293,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "t3g/symfony-template-bundle": 20,
-        "t3g/symfony-usercentrics-bundle": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": true,
