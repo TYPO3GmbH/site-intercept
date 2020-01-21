@@ -112,6 +112,13 @@
                                             </a>
                                         {% endif %}
 
+                                        {% if is_granted('ROLE_ADMIN') and deployment.status == 0 %}
+                                            <a class="datatable-action" title="Reset rendering status" href="{{ path('admin_docs_deployments_reset_action', {documentationJarId: deployment.id}) }}">
+                                                <span class="datatable-action-icon"><i class="fas fa-undo"></i></span>
+                                                <span class="datatable-action-label datatable-visually-hidden">Reset rendering status</span>
+                                            </a>
+                                        {% endif %}
+
                                         {% if deployment.getStatus() == "4" %}
                                             <a class="datatable-action" title="Approve documentation" href="{{ path('admin_docs_deployments_approve_action', {documentationJarId: deployment.id}) }}">
                                                 <span class="datatable-action-icon"><i class="fas fa-check"></i></span>

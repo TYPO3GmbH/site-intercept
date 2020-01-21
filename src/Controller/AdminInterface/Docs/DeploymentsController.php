@@ -257,4 +257,28 @@ class DeploymentsController extends AbstractController
             return Response::create('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', 412);
         }
     }
+
+    /**
+     * @Route("/admin/docs/deployments/reset/{documentationJarId}", name="admin_docs_deployments_reset_action", requirements={"documentationJarId"="\d+"}, methods={"GET"})
+     * @IsGranted({"ROLE_ADMIN"})
+     * @param int $documentationJarId
+     * @param DocumentationJarRepository $documentationJarRepository
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
+    public function resetStatus(
+        int $documentationJarId,
+        DocumentationJarRepository $documentationJarRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $jar = $documentationJarRepository->find($documentationJarId);
+
+        if (null !== $jar) {
+            $jar->setStatus(DocumentationStatus::STATUS_RENDERED);
+            $entityManager->persist($jar);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('admin_docs_deployments');
+    }
 }
