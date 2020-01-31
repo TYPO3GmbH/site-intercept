@@ -19,6 +19,8 @@ security:
                 dn_string: 'ou=people,dc=typo3,dc=org'
                 query_string: '(&(objectClass=inetOrgPerson)(uid={username}))'
                 success_handler: App\Security\AuthenticationSuccessHandler
+                search_dn: '%env(LDAP_SEARCH_USER)%'
+                search_password: '%env(LDAP_SEARCH_PASSWORD)%'
             logout:
                 path: /logout
                 target: admin_index
