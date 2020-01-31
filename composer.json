@@ -11,7 +11,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.2",
+        "php": "^7.4.0",
         "ext-SimpleXML": "*",
         "ext-bcmath": "*",
         "ext-json": "*",
@@ -89,6 +89,9 @@
     },
     "config": {
         "bin-dir": "bin/",
+        "platform": {
+            "php": "7.4"
+        },
         "sort-packages": true,
         "optimize-autoloader": true,
         "preferred-install": {

@@ -5,7 +5,7 @@ version: '2.3'
 services:
   git-core-split-worker:
     restart: always
-    image: typo3gmbh/php72:latest
+    image: typo3gmbh/php74:latest
     user: "1025:1027"
     hostname: intercept-split-worker
     volumes:
