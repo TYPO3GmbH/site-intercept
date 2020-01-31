@@ -52,7 +52,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% for deployment in pagination %}
+                        {% for deployment in pagination.getItems() %}
                             <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('m/d/y, H:i', "UTC") }}">
                                 <th data-type="icon">
                                     <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener noreferrer" target="_blank">
@@ -151,7 +151,7 @@
                         </tbody>
                     </table>
                 </div>
-                {% if pagination.getTotalItemCount > 10 %}
+                {% if pagination.getTotalItemCount() > 10 %}
                     <div class="card-footer">
                         {{ knp_pagination_render(pagination) }}
                     </div>
