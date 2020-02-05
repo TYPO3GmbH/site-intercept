@@ -1,0 +1,46 @@
+magephp:
+  environments:
+    stage:
+      user: stage.intercept.typo3.com
+      branch: develop
+      from: ./
+      host_path: /srv/vhosts/stage.intercept.typo3.com/site/
+      releases: 1
+      exclude:
+        - ./var/cache/*
+        - ./var/log/*
+        - ./web/app_dev.php
+      hosts:
+        - stage.intercept.typo3.com
+      pre-deploy:
+        - git/update
+        - composer/install
+        - composer/dump-autoload
+      on-deploy:
+        - symfony/cache-warmup: { env: 'dev' }
+        - symfony/assets-install: { env: 'dev' }
+      on-release:
+      post-release:
+      post-deploy:
+    production:
+      user: intercept.typo3.com
+      branch: master
+      from: ./
+      host_path: /srv/vhosts/intercept.typo3.com/site/
+      releases: 1
+      exclude:
+        - ./var/cache/*
+        - ./var/log/*
+        - ./web/app_dev.php
+      hosts:
+        - intercept.typo3.com
+      pre-deploy:
+        - git/update
+        - composer/install
+        - composer/dump-autoload
+      on-deploy:
+        - symfony/cache-warmup: { env: 'prod' }
+        - symfony/assets-install: { env: 'prod' }
+      on-release:
+      post-release:
+      post-deploy:
