@@ -36,7 +36,7 @@ magephp:
         - intercept.typo3.com
       pre-deploy:
         - git/update
-        - composer/install
+        - composer/install: { flags: '--no-dev' }
         - composer/dump-autoload
       on-deploy:
         - symfony/cache-warmup: { env: 'prod' }
