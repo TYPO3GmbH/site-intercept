@@ -1,0 +1,15 @@
+{
+  "name": "bla/yay",
+  "type": "typo3-cms-documentation",
+  "description": "Main TYPO3 core documentation",
+  "license": "GPL-1.0",
+  "authors": [
+    {
+      "name": "John Doe",
+      "email": "john.doe@example.com"
+    }
+  ],
+  "require": {
+    "typo3/cms-core": "^8.7.0 || ^9.5.0"
+  }
+}

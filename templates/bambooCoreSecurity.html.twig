@@ -1,0 +1,158 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Bamboo Core Security{% endblock %}
+{% block headline %}Trigger bamboo security builds{% endblock %}
+{% block body %}
+
+    <div class="content-section">
+        <div class="container">
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="alert alert-danger">
+                    Do not abuse this interface - triggering many builds can <strong>easily</strong>
+                    occupy bamboo for hours.
+                </div>
+                <div class="row mb-4">
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>
+                                    Bamboo core security tests with specific patch
+                                </h2>
+                            </div>
+                            <div class="card-body">
+                                <p>
+                                    Interface to trigger bamboo pre-merge security builds with specific change and patch
+                                    sets. Finished pre-merge builds will vote on gerrit. These patches will be cherry picked on top of the
+                                    current clean core master branch.
+                                </p>
+
+                                <h3>
+                                    Trigger by change id and patch set
+                                </h3>
+                                {{ form_start(patchForm) }}
+                                {{ form_errors(patchForm) }}
+                                <div class="form-group row">
+                                    <div class="col-lg-4 col-md-4 col-sm-6">
+                                        {{ form_label(patchForm.change) }}
+                                        {{ form_errors(patchForm.change) }}
+                                        {{ form_widget(patchForm.change) }}
+                                        {{ form_help(patchForm.change) }}
+                                    </div>
+                                    <div class="col-lg-2 col-md-4 col-sm-6">
+                                        {{ form_label(patchForm.set) }}
+                                        {{ form_errors(patchForm.set) }}
+                                        {{ form_widget(patchForm.set) }}
+                                        {{ form_help(patchForm.set) }}
+                                    </div>
+                                </div>
+
+                                {{ form_widget(patchForm.master, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                                {{ form_widget(patchForm.branch9_5, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                                {{ form_widget(patchForm.branch8_7, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                                {{ form_widget(patchForm._token, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                                {{ form_end(patchForm, {'render_rest': false}) }}
+                            </div>
+                            <div class="card-body">
+                                {{ form_start(urlForm) }}
+                                <h3>
+                                    Trigger pre merge security testing by url
+                                </h3>
+                                <p>
+                                    Insert a casual review.typo3.org url. If a specific patch set is given, it will be used. If
+                                    not, the latest patch set of the change will be determined. The patch will be automatically rebased
+                                    on top of current head of the core master target branch which may fail if it has merge conflicts.
+                                </p>
+                                {{ form_errors(urlForm) }}
+                                <div class="form-group">
+                                    {{ form_errors(urlForm.url) }}
+                                    {{ form_widget(urlForm.url) }}
+                                    {{ form_help(urlForm.url) }}
+                                </div>
+                                {{ form_widget(urlForm._token) }}
+                                {{ form_widget(urlForm.trigger) }}
+                                {{ form_end(urlForm, {'render_rest': false}) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if logMessages %}
+                <div class="content-spacer"></div>
+                <h2>Recent actions</h2>
+                <div class="card">
+                    <div class="message-list">
+                        {% for log in logMessages %}
+                            <div class="message message-{% if log.vote == '-1' or log.type == 'rebuildNightly' %}warning{% elseif log.vote == '+1' %}success{% elseif log.type == 'reportBrokenNightly' %}danger{% else %}info{% endif %}">
+                                <div class="message-badge">
+                                    {% if log.triggeredBy == 'api' %}
+                                        <span class="badge badge-secondary">API</span>
+                                    {% elseif log.triggeredBy == 'interface' %}
+                                        <span class="badge badge-secondary">WEB</span>
+                                    {% endif %}
+                                </div>
+                                <div class="message-body">
+                                    <div class="message-meta">
+                                        <span class="message-date">
+                                            {{ localtime(log.time) }}
+                                        </span>
+                                        {% if log.userDisplayName %}
+                                            <span class="message-user">- by {{ log.userDisplayName }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-text">
+                                        {% if log.type == 'voteGerrit' %}
+                                            <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">Voted on gerrit</a>
+                                            by <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">bamboo result</a>
+                                        {% elseif log.type == 'triggerBamboo' and log.bambooKey != '' %}
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo</a>
+                                            {% if log.change and log.patch %}for <a href="https://review.typo3.org/#/c/{{ log.change }}/{{ log.patch }}">gerrit patch</a>{% endif %}
+                                        {% elseif log.type == 'rebuildNightly' and log.bambooKey != '' %}
+                                            <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Re-triggered failed bamboo nightly</a>
+                                        {% elseif log.type == 'reportBrokenNightly' and log.bambooKey != '' %}
+                                            Reported <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">broken nightly</a> to slack
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-detail">
+                                        {% if log.vote %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Vote</span>
+                                                <span class="message-detail-value">{{ log.vote }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.branch %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Branch</span>
+                                                <span class="message-detail-value">{{ log.branch }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.change %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Change</span>
+                                                <span class="message-detail-value">{{ log.change }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.patch %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Patch</span>
+                                                <span class="message-detail-value">{{ log.patch }}</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if log.bambooKey %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Bamboo key</span>
+                                                <span class="message-detail-value">{{ log.bambooKey }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+{% endblock %}

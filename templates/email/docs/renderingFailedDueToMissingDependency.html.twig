@@ -1,0 +1,13 @@
+{% set active = 'renderingFailed' %}
+
+<h2>Rendering documentation failed</h2>
+
+<p>Hi {{ author.name }}!</p>
+<p>Rendering the documentation for {{ package }} failed because of the following reason:</p>
+<pre>{{ reasonPhrase }}</pre>
+
+<h3>Additional data</h3>
+<ul>
+    <li>Repository: {{ pushEvent.repositoryUrl }}</li>
+    <li>Tag or branch: {{ pushEvent.versionString }}</li>
+</ul>

@@ -1,0 +1,31 @@
+{% extends 'layout.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Create new Redirect{% endblock %}
+{% block headline %}Create new Redirect{% endblock %}
+{% block body %}
+
+    <div class="content-section">
+        <div class="container">
+
+            <div class="card">
+                <div class="card-body">
+                    {{ include('redirect/_form.html.twig') }}
+                </div>
+            </div>
+            <div class="row mt-4 justify-content-between">
+                <div class="col-auto">
+                    {{ 
+                        macros.linkbutton(
+                            path('admin_redirect_index'),
+                            'back to list',
+                            'outline-secondary',
+                            'arrow-left'
+                        )
+                    }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

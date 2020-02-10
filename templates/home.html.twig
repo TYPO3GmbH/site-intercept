@@ -1,0 +1,239 @@
+{% extends 'layout.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Home{% endblock %}
+{% block headline %}About Intercept{% endblock %}
+{% block body %}
+
+    <div class="content-section bg-primary">
+        <div class="container">
+
+            <div class="card-deck">
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            Intercept is a middleware in the TYPO3 ecosystem that does coordination
+                            and communication jobs between various services used for core development
+                            and documentation management. This web interface allows interacting with
+                            intercept to show and trigger certain jobs.
+                        </p>
+                    </div>
+                    <div class="card-footer"></div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            {% if app.user %}
+                                Welcome {{ app.user.username }}, you are logged in to Intercept.
+                            {% else %}
+                                You can login to Intercept with your <a href="https://typo3.org" target="_blank" rel="noopener">typo3.org</a> account.
+                            {% endif %}
+                            This enables various interfaces to trigger intercept jobs. Members
+                            of the documentation team have additional access right to manage the documentation
+                            server deployments.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        {% if app.user %}
+                            {{
+                                macros.linkbutton(
+                                    path('logout'),
+                                    'Logout',
+                                    'primary',
+                                    'lock'
+                                )
+                            }}
+                        {% else %}
+                            {{
+                                macros.linkbutton(
+                                    path('admin_login'),
+                                    'Login',
+                                    'primary',
+                                    'unlock'
+                                )
+                            }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="content-section">
+        <div class="container">
+
+            <div class="card-deck card-deck-dashboard">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-bar">
+                            <div class="card-header-title">
+                                <h3>Pre-Merge Testing</h3>
+                            </div>
+                            <div class="card-header-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            If a core patch is pushed to the gerrit review system at
+                            <a href="https://review.typo3.org/">review.typo3.org</a>,
+                            intercept triggers the according "pre-merge" core test suite at
+                            <a href="https://bamboo.typo3.com/">bamboo.typo3.com</a> and reports
+                            the result back to the review system by voting on the patch.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="text-muted">
+                            Logged in users can trigger tests manually.
+                        </p>
+                        {{
+                            macros.linkbutton(
+                                path('admin_bamboo_core'),
+                                'Build Plans',
+                                'light'
+                            )
+                        }}
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-bar">
+                            <div class="card-header-title">
+                                <h3>GitHub Pull-Requests</h3>
+                            </div>
+                            <div class="card-header-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        If a pull request is opened on the github main core repository at
+                        <a href="https://github.com/typo3/typo3.cms">github/typo3/typo3.cms</a>,
+                        intercept creates an issue from that pull request at <a href="https://forge.typo3.org">
+                        forge.typo3.org</a>, transfers the pull reqeust to a gerrit review
+                        <a href="https://review.typo3.org">review.typo3.org</a> and closes the pull request
+                        with a remark that it has been transferred.
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-bar">
+                            <div class="card-header-title">
+                                <h3>Nightly Builds</h3>
+                            </div>
+                            <div class="card-header-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <a href="https://bamboo.typo3.org">Bamboo</a> executes a nightly test build of
+                        all active TYPO3 core development branches. Intercept re-triggers those nightlies
+                        once if they failed, and reports a failing nightly build to <a href="https://typo3.slack.com">
+                        slack channel #typo3-cms-coredev</a> if it continues to fail.
+                    </div>
+                    <div class="card-footer">
+                        <p class="text-muted">
+                            Logged in users can trigger tests manually.
+                        </p>
+                        {{
+                            macros.linkbutton(
+                                path('admin_bamboo_core'),
+                                'Build Plans',
+                                'light'
+                            )
+                        }}
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-bar">
+                            <div class="card-header-title">
+                                <h3>Subtree Splitting</h3>
+                            </div>
+                            <div class="card-header-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        If a TYPO3 core patch is merged in the <a href="https://review.typo3.org">review system</a>,
+                        intercept executes the sub tree splitting of the main repository into the single
+                        core extensions repositories and pushes them to <a href="https://github.com/typo3-cms">github</a>.
+                    </div>
+                    <div class="card-footer">
+                        <p class="text-muted">
+                            Elevated users can trigger this manually.
+                        </p>
+                        {{
+                            macros.linkbutton(
+                                path('admin_split_core'),
+                                'Split Core',
+                                'light'
+                            )
+                        }}
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-bar">
+                            <div class="card-header-title">
+                                <h3>Version Tagging</h3>
+                            </div>
+                            <div class="card-header-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        When a new TYPO3 core version is tagged an released in the <a href="https://github.com/typo3/typo3.cms">
+                        main core repository</a>, intercept creates the needed tags in the <a href="https://github.com/typo3-cms">
+                        sub tree repositories</a>.
+                    </div>
+                    <div class="card-footer">
+                        <p class="text-muted">
+                            Elevated users can trigger this manually.
+                        </p>
+                        {{
+                            macros.linkbutton(
+                                path('admin_split_core'),
+                                'Split Core',
+                                'light'
+                            )
+                        }}
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-bar">
+                            <div class="card-header-title">
+                                <h3>Documentation Rendering</h3>
+                            </div>
+                            <div class="card-header-status">
+                                <span class="badge badge-success">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            Intercept is the endpoint for the <a href="https://docs-hook.typo3.org">documentation hook</a>,
+                            triggers documentation rendering in bamboo and deploys it to the <a href="https://docs.typo3.org">documentation server</a>.
+                            Members of the documentation team can manage redirects on the documentation server and deployed documentation.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        {{
+                        macros.linkbutton(
+                            path('admin_docs_deployments'),
+                            'Recent Renderings',
+                            'light'
+                        )
+                        }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{# Wrapper to extend the default layout within the project #}
+{% extends '@Template/layout.html.twig' %}
+{% block footer %}
+    <div class="content-section content-section-centered-wide bg-secondary">
+        <div class="container">
+            {{ intercept_status() }}
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    {{ usercentrics() }}
+{% endblock %}

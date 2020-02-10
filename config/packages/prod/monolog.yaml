@@ -1,0 +1,13 @@
+monolog:
+    handlers:
+        main:
+            type: group
+            members: [file, graylog]
+        file:
+            type: rotating_file
+            level: INFO
+            path: "%kernel.logs_dir%/%kernel.environment%.log"
+        graylog:
+            type: gelf
+            level: INFO
+            publisher: "gelf.publisher"

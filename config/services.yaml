@@ -1,0 +1,180 @@
+parameters:
+    locale: 'en'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        public: false       # Allows optimizing the container by removing unused services; this also means
+                            # fetching services directly from the container via $container->get() won't work.
+                            # The best practice is to be explicit about your dependencies anyway.
+        bind:
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+    App\Client\BambooClient: '@eight_points_guzzle.client.bamboo'
+    App\Client\GerritClient: '@eight_points_guzzle.client.gerrit'
+    App\Client\GeneralClient: '@eight_points_guzzle.client.general'
+    App\Client\GraylogClient: '@eight_points_guzzle.client.graylog'
+    App\Client\RabbitManagementClient: '@eight_points_guzzle.client.rabbitManagement'
+    App\Client\SlackClient: '@eight_points_guzzle.client.slack'
+
+    App\Client\ForgeClient:
+        class: App\Client\ForgeClient
+        public: true
+        arguments:
+            $url: '%env(FORGE_ENDPOINT)%'
+            $apikeyOrUsername: '%env(FORGE_ACCESS_TOKEN)%'
+        tags:
+            - testDouble
+
+    App\Service\LocalCoreGitService:
+        class: App\Service\LocalCoreGitService
+        public: true
+        arguments:
+            $logger: '@monolog.logger.request'
+            $listener: '@App\GitWrapper\Event\GitOutputListener'
+            $pullRequestCorePath: '%kernel.project_dir%/var/git-core-pr/'
+        tags:
+            - testDouble
+
+    App\Service\CoreSplitService:
+        class: App\Service\CoreSplitService
+        public: true
+        arguments:
+            $logger: '@monolog.logger.request'
+            $splitCorePath: '%kernel.project_dir%/var/git-core-split/'
+            $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO)%'
+            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE)%'
+            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions/'
+            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
+        tags:
+            - testDouble
+
+    App\Service\DiscordServerService:
+        class: App\Service\DiscordServerService
+        public: true
+        arguments:
+            $serverId: '%env(DISCORD_SERVER_ID)%'
+            $botToken: '%env(DISCORD_BOT_TOKEN)%'
+
+    App\Service\SlackService:
+        class: App\Service\SlackService
+        public: true
+        arguments:
+            $hook: '%env(SLACK_HOOK)%'
+
+    App\Service\DiscordWebhookService:
+        class: App\Service\DiscordWebhookService
+        public: true
+
+    App\Service\GithubService:
+        class: App\Service\GithubService
+        arguments:
+            # Absolute path to local directory where github core pull request files are put
+            $pullRequestPatchPath: '%kernel.project_dir%/var/patches/'
+            $client: '@App\Client\GeneralClient'
+
+    App\Service\DocumentationBuildInformationService:
+        class: App\Service\DocumentationBuildInformationService
+        public: true
+        arguments:
+            $privateDir: '%kernel.project_dir%/var'
+            $subDir: 'docs-build-information'
+        tags:
+            - testDouble
+
+    App\Service\DocsServerNginxService:
+        class: App\Service\DocsServerNginxService
+        public: true
+        arguments:
+            $privateDir: '%kernel.project_dir%/var'
+            $staticDir: '%kernel.project_dir%/config/nginx'
+            $subDir: 'docs-redirects'
+        tags:
+            - testDouble
+
+    App\Service\GerritService:
+        class: App\Service\GerritService
+        public: true
+        arguments:
+            $gerritToken: '%env(GERRIT_TOKEN)%'
+
+    App\Service\RabbitPublisherService:
+        class: App\Service\RabbitPublisherService
+        arguments:
+            $logger: '@monolog.logger.request'
+            $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
+            $rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
+
+    App\Service\RabbitConsumerService:
+        class: App\Service\RabbitConsumerService
+        arguments:
+            $logger: '@monolog.logger.request'
+            $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
+            $coreSplitService: '@App\Service\CoreSplitService'
+            $rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
+
+    App\Service\RabbitStatusService:
+        class: App\Service\RabbitStatusService
+        arguments:
+            $client: '@App\Client\RabbitManagementClient'
+
+    PhpAmqpLib\Connection\AMQPStreamConnection:
+        class: PhpAmqpLib\Connection\AMQPLazyConnection
+        public: true
+        arguments:
+            $host: '%env(RABBITMQ_HOST)%'
+            $port: '%env(RABBITMQ_PORT)%'
+            $user: '%env(RABBITMQ_USER)%'
+            $password: '%env(RABBITMQ_PASSWORD)%'
+        tags:
+            - testDouble
+
+    # graylog log setup and enrichment of log rows with static
+    # data for easy search on elk.typo3.com. Works on dev / local too since
+    # errors are ignored when sending.
+    gelf.publisher:
+        class: Gelf\Publisher
+        arguments: ['@gelf.ignore_error_transport']
+    gelf.ignore_error_transport:
+        class: Gelf\Transport\IgnoreErrorTransportWrapper
+        arguments: ['@gelf.transport']
+    gelf.transport:
+        class: Gelf\Transport\UdpTransport
+        arguments: ['%env(GRAYLOG_HOST)%', '%env(int:GRAYLOG_PORT)%']
+
+    # LDAP connection for user authentication
+    Symfony\Component\Ldap\Ldap:
+        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+        arguments:
+            -   host: ldap.typo3.org
+                port: 636
+                encryption: ssl
+                options:
+                    protocol_version: 3
+                    referrals: false
+
+    # Our custom user provider to ldap.typo3.org
+    ldap.typo3.org.user.provider:
+        class: App\Security\LdapUserProvider
+        arguments:
+            $ldap: '@Symfony\Component\Ldap\Ldap'
+            $baseDn: 'ou=people,dc=typo3,dc=org'
+            $searchDn: '%env(LDAP_SEARCH_USER)%'
+            $searchPassword: '%env(LDAP_SEARCH_PASSWORD)%'
+            $defaultRoles: [ 'ROLE_USER' ]

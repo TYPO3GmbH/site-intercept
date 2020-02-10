@@ -1,0 +1,90 @@
+{% extends 'layout.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Documentation deployments{% endblock %}
+{% block headline %}Deployed documentation{% endblock %}
+{% block body %}
+
+    <div class="content-section">
+        <div class="container">
+            <h2>
+                Are you sure you want to delete this documentation?
+            </h2>
+
+            <div class="card">
+                <div class="datatable">
+                    <table class="datatable-table">
+                        <thead>
+                        <tr>
+                            <th scope="col" colspan="3">Package</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Branch</th>
+                            <th scope="col">Last rendered</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('m/d/y, H:i', "UTC") }}">
+                                <th data-type="icon">
+                                    <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
+                                        <i class="fab fa-fw fa-git-alt"></i>
+                                    </a>
+                                </th>
+                                <th data-type="title">
+                                    <strong>{{ deployment.packageName }}</strong><br>
+                                    <small>{{ deployment.packageType }}</small>
+                                </th>
+                                <th>
+                                    {% if deployment.status == "0" %}
+                                        <span class="badge badge-info">Rendering</span>
+                                    {% elseif deployment.status == "1" %}
+                                        <span class="badge badge-success">Rendered</span>
+                                    {% elseif deployment.status == "2" %}
+                                        <span class="badge badge-warning">Deleting</span>
+                                    {% elseif deployment.status == "3" %}
+                                        <span class="badge badge-danger">Failed</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Unknown</span>
+                                    {% endif %}
+                                </th>
+                                <td>{{ deployment.typeLong }}</td>
+                                <td>
+                                    {% if deployment.branch != deployment.targetBranchDirectory %}
+                                        {{ deployment.branch }} &raquo;
+                                    {% endif %}
+                                    <a href="{{ docsLiveServer }}/{{ deployment.typeShort }}/{{ deployment.packageName }}/{{ deployment.targetBranchDirectory }}" rel="noopener" target="_blank">
+                                        {{ deployment.targetBranchDirectory }}
+                                    </a>
+                                </td>
+                                <td data-type="localdate">
+                                    {{ localtime(deployment.lastRenderedAt) }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row mt-4 justify-content-between">
+                <div class="col-auto">
+                    {{
+                        macros.linkbutton(
+                            path('admin_docs_deployments'),
+                            'back to list',
+                            'outline-secondary',
+                            'arrow-left'
+                        )
+                    }}
+                </div>
+                <div class="col-auto">
+                    <form class="d-inline-block" method="post" action="{{ path('admin_docs_deployments_delete_action', {'documentationJarId': deployment.getId()}) }}">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ deployment.getId()) }}">
+                        <button class="btn btn-danger" id="docsformdelete">
+                            <span class="btn-icon"><i class="fa fa-trash"></i></span>
+                            <span class="btn-text">Delete</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

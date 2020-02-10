@@ -1,0 +1,77 @@
+magephp:
+  log_dir: ./.mage/logs
+  composer:
+    path: composer
+  exclude:
+    - .ddev
+    - .git
+    - .gitattributes
+    - .gitignore
+    - .github
+    - .mage
+    - .vscode
+    - .editorconfig
+    - .env.local
+    - .mage.yml
+    - assets
+    - var/
+    - .php_cs.cache
+    - .php_cs.dist
+    - auth.json
+    - tests
+    - node_modules
+    - Build
+    - bin/
+    - phpunit.xml.dist
+    - yarn.lock
+    - webpack.config.js
+    - tsconfig.json
+    - package.json
+  environments:
+    master:
+      user: intercept.typo3.com
+      from: ./
+      host_path: /srv/vhosts/intercept.typo3.com/site/mage/
+      releases: 3
+      hosts:
+        - srv001.typo3.com
+      pre-deploy:
+        - exec: { cmd: "echo \"APP_ENV=prod\" >> .env.local"}
+        - exec: { cmd: "composer install --no-dev --no-progress --optimize-autoloader"}
+        - exec: { cmd: "yarn install --silent"}
+        - exec: { cmd: "yarn build"}
+      on-deploy:
+        - exec: { cmd: "rm -Rf var/log"}
+        - fs/link: { from: "../../../../shared/var/log", to: "var/log" }
+        - fs/link: { from: "../../../../shared/var/docs-redirects", to: "var/docs-redirects" }
+        - fs/link: { from: "../../../../shared/var/patches", to: "var/patches" }
+        - fs/link: { from: "../../../../shared/var/data.db", to: "var/data.db" }
+        - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
+      on-release:
+      post-release:
+      post-deploy:
+        - exec: { cmd: "./bin/console cache:clear"}
+
+    develop:
+      user: stage.intercept.typo3.com
+      from: ./
+      host_path: /srv/vhosts/stage.intercept.typo3.com/site/mage/
+      releases: 3
+      hosts:
+        - srv001.typo3.com
+      pre-deploy:
+        - exec: { cmd: "echo \"APP_ENV=prod\" >> .env.local"}
+        - exec: { cmd: "composer install --no-dev --no-progress --optimize-autoloader"}
+        - exec: { cmd: "yarn install --silent"}
+        - exec: { cmd: "yarn build"}
+      on-deploy:
+        - exec: { cmd: "rm -Rf var/log"}
+        - fs/link: { from: "../../../../shared/var/log", to: "var/log" }
+        - fs/link: { from: "../../../../shared/var/docs-redirects", to: "var/docs-redirects" }
+        - fs/link: { from: "../../../../shared/var/patches", to: "var/patches" }
+        - fs/link: { from: "../../../../shared/var/data.db", to: "var/data.db" }
+        - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
+      on-release:
+      post-release:
+      post-deploy:
+        - exec: { cmd: "./bin/console cache:clear"}

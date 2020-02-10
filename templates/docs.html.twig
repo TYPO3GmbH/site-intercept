@@ -1,0 +1,100 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Documentation{% endblock %}
+{% block headline %}Trigger documentation rendering{% endblock %}
+{% block body %}
+
+    <div class="content-section">
+        <div class="container">
+
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <h2>
+                    Trigger stand alone packages documentation rendering
+                </h2>
+                <p>
+                    Some packages provide documentation displayed on TYPO3s official documentation, but do not fit
+                    in any other category like manuals, system extensions or community extensions.
+                    These documentations are also rendered automatically, but if some urgent need arises, you find the
+                    trigger buttons for immediate re-rendering here.
+
+                    Interface to render the Fluid View Helper Reference and deploy it to the
+                    <a target="_blank" href="https://docs.typo3.org/typo3cms/ViewHelperReference/Index.html">OLD docs server</a>.
+                    This build and deployment is scheduled on  a daily basis, but can be triggered here manually
+                    if an urgent update is wanted.
+                </p>
+                <div>
+                    <h3>Fluid View Helper Reference</h3>
+
+                    {{ form_start(fluidVhForm) }}
+                        {{ form_errors(fluidVhForm) }}
+                        <div class="form-group">
+                            {{ form_widget(fluidVhForm.trigger) }}
+                        </div>
+                        {{ form_widget(fluidVhForm._token) }}
+                    {{ form_end(fluidVhForm, {'render_rest': false}) }}
+                </div>
+                <div>
+                    <h3>TYPO3 Surf Documentation</h3>
+
+                    {{ form_start(surfMasterForm) }}
+                    {{ form_errors(surfMasterForm) }}
+                    <div class="form-group">
+                        {{ form_widget(surfMasterForm.trigger) }}
+                    </div>
+                    {{ form_widget(surfMasterForm._token) }}
+                    {{ form_end(surfMasterForm, {'render_rest': false}) }}
+
+                    {{ form_start(surf20Form) }}
+                    {{ form_errors(surf20Form) }}
+                    <div class="form-group">
+                        {{ form_widget(surf20Form.trigger) }}
+                    </div>
+                    {{ form_widget(surf20Form._token) }}
+                    {{ form_end(surf20Form, {'render_rest': false}) }}
+                </div>
+            {% endif %}
+
+            {% if logMessages %}
+                <div class="content-spacer"></div>
+                <h2>Recent actions</h2>
+                <div class="card">
+                    <div class="message-list">
+                        {% for log in logMessages %}
+                            <div class="message message-success">
+                                <div class="message-badge">
+                                    {% if log.triggeredBy == 'api' %}
+                                        <span class="badge badge-secondary">API</span>
+                                    {% elseif log.triggeredBy == 'interface' %}
+                                        <span class="badge badge-secondary">WEB</span>
+                                    {% endif %}
+                                </div>
+                                <div class="message-body">
+                                    <div class="message-meta">
+                                        <span class="message-date">
+                                            {{ localtime(log.time) }}
+                                        </span>
+                                        {% if log.userDisplayName %}
+                                            <span class="message-user">- by {{ log.userDisplayName }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="message-text">
+                                        <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">{{ log.message }}</a>
+                                    </div>
+                                    <div class="message-detail">
+                                        {% if log.bambooKey %}
+                                            <div class="message-detail-item">
+                                                <span class="message-detail-key">Bamboo key</span>
+                                                <span class="message-detail-value">{{ log.bambooKey }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+{% endblock %}

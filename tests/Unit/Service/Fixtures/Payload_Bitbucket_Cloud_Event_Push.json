@@ -1,0 +1,531 @@
+{
+    "push": {
+        "changes": [
+            {
+                "forced": false,
+                "old": null,
+                "links": {
+                    "commits": {
+                        "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commits?include=fe25894de60016db5f82bed906d6c8aeabf9e0af"
+                    },
+                    "html": {
+                        "href": "https://bitbucket.org/DanielSiepmann/contacts/branch/documentation-draft"
+                    }
+                },
+                "created": true,
+                "commits": [
+                    {
+                        "rendered": {},
+                        "hash": "fe25894de60016db5f82bed906d6c8aeabf9e0af",
+                        "links": {
+                            "self": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/fe25894de60016db5f82bed906d6c8aeabf9e0af"
+                            },
+                            "comments": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/fe25894de60016db5f82bed906d6c8aeabf9e0af/comments"
+                            },
+                            "patch": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/patch/fe25894de60016db5f82bed906d6c8aeabf9e0af"
+                            },
+                            "html": {
+                                "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/fe25894de60016db5f82bed906d6c8aeabf9e0af"
+                            },
+                            "diff": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/diff/fe25894de60016db5f82bed906d6c8aeabf9e0af"
+                            },
+                            "approve": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/fe25894de60016db5f82bed906d6c8aeabf9e0af/approve"
+                            },
+                            "statuses": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/fe25894de60016db5f82bed906d6c8aeabf9e0af/statuses"
+                            }
+                        },
+                        "author": {
+                            "raw": "Daniel Gohlke <daniel.gohlke@extco.de>",
+                            "type": "author",
+                            "user": {
+                                "username": "extcode",
+                                "display_name": "Daniel Gohlke",
+                                "uuid": "{afebd2de-0c3d-45ac-8ee0-55105e66362d}",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/users/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D/"
+                                    },
+                                    "avatar": {
+                                        "href": "https://avatar-cdn.atlassian.com/557058%3A0d33ce52-7fd5-467d-836f-998d8c9326b7?by=id&sg=q5IuZAB9wjhTBfMDR51mxz0n%2FYY%3D&d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDG-0.svg"
+                                    }
+                                },
+                                "nickname": "Daniel Gohlke",
+                                "type": "user",
+                                "account_id": "557058:0d33ce52-7fd5-467d-836f-998d8c9326b7"
+                            }
+                        },
+                        "summary": {
+                            "raw": "[BUGFIX] fix javascript error for gmaps in TCA\n\nAdds a new eval class for lat/lng.\n\nResolves: #45\n",
+                            "markup": "markdown",
+                            "html": "<p>[BUGFIX] fix javascript error for gmaps in TCA</p>\n<p>Adds a new eval class for lat/lng.</p>\n<p>Resolves: #45</p>",
+                            "type": "rendered"
+                        },
+                        "parents": [
+                            {
+                                "hash": "809a1f5a94691261d5683f31b29bf47d09168ad0",
+                                "type": "commit",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/809a1f5a94691261d5683f31b29bf47d09168ad0"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/809a1f5a94691261d5683f31b29bf47d09168ad0"
+                                    }
+                                }
+                            }
+                        ],
+                        "date": "2019-05-11T11:09:28+00:00",
+                        "message": "[BUGFIX] fix javascript error for gmaps in TCA\n\nAdds a new eval class for lat/lng.\n\nResolves: #45\n",
+                        "type": "commit",
+                        "properties": {}
+                    },
+                    {
+                        "rendered": {},
+                        "hash": "809a1f5a94691261d5683f31b29bf47d09168ad0",
+                        "links": {
+                            "self": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/809a1f5a94691261d5683f31b29bf47d09168ad0"
+                            },
+                            "comments": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/809a1f5a94691261d5683f31b29bf47d09168ad0/comments"
+                            },
+                            "patch": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/patch/809a1f5a94691261d5683f31b29bf47d09168ad0"
+                            },
+                            "html": {
+                                "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/809a1f5a94691261d5683f31b29bf47d09168ad0"
+                            },
+                            "diff": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/diff/809a1f5a94691261d5683f31b29bf47d09168ad0"
+                            },
+                            "approve": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/809a1f5a94691261d5683f31b29bf47d09168ad0/approve"
+                            },
+                            "statuses": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/809a1f5a94691261d5683f31b29bf47d09168ad0/statuses"
+                            }
+                        },
+                        "author": {
+                            "raw": "Daniel Gohlke <daniel.gohlke@extco.de>",
+                            "type": "author",
+                            "user": {
+                                "username": "extcode",
+                                "display_name": "Daniel Gohlke",
+                                "uuid": "{afebd2de-0c3d-45ac-8ee0-55105e66362d}",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/users/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D/"
+                                    },
+                                    "avatar": {
+                                        "href": "https://avatar-cdn.atlassian.com/557058%3A0d33ce52-7fd5-467d-836f-998d8c9326b7?by=id&sg=q5IuZAB9wjhTBfMDR51mxz0n%2FYY%3D&d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDG-0.svg"
+                                    }
+                                },
+                                "nickname": "Daniel Gohlke",
+                                "type": "user",
+                                "account_id": "557058:0d33ce52-7fd5-467d-836f-998d8c9326b7"
+                            }
+                        },
+                        "summary": {
+                            "raw": "[BUGFIX] Cast method parameter to int\n\nResolves: #44\n",
+                            "markup": "markdown",
+                            "html": "<p>[BUGFIX] Cast method parameter to int</p>\n<p>Resolves: #44</p>",
+                            "type": "rendered"
+                        },
+                        "parents": [
+                            {
+                                "hash": "9d76e36168570a7be46b5947d2b3d6e1c1f98d64",
+                                "type": "commit",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/9d76e36168570a7be46b5947d2b3d6e1c1f98d64"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/9d76e36168570a7be46b5947d2b3d6e1c1f98d64"
+                                    }
+                                }
+                            }
+                        ],
+                        "date": "2019-05-11T10:47:29+00:00",
+                        "message": "[BUGFIX] Cast method parameter to int\n\nResolves: #44\n",
+                        "type": "commit",
+                        "properties": {}
+                    },
+                    {
+                        "rendered": {},
+                        "hash": "9d76e36168570a7be46b5947d2b3d6e1c1f98d64",
+                        "links": {
+                            "self": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/9d76e36168570a7be46b5947d2b3d6e1c1f98d64"
+                            },
+                            "comments": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/9d76e36168570a7be46b5947d2b3d6e1c1f98d64/comments"
+                            },
+                            "patch": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/patch/9d76e36168570a7be46b5947d2b3d6e1c1f98d64"
+                            },
+                            "html": {
+                                "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/9d76e36168570a7be46b5947d2b3d6e1c1f98d64"
+                            },
+                            "diff": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/diff/9d76e36168570a7be46b5947d2b3d6e1c1f98d64"
+                            },
+                            "approve": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/9d76e36168570a7be46b5947d2b3d6e1c1f98d64/approve"
+                            },
+                            "statuses": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/9d76e36168570a7be46b5947d2b3d6e1c1f98d64/statuses"
+                            }
+                        },
+                        "author": {
+                            "raw": "Daniel Gohlke <daniel.gohlke@extco.de>",
+                            "type": "author",
+                            "user": {
+                                "username": "extcode",
+                                "display_name": "Daniel Gohlke",
+                                "uuid": "{afebd2de-0c3d-45ac-8ee0-55105e66362d}",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/users/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D/"
+                                    },
+                                    "avatar": {
+                                        "href": "https://avatar-cdn.atlassian.com/557058%3A0d33ce52-7fd5-467d-836f-998d8c9326b7?by=id&sg=q5IuZAB9wjhTBfMDR51mxz0n%2FYY%3D&d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDG-0.svg"
+                                    }
+                                },
+                                "nickname": "Daniel Gohlke",
+                                "type": "user",
+                                "account_id": "557058:0d33ce52-7fd5-467d-836f-998d8c9326b7"
+                            }
+                        },
+                        "summary": {
+                            "raw": "[TASK] Prepare release\n\nResolves: #43\n",
+                            "markup": "markdown",
+                            "html": "<p>[TASK] Prepare release</p>\n<p>Resolves: #43</p>",
+                            "type": "rendered"
+                        },
+                        "parents": [
+                            {
+                                "hash": "73e45bf5d3cce82ac44241219697f43598efb115",
+                                "type": "commit",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/73e45bf5d3cce82ac44241219697f43598efb115"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/73e45bf5d3cce82ac44241219697f43598efb115"
+                                    }
+                                }
+                            }
+                        ],
+                        "date": "2019-05-07T06:55:49+00:00",
+                        "message": "[TASK] Prepare release\n\nResolves: #43\n",
+                        "type": "commit",
+                        "properties": {}
+                    },
+                    {
+                        "rendered": {},
+                        "hash": "73e45bf5d3cce82ac44241219697f43598efb115",
+                        "links": {
+                            "self": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/73e45bf5d3cce82ac44241219697f43598efb115"
+                            },
+                            "comments": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/73e45bf5d3cce82ac44241219697f43598efb115/comments"
+                            },
+                            "patch": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/patch/73e45bf5d3cce82ac44241219697f43598efb115"
+                            },
+                            "html": {
+                                "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/73e45bf5d3cce82ac44241219697f43598efb115"
+                            },
+                            "diff": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/diff/73e45bf5d3cce82ac44241219697f43598efb115"
+                            },
+                            "approve": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/73e45bf5d3cce82ac44241219697f43598efb115/approve"
+                            },
+                            "statuses": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/73e45bf5d3cce82ac44241219697f43598efb115/statuses"
+                            }
+                        },
+                        "author": {
+                            "raw": "Daniel Gohlke <daniel.gohlke@extco.de>",
+                            "type": "author",
+                            "user": {
+                                "username": "extcode",
+                                "display_name": "Daniel Gohlke",
+                                "uuid": "{afebd2de-0c3d-45ac-8ee0-55105e66362d}",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/users/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D/"
+                                    },
+                                    "avatar": {
+                                        "href": "https://avatar-cdn.atlassian.com/557058%3A0d33ce52-7fd5-467d-836f-998d8c9326b7?by=id&sg=q5IuZAB9wjhTBfMDR51mxz0n%2FYY%3D&d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDG-0.svg"
+                                    }
+                                },
+                                "nickname": "Daniel Gohlke",
+                                "type": "user",
+                                "account_id": "557058:0d33ce52-7fd5-467d-836f-998d8c9326b7"
+                            }
+                        },
+                        "summary": {
+                            "raw": "[TASK] Revise contact backend module\n\nrevise translation files\n\nResolves: #42\n",
+                            "markup": "markdown",
+                            "html": "<p>[TASK] Revise contact backend module</p>\n<p>revise translation files</p>\n<p>Resolves: #42</p>",
+                            "type": "rendered"
+                        },
+                        "parents": [
+                            {
+                                "hash": "40319b8aae3080e9e06fc21c04ff97b5061ee948",
+                                "type": "commit",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/40319b8aae3080e9e06fc21c04ff97b5061ee948"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/40319b8aae3080e9e06fc21c04ff97b5061ee948"
+                                    }
+                                }
+                            }
+                        ],
+                        "date": "2019-05-07T06:41:50+00:00",
+                        "message": "[TASK] Revise contact backend module\n\nrevise translation files\n\nResolves: #42\n",
+                        "type": "commit",
+                        "properties": {}
+                    },
+                    {
+                        "rendered": {},
+                        "hash": "40319b8aae3080e9e06fc21c04ff97b5061ee948",
+                        "links": {
+                            "self": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/40319b8aae3080e9e06fc21c04ff97b5061ee948"
+                            },
+                            "comments": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/40319b8aae3080e9e06fc21c04ff97b5061ee948/comments"
+                            },
+                            "patch": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/patch/40319b8aae3080e9e06fc21c04ff97b5061ee948"
+                            },
+                            "html": {
+                                "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/40319b8aae3080e9e06fc21c04ff97b5061ee948"
+                            },
+                            "diff": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/diff/40319b8aae3080e9e06fc21c04ff97b5061ee948"
+                            },
+                            "approve": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/40319b8aae3080e9e06fc21c04ff97b5061ee948/approve"
+                            },
+                            "statuses": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/40319b8aae3080e9e06fc21c04ff97b5061ee948/statuses"
+                            }
+                        },
+                        "author": {
+                            "raw": "Daniel Gohlke <daniel.gohlke@extco.de>",
+                            "type": "author",
+                            "user": {
+                                "username": "extcode",
+                                "display_name": "Daniel Gohlke",
+                                "uuid": "{afebd2de-0c3d-45ac-8ee0-55105e66362d}",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/users/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D/"
+                                    },
+                                    "avatar": {
+                                        "href": "https://avatar-cdn.atlassian.com/557058%3A0d33ce52-7fd5-467d-836f-998d8c9326b7?by=id&sg=q5IuZAB9wjhTBfMDR51mxz0n%2FYY%3D&d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDG-0.svg"
+                                    }
+                                },
+                                "nickname": "Daniel Gohlke",
+                                "type": "user",
+                                "account_id": "557058:0d33ce52-7fd5-467d-836f-998d8c9326b7"
+                            }
+                        },
+                        "summary": {
+                            "raw": "[TASK] Add template selector for different map provider\n\nResolves: #41\n",
+                            "markup": "markdown",
+                            "html": "<p>[TASK] Add template selector for different map provider</p>\n<p>Resolves: #41</p>",
+                            "type": "rendered"
+                        },
+                        "parents": [
+                            {
+                                "hash": "2ec93e0393abae31789e4ddaf41c794ec9fcd43e",
+                                "type": "commit",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/2ec93e0393abae31789e4ddaf41c794ec9fcd43e"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/2ec93e0393abae31789e4ddaf41c794ec9fcd43e"
+                                    }
+                                }
+                            }
+                        ],
+                        "date": "2019-05-06T12:02:13+00:00",
+                        "message": "[TASK] Add template selector for different map provider\n\nResolves: #41\n",
+                        "type": "commit",
+                        "properties": {}
+                    }
+                ],
+                "truncated": true,
+                "closed": false,
+                "new": {
+                    "name": "documentation-draft",
+                    "links": {
+                        "commits": {
+                            "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commits/documentation-draft"
+                        },
+                        "self": {
+                            "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/refs/branches/documentation-draft"
+                        },
+                        "html": {
+                            "href": "https://bitbucket.org/DanielSiepmann/contacts/branch/documentation-draft"
+                        }
+                    },
+                    "default_merge_strategy": "merge_commit",
+                    "merge_strategies": [
+                        "merge_commit",
+                        "squash",
+                        "fast_forward"
+                    ],
+                    "type": "branch",
+                    "target": {
+                        "rendered": {},
+                        "hash": "fe25894de60016db5f82bed906d6c8aeabf9e0af",
+                        "links": {
+                            "self": {
+                                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/fe25894de60016db5f82bed906d6c8aeabf9e0af"
+                            },
+                            "html": {
+                                "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/fe25894de60016db5f82bed906d6c8aeabf9e0af"
+                            }
+                        },
+                        "author": {
+                            "raw": "Daniel Gohlke <daniel.gohlke@extco.de>",
+                            "type": "author",
+                            "user": {
+                                "username": "extcode",
+                                "display_name": "Daniel Gohlke",
+                                "uuid": "{afebd2de-0c3d-45ac-8ee0-55105e66362d}",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/users/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/%7Bafebd2de-0c3d-45ac-8ee0-55105e66362d%7D/"
+                                    },
+                                    "avatar": {
+                                        "href": "https://avatar-cdn.atlassian.com/557058%3A0d33ce52-7fd5-467d-836f-998d8c9326b7?by=id&sg=q5IuZAB9wjhTBfMDR51mxz0n%2FYY%3D&d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDG-0.svg"
+                                    }
+                                },
+                                "nickname": "Daniel Gohlke",
+                                "type": "user",
+                                "account_id": "557058:0d33ce52-7fd5-467d-836f-998d8c9326b7"
+                            }
+                        },
+                        "summary": {
+                            "raw": "[BUGFIX] fix javascript error for gmaps in TCA\n\nAdds a new eval class for lat/lng.\n\nResolves: #45\n",
+                            "markup": "markdown",
+                            "html": "<p>[BUGFIX] fix javascript error for gmaps in TCA</p>\n<p>Adds a new eval class for lat/lng.</p>\n<p>Resolves: #45</p>",
+                            "type": "rendered"
+                        },
+                        "parents": [
+                            {
+                                "hash": "809a1f5a94691261d5683f31b29bf47d09168ad0",
+                                "type": "commit",
+                                "links": {
+                                    "self": {
+                                        "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts/commit/809a1f5a94691261d5683f31b29bf47d09168ad0"
+                                    },
+                                    "html": {
+                                        "href": "https://bitbucket.org/DanielSiepmann/contacts/commits/809a1f5a94691261d5683f31b29bf47d09168ad0"
+                                    }
+                                }
+                            }
+                        ],
+                        "date": "2019-05-11T11:09:28+00:00",
+                        "message": "[BUGFIX] fix javascript error for gmaps in TCA\n\nAdds a new eval class for lat/lng.\n\nResolves: #45\n",
+                        "type": "commit",
+                        "properties": {}
+                    }
+                }
+            }
+        ]
+    },
+    "actor": {
+        "username": "DanielSiepmann",
+        "display_name": "Daniel Siepmann",
+        "uuid": "{6e2dff7b-ef72-458d-a539-472c31ed1716}",
+        "links": {
+            "self": {
+                "href": "https://api.bitbucket.org/2.0/users/%7B6e2dff7b-ef72-458d-a539-472c31ed1716%7D"
+            },
+            "html": {
+                "href": "https://bitbucket.org/%7B6e2dff7b-ef72-458d-a539-472c31ed1716%7D/"
+            },
+            "avatar": {
+                "href": "https://avatar-cdn.atlassian.com/557057%3A2a1afe56-35d2-414b-a764-ca1d55934c41?by=id&sg=6A%2BplUoegB2LocKKU1OEj3rp2WQ%3D&d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDS-3.svg"
+            }
+        },
+        "nickname": "Daniel Siepmann",
+        "type": "user",
+        "account_id": "557057:2a1afe56-35d2-414b-a764-ca1d55934c41"
+    },
+    "repository": {
+        "scm": "git",
+        "website": "",
+        "name": "contacts",
+        "links": {
+            "self": {
+                "href": "https://api.bitbucket.org/2.0/repositories/DanielSiepmann/contacts"
+            },
+            "html": {
+                "href": "https://bitbucket.org/DanielSiepmann/contacts"
+            },
+            "avatar": {
+                "href": "https://bytebucket.org/ravatar/%7Bba6a15aa-5e5e-4dea-81e4-341e11d8aaf2%7D?ts=default"
+            }
+        },
+        "full_name": "DanielSiepmann/contacts",
+        "owner": {
+            "username": "DanielSiepmann",
+            "display_name": "Daniel Siepmann",
+            "uuid": "{6e2dff7b-ef72-458d-a539-472c31ed1716}",
+            "links": {
+                "self": {
+                    "href": "https://api.bitbucket.org/2.0/users/%7B6e2dff7b-ef72-458d-a539-472c31ed1716%7D"
+                },
+                "html": {
+                    "href": "https://bitbucket.org/%7B6e2dff7b-ef72-458d-a539-472c31ed1716%7D/"
+                },
+                "avatar": {
+                    "href": "https://avatar-cdn.atlassian.com/557057%3A2a1afe56-35d2-414b-a764-ca1d55934c41?by=id&sg=6A%2BplUoegB2LocKKU1OEj3rp2WQ%3D&d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDS-3.svg"
+                }
+            },
+            "nickname": "Daniel Siepmann",
+            "type": "user",
+            "account_id": "557057:2a1afe56-35d2-414b-a764-ca1d55934c41"
+        },
+        "type": "repository",
+        "is_private": false,
+        "uuid": "{ba6a15aa-5e5e-4dea-81e4-341e11d8aaf2}"
+    }
+}
