@@ -3,7 +3,6 @@ package docs;
 import com.atlassian.bamboo.specs.api.BambooSpec;
 import com.atlassian.bamboo.specs.api.builders.BambooKey;
 import com.atlassian.bamboo.specs.api.builders.Variable;
-import com.atlassian.bamboo.specs.api.builders.credentials.SharedCredentialsIdentifier;
 import com.atlassian.bamboo.specs.api.builders.plan.Job;
 import com.atlassian.bamboo.specs.api.builders.plan.Plan;
 import com.atlassian.bamboo.specs.api.builders.plan.Stage;
@@ -14,7 +13,9 @@ import com.atlassian.bamboo.specs.api.builders.plan.branches.PlanBranchManagemen
 import com.atlassian.bamboo.specs.api.builders.plan.configuration.AllOtherPluginsConfiguration;
 import com.atlassian.bamboo.specs.api.builders.plan.configuration.ConcurrentBuilds;
 import com.atlassian.bamboo.specs.api.builders.requirement.Requirement;
-import com.atlassian.bamboo.specs.builders.task.*;
+import com.atlassian.bamboo.specs.builders.task.ArtifactItem;
+import com.atlassian.bamboo.specs.builders.task.CommandTask;
+import com.atlassian.bamboo.specs.builders.task.ScriptTask;
 import com.atlassian.bamboo.specs.builders.trigger.ScheduledTrigger;
 import com.atlassian.bamboo.specs.util.BambooServer;
 import com.atlassian.bamboo.specs.util.MapBuilder;
@@ -102,23 +103,16 @@ public class DocsRenderingFluidVHmasterSpec extends AbstractSpec {
                                         .build())
                                     .build())
                                 .build()))
-                        .tasks(new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.docs.typo3.com@srv007.typo3.com"))
+                        .tasks(getAuthenticatedSshTask()
                                 .description("mkdir")
-                                .host("srv007.typo3.com")
-                                .username("prod.docs.typo3.com")
                                 .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
-                            new ScpTask()
+                            getAuthenticatedScpTask()
                                 .description("copy result")
-                                .host("srv007.typo3.com")
-                                .username("prod.docs.typo3.com")
                                 .toRemotePath("/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}")
-                                .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.docs.typo3.com@srv007.typo3.com"))
                                 .fromArtifact(new ArtifactItem()
                                     .artifact("docs.tgz")),
-                            new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.docs.typo3.com@srv007.typo3.com"))
+                            getAuthenticatedSshTask()
                                 .description("unpack and publish docs")
-                                .host("srv007.typo3.com")
-                                .username("prod.docs.typo3.com")
                                 .command("set -e\r\nset -x\r\n\r\ncd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\r\n\r\nmkdir documentation_result\r\ntar xf docs.tgz -C documentation_result\r\n\r\ntarget_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web/other/typo3/view-helper-reference/master/en-us\"\r\n\r\necho \"Deploying to ${target_dir}\"\r\n\r\nmkdir -p $target_dir\r\nrm -rf $target_dir/*\r\n\r\nmv documentation_result/FinalDocumentation/* $target_dir\r\n\r\nrm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"))
                         .requirements(new Requirement("system.hasDocker")
                                 .matchValue("1.0")

@@ -3,7 +3,6 @@ package docs;
 import com.atlassian.bamboo.specs.api.BambooSpec;
 import com.atlassian.bamboo.specs.api.builders.BambooKey;
 import com.atlassian.bamboo.specs.api.builders.Variable;
-import com.atlassian.bamboo.specs.api.builders.credentials.SharedCredentialsIdentifier;
 import com.atlassian.bamboo.specs.api.builders.plan.Job;
 import com.atlassian.bamboo.specs.api.builders.plan.Plan;
 import com.atlassian.bamboo.specs.api.builders.plan.Stage;
@@ -14,7 +13,9 @@ import com.atlassian.bamboo.specs.api.builders.plan.branches.PlanBranchManagemen
 import com.atlassian.bamboo.specs.api.builders.plan.configuration.AllOtherPluginsConfiguration;
 import com.atlassian.bamboo.specs.api.builders.plan.configuration.ConcurrentBuilds;
 import com.atlassian.bamboo.specs.api.builders.requirement.Requirement;
-import com.atlassian.bamboo.specs.builders.task.*;
+import com.atlassian.bamboo.specs.builders.task.ArtifactItem;
+import com.atlassian.bamboo.specs.builders.task.CommandTask;
+import com.atlassian.bamboo.specs.builders.task.ScriptTask;
 import com.atlassian.bamboo.specs.model.task.ScriptTaskProperties;
 import com.atlassian.bamboo.specs.util.BambooServer;
 import com.atlassian.bamboo.specs.util.MapBuilder;
@@ -95,23 +96,16 @@ public class DocsRedirectsSpec extends AbstractSpec {
                                         .build())
                                     .build())
                                 .build()))
-                        .tasks(new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.docs.typo3.com@srv007.typo3.com"))
+                        .tasks(getAuthenticatedSshTask()
                                 .description("mkdir")
-                                .host("srv007.typo3.com")
-                                .username("prod.docs.typo3.com")
                                 .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
-                            new ScpTask()
+                            getAuthenticatedScpTask()
                                 .description("copy result")
-                                .host("srv007.typo3.com")
-                                .username("prod.docs.typo3.com")
                                 .toRemotePath("/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}")
-                                .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.docs.typo3.com@srv007.typo3.com"))
                                 .fromArtifact(new ArtifactItem()
                                     .artifact("nginx.tgz")),
-                            new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.docs.typo3.com@srv007.typo3.com"))
+                            getAuthenticatedSshTask()
                                 .description("unpack and publish docs")
-                                .host("srv007.typo3.com")
-                                .username("prod.docs.typo3.com")
                                 .command("set -e\r\nset -x\r\n\r\n# Create \r\ncd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\r\n\r\ntar xf nginx.tgz\r\n\r\n# Run Deployment script\r\n/srv/vhosts/prod.docs.typo3.com/home/bin/checkAndUpdateRedirectsConfiguration.sh ${bamboo.buildResultKey}\r\n\r\n# Cleanup your room\r\nrm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"))
                         .requirements(new Requirement("system.hasDocker")
                                 .matchValue("1.0")

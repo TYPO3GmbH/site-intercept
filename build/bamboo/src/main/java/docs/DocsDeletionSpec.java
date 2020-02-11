@@ -4,7 +4,6 @@ import com.atlassian.bamboo.specs.api.BambooSpec;
 import com.atlassian.bamboo.specs.api.builders.AtlassianModule;
 import com.atlassian.bamboo.specs.api.builders.BambooKey;
 import com.atlassian.bamboo.specs.api.builders.Variable;
-import com.atlassian.bamboo.specs.api.builders.credentials.SharedCredentialsIdentifier;
 import com.atlassian.bamboo.specs.api.builders.notification.AnyNotificationRecipient;
 import com.atlassian.bamboo.specs.api.builders.notification.Notification;
 import com.atlassian.bamboo.specs.api.builders.plan.Job;
@@ -18,7 +17,9 @@ import com.atlassian.bamboo.specs.api.builders.plan.configuration.AllOtherPlugin
 import com.atlassian.bamboo.specs.api.builders.plan.configuration.ConcurrentBuilds;
 import com.atlassian.bamboo.specs.api.builders.requirement.Requirement;
 import com.atlassian.bamboo.specs.builders.notification.PlanCompletedNotification;
-import com.atlassian.bamboo.specs.builders.task.*;
+import com.atlassian.bamboo.specs.builders.task.ArtifactItem;
+import com.atlassian.bamboo.specs.builders.task.CommandTask;
+import com.atlassian.bamboo.specs.builders.task.ScriptTask;
 import com.atlassian.bamboo.specs.util.BambooServer;
 import com.atlassian.bamboo.specs.util.MapBuilder;
 
@@ -79,23 +80,16 @@ public class DocsDeletionSpec extends AbstractSpec {
                                         .build())
                                     .build())
                                 .build()))
-                        .tasks(new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.docs.typo3.com@srv007.typo3.com"))
+                        .tasks(getAuthenticatedSshTask()
                                 .description("mkdir")
-                                .host("srv007.typo3.com")
-                                .username("prod.docs.typo3.com")
                                 .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
-                            new ScpTask()
+                            getAuthenticatedScpTask()
                                 .description("copy result")
-                                .host("srv007.typo3.com")
-                                .username("prod.docs.typo3.com")
                                 .toRemotePath("/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}")
-                                .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.docs.typo3.com@srv007.typo3.com"))
                                 .fromArtifact(new ArtifactItem()
                                     .artifact("docs.tgz")),
-                            new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.docs.typo3.com@srv007.typo3.com"))
+                            getAuthenticatedSshTask()
                                 .description("unpack and publish docs")
-                                .host("srv007.typo3.com")
-                                .username("prod.docs.typo3.com")
                                 .command("set -e\r\nset -x\r\n\r\ncd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}/\r\n\r\nmkdir documentation_result\r\ntar xf docs.tgz -C documentation_result\r\n\r\nsource \"documentation_result/deployment_infos.sh\"\r\n\r\nweb_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web\"\r\ntarget_dir=\"${web_dir}/${type_short:?type_short must be set}/${vendor:?vendor must be set}/${name:?name must be set}/${target_branch_directory:?target_branch_directory must be set}\"\r\n\r\necho \"Deleting $target_dir\"\r\n\r\nrm -rf $target_dir\r\n\r\n# Move \"static\" extension list\r\nmv documentation_result/extensions.js ${web_dir}/Home/extensions.js\r\n\r\nrm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}/"))
                         .requirements(new Requirement("system.hasDocker")
                                 .matchValue("1.0")
