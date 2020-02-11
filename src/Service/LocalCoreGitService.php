@@ -57,10 +57,6 @@ class LocalCoreGitService
         $gitWrapper->setTimeout(300);
         $this->workingCopy = $gitWrapper->workingCopy($pullRequestCorePath);
         if (!$this->workingCopy->isCloned()) {
-            // Initial set up
-            $gitWrapper->git('config --global user.name "TYPO3.com Service"');
-            $gitWrapper->git('config --global user.email noreply@typo3.com');
-            $gitWrapper->git('config --global url."ssh://typo3com_bamboo@review.typo3.org:29418".pushInsteadOf git://git.typo3.org');
             // Initial clone
             $this->workingCopy->cloneRepository('git://git.typo3.org/Packages/TYPO3.CMS.git');
             $this->workingCopy->setCloned(true);
