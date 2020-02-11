@@ -1,6 +1,7 @@
 # This container is for LIVE hosting only!
 # To run the worker locally, just execute them directly
 # ./bin/console app:git-core-split-worker
+# THIS is not the docker-compose file currently used but rather a copy
 version: '2.3'
 services:
   git-core-split-worker:
@@ -12,7 +13,7 @@ services:
     - /srv/vhosts/intercept.typo3.com:/srv/vhosts/intercept.typo3.com
     - /etc/passwd:/etc/passwd:ro
     - /etc/group:/etc/group:ro
-    working_dir: /srv/vhosts/intercept.typo3.com/intercept
+    working_dir: /srv/vhosts/intercept.typo3.com/site/mage/current
     # sleep a second to avoid funny stream issues when starting
     command: >
       /bin/sh -c "
