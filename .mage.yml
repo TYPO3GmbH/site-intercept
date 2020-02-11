@@ -37,7 +37,7 @@ magephp:
         - srv001.typo3.com
       pre-deploy:
         - exec: { cmd: "echo \"APP_ENV=prod\" >> .env.local"}
-        - exec: { cmd: "composer install --no-dev --no-progress --optimize-autoloader"}
+        - composer/install: { flags: "--no-dev --optimize-autoloader"}
         - exec: { cmd: "yarn install --silent"}
         - exec: { cmd: "yarn build"}
       on-deploy:
@@ -49,8 +49,8 @@ magephp:
         - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
       on-release:
       post-release:
+        - symfony/cache-clear: { env: prod }
       post-deploy:
-        - exec: { cmd: "./bin/console cache:clear"}
 
     develop:
       user: stage.intercept.typo3.com
@@ -61,7 +61,7 @@ magephp:
         - srv001.typo3.com
       pre-deploy:
         - exec: { cmd: "echo \"APP_ENV=prod\" >> .env.local"}
-        - exec: { cmd: "composer install --no-dev --no-progress --optimize-autoloader"}
+        - composer/install: { flags: "--no-dev --optimize-autoloader"}
         - exec: { cmd: "yarn install --silent"}
         - exec: { cmd: "yarn build"}
       on-deploy:
@@ -73,5 +73,5 @@ magephp:
         - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
       on-release:
       post-release:
+        - symfony/cache-clear: { env: prod }
       post-deploy:
-        - exec: { cmd: "./bin/console cache:clear"}
