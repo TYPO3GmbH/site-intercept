@@ -5,9 +5,9 @@ monolog:
             members: [file, graylog]
         file:
             type: rotating_file
-            level: INFO
+            level: WARN
             path: "%kernel.logs_dir%/%kernel.environment%.log"
         graylog:
             type: gelf
-            level: INFO
+            level: WARN
             publisher: "gelf.publisher"
