@@ -28,7 +28,7 @@ public class DocsRenderingFluidVHmasterSpec extends AbstractSpec {
     public static void main(String... argv) {
         // By default credentials are read from the '.credentials' file.
         BambooServer bambooServer = new BambooServer(bambooServerName);
-        final DocsRenderingFluidVH95Spec planSpec = new DocsRenderingFluidVH95Spec();
+        final DocsRenderingFluidVHmasterSpec planSpec = new DocsRenderingFluidVHmasterSpec();
         bambooServer.publish(planSpec.plan());
         bambooServer.publish(planSpec.getDefaultPlanPermissions(projectKey, planKey));
     }
