@@ -71,9 +71,8 @@ magephp:
         - fs/link: { from: "../../../../shared/var/docs-redirects", to: "var/docs-redirects" }
         - fs/link: { from: "../../../../shared/var/patches", to: "var/patches" }
         - fs/link: { from: "../../../../shared/var/data.db", to: "var/data.db" }
-        - fs/link: { from: "../../../../shared/var/git-core-split", to: "var/git-core-split" }
         - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
-        - fs/link: { from: "bin/splitsh-lite-linux", to: "../../../shared/bin/splitsh-lite-linux" }
+        - fs/link: { from: "../../../../shared/var/git-core-split", to: "var/git-core-split" }
       on-release:
       post-release:
         - symfony/cache-clear: { env: prod }
