@@ -9,5 +9,6 @@ monolog:
             path: "%kernel.logs_dir%/%kernel.environment%.log"
         graylog:
             type: gelf
-            level: ERROR
+            # use INFO for Gelf as intercept extracts info level messages for display
+            level: INFO
             publisher: "gelf.publisher"
