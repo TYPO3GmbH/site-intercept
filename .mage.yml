@@ -81,6 +81,6 @@ magephp:
       post-release:
         - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}
         - exec: { cmd: "[ -f ../../../cachetool/cachetool.phar ] || curl -o ../../../cachetool/cachetool.phar http://gordalina.github.io/cachetool/downloads/cachetool.phar && chmod +x ../../../cachetool/cachetool.phar"}
-        - exec: { cmd: "SITEVHOST=stage.intercept.typo3.com && php /srv/vhosts/$SITEVHOST/site/cachetool/cachetool.phar opcache:reset --fcgi=/var/run/$SITEVHOST_fpm.sock --tmp-dir=/srv/vhosts/$SITEVHOST/site/cachetool"}
+        - exec: { cmd: "php ../../../cachetool/cachetool.phar opcache:reset --fcgi=/var/run/stage.intercept.typo3.com_fpm.sock --tmp-dir=/srv/vhosts/stage.intercept.typo3.com/site/cachetool"}
         - symfony/cache-clear: { env: prod }
       post-deploy:
