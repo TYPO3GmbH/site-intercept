@@ -32,7 +32,7 @@ public class DocsRenderingSurfMasterSpec extends AbstractSpec {
     public static void main(String... argv) {
         // By default credentials are read from the '.credentials' file.
         BambooServer bambooServer = new BambooServer(bambooServerName);
-        final DocsRedirectsSpec planSpec = new DocsRedirectsSpec();
+        final DocsRenderingSurfMasterSpec planSpec = new DocsRenderingSurfMasterSpec();
         bambooServer.publish(planSpec.plan());
         bambooServer.publish(planSpec.getDefaultPlanPermissions(projectKey, planKey));
     }

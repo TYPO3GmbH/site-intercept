@@ -26,7 +26,7 @@ public class DocsWebRootResourcesSpec extends AbstractSpec {
     public static void main(String... argv) {
         // By default credentials are read from the '.credentials' file.
         BambooServer bambooServer = new BambooServer(bambooServerName);
-        final DocsRedirectsSpec planSpec = new DocsRedirectsSpec();
+        final DocsWebRootResourcesSpec planSpec = new DocsWebRootResourcesSpec();
         bambooServer.publish(planSpec.plan());
         bambooServer.publish(planSpec.getDefaultPlanPermissions(projectKey, planKey));
     }

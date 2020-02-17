@@ -52,6 +52,9 @@ magephp:
         - fs/link: { from: "../../../../shared/var/git-core-split", to: "var/git-core-split" }
       on-release:
       post-release:
+        - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}
+        - exec: { cmd: "[ -f ../../../cachetool/cachetool.phar ] || curl -o ../../../cachetool/cachetool.phar http://gordalina.github.io/cachetool/downloads/cachetool.phar && chmod +x ../../../cachetool/cachetool.phar"}
+        - exec: { cmd: "php ../../../cachetool/cachetool.phar opcache:reset --fcgi=/var/run/intercept.typo3.com_fpm.sock --tmp-dir=/srv/vhosts/intercept.typo3.com/site/cachetool"}
         - symfony/cache-clear: { env: prod }
       post-deploy:
 
@@ -79,5 +82,8 @@ magephp:
         - fs/link: { from: "../../../../shared/var/git-core-split", to: "var/git-core-split" }
       on-release:
       post-release:
+        - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}
+        - exec: { cmd: "[ -f ../../../cachetool/cachetool.phar ] || curl -o ../../../cachetool/cachetool.phar http://gordalina.github.io/cachetool/downloads/cachetool.phar && chmod +x ../../../cachetool/cachetool.phar"}
+        - exec: { cmd: "php ../../../cachetool/cachetool.phar opcache:reset --fcgi=/var/run/stage.intercept.typo3.com_fpm.sock --tmp-dir=/srv/vhosts/stage.intercept.typo3.com/site/cachetool"}
         - symfony/cache-clear: { env: prod }
       post-deploy:
