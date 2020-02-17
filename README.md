@@ -129,13 +129,13 @@ tab 'Clover' for a summary graph.
 Notes: the ddev based setup does currently NOT start the rabbitmq server and the core
 split / tag worker. Some further setup is not fully finished, like valid credentials
 for third party services. The documented setup has been created to allow easy
-development of the documentation part - if more is needed, have a look at the .env
-file and write proper values to a .env.local file!
+development of the documentation part - if more is needed, have a look at the `.env`
+file and write proper values to a `.env.local` file!
 
 ### First install ddev based
 
 On linux, the elasticsearch container for graylog needs an kernel argument: On the host,
-edit file /etc/sysctl.conf and add:
+edit file `/etc/sysctl.conf` and add:
 
 ```
 $ sudo vi /etc/sysctl.conf
@@ -146,15 +146,17 @@ vm.max_map_count = 262144
 
 Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` once.
 
--   Clone repo
--   \$ ddev start
--   \$ ddev composer install
--   \$ ddev exec bin/console doctrine:migrations:migrate -n
--   \$ ddev exec yarn install
--   \$ ddev exec yarn encore dev
--   \$ docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
--   \$ ddev exec -s graylogmongo mongorestore -d graylog /dump/graylog
--   \$ ddev exec -s graylogmongo rm -rf /dump
+```bash
+# Clone repo
+ddev start
+ddev composer install
+ddev exec bin/console doctrine:migrations:migrate -n
+ddev exec yarn install
+ddev exec yarn encore dev
+docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
+ddev exec -s graylogmongo mongorestore -d graylog /dump/graylog
+ddev exec -s graylogmongo rm -rf /dump
+```
 
 ### URL's
 
@@ -164,34 +166,40 @@ Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` o
 
 ### Upgrading ddev based
 
--   \$ git pull
--   \$ ddev start
--   \$ ddev composer install
--   \$ ddev exec bin/console cache:clear
--   \$ ddev exec bin/console doctrine:migrations:migrate -n
--   \$ ddev exec yarn install
--   \$ ddev exec yarn encore dev
--   \$ docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
--   \$ ddev exec -s graylogmongo mongorestore -d graylog /dump/graylog
--   \$ ddev exec -s graylogmongo rm -rf /dump
--   \$ ddev exec -s rabbitmq rabbitmqadmin -u admin -p foo declare queue name=intercept-core-split-testing
+```bash
+git pull
+ddev start
+ddev composer install
+ddev exec bin/console cache:clear
+ddev exec bin/console doctrine:migrations:migrate -n
+ddev exec yarn install
+ddev exec yarn encore dev
+docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
+ddev exec -s graylogmongo mongorestore -d graylog /dump/graylog
+ddev exec -s graylogmongo rm -rf /dump
+ddev exec -s rabbitmq rabbitmqadmin -u admin -p foo declare queue name=intercept-core-split-testing
+```
 
 ### Development
 
 If changing js / css / web images, files to public dirs need to be recompiled and published:
 
--   \$ ddev exec yarn encore dev
+```
+ddev exec yarn encore dev
+```
 
 An alternative is to start an explicit watcher process to recompile if css files change:
 
--   \$ ddev exec yarn encore dev --watch
+```
+ddev exec yarn encore dev --watch
+```
 
 ### Discord
 
 To use the Discord part of Intercept you need two variables in your `.env.local` file
 
--   DISCORD_SERVER_ID
--   DISCORD_BOT_TOKEN
+-   `DISCORD_SERVER_ID`
+-   `DISCORD_BOT_TOKEN`
 
 The server ID is the ID of the Discord server you wish to interact with. You can find this out by turning on developer
 mode in Discord, right clicking the server, and then clicking `copy id`.
@@ -212,25 +220,29 @@ To use Usercentrics you must set these variables in your `.env.local` file
 
 #### Unit tests
 
--   \$ ddev composer t3g:test:php:unit
--   OR \$ ddev exec bin/phpunit -c build/phpunit.xml --testsuite "Unit Test Suite"
+```
+ddev composer t3g:test:php:unit
+```
 
 #### Functional tests
 
--   \$ ddev composer t3g:test:php:functional
--   OR \$ ddev exec bin/phpunit -c build/phpunit.xml --testsuite "Functional Test Suite"
+```
+ddev composer t3g:test:php:functional
+```
 
 #### Unit and functional tests with coverage
 
 Find rendered coverage data at var/phpunit/coverage/index.html
 
--   \$ ddev composer t3g:test:php:cover
--   OR \$ ddev exec bin/phpunit -c build/phpunit.xml --log-junit var/phpunit/phpunit.xml --coverage-clover var/phpunit/coverage.xml --coverage-html var/phpunit/coverage/
+```
+ddev composer t3g:test:php:cover
+```
 
 ### Fix CGL
 
--   \$ ddev composer t3g:cgl
--   OR \$ ddev exec php-cs-fixer fix --config build/.php_cs.dist --format=junit > var/php-cs-fixer/php-cs-fixer.xml
+```
+ddev composer t3g:cgl
+```
 
 ### Creating a new mongo dump
 
@@ -239,16 +251,17 @@ adding stuff, the mongodb should be dumped afterwards and committed for other dd
 users to fetch this new config. Note: Do not use important passwords on the ddev
 based graylog instance, those would be within that dump!
 
--   \$ ddev exec -s graylogmongo rm -rf /dump
--   \$ ddev exec -s graylogmongo mongodump --out /dump
--   \$ cd .ddev/graylogmongo
--   \$ rm -rf dump
--   \$ docker cp ddev-intercept-graylogmongo:/dump .
--   \$ ddev exec -s graylogmongo rm -rf /dump
--   commit stuff to git
+```bash
+ddev exec -s graylogmongo rm -rf /dump
+ddev exec -s graylogmongo mongodump --out /dump
+cd .ddev/graylogmongo
+rm -rf dump
+docker cp ddev-intercept-graylogmongo:/dump .
+ddev exec -s graylogmongo rm -rf /dump
+# commit stuff to git
+```
 
 ### BlackfireIo
 
-If the instance runs with ddev, a .env.local file inside `.ddev` is mandatory. It can be copied from the existing .env.example
-file.
-For no performance profiling tasks, the values may be empty. Else, put your account data here. If in doubt, reach out to Susi.
+If the instance runs with ddev, a `.env.local` file inside `.ddev` is mandatory. It can be copied from the existing .env.example
+file. For no performance profiling tasks, the values may be empty. Else, put your account data here. If in doubt, reach out to Susi.
