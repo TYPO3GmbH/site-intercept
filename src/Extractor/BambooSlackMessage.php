@@ -44,7 +44,7 @@ class BambooSlackMessage
         $payload = $request->request->get('payload');
         if (
             !empty($payload) &&
-            preg_match('/<https:\/\/bamboo\.typo3\.com\/browse\/(?<buildKey>.*?)\|/', $payload, $matches)
+            preg_match('/bamboo\.typo3\.com\/browse\/(?<buildKey>.*?)\|/', $payload, $matches)
         ) {
             $this->buildKey = $matches['buildKey'];
             $this->isNightlyBuild = BranchUtility::isBambooNightlyBuild($matches['buildKey']);

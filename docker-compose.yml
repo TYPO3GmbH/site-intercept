@@ -1,22 +1,30 @@
 # This container is for LIVE hosting only!
 # To run the worker locally, just execute them directly
 # ./bin/console app:git-core-split-worker
+# THIS is not the docker-compose file currently used but rather a copy
 version: '2.3'
 services:
   git-core-split-worker:
+    networks:
+      - intercept_net
     restart: always
+    user: "1037:1038"
     image: typo3gmbh/php74:latest
-    user: "1025:1027"
     hostname: intercept-split-worker
     volumes:
-    - /srv/vhosts/intercept.typo3.com:/srv/vhosts/intercept.typo3.com
-    - /etc/passwd:/etc/passwd:ro
-    - /etc/group:/etc/group:ro
-    working_dir: /srv/vhosts/intercept.typo3.com/intercept
+      - /srv/vhosts/intercept.typo3.com:/srv/vhosts/intercept.typo3.com
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+    working_dir: /srv/vhosts/intercept.typo3.com/site/mage/current
     # sleep a second to avoid funny stream issues when starting
     command: >
       /bin/sh -c "
         sleep 1
-        php -n -c /etc/php/cli-no-xdebug/php.ini bin/console app:git-core-split-worker
+        php -n -c /etc/php/cli-no-xdebug/php.ini bin/console --env=prod app:git-core-split-worker -vvv
         sleep 60
       "
+
+networks:
+  intercept_net:
+    external:
+      name: intercepttypo3com_rabbitmq_net

@@ -5,9 +5,10 @@ monolog:
             members: [file, graylog]
         file:
             type: rotating_file
-            level: INFO
+            level: ERROR
             path: "%kernel.logs_dir%/%kernel.environment%.log"
         graylog:
             type: gelf
+            # use INFO for Gelf as intercept extracts info level messages for display
             level: INFO
             publisher: "gelf.publisher"
