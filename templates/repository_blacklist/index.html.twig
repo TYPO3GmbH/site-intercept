@@ -32,7 +32,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for repository in pagination %}
+                        {% for repository in pagination.getItems() %}
                             <tr data-id="{{ repository.id }}">
                                 <td>{{ repository.repositoryUrl }}</td>
                                 <td data-type="actions" data-label="Actions">
@@ -50,7 +50,7 @@
                         </tbody>
                     </table>
                 </div>
-                {% if pagination.getTotalItemCount > 10 %}
+                {% if pagination.getTotalItemCount() > 10 %}
                     <div class="card-footer">
                         {{ knp_pagination_render(pagination) }}
                     </div>

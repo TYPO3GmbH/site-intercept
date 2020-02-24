@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         php-versions:
-          - '7.2'
+          - '7.4'
 
     steps:
       - uses: actions/checkout@v1
@@ -31,13 +31,13 @@ jobs:
 
       - name: (CGL) PHP
         run: composer t3g:cgl
-      
+
       - name: (TEST) Run unit tests
         run: composer t3g:test:php:unit
 
       - name: Yarn install
         run: yarn install --silent
-  
+
       - name: Yarn build
         run: yarn build
 

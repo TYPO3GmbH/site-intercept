@@ -9,7 +9,7 @@ services:
       - intercept_net
     restart: always
     user: "1037:1038"
-    image: typo3gmbh/php72:latest
+    image: typo3gmbh/php74:latest
     hostname: intercept-split-worker
     volumes:
       - /srv/vhosts/intercept.typo3.com:/srv/vhosts/intercept.typo3.com

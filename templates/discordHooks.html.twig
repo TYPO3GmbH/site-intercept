@@ -34,7 +34,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for webhook in pagination %}
+                        {% for webhook in pagination.getItems() %}
                             <tr data-id="{{ webhook.id }}">
                                 <th data-type="icon">
                                     <i class="fab fa-fw fa-discord fa-style-discord"></i>
@@ -80,7 +80,7 @@
                         </tbody>
                     </table>
                 </div>
-                {% if pagination.getTotalItemCount > 10 %}
+                {% if pagination.getTotalItemCount() > 10 %}
                     <div class="card-footer">
                         {{ knp_pagination_render(pagination) }}
                     </div>

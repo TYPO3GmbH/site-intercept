@@ -39,7 +39,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% for redirect in pagination %}
+                        {% for redirect in pagination.getItems() %}
                             <tr data-id="{{ redirect.id }}">
                                 <th scope="row">
                                     <span class="datatable-text"><i class="fa fa-size-small fa-style-fade fa-arrow-left"></i></span>
@@ -72,7 +72,7 @@
                         </tbody>
                     </table>
                 </div>
-                {% if pagination.getTotalItemCount > 10 %}
+                {% if pagination.getTotalItemCount() > 10 %}
                     <div class="card-footer">
                         {{ knp_pagination_render(pagination) }}
                     </div>
