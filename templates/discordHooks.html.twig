@@ -4,90 +4,82 @@
 {% block headline %}Discord Webhooks{% endblock %}
 {% block body %}
 
-    <div class="content-section">
-        <div class="container">
-
-            <div class="card">
-
-                <div class="card-header">
-                    <div class="card-header-bar">
-                            <div class="card-header-actions">
-                                {{
+    {% frame %}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-bar">
+                        <div class="card-header-actions">
+                            {{
                                 macros.linkbutton(
                                     path('admin_discord_webhooks_add_action'),
                                     'Add webhook',
                                     'secondary'
                                 )
-                                }}
-                            </div>
-                    </div>
+                            }}
+                        </div>
                 </div>
-
-                <div class="datatable">
-                    <table class="datatable-table">
-                        <thead>
-                        <tr>
-                            <th scope="col" colspan="2">Name</th>
-                            <th scope="col">Discord Channel</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for webhook in pagination.getItems() %}
-                            <tr data-id="{{ webhook.id }}">
-                                <th data-type="icon">
-                                    <i class="fab fa-fw fa-discord fa-style-discord"></i>
-                                </th>
-                                <th data-type="title">
-                                    <strong>{{ webhook.name }}</strong><br>
-                                    <small>{{ path('webhook_to_discord', {'identifier': webhook.identifier}) }}</small>
-                                </th>
-                                {% if webhook.channel is empty %}
-                                    <td><span class="badge badge-danger">Webhook has no channel</span></td>
-                                {% elseif webhook.channel.getParent() %}
-                                    <td>{{ webhook.channel.getParent().channelName }} > #{{ webhook.channel.channelName }}</td>
-                                {% else %}
-                                    <td>#{{ webhook.channel.channelName }}</td>
-                                {% endif %}
-                                <td>{{ constant('App\\Discord\\DiscordTransformerFactory::TYPES')[webhook.type] }}</td>
-                                <td data-type="actions" data-label="Actions">
-                                    <a class="datatable-action" title="Send test message" href="{{ path('admin_discord_webhooks_test_action', {webhookId: webhook.id}) }}">
-                                        <span class="datatable-action-icon"><i class="fas fa-envelope"></i></span>
-                                        <span class="datatable-action-label datatable-visually-hidden">Send test message</span>
-                                    </a>
-
-                                    <a class="datatable-action" title="Edit" href="{{ path('admin_discord_webhooks_edit_action', {webhookId: webhook.id}) }}">
-                                        <span class="datatable-action-icon"><i class="fas fa-edit"></i></span>
-                                        <span class="datatable-action-label datatable-visually-hidden">Edit</span>
-                                    </a>
-
-                                    <a class="datatable-action" title="Delete" href="{{ path('admin_discord_webhooks_delete_action', {'webhookId': webhook.getId()}) }}">
-                                        <span class="datatable-action-icon"><i class="fa fa-trash"></i></span>
-                                        <span class="datatable-action-label datatable-visually-hidden">Delete</span>
-                                    </a>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
-                                    <td colspan="9">no records found</td>
-                                {% else %}
-                                    <td colspan="8">no records found</td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% if pagination.getTotalItemCount() > 10 %}
-                    <div class="card-footer">
-                        {{ knp_pagination_render(pagination) }}
-                    </div>
-                {% endif %}
             </div>
-
+            <div class="datatable">
+                <table class="datatable-table">
+                    <thead>
+                    <tr>
+                        <th scope="col" colspan="2">Name</th>
+                        <th scope="col">Discord Channel</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for webhook in pagination.getItems() %}
+                        <tr data-id="{{ webhook.id }}">
+                            <th data-type="icon">
+                                <i class="fab fa-fw fa-discord fa-style-discord"></i>
+                            </th>
+                            <th data-type="title">
+                                <strong>{{ webhook.name }}</strong><br>
+                                <small>{{ path('webhook_to_discord', {'identifier': webhook.identifier}) }}</small>
+                            </th>
+                            {% if webhook.channel is empty %}
+                                <td><span class="badge badge-danger">Webhook has no channel</span></td>
+                            {% elseif webhook.channel.getParent() %}
+                                <td>{{ webhook.channel.getParent().channelName }} > #{{ webhook.channel.channelName }}</td>
+                            {% else %}
+                                <td>#{{ webhook.channel.channelName }}</td>
+                            {% endif %}
+                            <td>{{ constant('App\\Discord\\DiscordTransformerFactory::TYPES')[webhook.type] }}</td>
+                            <td data-type="actions" data-label="Actions">
+                                <a class="datatable-action" title="Send test message" href="{{ path('admin_discord_webhooks_test_action', {webhookId: webhook.id}) }}">
+                                    <span class="datatable-action-icon"><i class="fas fa-envelope"></i></span>
+                                    <span class="datatable-action-label datatable-visually-hidden">Send test message</span>
+                                </a>
+                                <a class="datatable-action" title="Edit" href="{{ path('admin_discord_webhooks_edit_action', {webhookId: webhook.id}) }}">
+                                    <span class="datatable-action-icon"><i class="fas fa-edit"></i></span>
+                                    <span class="datatable-action-label datatable-visually-hidden">Edit</span>
+                                </a>
+                                <a class="datatable-action" title="Delete" href="{{ path('admin_discord_webhooks_delete_action', {'webhookId': webhook.getId()}) }}">
+                                    <span class="datatable-action-icon"><i class="fa fa-trash"></i></span>
+                                    <span class="datatable-action-label datatable-visually-hidden">Delete</span>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                <td colspan="9">no records found</td>
+                            {% else %}
+                                <td colspan="8">no records found</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pagination.getTotalItemCount() > 10 %}
+                <div class="card-footer">
+                    {{ knp_pagination_render(pagination) }}
+                </div>
+            {% endif %}
         </div>
-    </div>
+    {% endframe %}
 
 {% endblock %}

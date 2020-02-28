@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "efbf67d3702b4541833c8338d62c7f74",
+    "content-hash": "06a1f9e83f655943d79aa7e385910367",
     "packages": [
         {
             "name": "brick/reflection",
@@ -7015,16 +7015,16 @@
         },
         {
             "name": "t3g/symfony-template-bundle",
-            "version": "1.0.0",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TYPO3GmbH/symfony-template-bundle.git",
-                "reference": "bf7c92a81b637086d9b5b31a9289679e0333f01f"
+                "reference": "da615647c0fdf482b5c8cc52203170db737185e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TYPO3GmbH/symfony-template-bundle/zipball/bf7c92a81b637086d9b5b31a9289679e0333f01f",
-                "reference": "bf7c92a81b637086d9b5b31a9289679e0333f01f",
+                "url": "https://api.github.com/repos/TYPO3GmbH/symfony-template-bundle/zipball/da615647c0fdf482b5c8cc52203170db737185e2",
+                "reference": "da615647c0fdf482b5c8cc52203170db737185e2",
                 "shasum": ""
             },
             "require": {
@@ -7032,18 +7032,22 @@
                 "knplabs/knp-paginator-bundle": "^3.0 || ^4.0 || ^5.0",
                 "php": "^7.2",
                 "symfony/asset": "^4.4 || ^5.0",
+                "symfony/dependency-injection": "^4.4 || ^5.0",
                 "symfony/framework-bundle": "^4.4 || ^5.0",
                 "symfony/http-kernel": "^4.4 || ^5.0",
                 "symfony/security-bundle": "^4.4 || ^5.0",
                 "symfony/translation": "^4.4 || ^5.0",
                 "symfony/twig-bundle": "^4.4 || ^5.0",
-                "symfony/webpack-encore-bundle": "^1.7",
                 "twig/twig": "^2.12 || ^3.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.16",
                 "overtrue/phplint": "^1.2",
-                "symfony/phpunit-bridge": "^4.4 | ^5.0"
+                "symfony/phpunit-bridge": "^4.4 | ^5.0",
+                "symfony/webpack-encore-bundle": "^1.7"
+            },
+            "suggest": {
+                "symfony/webpack-encore-bundle": "Needed to support encore entrypoints."
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -7067,7 +7071,7 @@
                 "templates",
                 "typo3"
             ],
-            "time": "2019-12-20T11:23:53+00:00"
+            "time": "2020-02-28T12:19:16+00:00"
         },
         {
             "name": "t3g/symfony-usercentrics-bundle",
