@@ -22,6 +22,5 @@ class HomeControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', '/admin');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/About Intercept/', $client->getResponse()->getContent());
     }
 }

@@ -3,64 +3,60 @@
 {% block headline %}How to: Discord Webhooks{% endblock %}
 {% block body %}
 
-    <div class="content-section">
-        <div class="container">
-            <h2>
-                Configuring Intercept Discord webhooks in other services
-            </h2>
-            <div class="row">
-                <div class="card">
-                    <div class="card-body">
-                        <h3>Introduction</h3>
-                        <p>This page will contain documentation on how to connect other services (such as Bamboo) to
-                            Intercept Discord webhooks. Once you have created a webhook in Intercept, you can find the
-                            url to trigger it in the webhooks list, below the name of your hook. It will always look
-                            something like <i>/discord/hook/somelongrandomstring</i>. To get the complete url, prepend
-                            <i>https://intercept.typo3.com</i> to this string.</p>
+    {% frame %}
+        <h2>
+            Configuring Intercept Discord webhooks in other services
+        </h2>
+        <div class="card">
+            <div class="card-body">
+                <h3>Introduction</h3>
+                <p>This page will contain documentation on how to connect other services (such as Bamboo) to
+                    Intercept Discord webhooks. Once you have created a webhook in Intercept, you can find the
+                    url to trigger it in the webhooks list, below the name of your hook. It will always look
+                    something like <i>/discord/hook/somelongrandomstring</i>. To get the complete url, prepend
+                    <i>https://intercept.typo3.com</i> to this string.</p>
 
-                        <hr>
+                <hr>
 
-                        <h3>Bamboo</h3>
-                        To configure the webhook with Bamboo, copy the webhook url from Intercept and head to bamboo.
-                        Once in Bamboo pick the plan or project you would like to connect to the webhook and click on
-                        it. Then on the top-right hand side click on "Actions" -> "Configure plan". Now head to the
-                        "Notifications" tab and click the "Add notification" button. A new window should pop up. Select
-                        the events you want to send, and then in the "Recipient type" field select "Slack". Then paste
-                        the Intercept webhook url into the "Slack webhook URL" field and save. Your webhook is now set
-                        up.
+                <h3>Bamboo</h3>
+                To configure the webhook with Bamboo, copy the webhook url from Intercept and head to bamboo.
+                Once in Bamboo pick the plan or project you would like to connect to the webhook and click on
+                it. Then on the top-right hand side click on "Actions" -> "Configure plan". Now head to the
+                "Notifications" tab and click the "Add notification" button. A new window should pop up. Select
+                the events you want to send, and then in the "Recipient type" field select "Slack". Then paste
+                the Intercept webhook url into the "Slack webhook URL" field and save. Your webhook is now set
+                up.
 
-                        <hr>
+                <hr>
 
-                        <h3>Graylog</h3>
-                        <p>Log into Graylog and navigate to "Alerts" in the top menu bar. Then on the right, click the
-                            button "Notifications". Now click the "Add new notification" button. Select the stream you
-                            wish to connect to Discord. Set the "Notification type" to "HTTP Alarm Callback". Click on
-                            "Add alert notification". A new form should pop up. Name your notification, and add the
-                            intercept webhook url in the "URL" field, then save.</p>
+                <h3>Graylog</h3>
+                <p>Log into Graylog and navigate to "Alerts" in the top menu bar. Then on the right, click the
+                    button "Notifications". Now click the "Add new notification" button. Select the stream you
+                    wish to connect to Discord. Set the "Notification type" to "HTTP Alarm Callback". Click on
+                    "Add alert notification". A new form should pop up. Name your notification, and add the
+                    intercept webhook url in the "URL" field, then save.</p>
 
-                        <hr>
+                <hr>
 
-                        <h3>Custom Error Handler</h3>
-                        <p>This webhook type is triggered by a custom POST request directly from your project. You will
-                            need to send a POST request to the Intercept webhook with the following JSON parameters:</p>
-                        <ul>
-                            <li><strong>project_name</strong>: a string containing the name of the project.</li>
-                            <li><strong>message</strong>: a string containing the error message (or stack trace).</li>
-                            <li><strong>log_level</strong>: an integer containing the log level of this message.</li>
-                        </ul>
+                <h3>Custom Error Handler</h3>
+                <p>This webhook type is triggered by a custom POST request directly from your project. You will
+                    need to send a POST request to the Intercept webhook with the following JSON parameters:</p>
+                <ul>
+                    <li><strong>project_name</strong>: a string containing the name of the project.</li>
+                    <li><strong>message</strong>: a string containing the error message (or stack trace).</li>
+                    <li><strong>log_level</strong>: an integer containing the log level of this message.</li>
+                </ul>
 
-                        <div class="alert alert-info">
-                            Be aware that messages below the configured log level will be discarded automatically. So if
-                            you configure your webhook to send logs of level ERROR and above, WARNING messages will not
-                            appear in Discord.
-                        </div>
-
-                        Here is an example
-                        <pre><code class="language-json">{{ jsonExample }}</code></pre>
-                    </div>
+                <div class="alert alert-info">
+                    Be aware that messages below the configured log level will be discarded automatically. So if
+                    you configure your webhook to send logs of level ERROR and above, WARNING messages will not
+                    appear in Discord.
                 </div>
+
+                Here is an example
+                <pre><code class="language-json">{{ jsonExample }}</code></pre>
             </div>
         </div>
-    </div>
+    {% endframe %}
 
 {% endblock %}

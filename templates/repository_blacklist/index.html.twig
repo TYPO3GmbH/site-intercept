@@ -4,34 +4,17 @@
 {% block headline %}Repository Blacklist{% endblock %}
 {% block body %}
 
-    <div class="content-section">
-        <div class="container">
-
-            <div class="card">
-
-{#                <div class="card-header">#}
-{#                    <div class="card-header-bar">#}
-{#                        <div class="card-header-actions">#}
-{#                            {{#}
-{#                            macros.linkbutton(#}
-{#                                path('admin_discord_scheduled_messages_add_action'),#}
-{#                                'Add message',#}
-{#                                'secondary'#}
-{#                            )#}
-{#                            }}#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-
-                <div class="datatable">
-                    <table class="datatable-table">
-                        <thead>
+    {% frame %}
+        <div class="card">
+            <div class="datatable">
+                <table class="datatable-table">
+                    <thead>
                         <tr>
                             <th scope="col">URL</th>
                             <th scope="col">Actions</th>
                         </tr>
-                        </thead>
-                        <tbody>
+                    </thead>
+                    <tbody>
                         {% for repository in pagination.getItems() %}
                             <tr data-id="{{ repository.id }}">
                                 <td>{{ repository.repositoryUrl }}</td>
@@ -47,17 +30,15 @@
                                 <td colspan="5">no records found</td>
                             </tr>
                         {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% if pagination.getTotalItemCount() > 10 %}
-                    <div class="card-footer">
-                        {{ knp_pagination_render(pagination) }}
-                    </div>
-                {% endif %}
+                    </tbody>
+                </table>
             </div>
-
+            {% if pagination.getTotalItemCount() > 10 %}
+                <div class="card-footer">
+                    {{ knp_pagination_render(pagination) }}
+                </div>
+            {% endif %}
         </div>
-    </div>
+    {% endframe %}
 
 {% endblock %}
