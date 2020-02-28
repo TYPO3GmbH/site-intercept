@@ -11,6 +11,7 @@ namespace App\Controller\AdminInterface;
 
 use App\Entity\DiscordChannel;
 use App\Entity\DiscordScheduledMessage;
+use App\Entity\DiscordWebhook;
 use App\Repository\DiscordChannelRepository;
 use App\Repository\DiscordScheduledMessageRepository;
 use App\Repository\DiscordWebhookRepository;
@@ -29,6 +30,20 @@ use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
 class DiscordController extends AbstractController
 {
     /**
+     * @Route("/admin/discord/howto", name="admin_discord_webhooks_howto")
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function howTo(): Response
+    {
+        $jsonExample = '{' . PHP_EOL . '    "message": "This is an error message",' . PHP_EOL . '    "project_name": "My Cool Project",' . PHP_EOL . '    "log_level": 4' . PHP_EOL . '}';
+        return $this->render('discord/howto.html.twig',
+            [
+                'jsonExample' => $jsonExample
+            ]
+        );
+    }
+
+    /**
      * @Route("/admin/discord", name="admin_discord_webhooks")
      * @IsGranted("ROLE_ADMIN")
      *
@@ -37,16 +52,18 @@ class DiscordController extends AbstractController
      * @param PaginatorInterface $paginator
      * @return Response
      */
-    public function index(Request $request, DiscordWebhookRepository $discordWebhookRepository, PaginatorInterface $paginator): Response
-    {
+    public function webhookList(
+        Request $request,
+        DiscordWebhookRepository $discordWebhookRepository,
+        PaginatorInterface $paginator
+    ): Response {
         $hooks = $discordWebhookRepository->findAll();
         $pagination = $paginator->paginate(
             $hooks,
             $request->query->getInt('page', 1)
         );
 
-        return $this->render(
-            'discordHooks.html.twig',
+        return $this->render('discord/webhook_list.html.twig',
             [
                 'pagination' => $pagination,
             ]
@@ -62,8 +79,11 @@ class DiscordController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @return Response
      */
-    public function delete(int $webhookId, DiscordWebhookRepository $discordWebhookRepository, EntityManagerInterface $entityManager): Response
-    {
+    public function webhookDelete(
+        int $webhookId,
+        DiscordWebhookRepository $discordWebhookRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
         $hook = $discordWebhookRepository->find($webhookId);
 
         if (null !== $hook) {
@@ -86,7 +106,7 @@ class DiscordController extends AbstractController
      * @return Response
      * @throws \Exception
      */
-    public function add(
+    public function webhookAdd(
         Request $request,
         EntityManagerInterface $entityManager,
         DiscordChannelRepository $discordChannelRepository,
@@ -117,8 +137,7 @@ class DiscordController extends AbstractController
             }
         }
 
-        return $this->render(
-            'discord_webhooks/addWebhook.html.twig',
+        return $this->render('discord/webhook_form.html.twig',
             [
                 'form' => $form->createView(),
             ]
@@ -137,7 +156,7 @@ class DiscordController extends AbstractController
      * @param DiscordWebhookService $discordWebhookService
      * @return Response
      */
-    public function edit(
+    public function webhookEdit(
         Request $request,
         int $webhookId,
         EntityManagerInterface $entityManager,
@@ -199,22 +218,12 @@ class DiscordController extends AbstractController
             $form->get('channelId')->setData(null);
         }
 
-        return $this->render(
-            'discord_webhooks/addWebhook.html.twig',
+        return $this->render('discord/webhook_form.html.twig',
             [
                 'form' => $form->createView(),
                 'edit' => true,
             ]
         );
-    }
-    /**
-     * @Route("/admin/discord/howto", name="admin_discord_webhooks_howto")
-     * @IsGranted("ROLE_ADMIN")
-     */
-    public function howTo(): Response
-    {
-        $jsonExample = '{' . PHP_EOL . '    "message": "This is an error message",' . PHP_EOL . '    "project_name": "My Cool Project",' . PHP_EOL . '    "log_level": 4' . PHP_EOL . '}';
-        return $this->render('discord_webhooks/howto.html.twig', ['jsonExample' => $jsonExample]);
     }
 
     /**
@@ -226,8 +235,11 @@ class DiscordController extends AbstractController
      * @param DiscordWebhookService $discordWebhookService
      * @return Response
      */
-    public function testWebhook(int $webhookId, DiscordWebhookRepository $discordWebhookRepository, DiscordWebhookService $discordWebhookService): Response
-    {
+    public function webhookTest(
+        int $webhookId,
+        DiscordWebhookRepository $discordWebhookRepository,
+        DiscordWebhookService $discordWebhookService
+    ): Response {
         $hook = $discordWebhookRepository->find($webhookId);
 
         if (null !== $hook && null !== $hook->getChannel()) {
@@ -265,16 +277,18 @@ class DiscordController extends AbstractController
      * @param PaginatorInterface $paginator
      * @return Response
      */
-    public function scheduledMessagesIndex(Request $request, DiscordScheduledMessageRepository $discordScheduledMessageRepository, PaginatorInterface $paginator): Response
-    {
+    public function scheduledMessageList(
+        Request $request,
+        DiscordScheduledMessageRepository $discordScheduledMessageRepository,
+        PaginatorInterface $paginator
+    ): Response {
         $messaged = $discordScheduledMessageRepository->findAll();
         $pagination = $paginator->paginate(
             $messaged,
             $request->query->getInt('page', 1)
         );
 
-        return $this->render(
-            'discordScheduledMessages.html.twig',
+        return $this->render('discord/scheduled_message_list.html.twig',
             [
                 'pagination' => $pagination,
             ]
@@ -291,7 +305,7 @@ class DiscordController extends AbstractController
      * @return Response
      * @throws \Exception
      */
-    public function scheduledMessagesAdd(
+    public function scheduledMessageAdd(
         Request $request,
         EntityManagerInterface $entityManager,
         DiscordChannelRepository $discordChannelRepository
@@ -305,8 +319,7 @@ class DiscordController extends AbstractController
             $response = $this->handleFormSubmit($request->get('discord_scheduled_message'), $entityManager, $discordChannelRepository, $message);
         }
 
-        return $response ?? $this->render(
-            'discord_scheduled_messages/addMessage.html.twig',
+        return $response ?? $this->render('discord/scheduled_message_form.html.twig',
             [
                 'form' => $form->createView(),
             ]
@@ -324,7 +337,7 @@ class DiscordController extends AbstractController
      * @param DiscordScheduledMessageRepository $discordScheduledMessageRepository
      * @return Response
      */
-    public function scheduledMessagesEdit(
+    public function scheduledMessageEdit(
         int $messageId,
         Request $request,
         EntityManagerInterface $entityManager,
@@ -353,8 +366,7 @@ class DiscordController extends AbstractController
             $form->get('channelId')->setData(null);
         }
 
-        return $this->render(
-            'discord_scheduled_messages/addMessage.html.twig',
+        return $this->render('discord/scheduled_message_form.html.twig',
             [
                 'form' => $form->createView(),
                 'edit' => true,
@@ -371,8 +383,11 @@ class DiscordController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @return Response
      */
-    public function scheduledMessagesDelete(int $messageId, DiscordScheduledMessageRepository $discordScheduledMessageRepository, EntityManagerInterface $entityManager): Response
-    {
+    public function scheduledMessageDelete(
+        int $messageId,
+        DiscordScheduledMessageRepository $discordScheduledMessageRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
         $message = $discordScheduledMessageRepository->find($messageId);
 
         if (null !== $message) {
@@ -391,8 +406,12 @@ class DiscordController extends AbstractController
      * @param DiscordScheduledMessage|null $message
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
      */
-    protected function handleFormSubmit(array $discordScheduledMessage, EntityManagerInterface $entityManager, DiscordChannelRepository $discordChannelRepository, DiscordScheduledMessage $message): ?Response
-    {
+    protected function handleFormSubmit(
+        array $discordScheduledMessage,
+        EntityManagerInterface $entityManager,
+        DiscordChannelRepository $discordChannelRepository,
+        DiscordScheduledMessage $message
+    ): ?Response {
         $channel = $discordChannelRepository->findOneBy(['channelId' => $discordScheduledMessage['channelId']]);
         if (null !== $channel) {
             $transformer = new CronExpressionToPartsTransformer();
@@ -419,8 +438,11 @@ class DiscordController extends AbstractController
         return null;
     }
 
-    protected function setHookPropertiesFromRequest(\App\Entity\DiscordWebhook $hook, $discordWebHook, ?DiscordChannel $channel): void
-    {
+    protected function setHookPropertiesFromRequest(
+        DiscordWebhook $hook,
+        $discordWebHook,
+        ?DiscordChannel $channel
+    ): void {
         $hook->setName($discordWebHook['name'])
             ->setChannel($channel)
             ->setType($discordWebHook['type']);

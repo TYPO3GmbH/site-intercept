@@ -1,0 +1,29 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Documentation deployments{% endblock %}
+{% block headline %}Deployed documentation{% endblock %}
+{% block body %}
+
+    {% frame %}
+        <h2>Add Deployed documentation projects</h2>
+        <div class="card">
+            <div class="card-body">
+                {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <div class="text-center">
+                        {% if (showPrev) %}
+                        <button class="btn btn-outline-secondary" type="button" onclick="history.back();">
+                            <span class="btn-icon"><i class="fa fa-arrow-left"></i></span>
+                            <span class="btn-text">{{ button_label|default('Previous') }}</span>
+                        </button>
+                        {% endif %}
+                        <button class="btn btn-primary pull-right">
+                            <span class="btn-icon"><i class="fa fa-arrow-right"></i></span>
+                            <span class="btn-text">{{ button_label|default('Next') }}</span>
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    {% endframe %}
+
+{% endblock %}

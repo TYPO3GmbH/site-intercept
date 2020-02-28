@@ -1,13 +1,13 @@
 {% extends 'layout.html.twig' %}
 {% import 'macros/macros.html.twig' as macros %}
-{% block title %}Edit Redirect{% endblock %}
-{% block headline %}Edit Redirect{% endblock %}
+{% block title %}Edit Documentation Redirect{% endblock %}
+{% block headline %}Edit Documentation Redirect{% endblock %}
 {% block body %}
 
     {% frame %}
         <div class="card">
             <div class="card-body">
-                {{ include('redirect/_form.html.twig', {'button_label': 'Update'}) }}
+                {{ include('docs_redirect/_form.html.twig', {'button_label': 'Update'}) }}
             </div>
         </div>
         <div class="row mt-4 justify-content-between">
@@ -22,7 +22,7 @@
                 }}
             </div>
             <div class="col-auto">
-                {{ include('redirect/_delete_form.html.twig') }}
+                {{ include('docs_redirect/_delete_form.html.twig') }}
             </div>
         </div>
     {% endframe %}
