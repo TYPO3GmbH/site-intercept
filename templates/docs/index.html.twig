@@ -25,7 +25,10 @@
                 {{ form_start(fluidVhForm) }}
                     {{ form_errors(fluidVhForm) }}
                     <div class="form-group">
-                        {{ form_widget(fluidVhForm.trigger) }}
+                        {{ form_widget(fluidVhForm.DRF) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(fluidVhForm.DRFVM) }}
                     </div>
                     {{ form_widget(fluidVhForm._token) }}
                 {{ form_end(fluidVhForm, {'render_rest': false}) }}

@@ -61,8 +61,12 @@ class RedirectController extends AbstractController
      * @param PaginatorInterface $paginator
      * @return Response
      */
-    public function index(DocsServerRedirectRepository $redirectRepository, GraylogService $graylogService, Request $request, PaginatorInterface $paginator): Response
-    {
+    public function index(
+        DocsServerRedirectRepository $redirectRepository,
+        GraylogService $graylogService,
+        Request $request,
+        PaginatorInterface $paginator
+    ): Response {
         $currentConfigurationFile = $this->nginxService->findCurrentConfiguration();
         $staticConfigurationFile = $this->nginxService->getStaticConfiguration();
         $recentLogsMessages = $graylogService->getRecentRedirectActions();
@@ -93,13 +97,15 @@ class RedirectController extends AbstractController
             $request->query->getInt('page', 1)
         );
 
-        return $this->render('redirect/index.html.twig', [
-            'currentConfiguration' => $currentConfigurationFile,
-            'logMessages' => $recentLogsMessages,
-            'pagination' => $pagination,
-            'filter' => $form->createView(),
-            'staticConfiguration' => $staticConfigurationFile,
-        ]);
+        return $this->render('docs_redirect/index.html.twig',
+            [
+                'currentConfiguration' => $currentConfigurationFile,
+                'logMessages' => $recentLogsMessages,
+                'pagination' => $pagination,
+                'filter' => $form->createView(),
+                'staticConfiguration' => $staticConfigurationFile,
+            ]
+        );
     }
 
     /**
@@ -108,8 +114,9 @@ class RedirectController extends AbstractController
      * @param Request $request
      * @return Response
      */
-    public function new(Request $request): Response
-    {
+    public function new(
+        Request $request
+    ): Response {
         $redirect = new DocsServerRedirect();
         $form = $this->createForm(DocsServerRedirectType::class, $redirect);
         $form->handleRequest($request);
@@ -123,10 +130,12 @@ class RedirectController extends AbstractController
             return $this->redirectToRoute('admin_redirect_index');
         }
 
-        return $this->render('redirect/new.html.twig', [
-            'redirect' => $redirect,
-            'form' => $form->createView(),
-        ]);
+        return $this->render('docs_redirect/new.html.twig',
+            [
+                'redirect' => $redirect,
+                'form' => $form->createView(),
+            ]
+        );
     }
 
     /**
@@ -135,9 +144,14 @@ class RedirectController extends AbstractController
      * @param DocsServerRedirect $redirect
      * @return Response
      */
-    public function show(DocsServerRedirect $redirect): Response
-    {
-        return $this->render('redirect/show.html.twig', ['redirect' => $redirect]);
+    public function show(
+        DocsServerRedirect $redirect
+    ): Response {
+        return $this->render('docs_redirect/show.html.twig',
+            [
+                'redirect' => $redirect
+            ]
+        );
     }
 
     /**
@@ -147,8 +161,10 @@ class RedirectController extends AbstractController
      * @param DocsServerRedirect $redirect
      * @return Response
      */
-    public function edit(Request $request, DocsServerRedirect $redirect): Response
-    {
+    public function edit(
+        Request $request,
+        DocsServerRedirect $redirect
+    ): Response {
         $form = $this->createForm(DocsServerRedirectType::class, $redirect);
         $form->handleRequest($request);
 
@@ -159,10 +175,12 @@ class RedirectController extends AbstractController
             return $this->redirectToRoute('admin_redirect_index', ['id' => $redirect->getId()]);
         }
 
-        return $this->render('redirect/edit.html.twig', [
-            'redirect' => $redirect,
-            'form' => $form->createView(),
-        ]);
+        return $this->render('docs_redirect/edit.html.twig',
+            [
+                'redirect' => $redirect,
+                'form' => $form->createView(),
+            ]
+        );
     }
 
     /**
@@ -172,8 +190,10 @@ class RedirectController extends AbstractController
      * @param DocsServerRedirect $redirect
      * @return Response
      */
-    public function delete(Request $request, DocsServerRedirect $redirect): Response
-    {
+    public function delete(
+        Request $request,
+        DocsServerRedirect $redirect
+    ): Response {
         if ($this->isCsrfTokenValid('delete' . $redirect->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($redirect);
@@ -188,8 +208,10 @@ class RedirectController extends AbstractController
      * @param string $triggeredBySubType
      * @param DocsServerRedirect $redirect
      */
-    protected function createRedirectsAndDeploy(string $triggeredBySubType, DocsServerRedirect $redirect): void
-    {
+    protected function createRedirectsAndDeploy(
+        string $triggeredBySubType,
+        DocsServerRedirect $redirect
+    ): void {
         $filename = $this->nginxService->createRedirectConfigFile();
         $bambooBuildTriggered = $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
 

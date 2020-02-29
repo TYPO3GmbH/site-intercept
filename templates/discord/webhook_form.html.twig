@@ -1,0 +1,45 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Discord Webhooks{% endblock %}
+{% block headline %}Discord Webhooks{% endblock %}
+{% block body %}
+
+    {% frame %}
+        <h2>
+            {% if edit is defined %}
+                Edit a Discord webhook
+            {% else %}
+                Add a Discord webhook
+            {% endif %}
+        </h2>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        {{ form(form) }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Name</h3>
+                        <p>This is the name of this webhook entity, and is just for reference. This should be a distinguishable name.</p>
+                        <h3>Channel</h3>
+                        <p>This is the Discord channel the webhook should post it. If present, the category of a channel is listed after the name, between brackets.</p>
+                        <h3>Type</h3>
+                        <p>This is the type of service you wish to connect to Discord.</p>
+                        <div id="log_level_info_text">
+                            <h3>Loglevel</h3>
+                            <p>This is only relevant for the custom error handler type. This is the minimum log level a message must have in order to be passed on to Discord.</p>
+                        </div>
+                        <h3>Username</h3>
+                        <p>This will be the username the bot uses when this webhook is triggerd.</p>
+                        <h3>Avatar Url</h3>
+                        <p>This field can contain a link to an image (png, jpg or jpeg) that will then be used as avatar by the bot. However, this is not mandatory.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endframe %}
+
+{% endblock %}

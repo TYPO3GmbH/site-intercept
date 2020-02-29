@@ -84,8 +84,7 @@ class DeploymentsController extends AbstractController
             $request->query->getInt('page', 1)
         );
 
-        return $this->render(
-            'docsDeployments.html.twig',
+        return $this->render('docs_deployments/index.html.twig',
             [
                 'filter' => $form->createView(),
                 'pagination' => $pagination,
@@ -102,15 +101,16 @@ class DeploymentsController extends AbstractController
      * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
      */
-    public function deleteConfirm(int $documentationJarId, DocumentationJarRepository $documentationJarRepository): Response
-    {
+    public function deleteConfirm(
+        int $documentationJarId,
+        DocumentationJarRepository $documentationJarRepository
+    ): Response {
         $jar = $documentationJarRepository->find($documentationJarId);
         if (null === $jar || !$jar->isDeletable()) {
             return $this->redirectToRoute('admin_docs_deployments');
         }
 
-        return $this->render(
-            'docsDeploymentsDelete.html.twig',
+        return $this->render('docs_deployments/delete.html.twig',
             [
                 'deployment' => $jar,
                 'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),

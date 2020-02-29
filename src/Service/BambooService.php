@@ -204,10 +204,10 @@ class BambooService
      *
      * @return BambooBuildTriggered
      */
-    public function triggerDocumentationFluidVhPlan(): BambooBuildTriggered
+    public function triggerDocumentationFluidVhPlan(string $buildPlan): BambooBuildTriggered
     {
         $uri = 'latest/queue/'
-            . 'CORE-DRF?'
+            . 'CORE-' . $buildPlan . '?'
             . http_build_query([
                 'stage' => '',
                 'executeAllStages' => '',

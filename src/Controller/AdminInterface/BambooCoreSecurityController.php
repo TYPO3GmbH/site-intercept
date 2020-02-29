@@ -65,8 +65,7 @@ class BambooCoreSecurityController extends AbstractController
 
         $recentLogsMessages = $graylogService->getRecentBambooCoreSecurityTriggersAndVotes();
 
-        return $this->render(
-            'bambooCoreSecurity.html.twig',
+        return $this->render('bamboo_core_security/index.html.twig',
             [
                 'patchForm' => $patchForm->createView(),
                 'urlForm' => $urlForm->createView(),

@@ -23,7 +23,8 @@ class BambooDocsFluidVhTriggerFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('trigger', SubmitType::class, ['label' => 'Render Fluid View Helper Reference 9.5'])
+            ->add('DRF', SubmitType::class, ['label' => 'Render Fluid View Helper Reference 9.5'])
+            ->add('DRFVM', SubmitType::class, ['label' => 'Render Fluid View Helper Reference master'])
         ;
     }
 }

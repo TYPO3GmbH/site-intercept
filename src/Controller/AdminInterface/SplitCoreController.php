@@ -67,8 +67,7 @@ class SplitCoreController extends AbstractController
 
         $recentLogs = $graylogService->getRecentSplitActions();
 
-        return $this->render(
-            'splitCore.html.twig',
+        return $this->render('split_core/index.html.twig',
             [
                 'splitCoreSplit' => $splitForm->createView(),
                 'splitCoreTag' => $tagForm->createView(),

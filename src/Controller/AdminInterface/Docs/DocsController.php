@@ -58,8 +58,7 @@ class DocsController extends AbstractController
 
         $recentLogsMessages = $graylogService->getRecentBambooDocsThirdPartyTriggers();
 
-        return $this->render(
-            'docs.html.twig',
+        return $this->render('docs/index.html.twig',
             [
                 'fluidVhForm' => $fluidVhForm->createView(),
                 'surf20Form' => $surf20Form->createView(),
@@ -74,12 +73,15 @@ class DocsController extends AbstractController
      * @param BambooService $bambooService
      * @return FormInterface
      */
-    protected function getFluidVhForm(Request $request, BambooService $bambooService): FormInterface
-    {
+    protected function getFluidVhForm(
+        Request $request,
+        BambooService $bambooService
+    ): FormInterface {
         $fluidVhForm = $this->createForm(BambooDocsFluidVhTriggerFormType::class);
         $fluidVhForm->handleRequest($request);
         if ($fluidVhForm->isSubmitted() && $fluidVhForm->isValid()) {
-            $bambooTriggered = $bambooService->triggerDocumentationFluidVhPlan();
+            $buildPlan = $fluidVhForm->getClickedButton()->getName();
+            $bambooTriggered = $bambooService->triggerDocumentationFluidVhPlan($buildPlan);
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
@@ -111,8 +113,10 @@ class DocsController extends AbstractController
      * @param BambooService $bambooService
      * @return FormInterface
      */
-    protected function getSurf20Form(Request $request, BambooService $bambooService): FormInterface
-    {
+    protected function getSurf20Form(
+        Request $request,
+        BambooService $bambooService
+    ): FormInterface {
         $surfForm = $this->createForm(BambooDocsSurf20TriggerFormType::class);
         $surfForm->handleRequest($request);
         if ($surfForm->isSubmitted() && $surfForm->isValid()) {
@@ -148,8 +152,10 @@ class DocsController extends AbstractController
      * @param BambooService $bambooService
      * @return FormInterface
      */
-    protected function getSurfMasterForm(Request $request, BambooService $bambooService): FormInterface
-    {
+    protected function getSurfMasterForm(
+        Request $request,
+        BambooService $bambooService
+    ): FormInterface {
         $surfForm = $this->createForm(BambooDocsSurfMasterTriggerFormType::class);
         $surfForm->handleRequest($request);
         if ($surfForm->isSubmitted() && $surfForm->isValid()) {
