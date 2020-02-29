@@ -80,7 +80,8 @@ class DocsController extends AbstractController
         $fluidVhForm = $this->createForm(BambooDocsFluidVhTriggerFormType::class);
         $fluidVhForm->handleRequest($request);
         if ($fluidVhForm->isSubmitted() && $fluidVhForm->isValid()) {
-            $bambooTriggered = $bambooService->triggerDocumentationFluidVhPlan();
+            $buildPlan = $fluidVhForm->getClickedButton()->getName();
+            $bambooTriggered = $bambooService->triggerDocumentationFluidVhPlan($buildPlan);
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
