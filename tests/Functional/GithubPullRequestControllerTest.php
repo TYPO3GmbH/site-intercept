@@ -55,7 +55,7 @@ class GithubPullRequestControllerTest extends TestCase
                     [
                         'id' => 4,
                         'name' => 'TYPO3 Version',
-                        'value' => 8,
+                        'value' => 10,
                     ]
                 ]
             ])
