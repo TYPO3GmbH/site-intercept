@@ -12,6 +12,7 @@ namespace App\Tests\Unit\Extractor;
 
 use App\Extractor\GithubPushEventForCore;
 use App\Service\CoreSplitService;
+use App\Service\CoreSplitServiceV8;
 use App\Service\RabbitConsumerService;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -35,12 +36,15 @@ class RabbitConsumerServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
+        $coreSplitServiceV8 = $this->prophesize(CoreSplitServiceV8::class);
 
         $subject = new RabbitConsumerService(
             $loggerProphecy->reveal(),
             $rabbitConnection->reveal(),
             $coreSplitService->reveal(),
-            'intercept-core-split-testing'
+            $coreSplitServiceV8->reveal(),
+            'intercept-core-split-testing',
+            'foo'
         );
 
         $message = $this->prophesize(AMQPMessage::class);
@@ -63,12 +67,15 @@ class RabbitConsumerServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
+        $coreSplitServiceV8 = $this->prophesize(CoreSplitServiceV8::class);
 
         $subject = new RabbitConsumerService(
             $loggerProphecy->reveal(),
             $rabbitConnection->reveal(),
             $coreSplitService->reveal(),
-            'intercept-core-split-testing'
+            $coreSplitServiceV8->reveal(),
+            'intercept-core-split-testing',
+            'foo'
         );
 
         $message = $this->prophesize(AMQPMessage::class);
@@ -101,12 +108,15 @@ class RabbitConsumerServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
+        $coreSplitServiceV8 = $this->prophesize(CoreSplitServiceV8::class);
 
         $subject = new RabbitConsumerService(
             $loggerProphecy->reveal(),
             $rabbitConnection->reveal(),
             $coreSplitService->reveal(),
-            'intercept-core-split-testing'
+            $coreSplitServiceV8->reveal(),
+            'intercept-core-split-testing',
+            'foo'
         );
 
         $message = $this->prophesize(AMQPMessage::class);

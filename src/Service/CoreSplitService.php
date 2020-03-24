@@ -25,7 +25,7 @@ use Symfony\Component\Finder\SplFileInfo;
  *
  * @codeCoverageIgnore Covered by integration tests
  */
-class CoreSplitService
+class CoreSplitService implements CoreSplitServiceInterface
 {
     /**
      * @var LoggerInterface

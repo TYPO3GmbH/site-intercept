@@ -48,22 +48,38 @@ class RabbitConsumerService
     private $coreSplitService;
 
     /**
+     * @var CoreSplitService Service executing the split job
+     */
+    private $coreSplitServiceV8;
+
+    /**
+     * @var string the v8 ELTS repository name
+     */
+    private $eltsRepositoryNameV8;
+
+    /**
      * RabbitPublisherService constructor.
      *
      * @param LoggerInterface $logger
      * @param AMQPStreamConnection $rabbitConnection
      * @param CoreSplitService $coreSplitService
+     * @param CoreSplitServiceV8 $coreSplitServiceV8
      * @param string $rabbitSplitQueue
+     * @param string $eltsRepositoryNameV8
      */
     public function __construct(
         LoggerInterface $logger,
         AMQPStreamConnection $rabbitConnection,
-        CoreSplitService $coreSplitService,
-        string $rabbitSplitQueue
+        CoreSplitServiceInterface $coreSplitService,
+        CoreSplitServiceInterface $coreSplitServiceV8,
+        string $rabbitSplitQueue,
+        string $eltsRepositoryNameV8
     ) {
         $this->logger = $logger;
         $this->queueName = $rabbitSplitQueue;
+        $this->eltsRepositoryNameV8 = $eltsRepositoryNameV8;
         $this->coreSplitService = $coreSplitService;
+        $this->coreSplitServiceV8 = $coreSplitServiceV8;
         $this->rabbitChannel = $rabbitConnection->channel();
         $this->rabbitChannel->queue_declare($this->queueName, false, true, false, false);
         // Note getIO() is 'internal' / 'deprecated' in amqplib 2.9.2. However, there is
@@ -115,9 +131,9 @@ class RabbitConsumerService
             ]
         );
         if ($event->type === 'patch') {
-            $this->coreSplitService->split($event, $this->rabbitIO);
+            $this->getCoreSplitter($event)->split($event, $this->rabbitIO);
         } elseif ($event->type === 'tag') {
-            $this->coreSplitService->tag($event, $this->rabbitIO);
+            $this->getCoreSplitter($event)->tag($event, $this->rabbitIO);
         }
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
         $this->logger->info(
@@ -131,5 +147,13 @@ class RabbitConsumerService
                 'status' => 'done',
             ]
         );
+    }
+
+    private function getCoreSplitter(GithubPushEventForCore $event): CoreSplitService
+    {
+        if ($event->repositoryFullName === $this->eltsRepositoryNameV8) {
+            return $this->coreSplitServiceV8;
+        }
+        return $this->coreSplitService;
     }
 }
