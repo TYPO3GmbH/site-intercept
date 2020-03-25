@@ -58,7 +58,9 @@
                             <th data-type="title">
                                 <strong>{{ deployment.packageName }}</strong><br>
                                 {% if deployment.extensionKey %}
-                                    <small>ext key: {{ deployment.extensionKey }}</small>
+                                    <a href="https://extensions.typo3.org/extension/{{ deployment.extensionKey }}" title="Open Extension in TER" class="datatable-link-highlight" rel="noopener noreferrer" target="_blank">
+                                        <small>ext key: {{ deployment.extensionKey }}</small>
+                                    </a>
                                 {% endif %}
                             </th>
                             <th data-type="badge">
