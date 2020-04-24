@@ -69,6 +69,7 @@ class RabbitPublisherService
                 'job_uuid' => $message->jobUuid,
                 'type' => $message->type,
                 'triggeredBy' => $trigger,
+                'repository' => $message->repositoryFullName,
                 'sourceBranch' => $message->sourceBranch,
                 'targetBranch' => $message->targetBranch,
                 'tag' => $message->tag,

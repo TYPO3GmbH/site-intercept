@@ -130,10 +130,11 @@ class RabbitConsumerService
                 'status' => 'dispatch',
             ]
         );
+        $splitter = $this->getCoreSplitter($event);
         if ($event->type === 'patch') {
-            $this->getCoreSplitter($event)->split($event, $this->rabbitIO);
+            $splitter->split($event, $this->rabbitIO);
         } elseif ($event->type === 'tag') {
-            $this->getCoreSplitter($event)->tag($event, $this->rabbitIO);
+            $splitter->tag($event, $this->rabbitIO);
         }
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
         $this->logger->info(
@@ -141,6 +142,8 @@ class RabbitConsumerService
             [
                 'job_uuid' => $event->jobUuid,
                 'type' => $event->type,
+                'splitter' => get_class($splitter),
+                'repository' => $event->repositoryFullName,
                 'sourceBranch' => $event->sourceBranch,
                 'targetBranch' => $event->targetBranch,
                 'tag' => $event->tag,
