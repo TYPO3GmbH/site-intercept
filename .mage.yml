@@ -51,6 +51,7 @@ magephp:
         - fs/link: { from: "../../../../shared/var/data.db", to: "var/data.db" }
         - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
         - fs/link: { from: "../../../../shared/var/git-core-split", to: "var/git-core-split" }
+        - fs/link: { from: "../../../../shared/var/git-core-split-v8", to: "var/git-core-split-v8" }
       on-release:
       post-release:
         - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}
@@ -83,6 +84,7 @@ magephp:
         - fs/link: { from: "../../../../shared/var/data.db", to: "var/data.db" }
         - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
         - fs/link: { from: "../../../../shared/var/git-core-split", to: "var/git-core-split" }
+        - fs/link: { from: "../../../../shared/var/git-core-split-v8", to: "var/git-core-split-v8" }
       on-release:
       post-release:
         - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}
