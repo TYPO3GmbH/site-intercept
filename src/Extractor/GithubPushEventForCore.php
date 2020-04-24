@@ -51,6 +51,11 @@ class GithubPushEventForCore
     public $tag;
 
     /**
+     * @var string the full name of the repository
+     */
+    public $repositoryFullName;
+
+    /**
      * Extract information.
      *
      * @param array $fullPullRequestInformation Optional, this object is used in consumer, via json serializer, too.
@@ -63,6 +68,7 @@ class GithubPushEventForCore
             if (empty($fullPullRequestInformation['ref'])) {
                 throw new DoNotCareException('ref is empty, it\'s not my job');
             }
+            $this->repositoryFullName = $fullPullRequestInformation['repository']['full_name'] ?? '';
             if ($this->isPushedPatch($fullPullRequestInformation)) {
                 $this->type = self::TYPE_PATCH;
                 $this->sourceBranch = $this->getSourceBranch($fullPullRequestInformation['ref']);
