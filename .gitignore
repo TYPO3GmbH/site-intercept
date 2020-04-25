@@ -1,12 +1,9 @@
 .idea
 
-bin/php-cs-fixer
-bin/phpunit
-bin/php-parse
-bin/var-dump-server
-bin/doctrine
-bin/doctrine-dbal
-bin/doctrine-migrations
+bin/
+!bin/console
+!bin/splitsh-lite-darwin
+!bin/splitsh-lite-linux
 
 # JIRA plugin
 atlassian-ide-plugin.xml
