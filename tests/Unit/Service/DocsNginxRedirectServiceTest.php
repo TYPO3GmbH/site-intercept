@@ -8,7 +8,7 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Unit\Extractor;
+namespace App\Tests\Unit\Service;
 
 use App\Entity\DocsServerRedirect;
 use App\Repository\DocsServerRedirectRepository;
