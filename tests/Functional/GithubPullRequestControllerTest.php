@@ -27,11 +27,11 @@ class GithubPullRequestControllerTest extends TestCase
     public function pullRequestIsTransformed()
     {
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        TestDoubleBundle::addProphecy('App\Client\GeneralClient', $generalClientProphecy);
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
         $forgeClientProphecy = $this->prophesize(ForgeClient::class);
-        TestDoubleBundle::addProphecy('App\Client\ForgeClient', $forgeClientProphecy);
+        TestDoubleBundle::addProphecy(ForgeClient::class, $forgeClientProphecy);
         $gitServiceProphecy = $this->prophesize(LocalCoreGitService::class);
-        TestDoubleBundle::addProphecy('App\Service\LocalCoreGitService', $gitServiceProphecy);
+        TestDoubleBundle::addProphecy(LocalCoreGitService::class, $gitServiceProphecy);
 
         $generalClientProphecy
             ->get('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1')
@@ -114,11 +114,11 @@ class GithubPullRequestControllerTest extends TestCase
     public function pullRequestIsNotTransformed()
     {
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        TestDoubleBundle::addProphecy('App\Client\GeneralClient', $generalClientProphecy);
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
         $forgeClientProphecy = $this->prophesize(ForgeClient::class);
-        TestDoubleBundle::addProphecy('App\Client\ForgeClient', $forgeClientProphecy);
+        TestDoubleBundle::addProphecy(ForgeClient::class, $forgeClientProphecy);
         $gitServiceProphecy = $this->prophesize(LocalCoreGitService::class);
-        TestDoubleBundle::addProphecy('App\Service\LocalCoreGitService', $gitServiceProphecy);
+        TestDoubleBundle::addProphecy(LocalCoreGitService::class, $gitServiceProphecy);
 
         $generalClientProphecy->get(Argument::cetera())->shouldNotBeCalled();
 
