@@ -107,13 +107,16 @@ class BambooService
                     'label' => 'change-' . $pushEvent->changeId
                 ]);
             $response = $this->sendBamboo('get', $url);
-            $response = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-            foreach ($response->results->result ?? [] as $result) {
-                if (!in_array($result->state, ['Successful', 'Failed'], true)) {
-                    $this->sendBamboo(
-                        'delete',
-                        'latest/queue/' . $result->buildResultKey
-                    );
+            $body = (string)$response->getBody();
+            if ($body !== '') {
+                $response = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+                foreach ($response->results->result ?? [] as $result) {
+                    if (!in_array($result->state, ['Successful', 'Failed'], true)) {
+                        $this->sendBamboo(
+                            'delete',
+                            'latest/queue/' . $result->buildResultKey
+                        );
+                    }
                 }
             }
         } catch (ClientException $e) {
