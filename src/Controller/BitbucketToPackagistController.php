@@ -27,10 +27,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class BitbucketToPackagistController extends AbstractController
 {
-    /**
-     * @var PackagistService
-     */
-    private $packagistService;
+    private PackagistService $packagistService;
 
     public function __construct(PackagistService $packagistService)
     {
@@ -48,7 +45,7 @@ class BitbucketToPackagistController extends AbstractController
         if (!$request->query->has('apiToken') || !$request->query->has('username')) {
             return Response::create('Missing apiToken or username in request.', Response::HTTP_BAD_REQUEST);
         }
-        $pushEventInformation = json_decode($request->getContent(), true);
+        $pushEventInformation = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
         if (!$pushEventInformation) {
             return Response::create('Could not decode payload.', Response::HTTP_BAD_REQUEST);
         }

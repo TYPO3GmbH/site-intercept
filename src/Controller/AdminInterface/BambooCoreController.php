@@ -33,10 +33,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class BambooCoreController extends AbstractController
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @Route("/admin/bamboo/core", name="admin_bamboo_core")
@@ -101,8 +98,7 @@ class BambooCoreController extends AbstractController
                 if (!empty($bambooTriggered->buildResultKey)) {
                     $this->addFlash(
                         'success',
-                        'Triggered bamboo build'
-                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                        'Triggered bamboo build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                         . ' of change "' . $bambooData->changeId . '"'
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'
@@ -166,8 +162,7 @@ class BambooCoreController extends AbstractController
                 if (!empty($bambooTriggered->buildResultKey)) {
                     $this->addFlash(
                         'success',
-                        'Triggered bamboo build'
-                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '"rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                        'Triggered bamboo build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '"rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                         . ' of change "' . $bambooData->changeId . '"'
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'
@@ -218,8 +213,7 @@ class BambooCoreController extends AbstractController
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
-                    'Triggered bamboo build'
-                    . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                    'Triggered bamboo build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                     . ' to plan key "' . $bambooProject . '".'
                 );
                 $this->logger->info(

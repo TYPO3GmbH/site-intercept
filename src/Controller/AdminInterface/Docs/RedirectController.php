@@ -30,20 +30,11 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class RedirectController extends AbstractController
 {
-    /**
-     * @var DocsServerNginxService
-     */
-    protected $nginxService;
+    protected DocsServerNginxService $nginxService;
 
-    /**
-     * @var BambooService
-     */
-    protected $bambooService;
+    protected BambooService $bambooService;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     public function __construct(DocsServerNginxService $nginxService, BambooService $bambooService, LoggerInterface $logger)
     {

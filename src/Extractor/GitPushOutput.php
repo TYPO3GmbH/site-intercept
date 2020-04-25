@@ -19,7 +19,7 @@ class GitPushOutput
     /**
      * @var string Review extracted from a git push output, eg. 'https://review.typo3.org/c/Packages/TYPO3.CMS/+/60480'
      */
-    public $reviewUrl;
+    public string $reviewUrl;
 
     /**
      * Extract review URL

@@ -18,23 +18,14 @@ use App\Exception\DoNotCareException;
  */
 class PackagistUpdateRequest
 {
-    /**
-     * @var string
-     */
-    private $apiToken;
+    private string $apiToken;
 
-    /**
-     * @var string
-     */
-    private $repositoryUrl;
+    private string $repositoryUrl;
 
     private const PROJECT_MAPPING = [
         'ext-google_ads' => 'https://packagist.org/packages/t3g/google-ads',
     ];
-    /**
-     * @var string
-     */
-    private $userName;
+    private string $userName;
 
     /**
      * Extract data from payload

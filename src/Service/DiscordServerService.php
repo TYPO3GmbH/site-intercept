@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use GuzzleHttp\Exception\GuzzleException;
 use App\Entity\DiscordChannel;
 use App\Exception\UnexpectedDiscordApiResponseException;
 use GuzzleHttp\Client;
@@ -19,15 +20,9 @@ use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 
 class DiscordServerService
 {
-    /**
-     * @var string
-     */
-    private $serverId;
+    private string $serverId;
 
-    /**
-     * @var string
-     */
-    private $botToken;
+    private string $botToken;
 
     /**
      * @param string $serverId
@@ -119,7 +114,7 @@ class DiscordServerService
      * @param array $payload
      * @return array
      * @throws UnexpectedDiscordApiResponseException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     private function request(string $url, string $method = 'GET', array $payload = []): array
     {
@@ -140,7 +135,7 @@ class DiscordServerService
                                 'Authorization' => 'Bot ' . $this->botToken,
                                 'Content-Type' => 'application/json',
                             ],
-                            'body' => json_encode($payload),
+                            'body' => json_encode($payload, JSON_THROW_ON_ERROR),
                         ]
                     );
                 } else {
@@ -161,7 +156,7 @@ class DiscordServerService
                     throw new UnexpectedDiscordApiResponseException('Discord API responded with code ' . $e->getResponse()->getStatusCode(), 1561556560);
                 }
             }
-            $result = json_decode((string)$response->getBody(), true);
+            $result = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
             $sleep = $result['retry_after'] ?? null;
         }
 

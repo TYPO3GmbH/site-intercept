@@ -19,22 +19,22 @@ class BambooStatus
     /**
      * @var bool True if bamboo is online
      */
-    public $isOnline;
+    public bool $isOnline;
 
     /**
      * @var int Number of online agents (agents that have 'enabled' = true set)
      */
-    public $onlineAgents = 0;
+    public int $onlineAgents = 0;
 
     /**
      * @var int Number of busy agents
      */
-    public $busyAgents = 0;
+    public int $busyAgents = 0;
 
     /**
      * @var int Number of queued jobs waiting to be executed
      */
-    public $queueLength = 0;
+    public int $queueLength = 0;
 
     /**
      * Extract information from bamboo agent and queue status
@@ -46,14 +46,14 @@ class BambooStatus
     public function __construct(bool $online, string $agentStatus = '', string $queueStatus = '')
     {
         $this->isOnline = $online;
-        if ($agentStatus) {
-            $agentStatus = json_decode($agentStatus, true);
+        if ($agentStatus !== '') {
+            $agentStatus = json_decode($agentStatus, true, 512, JSON_THROW_ON_ERROR);
             // We consider agents that have 'enabled'=true as "online"
             $this->onlineAgents = count(array_keys(array_column($agentStatus, 'enabled'), true, true));
             $this->busyAgents = count(array_keys(array_column($agentStatus, 'busy'), true, true));
         }
-        if ($queueStatus) {
-            $queueStatus = json_decode($queueStatus, true);
+        if ($queueStatus !== '') {
+            $queueStatus = json_decode($queueStatus, true, 512, JSON_THROW_ON_ERROR);
             $this->queueLength = $queueStatus['queuedBuilds']['size'] ?? 0;
         }
     }

@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -22,15 +23,9 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler
 {
-    /**
-     * @var FlashBagInterface
-     */
-    private $flashBag;
+    private ?FlashBagInterface $flashBag = null;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private ?LoggerInterface $logger = null;
 
     /**
      * @param HttpUtils $httpUtils
@@ -52,7 +47,7 @@ class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler
     /**
      * @param Request $request
      * @param TokenInterface $token
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {

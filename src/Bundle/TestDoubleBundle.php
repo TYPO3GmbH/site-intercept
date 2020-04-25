@@ -52,7 +52,7 @@ class TestDoubleBundle extends Bundle implements CompilerPassInterface
      *
      * @var object[][]
      */
-    private static $prophecies = [];
+    private static array $prophecies = [];
 
     /**
      * Add a prophecy object for a certain service.
@@ -78,7 +78,7 @@ class TestDoubleBundle extends Bundle implements CompilerPassInterface
      */
     public function boot()
     {
-        foreach ($this->container->getParameter('doubleServices') as $serviceId => $_) {
+        foreach (array_keys($this->container->getParameter('doubleServices')) as $serviceId) {
             if (!empty(static::$prophecies[$serviceId])) {
                 $prophecy = array_shift(static::$prophecies[$serviceId]);
                 $this->container->set($serviceId, $prophecy->reveal());
@@ -108,7 +108,7 @@ class TestDoubleBundle extends Bundle implements CompilerPassInterface
     {
         $servicesTaggedWithTestDouble = $containerBuilder->findTaggedServiceIds('testDouble');
         $doubledServices = [];
-        foreach ($servicesTaggedWithTestDouble as $serviceId => $serviceConfig) {
+        foreach (array_keys($servicesTaggedWithTestDouble) as $serviceId) {
             $definition = $containerBuilder->getDefinition($serviceId);
             // Mark this service as NOT private, so boot() can set single objects
             $definition->setPrivate(false);

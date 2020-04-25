@@ -21,12 +21,12 @@ class GerritUrl
     /**
      * @var int Resolved change number, eg. 48574
      */
-    public $changeId;
+    public int $changeId;
 
     /**
      * @var int The patch set, eg. '5'
      */
-    public $patchSet;
+    public int $patchSet;
 
     /**
      * Extract data from url
@@ -36,7 +36,7 @@ class GerritUrl
      */
     public function __construct(string $url)
     {
-        preg_match('/https:\/\/review\.typo3\.org\/(#\/)?(c\/)?(Packages\/TYPO3\.CMS\/\+\/|Teams\/Security\/TYPO3v4\-Core\/\+\/)?([0-9]*)(\/{0,1})?([0-9]*)/', $url, $matches);
+        preg_match('/https:\/\/review\.typo3\.org\/(#\/)?(c\/)?(Packages\/TYPO3\.CMS\/\+\/|Teams\/Security\/TYPO3v4\-Core\/\+\/)?(\d*)(\/{0,1})?(\d*)/', $url, $matches);
         if (!empty($matches[4])) {
             $this->changeId = (int)$matches[4];
         }

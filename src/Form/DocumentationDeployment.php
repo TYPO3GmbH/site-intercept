@@ -75,7 +75,7 @@ class DocumentationDeployment extends AbstractType
                 $branches = (new GitRepositoryService())->getBranchesFromRepositoryUrl($repositoryUrl);
                 /** @var DocumentationJarRepository $documentationJarRepository */
                 $documentationJarRepository = $options['entity_manager']->getRepository(DocumentationJar::class);
-                foreach ($branches as $key => $branch) {
+                foreach (array_keys($branches) as $key) {
                     $jar = $documentationJarRepository
                         ->findBy([
                             'repositoryUrl' => $repositoryUrl,

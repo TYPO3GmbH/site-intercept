@@ -24,43 +24,43 @@ class DiscordWebhook
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private string $name;
 
     /**
      * @ManyToOne(targetEntity="DiscordChannel", inversedBy="webhooks")
      * @JoinColumn(name="channel_id", referencedColumnName="channel_id", nullable=true)
      */
-    private $channel;
+    private ?DiscordChannel $channel = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $identifier;
+    private ?string $identifier = null;
 
     /**
-     * @ORM\Column(type="integer", options={"default": 0})
+     * @ORM\Column(type="integer", options={"default": "0"})
      */
-    private $type;
+    private int $type;
 
     /**
      * @ORM\Column(type="string", length=255, options={"default": "Intercept"})
      */
-    private $username;
+    private string $username;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $avatarUrl;
+    private ?string $avatarUrl = null;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $logLevel;
+    private ?int $logLevel = null;
 
     /**
      * @return int

@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use GitWrapper\Event\GitOutputListenerInterface;
 use App\Creator\GerritCommitMessage;
 use App\Extractor\GithubCorePullRequest;
 use App\Extractor\GithubUserData;
@@ -29,15 +30,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class LocalCoreGitService
 {
-    /**
-     * @var GitWorkingCopy
-     */
-    private $workingCopy;
+    private GitWorkingCopy $workingCopy;
 
-    /**
-     * @var GitOutputListener
-     */
-    private $listener;
+    private GitOutputListener $listener;
 
     /**
      * Prepare core checkout.
@@ -46,7 +41,7 @@ class LocalCoreGitService
      * @param GitOutputListener $listener
      * @param string $pullRequestCorePath Absolute path of local core git checkout
      */
-    public function __construct(LoggerInterface $logger, GitOutputListener $listener, string $pullRequestCorePath)
+    public function __construct(LoggerInterface $logger, GitOutputListenerInterface $listener, string $pullRequestCorePath)
     {
         $this->listener = $listener;
         $gitWrapper = new GitWrapper();

@@ -21,7 +21,7 @@ class GerritBuildStatusMessage
     /**
      * @var string The created message
      */
-    public $message;
+    public string $message;
 
     /**
      * Create a readable message to be shown on gerrit.

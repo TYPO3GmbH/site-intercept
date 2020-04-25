@@ -23,14 +23,14 @@ class RepositoryBlacklistEntry
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank
      * @Assert\Url
      */
-    private $repositoryUrl;
+    private string $repositoryUrl;
 
     /**
      * @return int

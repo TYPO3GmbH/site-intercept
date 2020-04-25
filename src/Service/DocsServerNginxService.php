@@ -22,37 +22,22 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class DocsServerNginxService
 {
-    /**
-     * @var DocsServerRedirectRepository
-     */
-    protected $redirectRepository;
+    protected DocsServerRedirectRepository $redirectRepository;
 
-    /**
-     * @var string
-     */
-    protected $privateDir;
+    protected string $privateDir;
 
-    /**
-     * @var string
-     */
-    protected $subDir;
+    protected string $subDir;
 
-    /**
-     * @var string
-     */
-    protected $staticDir;
+    protected string $staticDir;
 
-    /**
-     * @var Filesystem
-     */
-    protected $filesystem;
+    protected Filesystem $filesystem;
 
-    protected $redirectTemplate = '# Rule: %d | Created: %s | Updated: %s
+    protected string $redirectTemplate = '# Rule: %d | Created: %s | Updated: %s
 location = %s {
     return %d %s;
 }';
 
-    protected $legacyRedirectTemplate = '# Rule: %d | Created: %s | Updated: %s | Legacy
+    protected string $legacyRedirectTemplate = '# Rule: %d | Created: %s | Updated: %s | Legacy
 location ~ ^%s(.*) {
     return %d %s$1;
 }';
@@ -114,8 +99,9 @@ location ~ ^%s(.*) {
             ->sortByName()
             ->reverseSorting();
 
-        $asArray = iterator_to_array($files);
-        return current($asArray) ?: null;
+        $iterator = $files->getIterator();
+        $iterator->rewind();
+        return $iterator->current();
     }
 
     /**
@@ -134,8 +120,9 @@ location ~ ^%s(.*) {
             ->files()
             ->name('redirects.conf');
 
-        $asArray = iterator_to_array($file);
-        return current($asArray) ?: null;
+        $iterator = $file->getIterator();
+        $iterator->rewind();
+        return $iterator->current();
     }
 
     /**

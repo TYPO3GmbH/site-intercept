@@ -17,7 +17,7 @@ use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 
 class DiscordWebhookService
 {
-    protected $client;
+    protected GeneralClient $client;
 
     public function __construct(GeneralClient $client)
     {
@@ -45,7 +45,7 @@ class DiscordWebhookService
                         'headers' => [
                             'Content-Type' => 'application/json',
                         ],
-                        'body' => json_encode($message->formatForDiscord()),
+                        'body' => json_encode($message->formatForDiscord(), JSON_THROW_ON_ERROR),
                     ]
                 );
             } catch (BadResponseException $e) {
@@ -55,7 +55,7 @@ class DiscordWebhookService
                 }
             }
 
-            $result = json_decode((string)$response->getBody(), true);
+            $result = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
             $sleep = $result['retry_after'] ?? null;
         }
     }

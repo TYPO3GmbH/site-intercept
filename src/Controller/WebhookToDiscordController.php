@@ -51,12 +51,12 @@ class WebhookToDiscordController extends AbstractController
             return Response::create('Webhook is of an unknown service type', Response::HTTP_PRECONDITION_FAILED);
         }
 
-        $content = json_decode($request->getContent(), true);
+        $content = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         if (null === $content) {
             $content = urldecode($request->getContent());
             $content = substr($content, 8); // cut off 'payload=', rest should be json, then
-            $content = json_decode($content, true);
+            $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $logger->warning(

@@ -24,20 +24,11 @@ class SendDiscordScheduledMessagesCommand extends Command
 {
     protected static $defaultName = 'app:discord-send';
 
-    /**
-     * @var DiscordScheduledMessageRepository
-     */
-    protected $discordScheduledMessageRepository;
+    protected DiscordScheduledMessageRepository $discordScheduledMessageRepository;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected LoggerInterface $logger;
 
-    /**
-     * @var DiscordWebhookService
-     */
-    protected $discordWebhookService;
+    protected DiscordWebhookService $discordWebhookService;
 
     /**
      * SyncDiscordChannelsCommand constructor.
@@ -60,7 +51,7 @@ class SendDiscordScheduledMessagesCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $dateTime = new DateTime('now', new DateTimeZone('UTC'));
 

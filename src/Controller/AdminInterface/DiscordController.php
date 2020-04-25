@@ -9,6 +9,7 @@
 
 namespace App\Controller\AdminInterface;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Entity\DiscordChannel;
 use App\Entity\DiscordScheduledMessage;
 use App\Entity\DiscordWebhook;
@@ -112,7 +113,7 @@ class DiscordController extends AbstractController
         DiscordChannelRepository $discordChannelRepository,
         DiscordWebhookRepository $discordWebhookRepository
     ): Response {
-        $hook = new \App\Entity\DiscordWebhook();
+        $hook = new DiscordWebhook();
         $form = $this->createForm(\App\Form\DiscordWebhook::class, $hook, ['entity_manager' => $this->getDoctrine()->getManager()]);
         $form->handleRequest($request);
 
@@ -404,7 +405,7 @@ class DiscordController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @param DiscordChannelRepository $discordChannelRepository
      * @param DiscordScheduledMessage|null $message
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+     * @return RedirectResponse|null
      */
     protected function handleFormSubmit(
         array $discordScheduledMessage,

@@ -27,7 +27,7 @@ class InvalidCharacterValidator extends ConstraintValidator
         }
 
         foreach ([';', '{', '}'] as $character) {
-            if (strpos($value, $character) !== false) {
+            if (strpos($value, (string) $character) !== false) {
                 $this->context
                     ->buildViolation('Invalid character found, please remove all "{{ character }}" from value')
                     ->setParameter('{{ character }}', $character)

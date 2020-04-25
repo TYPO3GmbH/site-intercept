@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Extractor\BambooBuildTriggered;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
@@ -27,40 +28,19 @@ use Psr\Log\LoggerInterface;
 class DocumentationService
 {
 
-    /**
-     * @var RenderDocumentationService
-     */
-    protected $renderDocumentationService;
+    protected RenderDocumentationService $renderDocumentationService;
 
-    /**
-     * @var DocumentationJarRepository
-     */
-    protected $docsRepository;
+    protected DocumentationJarRepository $docsRepository;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
-    /**
-     * @var DocumentationBuildInformationService
-     */
-    protected $documentationBuildInformationService;
+    protected DocumentationBuildInformationService $documentationBuildInformationService;
 
-    /**
-     * @var BambooService
-     */
-    protected $bambooService;
+    protected BambooService $bambooService;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected LoggerInterface $logger;
 
-    /**
-     * @var SlackService
-     */
-    protected $slackService;
+    protected SlackService $slackService;
 
     public function __construct(
         RenderDocumentationService $renderDocumentationService,
@@ -269,14 +249,13 @@ class DocumentationService
 
     /**
      * @param DocumentationJar $doc
-     * @return \App\Extractor\BambooBuildTriggered
+     * @return BambooBuildTriggered
      * @throws DocsPackageDoNotCareBranch
      */
-    public function triggerBuild(DocumentationJar $doc): \App\Extractor\BambooBuildTriggered
+    public function triggerBuild(DocumentationJar $doc): BambooBuildTriggered
     {
         $informationFile = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($doc);
         $this->documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
-        $bambooBuildTriggered = $this->bambooService->triggerDocumentationPlan($informationFile);
-        return $bambooBuildTriggered;
+        return $this->bambooService->triggerDocumentationPlan($informationFile);
     }
 }

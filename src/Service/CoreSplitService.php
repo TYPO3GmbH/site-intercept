@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use GitWrapper\Event\GitOutputListenerInterface;
 use App\Extractor\GithubPushEventForCore;
 use App\GitWrapper\Event\GitOutputListener;
 use GitWrapper\GitException;
@@ -27,45 +28,42 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class CoreSplitService implements CoreSplitServiceInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var string Absolute path to core checkout for core split jobs
      */
-    private $splitCorePath;
+    private string $splitCorePath;
 
     /**
      * @var string Link to github mono repo, eg. 'git@github.com:TYPO3/TYPO3.CMS.git'
      */
-    private $splitMonoRepo;
+    private string $splitMonoRepo;
 
     /**
      * @var string Base link to github single repos, eg. 'git@github.com:TYPO3-CMS/'
      */
-    private $splitSingleRepoBase;
+    private string $splitSingleRepoBase;
 
     /**
      * @var string Absolute path to extensions checkout for TAG jobs
      */
-    private $splitSingleRepoPath;
+    private string $splitSingleRepoPath;
 
     /**
      * @var GitOutputListener An objects catching git stdout responses
      */
-    private $gitOutputListener;
+    private GitOutputListener $gitOutputListener;
 
     /**
      * @var array An array filled by integration test to run only a gives series of extensions
      */
-    private $overrideExtensionList = [];
+    private array $overrideExtensionList = [];
 
     /**
      * @var GithubPushEventForCore Runtime rabbit message
      */
-    private $event;
+    private GithubPushEventForCore $event;
 
     /**
      * @param LoggerInterface $logger
@@ -81,7 +79,7 @@ class CoreSplitService implements CoreSplitServiceInterface
         string $splitMonoRepo,
         string $splitSingleRepoBase,
         string $splitSingleRepoPath,
-        GitOutputListener $gitOutputListener
+        GitOutputListenerInterface $gitOutputListener
     ) {
         $this->logger = $logger;
         $this->splitCorePath = $splitCorePath;
@@ -205,8 +203,7 @@ class CoreSplitService implements CoreSplitServiceInterface
         }
         if (!$responsibleForBranch) {
             $this->log(
-                'Job ignored: Skipped tagging sub tree repositories:'
-                . ' The given tag "' . $event->tag . '" is not in one of the branches we do care of - "TYPO3_8-7", ">=9.x.y" or "master"',
+                'Job ignored: Skipped tagging sub tree repositories: The given tag "' . $event->tag . '" is not in one of the branches we do care of - "TYPO3_8-7", ">=9.x.y" or "master"',
                 'WARNING'
             );
             return;

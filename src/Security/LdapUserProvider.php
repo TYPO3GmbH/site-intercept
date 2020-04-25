@@ -26,23 +26,18 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 class LdapUserProvider implements UserProviderInterface
 {
-    /**
-     * @var LdapInterface
-     */
-    private $ldap;
+    private LdapInterface $ldap;
 
-    private $baseDn;
-    private $searchDn;
-    private $searchPassword;
-    private $defaultRoles;
-    private $defaultSearch;
+    private string $baseDn;
+    private ?string $searchDn = null;
+    private ?string $searchPassword = null;
+    private array $defaultRoles;
+    private string $defaultSearch;
 
     /**
      * Map ldap isMemberOf attributes to roles
-     *
-     * @var array
      */
-    private $roleMapping = [
+    private array $roleMapping = [
         'typo3.com-intercept-docs' => 'ROLE_DOCUMENTATION_MAINTAINER',
         'typo3.com-gmbh' => 'ROLE_ADMIN',
     ];
@@ -111,7 +106,7 @@ class LdapUserProvider implements UserProviderInterface
         $entries = $search->execute();
         $count = \count($entries);
 
-        if (!$count) {
+        if ($count === 0) {
             throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
         }
 

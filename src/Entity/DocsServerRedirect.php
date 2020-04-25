@@ -30,7 +30,7 @@ class DocsServerRedirect
     public const STATUS_CODE_303 = 303; // See Other
     public const STATUS_CODE_307 = 307; // Temporary Redirect
 
-    public static $allowedStatusCodes = [
+    public static array $allowedStatusCodes = [
         self::STATUS_CODE_302,
         self::STATUS_CODE_303,
         self::STATUS_CODE_307,
@@ -41,17 +41,17 @@ class DocsServerRedirect
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(name="created_at", type="datetime")
      */
-    private $createdAt;
+    private \DateTimeInterface $createdAt;
 
     /**
      * @ORM\Column(name="updated_at", type="datetime")
      */
-    private $updatedAt;
+    private \DateTimeInterface $updatedAt;
 
     /**
      * @ORM\Column(type="string", length=2000)
@@ -61,7 +61,7 @@ class DocsServerRedirect
      * )
      * @AppAssert\InvalidCharacter
      */
-    private $source;
+    private string $source;
 
     /**
      * @ORM\Column(type="string", length=2000)
@@ -71,17 +71,17 @@ class DocsServerRedirect
      * )
      * @AppAssert\InvalidCharacter
      */
-    private $target;
+    private string $target;
 
     /**
      * @ORM\Column(name="is_legacy", type="integer")
      */
-    private $isLegacy = false;
+    private bool $isLegacy = false;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $statusCode = self::STATUS_CODE_303;
+    private int $statusCode = self::STATUS_CODE_303;
 
     /**
      * @ORM\PrePersist

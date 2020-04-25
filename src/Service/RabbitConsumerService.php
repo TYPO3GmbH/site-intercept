@@ -25,37 +25,34 @@ class RabbitConsumerService
     /**
      * @var AMQPChannel The rabbit channel to messages to and fetch from
      */
-    private $rabbitChannel;
+    private AMQPChannel $rabbitChannel;
 
     /**
      * @var AbstractIO Direct rabbit IO connection, used to send heartbeats in between single worker jobs
      */
-    private $rabbitIO;
+    private AbstractIO $rabbitIO;
 
     /**
      * @var string Name of the queue to push to and fetch from
      */
-    private $queueName;
+    private string $queueName;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var CoreSplitService Service executing the split job
      */
-    private $coreSplitService;
+    private CoreSplitService $coreSplitService;
 
     /**
      * @var CoreSplitService Service executing the split job
      */
-    private $coreSplitServiceV8;
+    private CoreSplitServiceV8 $coreSplitServiceV8;
 
     /**
      * @var string the v8 ELTS repository name
      */
-    private $eltsRepositoryNameV8;
+    private string $eltsRepositoryNameV8;
 
     /**
      * RabbitPublisherService constructor.
@@ -99,7 +96,9 @@ class RabbitConsumerService
      */
     public function workerLoop(): void
     {
-        $this->rabbitChannel->basic_consume($this->queueName, '', false, false, false, false, [$this, 'handleWorkerJob']);
+        $this->rabbitChannel->basic_consume($this->queueName, '', false, false, false, false, function (AMQPMessage $message) : void {
+            $this->handleWorkerJob($message);
+        });
         while (count($this->rabbitChannel->callbacks)) {
             $this->rabbitChannel->wait();
         }

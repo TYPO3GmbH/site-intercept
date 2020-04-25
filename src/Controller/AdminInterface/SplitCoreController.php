@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class SplitCoreController extends AbstractController
 {
     /**
-     * @Route("/admin/split/core", name="admin_split_core");
+     * @Route("/admin/split/core", name="admin_split_core")
      * @param Request $request
      * @param RabbitPublisherService $rabbitService
      * @param GraylogService $graylogService

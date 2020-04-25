@@ -25,15 +25,9 @@ class DocsRenderCommand extends Command
 {
     protected static $defaultName = 'app:docs-render';
 
-    /**
-     * @var RenderDocumentationService
-     */
-    protected $renderDocumentationService;
+    protected RenderDocumentationService $renderDocumentationService;
 
-    /**
-     * @var DocumentationJarRepository
-     */
-    protected $documentationJarRepository;
+    protected DocumentationJarRepository $documentationJarRepository;
 
     public function __construct(RenderDocumentationService $renderDocumentationService, DocumentationJarRepository $documentationJarRepository)
     {
@@ -52,7 +46,7 @@ class DocsRenderCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $all = $input->getOption('all') ?? false;

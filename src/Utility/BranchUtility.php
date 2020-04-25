@@ -20,7 +20,7 @@ class BranchUtility
     /**
      * @var array Identifiers to bamboo project keys mapping. Extend this for new plans.
      */
-    private static $branchToProjectKeys = [
+    private static array $branchToProjectKeys = [
         'master' => 'CORE-GTC',
         'nightlyMaster' => 'CORE-GTN',
         '9.5' => 'CORE-GTC95',
@@ -33,7 +33,7 @@ class BranchUtility
     /**
      * @var array Identifiers to bamboo project keys mapping for core security tests. Extend this for new plans.
      */
-    private static $securityBranchToProjectKeys = [
+    private static array $securityBranchToProjectKeys = [
         'master' => 'CORE-GTS',
         '9.5' => 'CORE-GTS95',
         '8.7' => 'CORE-GTS87',

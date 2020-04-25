@@ -20,10 +20,7 @@ class ComposerJson
 {
     private const ALLOWED_TYPO3_VERSIONS = ['6.2', '7.6', '8.7', '9.5', '10.0'];
 
-    /**
-     * @var array
-     */
-    private $composerJson;
+    private array $composerJson;
 
     public function __construct(array $composerJson)
     {
@@ -145,7 +142,7 @@ class ComposerJson
             return $this->composerJson['extra']['typo3/cms']['extension-key'];
         }
 
-        foreach ($this->composerJson['replace'] ?? [] as $packageName => $version) {
+        foreach (array_keys($this->composerJson['replace'] ?? []) as $packageName) {
             if (strpos($packageName, '/') === false) {
                 return trim($packageName);
             }

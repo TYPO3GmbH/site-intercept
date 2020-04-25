@@ -31,10 +31,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class BambooCoreSecurityController extends AbstractController
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @Route("/admin/bamboo/core/security", name="admin_bamboo_core_security")
@@ -95,8 +92,7 @@ class BambooCoreSecurityController extends AbstractController
                 if (!empty($bambooTriggered->buildResultKey)) {
                     $this->addFlash(
                         'success',
-                        'Triggered bamboo build'
-                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                        'Triggered bamboo build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                         . ' of change "' . $bambooData->changeId . '"'
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'
@@ -154,8 +150,7 @@ class BambooCoreSecurityController extends AbstractController
                 if (!empty($bambooTriggered->buildResultKey)) {
                     $this->addFlash(
                         'success',
-                        'Triggered bamboo security build'
-                        . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                        'Triggered bamboo security build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                         . ' of change "' . $bambooData->changeId . '"'
                         . ' with patch set "' . $bambooData->patchSet . '"'
                         . ' to plan key "' . $bambooData->bambooProject . '".'

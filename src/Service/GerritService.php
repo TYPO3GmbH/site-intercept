@@ -24,15 +24,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class GerritService
 {
-    /**
-     * @var GerritClient
-     */
-    private $client;
+    private GerritClient $client;
 
-    /**
-     * @var string
-     */
-    private $token;
+    private string $token;
 
     /**
      * GerritService constructor.
@@ -94,7 +88,7 @@ class GerritService
             throw new DoNotCareException('Usually: 404, No such change ...');
         }
         // gerrit responses prefix their json with ")]}'\n" which has to be removed first
-        $json = json_decode(str_replace(")]}'\n", '', (string)$response->getBody()), true);
+        $json = json_decode(str_replace(")]}'\n", '', (string)$response->getBody()), true, 512, JSON_THROW_ON_ERROR);
         $project = $json['project'];
         if ($project !== 'Packages/TYPO3.CMS' && $project !== 'Teams/Security/TYPO3v4-Core') {
             throw new DoNotCareException('no interesting project, next please...');

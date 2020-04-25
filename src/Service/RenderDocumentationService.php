@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Exception\DocsPackageDoNotCareBranch;
@@ -18,20 +19,11 @@ use Psr\Log\LoggerInterface;
 
 class RenderDocumentationService
 {
-    /**
-     * @var DocumentationBuildInformationService
-     */
-    protected $documentationBuildInformationService;
+    protected DocumentationBuildInformationService $documentationBuildInformationService;
 
-    /**
-     * @var BambooService
-     */
-    protected $bambooService;
+    protected BambooService $bambooService;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     public function __construct(DocumentationBuildInformationService $documentationBuildInformationService, BambooService $bambooService, LoggerInterface $logger)
     {
@@ -45,7 +37,7 @@ class RenderDocumentationService
      * @param string $scope
      * @return DeploymentInformation
      * @throws DocsPackageDoNotCareBranch
-     * @throws \App\Exception\DuplicateDocumentationRepositoryException
+     * @throws DuplicateDocumentationRepositoryException
      */
     public function renderDocumentationByDocumentationJar(DocumentationJar $documentationJar, string $scope): DeploymentInformation
     {
