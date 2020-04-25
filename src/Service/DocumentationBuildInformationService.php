@@ -10,12 +10,11 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use Doctrine\Persistence\ObjectRepository;
-use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
+use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch as DocsPackageDoNotCareBranchAlias;
@@ -24,8 +23,8 @@ use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
-use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Filesystem\Filesystem;
 

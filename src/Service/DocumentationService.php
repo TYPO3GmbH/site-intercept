@@ -10,7 +10,6 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use App\Extractor\BambooBuildTriggered;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
@@ -19,6 +18,7 @@ use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
+use App\Extractor\BambooBuildTriggered;
 use App\Extractor\DeploymentInformation;
 use App\Repository\DocumentationJarRepository;
 use App\Utility\RepositoryUrlUtility;
@@ -27,7 +27,6 @@ use Psr\Log\LoggerInterface;
 
 class DocumentationService
 {
-
     protected RenderDocumentationService $renderDocumentationService;
 
     protected DocumentationJarRepository $docsRepository;

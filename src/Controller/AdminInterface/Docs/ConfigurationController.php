@@ -60,7 +60,8 @@ class ConfigurationController extends AbstractController
             }
         }
 
-        return $this->render('docs_configuration/form.html.twig',
+        return $this->render(
+            'docs_configuration/form.html.twig',
             [
                 'redirect' => $documentationJar,
                 'form' => $form->createView(),
@@ -91,7 +92,8 @@ class ConfigurationController extends AbstractController
             return $this->forward(self::class . '::addConfigurationStep3');
         }
 
-        return $this->render('docs_configuration/form.html.twig',
+        return $this->render(
+            'docs_configuration/form.html.twig',
             [
                 'redirect' => $documentationJar,
                 'form' => $form->createView(),
@@ -149,7 +151,8 @@ class ConfigurationController extends AbstractController
             return $this->redirectToRoute('admin_docs_deployments');
         }
 
-        return $this->render('docs_configuration/form.html.twig',
+        return $this->render(
+            'docs_configuration/form.html.twig',
             [
                 'redirect' => $doc,
                 'form' => $form->createView(),

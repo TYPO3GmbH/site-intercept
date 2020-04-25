@@ -73,7 +73,8 @@ class BlacklistController extends AbstractController
             $request->query->getInt('page', 1)
         );
 
-        return $this->render('docs_blacklist/index.html.twig',
+        return $this->render(
+            'docs_blacklist/index.html.twig',
             [
                 'pagination' => $pagination
             ]

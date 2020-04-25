@@ -35,7 +35,7 @@ class DocsServerRedirectType extends AbstractType
             ])
             ->add('statusCode', ChoiceType::class, [
                 'choices' => DocsServerRedirect::$allowedStatusCodes,
-                'choice_label' => static fn($value) => $value
+                'choice_label' => static fn ($value) => $value
             ])
             ->add('isLegacy', HiddenType::class, [
                 'data' => '0'

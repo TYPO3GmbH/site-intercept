@@ -10,11 +10,11 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use GuzzleHttp\Exception\GuzzleException;
 use App\Entity\DiscordChannel;
 use App\Exception\UnexpectedDiscordApiResponseException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Response;
 use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 

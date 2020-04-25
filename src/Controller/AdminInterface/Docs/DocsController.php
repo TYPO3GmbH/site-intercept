@@ -55,7 +55,8 @@ class DocsController extends AbstractController
 
         $recentLogsMessages = $graylogService->getRecentBambooDocsThirdPartyTriggers();
 
-        return $this->render('docs/index.html.twig',
+        return $this->render(
+            'docs/index.html.twig',
             [
                 'fluidVhForm' => $fluidVhForm->createView(),
                 'surf20Form' => $surf20Form->createView(),

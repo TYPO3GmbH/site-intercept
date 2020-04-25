@@ -66,7 +66,8 @@ class BambooCoreController extends AbstractController
 
         $recentLogsMessages = $graylogService->getRecentBambooTriggersAndVotes();
 
-        return $this->render('bamboo_core/index.html.twig',
+        return $this->render(
+            'bamboo_core/index.html.twig',
             [
                 'patchForm' => $patchForm->createView(),
                 'urlForm' => $urlForm->createView(),

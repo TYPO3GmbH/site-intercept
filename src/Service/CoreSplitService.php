@@ -10,9 +10,9 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use GitWrapper\Event\GitOutputListenerInterface;
 use App\Extractor\GithubPushEventForCore;
 use App\GitWrapper\Event\GitOutputListener;
+use GitWrapper\Event\GitOutputListenerInterface;
 use GitWrapper\GitException;
 use GitWrapper\GitWorkingCopy;
 use GitWrapper\GitWrapper;

@@ -10,10 +10,10 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Exception\DocsPackageDoNotCareBranch;
+use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Extractor\DeploymentInformation;
 use Psr\Log\LoggerInterface;
 

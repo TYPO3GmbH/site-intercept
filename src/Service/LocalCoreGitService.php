@@ -10,7 +10,6 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use GitWrapper\Event\GitOutputListenerInterface;
 use App\Creator\GerritCommitMessage;
 use App\Extractor\GithubCorePullRequest;
 use App\Extractor\GithubUserData;
@@ -18,6 +17,7 @@ use App\Extractor\GitPatchFile;
 use App\Extractor\GitPushOutput;
 use App\GitWrapper\Event\GitOutputListener;
 use GitWrapper\Event\GitLoggerEventSubscriber;
+use GitWrapper\Event\GitOutputListenerInterface;
 use GitWrapper\GitWorkingCopy;
 use GitWrapper\GitWrapper;
 use Psr\Log\LoggerInterface;

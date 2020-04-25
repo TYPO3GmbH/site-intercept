@@ -135,7 +135,7 @@ class AssetsDocsController extends AbstractController
             $item['versions'] = array_values(array_reverse($item['versions']));
 
             // As the items are sorted as expected now, we can safely set the latest stable version
-            $stableVersions = array_values(array_filter($item['versions'], static fn(string $version): bool => preg_match('/\d+.\d+(.\d+)?/', $version) === 1));
+            $stableVersions = array_values(array_filter($item['versions'], static fn (string $version): bool => preg_match('/\d+.\d+(.\d+)?/', $version) === 1));
             $item['latest'] = $stableVersions[0] ?? $item['versions'][0];
 
             // Create ['versions'] = ['version' => 'path']
