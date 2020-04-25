@@ -30,12 +30,12 @@ class DiscordScheduledMessage
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private string $name;
+    private string $name = '';
 
     /**
      * @ORM\Column(type="string", length=2000)
      */
-    private string $message;
+    private string $message = '';
 
     /**
      * @ManyToOne(targetEntity="DiscordChannel", inversedBy="scheduledMessages")
@@ -52,7 +52,7 @@ class DiscordScheduledMessage
     /**
      * @ORM\Column(type="string", length=75)
      */
-    private string $timezone;
+    private string $timezone = '';
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)

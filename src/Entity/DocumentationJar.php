@@ -77,12 +77,12 @@ class DocumentationJar
     /**
      * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
-    private \DateTimeInterface $createdAt;
+    private ?\DateTimeInterface $createdAt = null;
 
     /**
      * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
-    private \DateTimeInterface $lastRenderedAt;
+    private ?\DateTimeInterface $lastRenderedAt = null;
 
     /**
      * @ORM\Column(type="string", length=255)

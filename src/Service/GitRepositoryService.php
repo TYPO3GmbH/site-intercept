@@ -102,7 +102,7 @@ class GitRepositoryService
         asort($uniqueVersion);
 
         // Keep master branch on top, then list tags
-        return [...$results, ...$uniqueVersion];
+        return array_merge($results, $uniqueVersion);
     }
 
     protected function runGitProcess(string $repositoryUrl): string

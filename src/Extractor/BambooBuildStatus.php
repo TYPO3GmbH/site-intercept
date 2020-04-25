@@ -29,7 +29,7 @@ class BambooBuildStatus
     /**
      * @var string build key, eg. 'CORE-GTC-30244'
      */
-    public string $buildKey;
+    public ?string $buildKey = null;
 
     /**
      * @var string build url, eg. 'https://bamboo.typo3.com/browse/CORE-GTC-30244
@@ -57,19 +57,19 @@ class BambooBuildStatus
     public int $buildDurationInSeconds;
 
     /**
-     * @var string Plan name, eg. 'Core master nightly'
+     * @var string|null Plan name, eg. 'Core master nightly'
      */
-    public string $planName;
+    public ?string $planName;
 
     /**
-     * @var string Project name, eg. 'Core'
+     * @var string|null Project name, eg. 'Core'
      */
-    public string $projectName;
+    public ?string $projectName;
 
     /**
-     * @var int Build number, eg. '42'
+     * @var int|null Build number, eg. '42'
      */
-    public int $buildNumber;
+    public ?int $buildNumber = null;
 
     /**
      * Extract information from a bamboo build status

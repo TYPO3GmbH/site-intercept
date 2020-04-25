@@ -68,9 +68,9 @@ class GraylogLogEntry
     public string $bambooKey;
 
     /**
-     * @var bool Optionally set if this has been a 'vote on gerrit' log entry
+     * @var string Optionally set if this has been a 'vote on gerrit' log entry
      */
-    public bool $vote;
+    public string $vote;
 
     /**
      * @var string Optionally set for core split/tag jobs

@@ -32,17 +32,17 @@ class DiscordChannel
      * @ORM\Id()
      * @ORM\Column(type="string", length=255)
      */
-    private string $channelId;
+    private string $channelId = '';
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private string $channelName;
+    private string $channelName = '';
 
     /**
      * @ORM\Column(type="integer", options={"default": "0"})
      */
-    private int $channelType;
+    private int $channelType = 0;
 
     /**
      * @ManyToOne(targetEntity="DiscordChannel", inversedBy="children")

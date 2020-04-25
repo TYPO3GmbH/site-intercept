@@ -30,7 +30,7 @@ class RepositoryBlacklistEntry
      * @Assert\NotBlank
      * @Assert\Url
      */
-    private string $repositoryUrl;
+    private string $repositoryUrl = '';
 
     /**
      * @return int

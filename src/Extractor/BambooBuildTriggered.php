@@ -28,7 +28,11 @@ class BambooBuildTriggered
      */
     public function __construct(string $payload)
     {
-        $response = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
-        $this->buildResultKey = $response['buildResultKey'] ?? '';
+        if ($payload === '') {
+            $this->buildResultKey = '';
+        } else {
+            $response = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+            $this->buildResultKey = $response['buildResultKey'] ?? '';
+        }
     }
 }

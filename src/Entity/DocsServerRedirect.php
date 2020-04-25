@@ -46,12 +46,12 @@ class DocsServerRedirect
     /**
      * @ORM\Column(name="created_at", type="datetime")
      */
-    private \DateTimeInterface $createdAt;
+    private ?\DateTimeInterface $createdAt = null;
 
     /**
      * @ORM\Column(name="updated_at", type="datetime")
      */
-    private \DateTimeInterface $updatedAt;
+    private ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @ORM\Column(type="string", length=2000)
@@ -61,7 +61,7 @@ class DocsServerRedirect
      * )
      * @AppAssert\InvalidCharacter
      */
-    private string $source;
+    private string $source = '';
 
     /**
      * @ORM\Column(type="string", length=2000)
@@ -71,7 +71,7 @@ class DocsServerRedirect
      * )
      * @AppAssert\InvalidCharacter
      */
-    private string $target;
+    private string $target = '';
 
     /**
      * @ORM\Column(name="is_legacy", type="integer")

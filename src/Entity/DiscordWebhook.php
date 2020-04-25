@@ -29,7 +29,7 @@ class DiscordWebhook
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private string $name;
+    private string $name = '';
 
     /**
      * @ManyToOne(targetEntity="DiscordChannel", inversedBy="webhooks")
@@ -45,12 +45,12 @@ class DiscordWebhook
     /**
      * @ORM\Column(type="integer", options={"default": "0"})
      */
-    private int $type;
+    private int $type = 0;
 
     /**
      * @ORM\Column(type="string", length=255, options={"default": "Intercept"})
      */
-    private string $username;
+    private string $username = 'Intercept';
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)

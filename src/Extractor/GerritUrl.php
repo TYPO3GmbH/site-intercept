@@ -21,12 +21,12 @@ class GerritUrl
     /**
      * @var int Resolved change number, eg. 48574
      */
-    public int $changeId;
+    public ?int $changeId = null;
 
     /**
      * @var int The patch set, eg. '5'
      */
-    public int $patchSet;
+    public ?int $patchSet = null;
 
     /**
      * Extract data from url
