@@ -78,6 +78,7 @@
         "friendsofphp/php-cs-fixer": "^2.12",
         "fzaninotto/faker": "^1.8",
         "phpunit/phpunit": "^7.4",
+        "rector/rector": "^0.7.19",
         "roave/security-advisories": "dev-master",
         "symfony/browser-kit": "^4.2",
         "symfony/css-selector": "^4.2",
