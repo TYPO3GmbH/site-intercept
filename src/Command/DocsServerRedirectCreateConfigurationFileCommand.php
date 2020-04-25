@@ -57,5 +57,7 @@ class DocsServerRedirectCreateConfigurationFileCommand extends Command
         $io->writeln('trigger now the deployment');
         $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
         $io->success('done');
+
+        return 0;
     }
 }

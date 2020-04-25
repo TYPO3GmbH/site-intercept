@@ -87,5 +87,7 @@ class SendDiscordScheduledMessagesCommand extends Command
                 }
             }
         }
+
+        return 0;
     }
 }

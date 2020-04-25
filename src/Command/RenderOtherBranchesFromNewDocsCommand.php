@@ -47,10 +47,12 @@ class RenderOtherBranchesFromNewDocsCommand extends Command
         ]);
 
         if (count($newRepositories) === 0) {
-            return;
+            return 0;
         }
         foreach ($newRepositories as $documentationJar) {
             $this->documentationService->handleNewRepository($documentationJar);
         }
+
+        return 0;
     }
 }

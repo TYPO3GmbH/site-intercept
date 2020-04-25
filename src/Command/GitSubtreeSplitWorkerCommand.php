@@ -76,5 +76,7 @@ class GitSubtreeSplitWorkerCommand extends Command
         $this->rabbitService->workerLoop();
         // Worker usually never stop, but if they do, they log ... hopefully
         $this->logger->warning('Git core split worker stopped');
+
+        return 0;
     }
 }

@@ -100,7 +100,7 @@ class SyncDiscordChannelsCommand extends Command
                     'message' => $e->getMessage(),
                 ]
             );
-            return;
+            return 1;
         }
 
         $channelIds = [];
@@ -167,5 +167,7 @@ class SyncDiscordChannelsCommand extends Command
         }
 
         $this->entityManager->flush();
+
+        return 0;
     }
 }

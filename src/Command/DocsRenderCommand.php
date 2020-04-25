@@ -63,7 +63,7 @@ class DocsRenderCommand extends Command
 
         if ($all === false && $id === null && $package === null) {
             $io->error('At least one option is required: --all, --configuration or --package');
-            exit;
+            return 1;
         }
 
         try {
@@ -96,6 +96,8 @@ class DocsRenderCommand extends Command
         } catch (DocsPackageDoNotCareBranch $exception) {
             $io->writeln($exception->getMessage());
         }
+
+        return 0;
     }
 
     /**
