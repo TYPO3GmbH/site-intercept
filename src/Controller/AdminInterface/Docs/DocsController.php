@@ -29,10 +29,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class DocsController extends AbstractController
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @Route("/admin/docs", name="admin_docs_third_party")
@@ -58,7 +55,8 @@ class DocsController extends AbstractController
 
         $recentLogsMessages = $graylogService->getRecentBambooDocsThirdPartyTriggers();
 
-        return $this->render('docs/index.html.twig',
+        return $this->render(
+            'docs/index.html.twig',
             [
                 'fluidVhForm' => $fluidVhForm->createView(),
                 'surf20Form' => $surf20Form->createView(),
@@ -85,8 +83,7 @@ class DocsController extends AbstractController
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
-                    'Triggered fluid view helper build'
-                    . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                    'Triggered fluid view helper build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                     . ' of plan key "CORE-DRF".'
                 );
                 $this->logger->info(
@@ -100,8 +97,7 @@ class DocsController extends AbstractController
             } else {
                 $this->addFlash(
                     'danger',
-                    'Bamboo trigger not successful'
-                    . ' of plan key "CORE-DRF".'
+                    'Bamboo trigger not successful of plan key "CORE-DRF".'
                 );
             }
         }
@@ -124,8 +120,7 @@ class DocsController extends AbstractController
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
-                    'Triggered surf 2.0 build'
-                    . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                    'Triggered surf 2.0 build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                     . ' of plan key "CORE-DRS".'
                 );
                 $this->logger->info(
@@ -139,8 +134,7 @@ class DocsController extends AbstractController
             } else {
                 $this->addFlash(
                     'danger',
-                    'Bamboo trigger not successful'
-                    . ' of plan key "CORE-DRS".'
+                    'Bamboo trigger not successful of plan key "CORE-DRS".'
                 );
             }
         }
@@ -163,8 +157,7 @@ class DocsController extends AbstractController
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
-                    'Triggered surf master build'
-                    . ' <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                    'Triggered surf master build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
                     . ' of plan key "CORE-DRSM".'
                 );
                 $this->logger->info(
@@ -178,8 +171,7 @@ class DocsController extends AbstractController
             } else {
                 $this->addFlash(
                     'danger',
-                    'Bamboo trigger not successful'
-                    . ' of plan key "CORE-DRSM".'
+                    'Bamboo trigger not successful of plan key "CORE-DRSM".'
                 );
             }
         }

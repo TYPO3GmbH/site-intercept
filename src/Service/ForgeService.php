@@ -24,17 +24,14 @@ class ForgeService
     /**
      * @var string TYPO3 forge base url
      */
-    private $url = 'https://forge.typo3.org';
+    private string $url = 'https://forge.typo3.org';
 
     /**
      * @var int TYPO3 core project id on forge
      */
-    private $projectId = 27;
+    private int $projectId = 27;
 
-    /**
-     * @var ForgeClient
-     */
-    private $client;
+    private ForgeClient $client;
 
     /**
      * BambooService constructor.

@@ -26,7 +26,7 @@ class GerritCommitMessage
     /**
      * @var string The created commit message
      */
-    public $message;
+    public string $message;
 
     /**
      * Create a decent commit message from the github pull request information

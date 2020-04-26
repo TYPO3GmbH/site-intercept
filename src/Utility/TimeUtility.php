@@ -58,7 +58,7 @@ class TimeUtility
 
         $timezones = [];
         foreach ($regions as $region) {
-            $timezones = array_merge($timezones, DateTimeZone::listIdentifiers($region));
+            $timezones = [...$timezones, ...DateTimeZone::listIdentifiers($region)];
         }
 
         $timezoneOffsets = [];

@@ -20,14 +20,8 @@ use Psr\Log\LoggerInterface;
  */
 class PackagistService
 {
-    /**
-     * @var PackagistClient
-     */
-    private $client;
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private PackagistClient $client;
+    private LoggerInterface $logger;
 
     /**
      * @param PackagistClient $client

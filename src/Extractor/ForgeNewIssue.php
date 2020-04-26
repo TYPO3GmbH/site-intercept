@@ -19,7 +19,7 @@ class ForgeNewIssue
     /**
      * @var int New forge issue is, eg. '12345'
      */
-    public $id;
+    public int $id;
 
     /**
      * Extract information from a new forge issue response.

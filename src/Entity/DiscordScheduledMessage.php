@@ -25,45 +25,44 @@ class DiscordScheduledMessage
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private string $name = '';
 
     /**
      * @ORM\Column(type="string", length=2000)
      */
-    private $message;
+    private string $message = '';
 
     /**
      * @ManyToOne(targetEntity="DiscordChannel", inversedBy="scheduledMessages")
      * @JoinColumn(name="channel_id", referencedColumnName="channel_id", nullable=true)
      */
-    private $channel;
+    private ?DiscordChannel $channel = null;
 
     /**
-     * @var CronExpression
      *
      * @ORM\Column(type="cron_expression")
      */
-    private $schedule;
+    private ?CronExpression $schedule = null;
 
     /**
      * @ORM\Column(type="string", length=75)
      */
-    private $timezone;
+    private string $timezone = '';
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $username;
+    private ?string $username = null;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $avatarUrl;
+    private ?string $avatarUrl = null;
 
     /**
      * @return int

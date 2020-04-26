@@ -14,6 +14,7 @@ use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
+use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsPackageDoNotCareBranch as DocsPackageDoNotCareBranchAlias;
@@ -22,8 +23,8 @@ use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
-use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -36,37 +37,22 @@ class DocumentationBuildInformationService
     /**
      * @var string Absolute, private base directory where deployment infos are stored, configured via DI, typically '/.../var/'
      */
-    private $privateDir;
+    private string $privateDir;
 
     /**
      * @var string Name of sub directory in $publicDir and $privateDir where the files are stored, typically 'docs-build-information'
      */
-    private $subDir;
+    private string $subDir;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
+    private Filesystem $fileSystem;
 
-    /**
-     * @var DocumentationJarRepository
-     */
-    private $documentationJarRepository;
+    private ObjectRepository $documentationJarRepository;
 
-    /**
-     * @var GeneralClient
-     */
-    private $client;
+    private GeneralClient $client;
 
-    /**
-     * @var SlackService
-     */
-    private $slackService;
+    private SlackService $slackService;
 
     /**
      * Constructor
@@ -116,7 +102,7 @@ class DocumentationBuildInformationService
         }
         $stream = $response->getBody();
         $stream->rewind();
-        $json = json_decode($stream->getContents(), true);
+        $json = json_decode($stream->getContents(), true, 512, JSON_THROW_ON_ERROR);
         if (!is_array($json)) {
             throw new ComposerJsonInvalidException('Decoding composer.json did not return an object. Invalid json syntax?', 1558022442);
         }
@@ -142,7 +128,7 @@ class DocumentationBuildInformationService
      * @throws ComposerJsonInvalidException
      * @throws DocsPackageDoNotCareBranchAlias
      * @throws DocsComposerDependencyException
-     * @throws \App\Exception\Composer\DocsComposerMissingValueException
+     * @throws DocsComposerMissingValueException
      */
     public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {
@@ -241,8 +227,7 @@ class DocumentationBuildInformationService
         ]);
         if (count($records) > 1) {
             throw new DuplicateDocumentationRepositoryException(
-                'Inconsistent database, there should be only one entry for'
-                . ' repository ' . $deploymentInformation->repositoryUrl
+                'Inconsistent database, there should be only one entry for repository ' . $deploymentInformation->repositoryUrl
                 . ' package ' . $deploymentInformation->packageName
                 . ' with target directory ' . $deploymentInformation->targetBranchDirectory
                 . ' , but ' . count($records) . ' found.',

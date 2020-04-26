@@ -96,8 +96,7 @@ class DiscordWebhook extends AbstractType
         }
 
         asort($channels);
-        $channels = array_flip($channels);
 
-        return $channels;
+        return array_flip($channels);
     }
 }

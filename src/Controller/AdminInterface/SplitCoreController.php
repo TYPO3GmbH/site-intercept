@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class SplitCoreController extends AbstractController
 {
     /**
-     * @Route("/admin/split/core", name="admin_split_core");
+     * @Route("/admin/split/core", name="admin_split_core")
      * @param Request $request
      * @param RabbitPublisherService $rabbitService
      * @param GraylogService $graylogService
@@ -67,7 +67,8 @@ class SplitCoreController extends AbstractController
 
         $recentLogs = $graylogService->getRecentSplitActions();
 
-        return $this->render('split_core/index.html.twig',
+        return $this->render(
+            'split_core/index.html.twig',
             [
                 'splitCoreSplit' => $splitForm->createView(),
                 'splitCoreTag' => $tagForm->createView(),

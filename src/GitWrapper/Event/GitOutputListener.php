@@ -23,7 +23,7 @@ class GitOutputListener implements GitOutputListenerInterface
     /**
      * @var string Output including stderr
      */
-    public $output = '';
+    public string $output = '';
 
     /**
      * Looks ugly, but as gerrit uses stderr to output the link to the review system - even if nothing

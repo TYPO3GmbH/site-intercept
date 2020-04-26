@@ -21,17 +21,17 @@ class BambooSlackMessage
     /**
      * @var string Project-Plan-BuildNumber, eg. 'CORE-GTC-30244'
      */
-    public $buildKey;
+    public string $buildKey;
 
     /**
      * @var bool True if plan key is a nightly build
      */
-    public $isNightlyBuild;
+    public bool $isNightlyBuild;
 
     /**
      * @var bool True if plan key is a security build
      */
-    public $isSecurityBuild;
+    public bool $isSecurityBuild;
 
     /**
      * Extract relevant information from a bamboo created slack message

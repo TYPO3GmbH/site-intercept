@@ -22,10 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AssetsDocsController extends AbstractController
 {
-    /**
-     * @var DocumentationJarRepository
-     */
-    private $documentationJarRepository;
+    private DocumentationJarRepository $documentationJarRepository;
 
     public function __construct(DocumentationJarRepository $documentationJarRepository)
     {
@@ -41,7 +38,7 @@ class AssetsDocsController extends AbstractController
     {
         $aggregatedExtensions = [];
 
-        $legacyExtensions = json_decode(file_get_contents(__DIR__ . '/../../config/docs-legacy-rendering/typo3cms-extensions.json'), true);
+        $legacyExtensions = json_decode(file_get_contents(__DIR__ . '/../../config/docs-legacy-rendering/typo3cms-extensions.json'), true, 512, JSON_THROW_ON_ERROR);
         foreach ($legacyExtensions as $extension) {
             $extensionKey = $extension['key'];
             $aggregatedExtensions[$extensionKey]['docs'] = [];
@@ -102,7 +99,7 @@ class AssetsDocsController extends AbstractController
             'var extensionList = %s;',
         ]);
 
-        $legacyExtensions = json_decode(file_get_contents(__DIR__ . '/../../config/docs-legacy-rendering/typo3cms-extensions.json'), true);
+        $legacyExtensions = json_decode(file_get_contents(__DIR__ . '/../../config/docs-legacy-rendering/typo3cms-extensions.json'), true, 512, JSON_THROW_ON_ERROR);
         $flatList = $legacyExtensions;
 
         foreach ($extensions as $extension) {
@@ -138,10 +135,7 @@ class AssetsDocsController extends AbstractController
             $item['versions'] = array_values(array_reverse($item['versions']));
 
             // As the items are sorted as expected now, we can safely set the latest stable version
-            $stableVersions = array_values(array_filter($item['versions'], static function (string $version): bool {
-                // Remove any item not being a version number
-                return preg_match('/\d+.\d+(.\d+)?/', $version) === 1;
-            }));
+            $stableVersions = array_values(array_filter($item['versions'], static fn (string $version): bool => preg_match('/\d+.\d+(.\d+)?/', $version) === 1));
             $item['latest'] = $stableVersions[0] ?? $item['versions'][0];
 
             // Create ['versions'] = ['version' => 'path']
@@ -155,7 +149,7 @@ class AssetsDocsController extends AbstractController
         unset($item);
 
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $encoded = json_encode(array_values($flatList));
+        $encoded = json_encode(array_values($flatList), JSON_THROW_ON_ERROR);
 
         $javaScript = sprintf($template, $now->format(\DateTimeInterface::ATOM), $encoded);
 

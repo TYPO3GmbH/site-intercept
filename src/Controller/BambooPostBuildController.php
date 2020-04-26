@@ -111,7 +111,7 @@ class BambooPostBuildController extends AbstractController
             // Vote on gerrit if this build has been triggered by a gerrit push
             $message = new GerritBuildStatusMessage($buildDetails);
             $gerritService->voteOnGerrit($buildDetails, $message);
-            $vote = $buildDetails->success === true ? '+1' : '-1';
+            $vote = $buildDetails->success ? '+1' : '-1';
             $logger->info(
                 'Voted ' . $vote . ' on gerrit'
                 . ' due to bamboo build "' . $buildDetails->buildKey . '"'
@@ -141,8 +141,7 @@ class BambooPostBuildController extends AbstractController
                 $manager->flush();
 
                 $logger->info(
-                    'Deleted documentation'
-                    . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                    'Deleted documentation due to bamboo build "' . $buildDetails->buildKey . '"',
                     [
                         'type' => 'docsRendering',
                         'status' => 'documentationDeleted',
@@ -161,8 +160,7 @@ class BambooPostBuildController extends AbstractController
                 $manager->flush();
 
                 $logger->warning(
-                    'Failed to delete documentation'
-                    . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                    'Failed to delete documentation due to bamboo build "' . $buildDetails->buildKey . '"',
                     [
                         'type' => 'docsRendering',
                         'status' => 'documentationDeleteFailed',
@@ -186,8 +184,7 @@ class BambooPostBuildController extends AbstractController
                         ->setLastRenderedAt(new \DateTime('now'))
                         ->setStatus(DocumentationStatus::STATUS_RENDERED);
                     $logger->info(
-                        'Documentation rendered'
-                        . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                        'Documentation rendered due to bamboo build "' . $buildDetails->buildKey . '"',
                         [
                             'type' => 'docsRendering',
                             'status' => 'documentationRendered',
@@ -201,8 +198,7 @@ class BambooPostBuildController extends AbstractController
                     // Build failed, set status of documentation to "rendering failed"
                     $documentationJar->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED);
                     $logger->warning(
-                        'Failed to render documentation'
-                        . ' due to bamboo build "' . $buildDetails->buildKey . '"',
+                        'Failed to render documentation due to bamboo build "' . $buildDetails->buildKey . '"',
                         [
                             'type' => 'docsRendering',
                             'status' => 'documentationRenderingFailed',

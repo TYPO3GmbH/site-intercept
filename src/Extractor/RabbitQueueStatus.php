@@ -19,17 +19,17 @@ class RabbitQueueStatus
     /**
      * @var bool True if rabbit mq service is online
      */
-    public $isRabbitOnline;
+    public bool $isRabbitOnline;
 
     /**
      * @var bool True if the one worker is online
      */
-    public $isWorkerOnline;
+    public bool $isWorkerOnline;
 
     /**
      * @var int Number of messages in queue
      */
-    public $numberOfJobs;
+    public int $numberOfJobs;
 
     /**
      * @param array $body

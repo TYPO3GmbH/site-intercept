@@ -23,32 +23,32 @@ class GithubCorePullRequest
     /**
      * @var string Target PR branch, eg. 'master'
      */
-    public $branch;
+    public string $branch;
 
     /**
      * @var string Diff URL, eg. 'https://github.com/psychomieze/TYPO3.CMS/pull/1.diff'
      */
-    public $diffUrl;
+    public string $diffUrl;
 
     /**
      * @var string URL to github user, eg. 'https://api.github.com/users/psychomieze'
      */
-    public $userUrl;
+    public string $userUrl;
 
     /**
      * @var string URL to pr "issue", eg. 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1'
      */
-    public $issueUrl;
+    public string $issueUrl;
 
     /**
      * @var string URL to pull request, eg. 'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1'
      */
-    public $pullRequestUrl;
+    public string $pullRequestUrl;
 
     /**
      * @var string URL to pull request comments, eg. 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments'
      */
-    public $commentsUrl;
+    public string $commentsUrl;
 
     /**
      * Extract information needed by pull request controller from a github
@@ -59,7 +59,7 @@ class GithubCorePullRequest
      */
     public function __construct(string $payload)
     {
-        $payload = json_decode($payload, true);
+        $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
         $action = $payload['action'] ?? '';
         if ($action !== 'opened') {
             throw new DoNotCareException('action is not opened, it\'s not my job');

@@ -22,38 +22,38 @@ use Ramsey\Uuid\Uuid;
  */
 class GithubPushEventForCore
 {
-    private const TYPE_PATCH='patch';
-    private const TYPE_TAG='tag';
+    private const TYPE_PATCH = 'patch';
+    private const TYPE_TAG = 'tag';
 
     /**
      * @var string Used especially in logging as context.
      */
-    public $jobUuid;
+    public ?string $jobUuid = null;
 
     /**
      * @var string Either 'patch' if a merged patch should be split, or 'tag' to apply tags to sub reps
      */
-    public $type;
+    public ?string $type = null;
 
     /**
      * @var string The source branch to split FROM, eg. 'TYPO3_8-7', '9.2', 'master'
      */
-    public $sourceBranch;
+    public ?string $sourceBranch = null;
 
     /**
      * @var string The target branch to split TO, eg. '8.7', '9.2', 'master'
      */
-    public $targetBranch;
+    public ?string $targetBranch = null;
 
     /**
      * @var string Set to the tag that has been pushed for type=tag
      */
-    public $tag;
+    public ?string $tag = null;
 
     /**
      * @var string the full name of the repository
      */
-    public $repositoryFullName;
+    public ?string $repositoryFullName = null;
 
     /**
      * Extract information.

@@ -17,15 +17,9 @@ use Twig\Environment;
 
 class MailService
 {
-    /**
-     * @var \Swift_Mailer
-     */
-    private $mailer;
+    private \Swift_Mailer $mailer;
 
-    /**
-     * @var Environment
-     */
-    private $templating;
+    private Environment $templating;
 
     public function __construct(\Swift_Mailer $mailer, Environment $templating)
     {

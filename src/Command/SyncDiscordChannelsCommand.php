@@ -26,35 +26,17 @@ class SyncDiscordChannelsCommand extends Command
 {
     protected static $defaultName = 'app:discord-sync';
 
-    /**
-     * @var DiscordServerService
-     */
-    protected $discordServerService;
+    protected DiscordServerService $discordServerService;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
-    /**
-     * @var DiscordChannelRepository
-     */
-    protected $discordChannelRepository;
+    protected DiscordChannelRepository $discordChannelRepository;
 
-    /**
-     * @var DiscordWebhookRepository
-     */
-    protected $discordWebhookRepository;
+    protected DiscordWebhookRepository $discordWebhookRepository;
 
-    /**
-     * @var DiscordScheduledMessageRepository
-     */
-    protected $discordScheduledMessageRepository;
+    protected DiscordScheduledMessageRepository $discordScheduledMessageRepository;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     /**
      * SyncDiscordChannelsCommand constructor.
@@ -89,7 +71,7 @@ class SyncDiscordChannelsCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $channels = $this->discordServerService->getChannels();
@@ -100,7 +82,7 @@ class SyncDiscordChannelsCommand extends Command
                     'message' => $e->getMessage(),
                 ]
             );
-            return;
+            return 1;
         }
 
         $channelIds = [];
@@ -167,5 +149,7 @@ class SyncDiscordChannelsCommand extends Command
         }
 
         $this->entityManager->flush();
+
+        return 0;
     }
 }
