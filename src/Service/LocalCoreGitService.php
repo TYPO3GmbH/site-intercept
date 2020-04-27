@@ -17,6 +17,7 @@ use App\Extractor\GitPatchFile;
 use App\Extractor\GitPushOutput;
 use App\GitWrapper\Event\GitOutputListener;
 use GitWrapper\Event\GitLoggerEventSubscriber;
+use GitWrapper\Event\GitOutputListenerInterface;
 use GitWrapper\GitWorkingCopy;
 use GitWrapper\GitWrapper;
 use Psr\Log\LoggerInterface;
@@ -29,15 +30,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class LocalCoreGitService
 {
-    /**
-     * @var GitWorkingCopy
-     */
-    private $workingCopy;
+    private GitWorkingCopy $workingCopy;
 
-    /**
-     * @var GitOutputListener
-     */
-    private $listener;
+    private GitOutputListener $listener;
 
     /**
      * Prepare core checkout.
@@ -46,7 +41,7 @@ class LocalCoreGitService
      * @param GitOutputListener $listener
      * @param string $pullRequestCorePath Absolute path of local core git checkout
      */
-    public function __construct(LoggerInterface $logger, GitOutputListener $listener, string $pullRequestCorePath)
+    public function __construct(LoggerInterface $logger, GitOutputListenerInterface $listener, string $pullRequestCorePath)
     {
         $this->listener = $listener;
         $gitWrapper = new GitWrapper();

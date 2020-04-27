@@ -18,14 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class RenderOtherBranchesFromNewDocsCommand extends Command
 {
     protected static $defaultName = 'app:docs-render-new';
-    /**
-     * @var DocumentationJarRepository
-     */
-    private $documentationJarRepository;
-    /**
-     * @var DocumentationService
-     */
-    private $documentationService;
+    private DocumentationJarRepository $documentationJarRepository;
+    private DocumentationService $documentationService;
 
     public function __construct(DocumentationJarRepository $documentationJarRepository, DocumentationService $documentationService)
     {
@@ -39,7 +33,7 @@ class RenderOtherBranchesFromNewDocsCommand extends Command
         $this->setDescription('Command to render missing branches from newly added repositories');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $newRepositories = $this->documentationJarRepository->findBy([
             'new' => true,
@@ -47,10 +41,12 @@ class RenderOtherBranchesFromNewDocsCommand extends Command
         ]);
 
         if (count($newRepositories) === 0) {
-            return;
+            return 0;
         }
         foreach ($newRepositories as $documentationJar) {
             $this->documentationService->handleNewRepository($documentationJar);
         }
+
+        return 0;
     }
 }

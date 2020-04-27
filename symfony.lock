@@ -134,6 +134,12 @@
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
+    "jean85/pretty-package-versions": {
+        "version": "1.2"
+    },
+    "jetbrains/phpstorm-stubs": {
+        "version": "v2019.3"
+    },
     "kbsali/redmine-api": {
         "version": "v1.5.16"
     },
@@ -164,6 +170,15 @@
     "myclabs/deep-copy": {
         "version": "1.8.1"
     },
+    "nette/finder": {
+        "version": "v2.5.2"
+    },
+    "nette/robot-loader": {
+        "version": "v3.2.3"
+    },
+    "nette/utils": {
+        "version": "v3.1.1"
+    },
     "nikic/php-parser": {
         "version": "v4.1.0"
     },
@@ -172,6 +187,9 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.2.2"
+    },
+    "ondram/ci-detector": {
+        "version": "3.3.0"
     },
     "paragonie/constant_time_encoding": {
         "version": "v2.2.2"
@@ -205,6 +223,15 @@
     },
     "phpspec/prophecy": {
         "version": "1.8.0"
+    },
+    "phpstan/phpdoc-parser": {
+        "version": "0.4.4"
+    },
+    "phpstan/phpstan": {
+        "version": "0.12.19"
+    },
+    "phpstan/phpstan-phpunit": {
+        "version": "0.12.8"
     },
     "phpunit/php-code-coverage": {
         "version": "6.1.4"
@@ -242,11 +269,17 @@
     "psr/log": {
         "version": "1.0.2"
     },
+    "psr/simple-cache": {
+        "version": "1.0.1"
+    },
     "ralouphie/getallheaders": {
         "version": "2.0.5"
     },
     "ramsey/uuid": {
         "version": "3.8.0"
+    },
+    "rector/rector": {
+        "version": "v0.7.19"
     },
     "roave/security-advisories": {
         "version": "dev-master"
@@ -562,6 +595,21 @@
     "symfony/yaml": {
         "version": "v4.1.7"
     },
+    "symplify/auto-bind-parameter": {
+        "version": "v7.2.19"
+    },
+    "symplify/autowire-array-parameter": {
+        "version": "v7.2.19"
+    },
+    "symplify/package-builder": {
+        "version": "v7.2.19"
+    },
+    "symplify/set-config-resolver": {
+        "version": "v7.2.19"
+    },
+    "symplify/smart-file-system": {
+        "version": "v7.2.19"
+    },
     "t3g/symfony-template-bundle": {
         "version": "dev-initialize"
     },
@@ -570,6 +618,9 @@
     },
     "theseer/tokenizer": {
         "version": "1.1.0"
+    },
+    "tracy/tracy": {
+        "version": "v2.7.4"
     },
     "twig/twig": {
         "version": "v2.5.0"

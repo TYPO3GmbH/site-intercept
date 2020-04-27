@@ -21,19 +21,17 @@ class GithubPushEventForDocs
     /**
      * @var string A tag or a branch name
      */
-    public $tagOrBranchName = '';
+    public string $tagOrBranchName = '';
 
     /**
      * @var string Repository url to clone, eg. 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git'
      */
-    public $repositoryUrl = '';
+    public string $repositoryUrl = '';
 
     /**
      * Path to composer.json in repository
-     *
-     * @var string
      */
-    public $composerFile = '';
+    public string $composerFile = '';
 
     /**
      * Extract information needed by docs trigger from a github
@@ -44,7 +42,7 @@ class GithubPushEventForDocs
      */
     public function __construct(string $payload)
     {
-        $payload = json_decode($payload, true);
+        $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
         $this->tagOrBranchName = $this->getTagOrBranchFromRef($payload['ref']);
         $this->repositoryUrl = $payload['repository']['clone_url'];
         $repositoryName = $this->extractRepositoryNameFromUrl($this->repositoryUrl);

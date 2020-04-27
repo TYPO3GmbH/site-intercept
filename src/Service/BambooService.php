@@ -26,10 +26,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 class BambooService
 {
-    /**
-     * @var BambooClient
-     */
-    private $client;
+    private BambooClient $client;
 
     /**
      * BambooService constructor.
@@ -110,13 +107,16 @@ class BambooService
                     'label' => 'change-' . $pushEvent->changeId
                 ]);
             $response = $this->sendBamboo('get', $url);
-            $response = json_decode((string)$response->getBody(), true);
-            foreach ($response->results->result ?? [] as $result) {
-                if (!in_array($result->state, ['Successful', 'Failed'], true)) {
-                    $this->sendBamboo(
-                        'delete',
-                        'latest/queue/' . $result->buildResultKey
-                    );
+            $body = (string)$response->getBody();
+            if ($body !== '') {
+                $response = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+                foreach ($response->results->result ?? [] as $result) {
+                    if (!in_array($result->state, ['Successful', 'Failed'], true)) {
+                        $this->sendBamboo(
+                            'delete',
+                            'latest/queue/' . $result->buildResultKey
+                        );
+                    }
                 }
             }
         } catch (ClientException $e) {
@@ -165,8 +165,7 @@ class BambooService
      */
     public function triggerDocumentationDeletionPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
     {
-        $uri = 'latest/queue/'
-            . 'CORE-DDEL?'
+        $uri = 'latest/queue/CORE-DDEL?'
             . http_build_query([
                 'stage' => '',
                 'executeAllStages' => '',
@@ -185,8 +184,7 @@ class BambooService
      */
     public function triggerDocumentationPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
     {
-        $uri = 'latest/queue/'
-            . 'CORE-DR?'
+        $uri = 'latest/queue/CORE-DR?'
             . http_build_query([
                 'stage' => '',
                 'executeAllStages' => '',
@@ -206,8 +204,7 @@ class BambooService
      */
     public function triggerDocumentationFluidVhPlan(string $buildPlan): BambooBuildTriggered
     {
-        $uri = 'latest/queue/'
-            . 'CORE-' . $buildPlan . '?'
+        $uri = 'latest/queue/CORE-' . $buildPlan . '?'
             . http_build_query([
                 'stage' => '',
                 'executeAllStages' => '',
@@ -224,8 +221,7 @@ class BambooService
      */
     public function triggerDocumentationSurf20Plan(): BambooBuildTriggered
     {
-        $uri = 'latest/queue/'
-            . 'CORE-DRS?'
+        $uri = 'latest/queue/CORE-DRS?'
             . http_build_query([
                 'stage' => '',
                 'executeAllStages' => '',
@@ -242,8 +238,7 @@ class BambooService
      */
     public function triggerDocumentationSurfMasterPlan(): BambooBuildTriggered
     {
-        $uri = 'latest/queue/'
-            . 'CORE-DRSM?'
+        $uri = 'latest/queue/CORE-DRSM?'
             . http_build_query([
                 'stage' => '',
                 'executeAllStages' => '',

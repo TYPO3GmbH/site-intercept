@@ -33,13 +33,11 @@ class CustomErrorHandlerTransformer extends AbstractDiscordTransformer
      */
     protected function transformPayloadToDiscordMessage(array $payload): AbstractDiscordMessage
     {
-        $message = (new DiscordEmbedsMessage())
+        return (new DiscordEmbedsMessage())
             ->setDescription('```' . $payload['message'] . '```')
             ->setTitle('Log entry for ' . $payload['project_name'])
             ->setColorWithHexValue(self::LOG_COLORS[$payload['log_level']])
             ->addField('Log Level', $payload['log_level'], true);
-
-        return $message;
     }
 
     /**

@@ -28,14 +28,14 @@ class GitRepositoryService
         self::SERVICE_BITBUCKET_SERVER => 'Bitbucket Server'
     ];
 
-    protected $composerJsonUrlFormat = [
+    protected array $composerJsonUrlFormat = [
         self::SERVICE_BITBUCKET_CLOUD => '{baseUrl}/{repoName}/raw/{version}/composer.json',
         self::SERVICE_BITBUCKET_SERVER => '{baseUrl}/projects/{project}/repos/{package}/raw/composer.json?at=refs%2F{type}%2F{version}',
         self::SERVICE_GITLAB => '{baseUrl}/raw/{version}/composer.json',
         self::SERVICE_GITHUB => 'https://raw.githubusercontent.com/{repoName}/{version}/composer.json',
     ];
 
-    protected $allowedBranches = ['master', 'documentation-draft'];
+    protected array $allowedBranches = ['master', 'documentation-draft'];
 
     public function resolvePublicComposerJsonUrlByPayload(stdClass $payload, string $repoService): string
     {

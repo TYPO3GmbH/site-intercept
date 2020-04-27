@@ -21,27 +21,27 @@ class SlackCoreNightlyBuildMessage implements \JsonSerializable
     /**
      * @var int one of the constants above
      */
-    private $status;
+    private int $status;
 
     /**
      * @var string Full plan key with number, eg. 'CORE-GTC-23'
      */
-    private $buildKey;
+    private string $buildKey;
 
     /**
      * @var string Project name, eg. 'Core nightly master'
      */
-    private $projectName;
+    private string $projectName;
 
     /**
      * @var string Plan name, eg. 'Core'
      */
-    private $planName;
+    private string $planName;
 
     /**
      * @var int Build number, eg. '23'
      */
-    private $buildNumber;
+    private int $buildNumber;
 
     /**
      * Create a readable message to be shown on gerrit.

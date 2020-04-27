@@ -23,17 +23,17 @@ class GithubPullRequestIssue
     /**
      * @var string Github new pull request title, eg. 'Improve foo'
      */
-    public $title;
+    public string $title;
 
     /**
      * @var string (optional) Github new pull request body, eg. 'Fixes whatever'
      */
-    public $body;
+    public string $body;
 
     /**
      * @var string Github new pull request url, eg. 'https://github.com/psychomieze/TYPO3.CMS/pull/1`
      */
-    public $url;
+    public string $url;
 
     /**
      * Extract information from a github pull request issue.
@@ -44,7 +44,7 @@ class GithubPullRequestIssue
     public function __construct(ResponseInterface $response)
     {
         $responseBody = (string)$response->getBody();
-        $issueInformation = json_decode($responseBody, true);
+        $issueInformation = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
         $this->title = (string)($issueInformation['title'] ?? '');
         $this->body = (string)($issueInformation['body'] ?? '');
         $this->url = (string)($issueInformation['html_url'] ?? '');

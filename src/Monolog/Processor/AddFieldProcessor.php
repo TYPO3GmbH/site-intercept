@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Security;
  */
 class AddFieldProcessor
 {
-    private $fieldValues = [];
+    private array $fieldValues = [];
 
     public function __construct(array $fieldValues = [])
     {

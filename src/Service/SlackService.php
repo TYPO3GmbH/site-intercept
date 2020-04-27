@@ -21,15 +21,9 @@ use Psr\Http\Message\ResponseInterface;
  */
 class SlackService
 {
-    /**
-     * @var SlackClient
-     */
-    private $client;
+    private SlackClient $client;
 
-    /**
-     * @var string
-     */
-    private $hook;
+    private string $hook;
 
     /**
      * SlackService constructor.
@@ -51,13 +45,12 @@ class SlackService
      */
     public function sendNightlyBuildMessage(SlackCoreNightlyBuildMessage $message): ResponseInterface
     {
-        $response = $this->client->post(
+        return $this->client->post(
             $this->hook,
             [
                 RequestOptions::JSON => $message,
             ]
         );
-        return $response;
     }
 
     /**
@@ -92,12 +85,11 @@ class SlackService
      */
     protected function sendMessage(array $parameters): ResponseInterface
     {
-        $response = $this->client->post(
+        return $this->client->post(
             $this->hook,
             [
                 RequestOptions::JSON => $parameters,
             ]
         );
-        return $response;
     }
 }

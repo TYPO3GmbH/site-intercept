@@ -23,12 +23,12 @@ class GithubUserData
     /**
      * @var string User name or user login name, eg. 'Christian Kuhn' or 'lolli42'
      */
-    public $user;
+    public string $user;
 
     /**
      * @var string User email address if set, eg. 'lolli@schwarzbu.ch'
      */
-    public $email;
+    public string $email;
 
     /**
      * Extract information from a github pull request issue.
@@ -39,7 +39,7 @@ class GithubUserData
     public function __construct(ResponseInterface $response)
     {
         $responseBody = (string)$response->getBody();
-        $userInformation = json_decode($responseBody, true);
+        $userInformation = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
         $this->user = $userInformation['name'] ?? $userInformation['login'] ?? '';
         $this->email = $userInformation['email'] ?? 'noreply@example.com';
 

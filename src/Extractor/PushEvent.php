@@ -18,17 +18,14 @@ class PushEvent
     /**
      * @var string A tag or a branch name
      */
-    protected $versionString;
+    protected string $versionString;
 
     /**
      * @var string Repository url to clone
      */
-    protected $repositoryUrl;
+    protected string $repositoryUrl;
 
-    /**
-     * @var string
-     */
-    protected $urlToComposerFile;
+    protected string $urlToComposerFile;
 
     /**
      * PushEvent constructor.

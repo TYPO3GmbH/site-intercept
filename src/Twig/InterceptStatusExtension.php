@@ -18,8 +18,8 @@ use Twig\TwigFunction;
 
 class InterceptStatusExtension extends AbstractExtension
 {
-    protected $bambooService;
-    protected $rabbitService;
+    protected BambooService $bambooService;
+    protected RabbitStatusService $rabbitService;
 
     public function __construct(
         BambooService $bambooService,

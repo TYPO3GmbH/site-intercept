@@ -23,15 +23,12 @@ use App\Extractor\GitPatchFile;
  */
 class GithubService
 {
-    /**
-     * @var GeneralClient
-     */
-    private $client;
+    private GeneralClient $client;
 
     /**
      * @var string Absolute path pull request files are put to
      */
-    private $pullRequestPatchPath;
+    private string $pullRequestPatchPath;
 
     /**
      * @var string Github access token

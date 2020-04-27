@@ -22,6 +22,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Setono\CronExpressionBundle\Form\DataTransformer\CronExpressionToPartsTransformer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,7 +37,8 @@ class DiscordController extends AbstractController
     public function howTo(): Response
     {
         $jsonExample = '{' . PHP_EOL . '    "message": "This is an error message",' . PHP_EOL . '    "project_name": "My Cool Project",' . PHP_EOL . '    "log_level": 4' . PHP_EOL . '}';
-        return $this->render('discord/howto.html.twig',
+        return $this->render(
+            'discord/howto.html.twig',
             [
                 'jsonExample' => $jsonExample
             ]
@@ -63,7 +65,8 @@ class DiscordController extends AbstractController
             $request->query->getInt('page', 1)
         );
 
-        return $this->render('discord/webhook_list.html.twig',
+        return $this->render(
+            'discord/webhook_list.html.twig',
             [
                 'pagination' => $pagination,
             ]
@@ -112,7 +115,7 @@ class DiscordController extends AbstractController
         DiscordChannelRepository $discordChannelRepository,
         DiscordWebhookRepository $discordWebhookRepository
     ): Response {
-        $hook = new \App\Entity\DiscordWebhook();
+        $hook = new DiscordWebhook();
         $form = $this->createForm(\App\Form\DiscordWebhook::class, $hook, ['entity_manager' => $this->getDoctrine()->getManager()]);
         $form->handleRequest($request);
 
@@ -137,7 +140,8 @@ class DiscordController extends AbstractController
             }
         }
 
-        return $this->render('discord/webhook_form.html.twig',
+        return $this->render(
+            'discord/webhook_form.html.twig',
             [
                 'form' => $form->createView(),
             ]
@@ -218,7 +222,8 @@ class DiscordController extends AbstractController
             $form->get('channelId')->setData(null);
         }
 
-        return $this->render('discord/webhook_form.html.twig',
+        return $this->render(
+            'discord/webhook_form.html.twig',
             [
                 'form' => $form->createView(),
                 'edit' => true,
@@ -288,7 +293,8 @@ class DiscordController extends AbstractController
             $request->query->getInt('page', 1)
         );
 
-        return $this->render('discord/scheduled_message_list.html.twig',
+        return $this->render(
+            'discord/scheduled_message_list.html.twig',
             [
                 'pagination' => $pagination,
             ]
@@ -319,7 +325,8 @@ class DiscordController extends AbstractController
             $response = $this->handleFormSubmit($request->get('discord_scheduled_message'), $entityManager, $discordChannelRepository, $message);
         }
 
-        return $response ?? $this->render('discord/scheduled_message_form.html.twig',
+        return $response ?? $this->render(
+            'discord/scheduled_message_form.html.twig',
             [
                 'form' => $form->createView(),
             ]
@@ -366,7 +373,8 @@ class DiscordController extends AbstractController
             $form->get('channelId')->setData(null);
         }
 
-        return $this->render('discord/scheduled_message_form.html.twig',
+        return $this->render(
+            'discord/scheduled_message_form.html.twig',
             [
                 'form' => $form->createView(),
                 'edit' => true,
@@ -404,7 +412,7 @@ class DiscordController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @param DiscordChannelRepository $discordChannelRepository
      * @param DiscordScheduledMessage|null $message
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+     * @return RedirectResponse|null
      */
     protected function handleFormSubmit(
         array $discordScheduledMessage,

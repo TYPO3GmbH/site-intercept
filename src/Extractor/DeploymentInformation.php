@@ -17,10 +17,7 @@ use App\Exception\DocsPackageDoNotCareBranch;
  */
 class DeploymentInformation
 {
-    /**
-     * @var array
-     */
-    private static $typeMap = [
+    private static array $typeMap = [
         'typo3-cms-documentation' => ['m' => 'manual'],
         'typo3-cms-framework' => ['c' => 'core-extension'],
         'typo3-cms-extension' => ['p' => 'extension'],
@@ -35,37 +32,37 @@ class DeploymentInformation
     /**
      * @var string Plain name of a package, e.g. "news"
      */
-    public $name;
+    public string $name;
 
     /**
      * @var string Full package name, eg. 'georgringer/news'
      */
-    public $packageName;
+    public string $packageName;
 
     /**
      * @var string Full package type, eg. 'typo3-cms-extension'
      */
-    public $packageType;
+    public string $packageType;
 
     /**
      * @var string Extension key, e.g. 'news'
      */
-    public $extensionKey;
+    public string $extensionKey;
 
     /**
      * @var string The (not changed) source branch or tag of the repository supposed to be checked out, eg. '1.2.3', '1.2', 'master', 'latest'
      */
-    public $sourceBranch;
+    public string $sourceBranch;
 
     /**
      * @var string The target directory on the documentation server, typically identical to $branch, except for $branch='latest', this is deployed to 'master'
      */
-    public $targetBranchDirectory;
+    public string $targetBranchDirectory;
 
     /**
      * @var string Long type name of a composer package, e.g. "manual" or "core-extension"
      */
-    public $typeLong;
+    public string $typeLong;
 
     /**
      * @var string Short type name of a composer package, e.g. "m" or "p"
@@ -75,32 +72,32 @@ class DeploymentInformation
     /**
      * @var string Repository URL, eg. 'https://github.com/lolli42/enetcache/'
      */
-    public $repositoryUrl;
+    public string $repositoryUrl;
 
     /**
      * @var string public URL to the composer.json file in the repository
      */
-    public $publicComposerJsonUrl;
+    public string $publicComposerJsonUrl;
 
     /**
      * @var string Absolute path to the dump file, eg. '/.../var/docs-build-information/1893678543347'
      */
-    public $absoluteDumpFile;
+    public string $absoluteDumpFile;
 
     /**
      * @var string Path to dump file relative to document root, eg. 'docs-build-information/1893678543347'
      */
-    public $relativeDumpFile;
+    public string $relativeDumpFile;
 
     /**
      * @var string TYPO3 version the package is compatible with (minimum)
      */
-    public $minimumTypoVersion;
+    public string $minimumTypoVersion;
 
     /**
      * @var string TYPO3 version the package is compatible with (maximum)
      */
-    public $maximumTypoVersion;
+    public string $maximumTypoVersion;
 
     /**
      * Constructor

@@ -37,7 +37,7 @@ class BitbucketToPackagistControllerTest extends TestCase
                 ]
             )->shouldBeCalled()
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy('App\Client\PackagistClient', $packagistClientProphecy);
+        TestDoubleBundle::addProphecy(PackagistClient::class, $packagistClientProphecy);
 
         $kernel = new Kernel('test', true);
         $kernel->boot();
@@ -64,7 +64,7 @@ class BitbucketToPackagistControllerTest extends TestCase
                 ]
             )->shouldBeCalled()
             ->willReturn(new Response(406));
-        TestDoubleBundle::addProphecy('App\Client\PackagistClient', $packagistClientProphecy);
+        TestDoubleBundle::addProphecy(PackagistClient::class, $packagistClientProphecy);
 
         $kernel = new Kernel('test', true);
         $kernel->boot();

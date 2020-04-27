@@ -23,27 +23,27 @@ class GerritToBambooCore
     /**
      * @var int Resolved change number, eg. 48574
      */
-    public $changeId;
+    public int $changeId;
 
     /**
      * @var int The patch set, eg. '5'
      */
-    public $patchSet;
+    public int $patchSet;
 
     /**
      * @var string Core branch, eg. 'TYPO3_8-7' or '9.5'
      */
-    public $branch;
+    public string $branch;
 
     /**
      * @var string The bamboo project that relates to given core pre-merge branch
      */
-    public $bambooProject;
+    public string $bambooProject;
 
     /**
      * @var bool True if core security repo is triggered
      */
-    public $isSecurity;
+    public bool $isSecurity;
 
     /**
      * Extract information needed from a gerrit push event hook

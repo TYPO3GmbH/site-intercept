@@ -25,15 +25,9 @@ class DocsRenderCommand extends Command
 {
     protected static $defaultName = 'app:docs-render';
 
-    /**
-     * @var RenderDocumentationService
-     */
-    protected $renderDocumentationService;
+    protected RenderDocumentationService $renderDocumentationService;
 
-    /**
-     * @var DocumentationJarRepository
-     */
-    protected $documentationJarRepository;
+    protected DocumentationJarRepository $documentationJarRepository;
 
     public function __construct(RenderDocumentationService $renderDocumentationService, DocumentationJarRepository $documentationJarRepository)
     {
@@ -52,7 +46,7 @@ class DocsRenderCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $all = $input->getOption('all') ?? false;
@@ -63,7 +57,7 @@ class DocsRenderCommand extends Command
 
         if ($all === false && $id === null && $package === null) {
             $io->error('At least one option is required: --all, --configuration or --package');
-            exit;
+            return 1;
         }
 
         try {
@@ -96,6 +90,8 @@ class DocsRenderCommand extends Command
         } catch (DocsPackageDoNotCareBranch $exception) {
             $io->writeln($exception->getMessage());
         }
+
+        return 0;
     }
 
     /**

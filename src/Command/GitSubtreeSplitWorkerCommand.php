@@ -24,15 +24,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class GitSubtreeSplitWorkerCommand extends Command
 {
-    /**
-     * @var RabbitConsumerService
-     */
-    private $rabbitService;
+    protected static $defaultName = 'app:git-core-split-worker';
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private RabbitConsumerService $rabbitService;
+
+    private LoggerInterface $logger;
 
     /**
      * GitSubtreeSplitWorkerCommand constructor.
@@ -54,7 +50,6 @@ class GitSubtreeSplitWorkerCommand extends Command
     {
         $this
             // Name of the command (the part after "bin/console")
-            ->setName('app:git-core-split-worker')
             // Short description shown while running "php bin/console list"
             ->setDescription('Run a worker for the git core split jobs')
             // Full command description shown when running the command with the "--help" option
@@ -70,11 +65,13 @@ class GitSubtreeSplitWorkerCommand extends Command
      * @return int|null|void
      * @throws \ErrorException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->logger->info('Starting git core split worker');
         $this->rabbitService->workerLoop();
         // Worker usually never stop, but if they do, they log ... hopefully
         $this->logger->warning('Git core split worker stopped');
+
+        return 0;
     }
 }

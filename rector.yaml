@@ -1,0 +1,20 @@
+parameters:
+  auto_import_names: true
+  import_short_classes: false
+
+  sets:
+    - 'code-quality'
+    - 'doctrine-code-quality'
+    - 'php72'
+    - 'php73'
+    - 'php74'
+    - 'symfony43'
+    - 'symfony44'
+    - 'symfony-code-quality'
+    - 'symfony-phpunit'
+  exclude_rectors:
+    - Rector\Php74\Rector\LNumber\AddLiteralSeparatorToNumberRector
+  paths:
+    - src
+  exclude_paths:
+    - '*/src/Migrations/*'

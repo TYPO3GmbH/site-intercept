@@ -25,10 +25,8 @@ class BambooCoreTriggerFormWithoutPatchSetType extends AbstractType
         $builder
             ->add('master', SubmitType::class, ['label' => 'Trigger master'])
             ->add('branch9_5', SubmitType::class, ['label' => 'Trigger 9.5'])
-            ->add('branch8_7', SubmitType::class, ['label' => 'Trigger 8.7'])
             ->add('nightlyMaster', SubmitType::class, ['label' => 'Trigger nightly master'])
             ->add('nightly9_5', SubmitType::class, ['label' => 'Trigger nightly 9.5'])
-            ->add('nightly8_7', SubmitType::class, ['label' => 'Trigger nightly 8.7'])
         ;
     }
 }

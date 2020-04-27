@@ -30,20 +30,11 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class RedirectController extends AbstractController
 {
-    /**
-     * @var DocsServerNginxService
-     */
-    protected $nginxService;
+    protected DocsServerNginxService $nginxService;
 
-    /**
-     * @var BambooService
-     */
-    protected $bambooService;
+    protected BambooService $bambooService;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     public function __construct(DocsServerNginxService $nginxService, BambooService $bambooService, LoggerInterface $logger)
     {
@@ -97,7 +88,8 @@ class RedirectController extends AbstractController
             $request->query->getInt('page', 1)
         );
 
-        return $this->render('docs_redirect/index.html.twig',
+        return $this->render(
+            'docs_redirect/index.html.twig',
             [
                 'currentConfiguration' => $currentConfigurationFile,
                 'logMessages' => $recentLogsMessages,
@@ -130,7 +122,8 @@ class RedirectController extends AbstractController
             return $this->redirectToRoute('admin_redirect_index');
         }
 
-        return $this->render('docs_redirect/new.html.twig',
+        return $this->render(
+            'docs_redirect/new.html.twig',
             [
                 'redirect' => $redirect,
                 'form' => $form->createView(),
@@ -147,7 +140,8 @@ class RedirectController extends AbstractController
     public function show(
         DocsServerRedirect $redirect
     ): Response {
-        return $this->render('docs_redirect/show.html.twig',
+        return $this->render(
+            'docs_redirect/show.html.twig',
             [
                 'redirect' => $redirect
             ]
@@ -175,7 +169,8 @@ class RedirectController extends AbstractController
             return $this->redirectToRoute('admin_redirect_index', ['id' => $redirect->getId()]);
         }
 
-        return $this->render('docs_redirect/edit.html.twig',
+        return $this->render(
+            'docs_redirect/edit.html.twig',
             [
                 'redirect' => $redirect,
                 'form' => $form->createView(),

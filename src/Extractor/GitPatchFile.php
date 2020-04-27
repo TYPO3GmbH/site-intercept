@@ -19,7 +19,7 @@ class GitPatchFile
     /**
      * @var string Absolute path to file
      */
-    public $file;
+    public string $file;
 
     /**
      * Extract review URL
