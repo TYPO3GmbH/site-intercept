@@ -173,7 +173,7 @@ class GraylogLogEntry
         $this->username = $entry['username'] ?? '';
         $this->userDisplayName = $entry['userDisplayName'] ?? '';
 
-        $this->exceptionCode = $entry['ctxt_exceptionCode'] ?? '';
+        $this->exceptionCode = (string)($entry['ctxt_exceptionCode'] ?? '');
         $this->repository = $entry['ctxt_repository'] ?? '';
         $this->composerFile = $entry['ctxt_composerFile'] ?? '';
         $this->package = $entry['ctxt_package'] ?? '';
