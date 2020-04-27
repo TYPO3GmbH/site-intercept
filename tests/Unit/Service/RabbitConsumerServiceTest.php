@@ -8,7 +8,7 @@ declare(strict_types = 1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Unit\Extractor;
+namespace App\Tests\Unit\Service;
 
 use App\Extractor\GithubPushEventForCore;
 use App\Service\CoreSplitService;
@@ -130,7 +130,7 @@ class RabbitConsumerServiceTest extends TestCase
             'jobUuid' => 'job-uuid',
             'type' => 'tag',
             'tag' => 'v9.5.1',
-        ]);
+        ], JSON_THROW_ON_ERROR, 512);
         $message->getBody()->shouldBeCalled()->willReturn($messageBody);
 
         $coreSplitService->tag(Argument::type(GithubPushEventForCore::class), Argument::type(AbstractIO::class))->shouldBeCalled();

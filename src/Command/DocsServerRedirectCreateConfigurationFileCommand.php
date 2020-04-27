@@ -24,15 +24,9 @@ class DocsServerRedirectCreateConfigurationFileCommand extends Command
 {
     protected static $defaultName = 'app:docs-redirect-deploy';
 
-    /**
-     * @var DocsServerNginxService
-     */
-    protected $nginxService;
+    protected DocsServerNginxService $nginxService;
 
-    /**
-     * @var BambooService
-     */
-    protected $bambooService;
+    protected BambooService $bambooService;
 
     public function __construct(?string $name = null, DocsServerNginxService $nginxService, BambooService $bambooService)
     {
@@ -48,7 +42,7 @@ class DocsServerRedirectCreateConfigurationFileCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Creating nginx redirect configuration file');
@@ -57,5 +51,7 @@ class DocsServerRedirectCreateConfigurationFileCommand extends Command
         $io->writeln('trigger now the deployment');
         $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
         $io->success('done');
+
+        return 0;
     }
 }

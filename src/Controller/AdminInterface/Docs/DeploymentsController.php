@@ -84,7 +84,8 @@ class DeploymentsController extends AbstractController
             $request->query->getInt('page', 1)
         );
 
-        return $this->render('docs_deployments/index.html.twig',
+        return $this->render(
+            'docs_deployments/index.html.twig',
             [
                 'filter' => $form->createView(),
                 'pagination' => $pagination,
@@ -110,7 +111,8 @@ class DeploymentsController extends AbstractController
             return $this->redirectToRoute('admin_docs_deployments');
         }
 
-        return $this->render('docs_deployments/delete.html.twig',
+        return $this->render(
+            'docs_deployments/delete.html.twig',
             [
                 'deployment' => $jar,
                 'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),

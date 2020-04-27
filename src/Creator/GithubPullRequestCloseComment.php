@@ -25,7 +25,7 @@ class GithubPullRequestCloseComment
     /**
      * @var string The created comment
      */
-    public $comment;
+    public string $comment;
 
     /**
      * Create message including link to patch on gerrit

@@ -22,15 +22,9 @@ use Psr\Log\LoggerInterface;
  */
 class GraylogService
 {
-    /**
-     * @var GraylogClient
-     */
-    private $client;
+    private GraylogClient $client;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @param GraylogClient $client
@@ -49,8 +43,7 @@ class GraylogService
     public function getRecentBambooTriggersAndVotes(): array
     {
         return $this->getLogs(
-            'application:intercept AND level:6'
-            . ' AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
             . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
             . ' AND ctxt_isSecurity:0'
         );
@@ -64,8 +57,7 @@ class GraylogService
     public function getRecentBambooCoreSecurityTriggersAndVotes(): array
     {
         return $this->getLogs(
-            'application:intercept AND level:6'
-            . ' AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
             . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
             . ' AND ctxt_isSecurity:1'
         );
@@ -80,8 +72,7 @@ class GraylogService
     public function getRecentBambooDocsActions(): array
     {
         return $this->getLogs(
-            'application:intercept'
-            . ' AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND env:' . getenv('GRAYLOG_ENV')
             . ' AND (ctxt_type:docsRendering)'
         );
     }
@@ -95,8 +86,7 @@ class GraylogService
     public function getRecentRedirectActions(): array
     {
         return $this->getLogs(
-            'application:intercept'
-            . ' AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND env:' . getenv('GRAYLOG_ENV')
             . ' AND (ctxt_type:docsRedirect)'
         );
     }
@@ -110,8 +100,7 @@ class GraylogService
     public function getRecentBambooDocsThirdPartyTriggers(): array
     {
         return $this->getLogs(
-            'application:intercept AND level:6'
-            . ' AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
             . ' AND (ctxt_type:triggerBambooDocsThirdParty)'
         );
     }
@@ -135,8 +124,7 @@ class GraylogService
     public function getRecentSplitActions(): array
     {
         $queueLogs = $this->getLogs(
-            'application:intercept AND level:6'
-            . ' AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
             . ' AND ctxt_status:queued AND (ctxt_type:patch OR ctxt_type:tag)'
         );
         $splitActions = [];
@@ -147,8 +135,7 @@ class GraylogService
                 'detailLogs' => [],
             ];
             $detailLogs = $this->getLogs(
-                'application:intercept AND level:6'
-                . ' AND env:' . getenv('GRAYLOG_ENV')
+                'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
                 . ' AND !(ctxt_status:queued)'
                 . ' AND (ctxt_type:patch OR ctxt_type:tag)'
                 . ' AND ctxt_job_uuid:' . $queueLog->uuid,
@@ -177,8 +164,7 @@ class GraylogService
         $query = urlencode($query);
         try {
             $response = $this->client->get(
-                'search/universal/relative'
-                . '?query=' . $query
+                'search/universal/relative?query=' . $query
                 . '&range=2592000' // 30 days max
                 . '&limit=' . $limit
                 . '&sort=' . urlencode('timestamp:desc')
@@ -188,7 +174,7 @@ class GraylogService
                     'headers' => ['accept' => 'application/json'],
                 ]
             );
-            $content = json_decode((string)$response->getBody(), true);
+            $content = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
             $messages = [];
             if (isset($content['messages']) && is_array($content['messages'])) {
                 foreach ($content['messages'] as $message) {

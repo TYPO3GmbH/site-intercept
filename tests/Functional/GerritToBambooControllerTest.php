@@ -38,7 +38,7 @@ class GerritToBambooControllerTest extends TestCase
                 require __DIR__ . '/Fixtures/GerritToBambooGoodBambooPostData.php'
             )->shouldBeCalled()
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
@@ -54,7 +54,7 @@ class GerritToBambooControllerTest extends TestCase
     {
         $bambooClient = $this->prophesize(BambooClient::class);
         $bambooClient->post(Argument::cetera())->shouldNotBeCalled();
-        TestDoubleBundle::addProphecy('App\Client\BambooClient', $bambooClient);
+        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClient);
 
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();

@@ -17,10 +17,7 @@ use Throwable;
  */
 class GithubHookPingException extends \Exception
 {
-    /**
-     * @var string
-     */
-    private $repositoryUrl;
+    private string $repositoryUrl;
 
     public function __construct($message = '', $code = 0, Throwable $previous = null, string $repositoryUrl = '')
     {

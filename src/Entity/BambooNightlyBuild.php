@@ -23,17 +23,17 @@ class BambooNightlyBuild
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $buildKey;
+    private string $buildKey;
 
     /**
-     * @ORM\Column(type="integer", options={"unsigned":true, "default":0})
+     * @ORM\Column(type="integer", options={"unsigned": true, "default": "0"})
      */
-    private $failedRuns;
+    private int $failedRuns;
 
     public function getId(): ?int
     {

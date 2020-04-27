@@ -40,7 +40,7 @@ class GitSubtreeSplitController extends AbstractController
     {
         try {
             // This throws exceptions if this push event should not trigger splitting, eg. if branches do not match.
-            $pushEventInformation = new GithubPushEventForCore(json_decode($request->getContent(), true));
+            $pushEventInformation = new GithubPushEventForCore(json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR));
             $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'api');
         } catch (DoNotCareException $e) {
             // Hook payload could not be identified as hook that should trigger git split

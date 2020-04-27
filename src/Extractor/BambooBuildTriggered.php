@@ -19,7 +19,7 @@ class BambooBuildTriggered
     /**
      * @var string Build result key, eg. 'CORE-GTC87-3282'
      */
-    public $buildResultKey;
+    public string $buildResultKey;
 
     /**
      * Extract information from a bamboo build status
@@ -28,7 +28,11 @@ class BambooBuildTriggered
      */
     public function __construct(string $payload)
     {
-        $response = json_decode($payload, true);
-        $this->buildResultKey = $response['buildResultKey'] ?? '';
+        if ($payload === '') {
+            $this->buildResultKey = '';
+        } else {
+            $response = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+            $this->buildResultKey = $response['buildResultKey'] ?? '';
+        }
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class ClockMockBundle extends Bundle
 {
-    private static $now;
+    private static ?float $now = null;
 
     /**
      * @param null|int|float $enable

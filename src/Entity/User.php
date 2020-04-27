@@ -19,14 +19,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
-    private $username;
-    private $password;
-    private $roles;
+    private ?string $username = null;
+    private ?string $password = null;
+    private array $roles;
 
     /**
      * @var string Attribute 'displayName' from LDAP
      */
-    private $displayName;
+    private string $displayName;
 
     public function __construct(
         ?string $username,

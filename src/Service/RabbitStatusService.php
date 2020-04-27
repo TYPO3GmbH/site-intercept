@@ -20,15 +20,9 @@ use Psr\Log\LoggerInterface;
  */
 class RabbitStatusService
 {
-    /**
-     * @var RabbitManagementClient
-     */
-    private $client;
+    private RabbitManagementClient $client;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @param RabbitManagementClient $client
@@ -54,7 +48,7 @@ class RabbitStatusService
                     'auth' => [getenv('RABBITMQ_USER'), getenv('RABBITMQ_PASSWORD')]
                 ]
             );
-            $body = json_decode((string)$response->getBody(), true);
+            $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage(), ['exception' => $e]);
             $body = [];

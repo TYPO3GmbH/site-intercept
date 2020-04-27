@@ -9,6 +9,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -30,43 +32,43 @@ class DiscordChannel
      * @ORM\Id()
      * @ORM\Column(type="string", length=255)
      */
-    private $channelId;
+    private string $channelId = '';
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $channelName;
+    private string $channelName = '';
 
     /**
-     * @ORM\Column(type="integer", options={"default": 0})
+     * @ORM\Column(type="integer", options={"default": "0"})
      */
-    private $channelType;
+    private int $channelType = 0;
 
     /**
      * @ManyToOne(targetEntity="DiscordChannel", inversedBy="children")
      * @JoinColumn(name="parent_id", referencedColumnName="channel_id")
      */
-    private $parent;
+    private ?DiscordChannel $parent = null;
 
     /**
      * @OneToMany(targetEntity="DiscordChannel", mappedBy="parent", cascade={"remove"})
      */
-    private $children;
+    private Collection $children;
 
     /**
      * @OneToMany(targetEntity="DiscordWebhook", mappedBy="channel", cascade={"remove"})
      */
-    private $webhooks;
+    private Collection $webhooks;
 
     /**
      * @OneToMany(targetEntity="DiscordScheduledMessage", mappedBy="channel", cascade={"remove"})
      */
-    private $scheduledMessages;
+    private Collection $scheduledMessages;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $webhookUrl;
+    private ?string $webhookUrl = null;
 
     /**
      * @return string
@@ -156,5 +158,11 @@ class DiscordChannel
     {
         $this->webhookUrl = $webhookUrl;
         return $this;
+    }
+    public function __construct()
+    {
+        $this->children = new ArrayCollection();
+        $this->webhooks = new ArrayCollection();
+        $this->scheduledMessages = new ArrayCollection();
     }
 }

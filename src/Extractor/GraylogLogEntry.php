@@ -18,122 +18,119 @@ class GraylogLogEntry
     /**
      * @var string Log message type, eg. 'triggerBamboo'
      */
-    public $type;
+    public string $type;
 
-    /**
-     * @var \DateTime
-     */
-    public $time;
+    public \DateTime $time;
 
     /**
      * @var string environment, eg. 'prod'
      */
-    public $env;
+    public string $env;
 
     /**
      * @var string Plain message string, eg. 'Triggered bamboo core build "CORE-GTC-30744" for change "57609" with patch set "11" on branch "master".`
      */
-    public $message;
+    public string $message;
 
     /**
      * @var int Log level, eg. '6'
      */
-    public $level;
+    public int $level;
 
     /**
      * @var string 'interface' if log entry has been triggered by users calling web interface, 'api' otherwise
      */
-    public $triggeredBy;
+    public string $triggeredBy;
 
     /**
      * @var string Optional action that triggered the invocation
      */
-    public $subType;
+    public string $subType;
 
     /**
      * @var string Optionally set for specific types
      */
-    public $branch;
+    public string $branch;
 
     /**
      * @var int Optionally set for specific types
      */
-    public $change;
+    public int $change;
 
     /**
      * @var int Optionally set for specific types
      */
-    public $patch;
+    public int $patch;
 
     /**
      * @var string Optionally set if this has been a 'triggerBamboo' log entry
      */
-    public $bambooKey;
+    public string $bambooKey;
 
     /**
-     * @var bool Optionally set if this has been a 'vote on gerrit' log entry
+     * @var string Optionally set if this has been a 'vote on gerrit' log entry
      */
-    public $vote;
-
-    /**
-     * @var string Optionally set for core split/tag jobs
-     */
-    public $uuid;
-
-    /**
-     * @var string Optionally set for core split/tag jobs, also used in docs rendering
-     */
-    public $status;
-
-    /**
-     * @var string Optionally set for core split/tag jobs, also used in docs rendering
-     */
-    public $sourceBranch;
-
-    /**
-     * @var string Optionally set for core split/tag jobs, also used in docs rendering
-     */
-    public $targetBranch;
+    public string $vote;
 
     /**
      * @var string Optionally set for core split/tag jobs
      */
-    public $tag;
+    public string $uuid;
+
+    /**
+     * @var string Optionally set for core split/tag jobs, also used in docs rendering
+     */
+    public string $status;
+
+    /**
+     * @var string Optionally set for core split/tag jobs, also used in docs rendering
+     */
+    public string $sourceBranch;
+
+    /**
+     * @var string Optionally set for core split/tag jobs, also used in docs rendering
+     */
+    public string $targetBranch;
+
+    /**
+     * @var string Optionally set for core split/tag jobs
+     */
+    public string $tag;
 
     /**
      * @var string Optional LDAP user name that triggered something
      */
-    public $username;
+    public string $username;
 
     /**
      * @var string Optional LDAP display name that triggered something
      */
-    public $userDisplayName;
+    public string $userDisplayName;
 
     /**
      * @var string Optional 'exception code', used in docs rendering, timestamp
      */
-    public $exceptionCode;
+    public string $exceptionCode;
 
     /**
      * @var string Optional 'repository url', used in docs rendering
      */
-    public $repository;
+    public string $repository;
 
     /**
      * @var string Optional 'composer file url', used in docs rendering
      */
-    public $composerFile;
+    public string $composerFile;
 
     /**
      * @var string Optional package name, used in docs rendering, eg. 'lolli42/enetcache'
      */
-    public $package;
+    public string $package;
 
     /**
      * @var array Optional redirect data
      */
-    public $redirect;
+    public array $redirect;
 
     /**
      * Extract information from a graylog log entry
@@ -181,6 +178,6 @@ class GraylogLogEntry
         $this->composerFile = $entry['ctxt_composerFile'] ?? '';
         $this->package = $entry['ctxt_package'] ?? '';
 
-        $this->redirect = json_decode($entry['ctxt_redirect'] ?? '{}', true);
+        $this->redirect = json_decode($entry['ctxt_redirect'] ?? '{}', true, 512, JSON_THROW_ON_ERROR);
     }
 }

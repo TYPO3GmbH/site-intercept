@@ -23,17 +23,14 @@ class RabbitPublisherService
     /**
      * @var AMQPStreamConnection The rabbit connection
      */
-    private $rabbitConnection;
+    private AMQPStreamConnection $rabbitConnection;
 
     /**
      * @var string Name of the queue to push to and fetch from
      */
-    private $queueName;
+    private string $queueName;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * RabbitPublisherService constructor.

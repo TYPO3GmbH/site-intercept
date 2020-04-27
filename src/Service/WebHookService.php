@@ -50,7 +50,7 @@ class WebHookService
             return $this->getPushEventFromGithub($request);
         }
         if ($request->headers->get('X-GitHub-Event', '') === 'ping') {
-            $payload = json_decode($request->getContent(), false);
+            $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
             throw new GithubHookPingException('', 1557838026, null, (string)$payload->repository->html_url);
         }
         throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1553256930);
@@ -62,7 +62,7 @@ class WebHookService
      */
     protected function getPushEventFromBitbucket(Request $request): array
     {
-        $payload = json_decode($request->getContent(), false);
+        $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
         $events = [];
         if (isset($payload->push->changes[0]->new->target->links->html->href)) {
             // Cloud (Push)
@@ -101,7 +101,7 @@ class WebHookService
      */
     protected function getPushEventFromGitlab(Request $request): array
     {
-        $payload = json_decode($request->getContent(), false);
+        $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
         $repositoryUrl = (string)$payload->repository->git_http_url;
         $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
         $urlToComposerFile = (new GitRepositoryService())
@@ -119,13 +119,13 @@ class WebHookService
     protected function getPushEventFromGithub(Request $request): array
     {
         $content = $request->getContent();
-        $payload = json_decode($content, false);
+        $payload = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
         if ($payload === null) {
             // If can't be decoded to json, this might be a x-www-form-encoded body
             // probably by using the old legacy hook, that used this
             $payload = urldecode($content);
             $payload = substr($payload, 8); // cut off 'payload=', rest should be json, then
-            $payload = json_decode($payload, false);
+            $payload = json_decode($payload, false, 512, JSON_THROW_ON_ERROR);
         }
         if ($payload === null) {
             throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
