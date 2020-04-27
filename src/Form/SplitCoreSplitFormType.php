@@ -24,7 +24,6 @@ class SplitCoreSplitFormType extends AbstractType
         $builder
             ->add('master', SubmitType::class, ['label' => 'Trigger master'])
             ->add('branch9_5', SubmitType::class, ['label' => 'Trigger 9.5'])
-            ->add('branch8_7', SubmitType::class, ['label' => 'Trigger 8.7'])
         ;
     }
 }
