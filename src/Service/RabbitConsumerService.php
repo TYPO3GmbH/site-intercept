@@ -39,15 +39,11 @@ class RabbitConsumerService
 
     private LoggerInterface $logger;
 
-    /**
-     * @var CoreSplitService Service executing the split job
-     */
-    private CoreSplitService $coreSplitService;
 
-    /**
-     * @var CoreSplitService Service executing the split job
-     */
-    private CoreSplitServiceV8 $coreSplitServiceV8;
+    private CoreSplitServiceInterface $coreSplitService;
+
+
+    private CoreSplitServiceInterface $coreSplitServiceV8;
 
     /**
      * @var string the v8 ELTS repository name
