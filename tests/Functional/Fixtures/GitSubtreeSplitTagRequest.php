@@ -22,6 +22,9 @@ return Request::create(
       "after": "3053f9000e50d0333310e95024639cfb14150eda",
       "created": true,
       "deleted": false,
-      "forced": false
+      "forced": false,
+      "repository": {
+        "master_branch": "TYPO3_8-7"
+      }
     }'
 );

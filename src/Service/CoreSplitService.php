@@ -177,7 +177,7 @@ class CoreSplitService implements CoreSplitServiceInterface
         $coreGitWrapper->setTimeout(300);
         $coreWorkingCopy = $coreGitWrapper->workingCopy($this->splitCorePath);
 
-        $this->initialCloneAndCheckout($coreWorkingCopy, 'master');
+        $this->initialCloneAndCheckout($coreWorkingCopy, $event->sourceBranch);
         // Send a heartbeat after initial clone
         $rabbitIO->read(0);
 
@@ -196,7 +196,7 @@ class CoreSplitService implements CoreSplitServiceInterface
                 continue;
             }
             $sourceBranch = str_replace('origin/', '', $branch);
-            if ($sourceBranch === 'master' || $sourceBranch === 'TYPO3_8-7' || (int)trim(substr($sourceBranch, 0, 2), '.') >= 9) {
+            if ($sourceBranch === $event->sourceBranch || (int)trim(substr($sourceBranch, 0, 2), '.') >= 9) {
                 $responsibleForBranch = true;
                 break;
             }
