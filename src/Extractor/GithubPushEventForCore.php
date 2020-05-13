@@ -75,6 +75,7 @@ class GithubPushEventForCore
                 $this->targetBranch = BranchUtility::resolveCoreSplitBranch($this->sourceBranch);
             } elseif ($this->isPushedTag($fullPullRequestInformation)) {
                 $this->type = self::TYPE_TAG;
+                $this->sourceBranch = $fullPullRequestInformation['repository']['master_branch'] ?? 'master';
                 $this->tag = $this->getTag($fullPullRequestInformation['ref']);
             } else {
                 throw new DoNotCareException('no pushed patch, no pushed tag, it\'s not my job');

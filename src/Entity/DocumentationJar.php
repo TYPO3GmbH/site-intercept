@@ -41,7 +41,7 @@ class DocumentationJar
      * @Assert\NotBlank
      * @Assert\Url
      */
-    private string $publicComposerJsonUrl;
+    private ?string $publicComposerJsonUrl = null;
 
     /**
      * @ORM\Column(type="string", length=255, options={"default": ""})
