@@ -23,6 +23,8 @@ class BranchUtility
     private static array $branchToProjectKeys = [
         'master' => 'CORE-GTC',
         'nightlyMaster' => 'CORE-GTN',
+        '10.4' => 'CORE-GTC104',
+        'nightly10.4' => 'CORE-GTN104',
         '9.5' => 'CORE-GTC95',
         'nightly9.5' => 'CORE-GTN95',
         '8.7' => 'CORE-GTC87',
@@ -35,6 +37,7 @@ class BranchUtility
      */
     private static array $securityBranchToProjectKeys = [
         'master' => 'CORE-GTS',
+        '10.4' => 'CORE-GTS104',
         '9.5' => 'CORE-GTS95',
         '8.7' => 'CORE-GTS87',
     ];
