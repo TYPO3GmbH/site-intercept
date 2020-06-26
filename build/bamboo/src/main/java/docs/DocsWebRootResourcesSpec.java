@@ -64,7 +64,17 @@ public class DocsWebRootResourcesSpec extends AbstractSpec {
                             .shared(true))
                         .tasks(new ScriptTask()
                                 .description("Clone docs homepage repo")
-                                .inlineBody("if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n    bash \"$0\" \"$@\"\n    exit \"$?\"\nfi\n\nset -e\nset -x\n\n# clone docs homepage repo and checkout master branch\nmkdir project\ngit clone https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git project\ncd project && git checkout master"),
+                                .inlineBody("if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n"
+                                        + "    bash \"$0\" \"$@\"\n"
+                                        + "    exit \"$?\"\n"
+                                        + "fi\n\n"
+                                        + "set -e\n"
+                                        + "set -x\n\n"
+                                        + "# clone docs homepage repo and checkout master branch\n"
+                                        + "mkdir project\n"
+                                        + "git clone https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git project\n"
+                                        + "cd project && git checkout master"
+                                ),
                             new CommandTask()
                                 .description("archive static resources")
                                 .executable("tar")
@@ -93,23 +103,44 @@ public class DocsWebRootResourcesSpec extends AbstractSpec {
                                     .build())
                                 .build()))
                         .tasks(getAuthenticatedSshTask()
-                                .description("mkdir")
-                                .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
-                            getAuthenticatedScpTask()
-                                .description("copy result")
-                                .toRemotePath("/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}")
-                                .fromArtifact(new ArtifactItem()
-                                    .artifact("resources.tgz")),
-                            getAuthenticatedSshTask()
-                                .description("unpack and publish docs")
-                                .command("set -e\r\nset -x\r\n\r\nsource_dir=\"/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}/\"\r\ncd ${source_dir} || exit 1\r\n\r\ntar xf resources.tgz\r\n\r\ntarget_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web/\"\r\n\r\ncd ${target_dir} || exit 1\r\n\r\n# Move the single resource files and directories\r\nrm -f robots.txt\r\nmv ${source_dir}project/WebRootResources/robots.txt .\r\n\r\nrm -f favicon.ico\r\nmv ${source_dir}project/WebRootResources/favicon.ico .\r\n\r\nrm -rf js\r\nmv ${source_dir}project/WebRootResources/js .\r\n\r\nrm -rf t3SphinxThemeRtd\r\nmv ${source_dir}project/WebRootResources/t3SphinxThemeRtd .\r\n\r\n# And clean the temp deployment dir afterwards\r\nrm -rf ${source_dir}"))
-                        .requirements(new Requirement("system.hasDocker")
-                                .matchValue("1.0")
-                                .matchType(Requirement.MatchType.EQUALS),
-                            new Requirement("system.builder.command.tar"))
-                        .artifactSubscriptions(new ArtifactSubscription()
-                            .artifact("resources.tgz"))
-                        .cleanWorkingDirectory(true)))
+                .description("mkdir")
+                .command("set -e\n"
+                    + "set -x\n\n"
+                    + "mkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"
+                ),
+                getAuthenticatedScpTask()
+                    .description("copy result")
+                    .toRemotePath("/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}")
+                    .fromArtifact(new ArtifactItem()
+                        .artifact("resources.tgz")),
+                getAuthenticatedSshTask()
+                    .description("unpack and publish docs")
+                    .command("set -e\n"
+                        + "set -x\n\n"
+                        + "source_dir=\"/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}/\"\n"
+                        + "cd ${source_dir} || exit 1\n\n"
+                        + "tar xf resources.tgz\n\n"
+                        + "target_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web/\"\n\n"
+                        + "cd ${target_dir} || exit 1\n\n"
+                        + "# Move the single resource files and directories\n"
+                        + "rm -f robots.txt\n"
+                        + "mv ${source_dir}project/WebRootResources/robots.txt .\n\n"
+                        + "rm -f favicon.ico\n"
+                        + "mv ${source_dir}project/WebRootResources/favicon.ico .\n\n"
+                        + "rm -rf js\n"
+                        + "mv ${source_dir}project/WebRootResources/js .\n\n"
+                        + "rm -rf t3SphinxThemeRtd\n"
+                        + "mv ${source_dir}project/WebRootResources/t3SphinxThemeRtd .\n\n"
+                        + "# And clean the temp deployment dir afterwards\nrm -rf ${source_dir}"
+                )
+            )
+            .requirements(new Requirement("system.hasDocker")
+                .matchValue("1.0")
+                .matchType(Requirement.MatchType.EQUALS),
+                new Requirement("system.builder.command.tar"))
+            .artifactSubscriptions(new ArtifactSubscription()
+                .artifact("resources.tgz"))
+            .cleanWorkingDirectory(true)))
             .planBranchManagement(new PlanBranchManagement()
                 .delete(new BranchCleanup())
                 .notificationForCommitters())
