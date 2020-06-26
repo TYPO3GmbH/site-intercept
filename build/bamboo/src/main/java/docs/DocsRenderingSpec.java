@@ -101,7 +101,10 @@ public class DocsRenderingSpec extends AbstractSpec {
                                 .build()))
                         .tasks(getAuthenticatedSshTask()
                                 .description("mkdir")
-                                .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
+                                .command("set -e\n"
+                                    + "set -x\n\n"
+                                    + "mkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"
+                                ),
                             getAuthenticatedScpTask()
                                 .description("copy result")
                                 .toRemotePath("/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}")
@@ -109,7 +112,42 @@ public class DocsRenderingSpec extends AbstractSpec {
                                     .artifact("docs.tgz")),
                             getAuthenticatedSshTask()
                                 .description("unpack and publish docs")
-                                .command("set -e\r\nset -x\r\n\r\ncd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\r\n\r\nmkdir documentation_result\r\ntar xf docs.tgz -C documentation_result\r\n\r\nsource \"documentation_result/deployment_infos.sh\"\r\n\r\nweb_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web\"\r\ntarget_dir=\"${web_dir}/${type_short:?type_short must be set}/${vendor:?vendor must be set}/${name:?name must be set}/${target_branch_directory:?target_branch_directory must be set}\"\r\n\r\necho \"Deploying to $target_dir\"\r\n\r\nmkdir -p $target_dir\r\nrm -rf $target_dir/*\r\n\r\nmv documentation_result/FinalDocumentation/* $target_dir\r\n\r\n# Re-New symlinks in document root if homepage repo is deployed\r\n# And some other homepage specific tasks\r\nif [ \"${type_short}\" == \"h\" ] && [ \"${target_branch_directory}\" == \"master\" ]; then\r\n    cd $web_dir\r\n    # Remove existing links (on first level only!)\r\n    find . -maxdepth 1 -type l | while read line; do\r\n\t    rm -v \"$line\"\r\n    done\r\n    # link all files in deployed homepage repo to doc root\r\n    ls h/typo3/docs-homepage/master/en-us/ | while read file; do\r\n\t    ln -s \"h/typo3/docs-homepage/master/en-us/$file\"\r\n    done\r\n    # Copy js/extensions-search.js to Home/extensions-search.js to\r\n    # have this file parallel to Home/Extensions.html\r\n    cp js/extensions-search.js Home/extensions-search.js\r\n    # Touch the empty and unused system-exensions.js referenced by the extension search\r\n    touch Home/systemextensions.js\r\nfi\r\n\r\n# Fetch latest \"static\" extension list from intercept (this is a php route!)\r\n# and put it as Home/extensions.js to be used by Home/Extensions.html\r\ncurl https://intercept.typo3.com/assets/docs/extensions.js --output ${web_dir}/Home/extensions.js\r\n\r\nrm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"))
+                                .command("set -e\n"
+                                    + "set -x\n\n"
+                                    + "cd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\n\n"
+                                    + "mkdir documentation_result\n"
+                                    + "tar xf docs.tgz -C documentation_result\n\n"
+                                    + "source \"documentation_result/deployment_infos.sh\"\n\n"
+                                    + "web_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web\"\n"
+                                    + "target_dir=\"${web_dir}/${type_short:?type_short must be set}/${vendor:?vendor must be set}/${name:?name must be set}/${target_branch_directory:?target_branch_directory must be set}\"\n\n"
+                                    + "echo \"Deploying to $target_dir\"\n\n"
+                                    + "mkdir -p $target_dir\n"
+                                    + "rm -rf $target_dir/*\n\n"
+                                    + "mv documentation_result/FinalDocumentation/* $target_dir\n\n"
+                                    + "# Re-New symlinks in document root if homepage repo is deployed\n"
+                                    + "# And some other homepage specific tasks\n"
+                                    + "if [ \"${type_short}\" == \"h\" ] && [ \"${target_branch_directory}\" == \"master\" ]; then\n"
+                                    + "    cd $web_dir\n"
+                                    + "    # Remove existing links (on first level only!)\n"
+                                    + "    find . -maxdepth 1 -type l | while read line; do\n"
+                                    + "        \t    rm -v \"$line\"\n"
+                                    + "    done\n"
+                                    + "    # link all files in deployed homepage repo to doc root\n"
+                                    + "    ls h/typo3/docs-homepage/master/en-us/ | while read file; do\n"
+                                    + "        \t    ln -s \"h/typo3/docs-homepage/master/en-us/$file\"\n"
+                                    + "    done\n"
+                                    + "    # Copy js/extensions-search.js to Home/extensions-search.js to\n"
+                                    + "    # have this file parallel to Home/Extensions.html\n"
+                                    + "    cp js/extensions-search.js Home/extensions-search.js\n"
+                                    + "    # Touch the empty and unused system-exensions.js referenced by the extension search\n"
+                                    + "    touch Home/systemextensions.js\n"
+                                    + "fi\n\n"
+                                    + "# Fetch latest \"static\" extension list from intercept (this is a php route!)\n"
+                                    + "# and put it as Home/extensions.js to be used by Home/Extensions.html\n"
+                                    + "curl https://intercept.typo3.com/assets/docs/extensions.js --output ${web_dir}/Home/extensions.js\n\n"
+                                    + "rm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"
+                                )
+                        )
                         .requirements(new Requirement("system.hasDocker")
                                 .matchValue("1.0")
                                 .matchType(Requirement.MatchType.EQUALS),
@@ -133,9 +171,6 @@ public class DocsRenderingSpec extends AbstractSpec {
             .forceStopHungBuilds();
     }
 
-    /**
-     * @return
-     */
     private String getInlineBodyContent() {
         final String inlineBody = "if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n"
             + "bash \"$0\" \"$@\"\n"
@@ -152,6 +187,7 @@ public class DocsRenderingSpec extends AbstractSpec {
             + "cd project && git checkout ${source_branch}\n"
             + "cd ..\n\n"
             + createJobFile()
+            + restoreModificationTime()
             + "function renderDocs() {\n"
             + "    docker run \\\n"
             + "        -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/project:/PROJECT \\\n"
@@ -159,7 +195,7 @@ public class DocsRenderingSpec extends AbstractSpec {
             + "        --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n"
             + "        --rm \\\n"
             + "        --entrypoint bash \\\n"
-            + "        t3docs/render-documentation:v2.5.1 \\\n"
+            + "        t3docs/render-documentation:v2.6.1 \\\n"
             + "        -c \"/ALL/Menu/mainmenu.sh makehtml -c replace_static_in_html 1 -c make_singlehtml 1 -c jobfile /PROJECT/jobfile.json; chown ${HOST_UID} -R /PROJECT /RESULT\"\n"
             + "}\n"
             + "mkdir -p RenderedDocumentation\nmkdir -p FinalDocumentation\n\n"

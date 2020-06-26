@@ -64,4 +64,11 @@ abstract class AbstractSpec {
             .host(deploymentHost)
             .username(deploymentUserName);
     }
+
+    protected String restoreModificationTime() {
+        return "cd project\n"
+                + "curl -o git-restore-mtime-modified.py https://raw.githubusercontent.com/marble/Toolchain_RenderDocumentation/master/16-Convert-and-fix-and-check/git-restore-mtime/git-restore-mtime-modified.py\n"
+                + "python git-restore-mtime-modified.py --destfile-gitloginfo=.gitloginfo-GENERATED.json\n"
+                + "cd ..\n\n";
+    }
 }

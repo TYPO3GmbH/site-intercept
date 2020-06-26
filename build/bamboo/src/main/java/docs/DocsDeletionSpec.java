@@ -53,7 +53,19 @@ public class DocsDeletionSpec extends AbstractSpec {
                             .shared(true))
                         .tasks(new ScriptTask()
                                 .description("Download job description")
-                                .inlineBody("if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n    bash \"$0\" \"$@\"\n    exit \"$?\"\nfi\n\nset -e\nset -x\n\n# fetch build information file and source it\ncurl https://intercept.typo3.com/${bamboo_BUILD_INFORMATION_FILE} --output deployment_infos.sh\nsource deployment_infos.sh || (echo \"No valid deployment_infos.sh file found\"; exit 1)\n\n# Fetch \"static\" extension list\ncurl https://intercept.typo3.com/assets/docs/extensions.js --output extensions.js"),
+                                .inlineBody(
+                                    "if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n"
+                                    + "    bash \"$0\" \"$@\"\n"
+                                    + "    exit \"$?\"\n"
+                                    + "fi\n\n"
+                                    + "set -e\n"
+                                    + "set -x\n\n"
+                                    + "# fetch build information file and source it\n"
+                                    + "curl https://intercept.typo3.com/${bamboo_BUILD_INFORMATION_FILE} --output deployment_infos.sh\n"
+                                    + "source deployment_infos.sh || (echo \"No valid deployment_infos.sh file found\"; exit 1)\n\n"
+                                    + "# Fetch \"static\" extension list\n"
+                                    + "curl https://intercept.typo3.com/assets/docs/extensions.js --output extensions.js"
+                                ),
                             new CommandTask()
                                 .description("Archive files for artifact")
                                 .executable("tar")
@@ -82,7 +94,10 @@ public class DocsDeletionSpec extends AbstractSpec {
                                 .build()))
                         .tasks(getAuthenticatedSshTask()
                                 .description("mkdir")
-                                .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
+                                .command("set -e\n"
+                                    + "set -x\n\n"
+                                    + "mkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"
+                                ),
                             getAuthenticatedScpTask()
                                 .description("copy result")
                                 .toRemotePath("/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}")
@@ -90,7 +105,21 @@ public class DocsDeletionSpec extends AbstractSpec {
                                     .artifact("docs.tgz")),
                             getAuthenticatedSshTask()
                                 .description("unpack and publish docs")
-                                .command("set -e\r\nset -x\r\n\r\ncd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}/\r\n\r\nmkdir documentation_result\r\ntar xf docs.tgz -C documentation_result\r\n\r\nsource \"documentation_result/deployment_infos.sh\"\r\n\r\nweb_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web\"\r\ntarget_dir=\"${web_dir}/${type_short:?type_short must be set}/${vendor:?vendor must be set}/${name:?name must be set}/${target_branch_directory:?target_branch_directory must be set}\"\r\n\r\necho \"Deleting $target_dir\"\r\n\r\nrm -rf $target_dir\r\n\r\n# Move \"static\" extension list\r\nmv documentation_result/extensions.js ${web_dir}/Home/extensions.js\r\n\r\nrm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}/"))
+                                .command("set -e\n"
+                                    + "set -x\n\n"
+                                    + "cd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}/\n\n"
+                                    + "mkdir documentation_result\n"
+                                    + "tar xf docs.tgz -C documentation_result\n\n"
+                                    + "source \"documentation_result/deployment_infos.sh\"\n\n"
+                                    + "web_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web\"\n"
+                                    + "target_dir=\"${web_dir}/${type_short:?type_short must be set}/${vendor:?vendor must be set}/${name:?name must be set}/${target_branch_directory:?target_branch_directory must be set}\"\n\n"
+                                    + "echo \"Deleting $target_dir\"\n\n"
+                                    + "rm -rf $target_dir\n\n"
+                                    + "# Move \"static\" extension list\n"
+                                    + "mv documentation_result/extensions.js ${web_dir}/Home/extensions.js\n\n"
+                                    + "rm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}/"
+                                )
+                        )
                         .requirements(new Requirement("system.hasDocker")
                                 .matchValue("1.0")
                                 .matchType(Requirement.MatchType.EQUALS),
