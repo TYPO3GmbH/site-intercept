@@ -67,7 +67,7 @@ abstract class AbstractFluidVHSpec extends AbstractSpec {
                                     + "rm -rf project result\n"
                                     + "mkdir -p project result\n"
                                     + "git clone https://github.com/TYPO3/TYPO3.CMS.git project\n"
-                                    + "cd project && git checkout ${bamboo_VERSION_NUMBER}"
+                                    + "cd project && git checkout ${bamboo.VERSION_NUMBER}"
                                 ),
                             new ScriptTask()
                                 .description("Generate core xsd schema files")
@@ -157,7 +157,7 @@ abstract class AbstractFluidVHSpec extends AbstractSpec {
                                     + "cd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\n\n"
                                     + "mkdir documentation_result\n"
                                     + "tar xf docs.tgz -C documentation_result\n\n"
-                                    + "target_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web/other/typo3/view-helper-reference/${bamboo_VERSION_NUMBER}/en-us\"\n\n"
+                                    + "target_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web/other/typo3/view-helper-reference/${bamboo.VERSION_NUMBER}/en-us\"\n\n"
                                     + "echo \"Deploying to ${target_dir}\"\n\n"
                                     + "mkdir -p $target_dir\n"
                                     + "rm -rf $target_dir/*\n\n"
@@ -190,9 +190,9 @@ abstract class AbstractFluidVHSpec extends AbstractSpec {
             + "git clone --depth 1 https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-ViewHelper.git project || exit 1\n\n"
             + "rm -rf project/Documentation/typo3 project/Documentation/typo3fluid\n"
             + "cp -r result/documentation/* project/Documentation/\n\n"
-            + "sed -i \"s/version.*=.*/version = ${bamboo_VERSION_NUMBER}/g\" project/Documentation/Settings.cfg\n"
-            + "sed -i \"s/release.*=.*/release = ${bamboo_VERSION_NUMBER}/g\" project/Documentation/Settings.cfg\n"
-            + "sed -i \"s/github_branch.*=.*/github_branch = ${bamboo_VERSION_NUMBER}/g\" project/Documentation/Settings.cfg\n\n"
+            + "sed -i \"s/version.*=.*/version = ${bamboo.VERSION_NUMBER}/g\" project/Documentation/Settings.cfg\n"
+            + "sed -i \"s/release.*=.*/release = ${bamboo.VERSION_NUMBER}/g\" project/Documentation/Settings.cfg\n"
+            + "sed -i \"s/github_branch.*=.*/github_branch = ${bamboo.VERSION_NUMBER}/g\" project/Documentation/Settings.cfg\n\n"
             + createJobFile()
             + restoreModificationTime()
             + "function renderDocs() {\n"

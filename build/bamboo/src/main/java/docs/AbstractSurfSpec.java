@@ -100,7 +100,7 @@ abstract class AbstractSurfSpec extends AbstractSpec {
                                     + "cd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\n\n"
                                     + "mkdir documentation_result\n"
                                     + "tar xf docs.tgz -C documentation_result\n\n"
-                                    + "target_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web/other/typo3/surf/${bamboo_VERSION_NUMBER}/en-us\"\n\n"
+                                    + "target_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web/other/typo3/surf/${bamboo.VERSION_NUMBER}/en-us\"\n\n"
                                     + "echo \"Deploying to ${target_dir}\"\n\n"
                                     + "mkdir -p $target_dir\n"
                                     + "rm -rf $target_dir/*\n\n"
@@ -138,7 +138,7 @@ abstract class AbstractSurfSpec extends AbstractSpec {
             + "# clone repo to project/ and checkout requested branch / tag\n"
             + "mkdir project\n"
             + "git clone https://github.com/TYPO3/Surf.git project\n"
-            + "cd project && git checkout ${bamboo_VERSION_NUMBER}\n"
+            + "cd project && git checkout ${bamboo.VERSION_NUMBER}\n"
             + "cd ..\n\n"
             + createJobFile()
             + restoreModificationTime()
