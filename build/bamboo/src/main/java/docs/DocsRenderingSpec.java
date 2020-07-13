@@ -41,7 +41,7 @@ public class DocsRenderingSpec extends AbstractSpec {
             .description("Documentation main rendering chain")
             .pluginConfigurations(new ConcurrentBuilds()
                     .useSystemWideDefault(false)
-                    .maximumNumberOfConcurrentBuilds(400),
+                    .maximumNumberOfConcurrentBuilds(59),
                 new AllOtherPluginsConfiguration()
                     .configuration(new MapBuilder()
                         .put("custom.buildExpiryConfig", buildExpiryConfig())
