@@ -37,6 +37,7 @@ class DiscordWebhookService
             if ($sleep > 0) {
                 usleep($sleep * 1000);
             }
+            $response = null;
             try {
                 $response = $this->client->request(
                     'POST',
@@ -53,10 +54,17 @@ class DiscordWebhookService
                 if ($e->getResponse()->getStatusCode() !== 429) {
                     throw $e;
                 }
+                $sleep = null;
             }
 
-            $result = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-            $sleep = $result['retry_after'] ?? null;
+            if ($response !== null) {
+                try {
+                    $result = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+                    $sleep = $result['retry_after'] ?? null;
+                } catch (\JsonException $e) {
+                    $sleep = null;
+                }
+            }
         }
     }
 }
