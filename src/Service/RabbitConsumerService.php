@@ -39,9 +39,7 @@ class RabbitConsumerService
 
     private LoggerInterface $logger;
 
-
     private CoreSplitServiceInterface $coreSplitService;
-
 
     private CoreSplitServiceInterface $coreSplitServiceV8;
 

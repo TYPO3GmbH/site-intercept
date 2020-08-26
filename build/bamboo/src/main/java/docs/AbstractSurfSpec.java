@@ -1,6 +1,5 @@
 package docs;
 
-import com.atlassian.bamboo.specs.api.BambooSpec;
 import com.atlassian.bamboo.specs.api.builders.AtlassianModule;
 import com.atlassian.bamboo.specs.api.builders.BambooKey;
 import com.atlassian.bamboo.specs.api.builders.Variable;
@@ -20,34 +19,18 @@ import com.atlassian.bamboo.specs.builders.notification.PlanCompletedNotificatio
 import com.atlassian.bamboo.specs.builders.task.ArtifactItem;
 import com.atlassian.bamboo.specs.builders.task.CommandTask;
 import com.atlassian.bamboo.specs.builders.task.ScriptTask;
-import com.atlassian.bamboo.specs.util.BambooServer;
+import com.atlassian.bamboo.specs.builders.trigger.ScheduledTrigger;
 import com.atlassian.bamboo.specs.util.MapBuilder;
 
-@BambooSpec
-public class DocsRenderingSpec extends AbstractSpec {
-    private static String planName = "Docs - Rendering";
-    private static String planKey = "DR";
-
-    public static void main(String... argv) {
-        // By default credentials are read from the '.credentials' file.
-        BambooServer bambooServer = new BambooServer(bambooServerName);
-        final DocsRenderingSpec planSpec = new DocsRenderingSpec();
-        bambooServer.publish(planSpec.plan());
-        bambooServer.publish(planSpec.getDefaultPlanPermissions(projectKey, planKey));
-    }
-
-    public Plan plan() {
-        return new Plan(project(), planName, planKey)
-            .description("Documentation main rendering chain")
-            .pluginConfigurations(new ConcurrentBuilds()
-                    .useSystemWideDefault(false)
-                    .maximumNumberOfConcurrentBuilds(59),
-                new AllOtherPluginsConfiguration()
-                    .configuration(new MapBuilder()
-                        .put("custom.buildExpiryConfig", buildExpiryConfig())
-                        .build()))
+abstract class AbstractSurfSpec extends AbstractSpec {
+    protected Plan configurePlan(Plan plan, String version) {
+        return plan.pluginConfigurations(new ConcurrentBuilds(),
+            new AllOtherPluginsConfiguration()
+                .configuration(new MapBuilder()
+                    .put("custom.buildExpiryConfig", buildExpiryConfig())
+                    .build()))
             .stages(new Stage("Render Stage")
-                    .jobs(new Job("Render",
+                    .jobs(new Job("Default Job",
                         new BambooKey("JOB1"))
                         .pluginConfigurations(new AllOtherPluginsConfiguration()
                             .configuration(new MapBuilder()
@@ -71,11 +54,11 @@ public class DocsRenderingSpec extends AbstractSpec {
                             .shared(true))
                         .tasks(new ScriptTask()
                                 .description("Render documentation")
-                                .inlineBody(getInlineBodyContent()),
+                                .inlineBody(this.getInlineBodyContent()),
                             new CommandTask()
                                 .description("archive rendered docs")
                                 .executable("tar")
-                                .argument("cfz docs.tgz FinalDocumentation deployment_infos.sh"))
+                                .argument("cfz docs.tgz FinalDocumentation"))
                         .requirements(new Requirement("system.hasDocker")
                             .matchValue("1.0")
                             .matchType(Requirement.MatchType.EQUALS))
@@ -111,40 +94,17 @@ public class DocsRenderingSpec extends AbstractSpec {
                                 .fromArtifact(new ArtifactItem()
                                     .artifact("docs.tgz")),
                             getAuthenticatedSshTask()
-                                .description("unpack and publish docs")
+                                .description("Unpack and publish docs")
                                 .command("set -e\n"
                                     + "set -x\n\n"
                                     + "cd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\n\n"
                                     + "mkdir documentation_result\n"
                                     + "tar xf docs.tgz -C documentation_result\n\n"
-                                    + "source \"documentation_result/deployment_infos.sh\"\n\n"
-                                    + "web_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web\"\n"
-                                    + "target_dir=\"${web_dir}/${type_short:?type_short must be set}/${vendor:?vendor must be set}/${name:?name must be set}/${target_branch_directory:?target_branch_directory must be set}\"\n\n"
-                                    + "echo \"Deploying to $target_dir\"\n\n"
+                                    + "target_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web/other/typo3/surf/${bamboo.VERSION_NUMBER}/en-us\"\n\n"
+                                    + "echo \"Deploying to ${target_dir}\"\n\n"
                                     + "mkdir -p $target_dir\n"
                                     + "rm -rf $target_dir/*\n\n"
                                     + "mv documentation_result/FinalDocumentation/* $target_dir\n\n"
-                                    + "# Re-New symlinks in document root if homepage repo is deployed\n"
-                                    + "# And some other homepage specific tasks\n"
-                                    + "if [ \"${type_short}\" == \"h\" ] && [ \"${target_branch_directory}\" == \"master\" ]; then\n"
-                                    + "    cd $web_dir\n"
-                                    + "    # Remove existing links (on first level only!)\n"
-                                    + "    find . -maxdepth 1 -type l | while read line; do\n"
-                                    + "        \t    rm -v \"$line\"\n"
-                                    + "    done\n"
-                                    + "    # link all files in deployed homepage repo to doc root\n"
-                                    + "    ls h/typo3/docs-homepage/master/en-us/ | while read file; do\n"
-                                    + "        \t    ln -s \"h/typo3/docs-homepage/master/en-us/$file\"\n"
-                                    + "    done\n"
-                                    + "    # Copy js/extensions-search.js to Home/extensions-search.js to\n"
-                                    + "    # have this file parallel to Home/Extensions.html\n"
-                                    + "    cp js/extensions-search.js Home/extensions-search.js\n"
-                                    + "    # Touch the empty and unused system-exensions.js referenced by the extension search\n"
-                                    + "    touch Home/systemextensions.js\n"
-                                    + "fi\n\n"
-                                    + "# Fetch latest \"static\" extension list from intercept (this is a php route!)\n"
-                                    + "# and put it as Home/extensions.js to be used by Home/Extensions.html\n"
-                                    + "curl https://intercept.typo3.com/assets/docs/extensions.js --output ${web_dir}/Home/extensions.js\n\n"
                                     + "rm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"
                                 )
                         )
@@ -155,12 +115,9 @@ public class DocsRenderingSpec extends AbstractSpec {
                         .artifactSubscriptions(new ArtifactSubscription()
                             .artifact("docs.tgz"))
                         .cleanWorkingDirectory(true)))
-            .variables(new Variable("BUILD_INFORMATION_FILE",
-                    ""),
-                new Variable("DIRECTORY",
-                    ""),
-                new Variable("PACKAGE",
-                    ""))
+            .triggers(new ScheduledTrigger()
+                .cronExpression("0 0 2 ? * *"))
+            .variables(new Variable("VERSION_NUMBER", version))
             .planBranchManagement(new PlanBranchManagement()
                 .delete(new BranchCleanup())
                 .notificationForCommitters())
@@ -173,18 +130,15 @@ public class DocsRenderingSpec extends AbstractSpec {
 
     private String getInlineBodyContent() {
         final String inlineBody = "if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n"
-            + "bash \"$0\" \"$@\"\n"
-            + "exit \"$?\"\n"
+            + "    bash \"$0\" \"$@\"\n"
+            + "    exit \"$?\"\n"
             + "fi\n\n"
             + "set -e\n"
             + "set -x\n\n"
-            + "# fetch build information file and source it\n"
-            + "curl https://intercept.typo3.com/${bamboo_BUILD_INFORMATION_FILE} --output deployment_infos.sh\n"
-            + "source deployment_infos.sh || (echo \"No valid deployment_infos.sh file found\"; exit 1)\n\n"
             + "# clone repo to project/ and checkout requested branch / tag\n"
             + "mkdir project\n"
-            + "git clone ${repository_url} project\n"
-            + "cd project && git checkout ${source_branch}\n"
+            + "git clone https://github.com/TYPO3/Surf.git project\n"
+            + "cd project && git checkout ${bamboo.VERSION_NUMBER}\n"
             + "cd ..\n\n"
             + createJobFile()
             + restoreModificationTime()
@@ -198,52 +152,22 @@ public class DocsRenderingSpec extends AbstractSpec {
             + "        t3docs/render-documentation:v2.6.1 \\\n"
             + "        -c \"/ALL/Menu/mainmenu.sh makehtml -c replace_static_in_html 1 -c make_singlehtml 1 -c jobfile /PROJECT/jobfile.json; chown ${HOST_UID} -R /PROJECT /RESULT\"\n"
             + "}\n"
-            + "mkdir -p RenderedDocumentation\nmkdir -p FinalDocumentation\n\n"
+            + "mkdir -p RenderedDocumentation\n"
+            + "mkdir -p FinalDocumentation\n\n"
             + "# main render call - will render main documentation and localizations\n"
             + "renderDocs\n\n"
-            + "# test if rendering failed for whatever reason\n"
-            + "ls RenderedDocumentation/Result || exit 1\n\n"
-            + "# if a result has been rendered for the main directory, we treat that as the 'en_us' version\n"
-            + "if [ -d RenderedDocumentation/Result/project/0.0.0/ ]; then\n"
-            + "        echo \"Handling main doc result as en-us version\"\n"
-            + "        mkdir FinalDocumentation/en-us\n"
-            + "        # Move en-us files to target dir, including dot files\n"
-            + "        (shopt -s dotglob; mv RenderedDocumentation/Result/project/0.0.0/* FinalDocumentation/en-us)\n"
-            + "        # evil hack to get rid of hardcoded docs.typo3.org domain name in version selector js side\n"
-            + "        # not needed with replace_static_in_html at the moment\n"
-            + "        # sed -i 's%https://docs.typo3.org%%' FinalDocumentation/en-us/_static/js/theme.js\n"
-            + "        # Remove the directory, all content has been moved\n"
-            + "        rmdir RenderedDocumentation/Result/project/0.0.0/\n"
-            + "        # Remove a possibly existing Localization.en_us directory, if it exists\n"
-            + "        rm -rf RenderedDocumentation/Result/project/en-us/\n"
-            + "fi\n\n"
-            + "# now see if other localization versions have been rendered. if so, move them to FinalDocumentation/, too\n"
-            + "if [ \"$(ls -A RenderedDocumentation/Result/project/)\" ]; then\n"
-            + "    for LOCALIZATIONDIR in RenderedDocumentation/Result/project/*; do\n"
-            + "            LOCALIZATION=`basename $LOCALIZATIONDIR`\n"
-            + "            echo \"Handling localized documentation version ${LOCALIZATION:?Localization could not be determined}\"\n"
-            + "            mkdir FinalDocumentation/${LOCALIZATION}\n"
-            + "            (shopt -s dotglob; mv ${LOCALIZATIONDIR}/0.0.0/* FinalDocumentation/${LOCALIZATION})\n"
-            + "            # Remove the localization dir, it should be empty now\n"
-            + "            rmdir ${LOCALIZATIONDIR}/0.0.0/\n"
-            + "            rmdir ${LOCALIZATIONDIR}\n"
-            + "            # evil hack to get rid of hardcoded docs.typo3.org domain name in version selector js side\n"
-            + "            # not needed with replace_static_in_html at the moment\n"
-            + "            # sed -i 's%https://docs.typo3.org%%' FinalDocumentation/${LOCALIZATION}/_static/js/theme.js\n"
-            + "    done\n"
-            + "fi\n\n"
+            + "# Move files to target dir, including dot files\n"
+            + "(shopt -s dotglob; mv RenderedDocumentation/Result/project/0.0.0/* FinalDocumentation)\n"
+            + "# Remove the directory, all content has been moved\n"
             + "rm -rf RenderedDocumentation";
         return inlineBody;
     }
 
-    private String createJobFile() {
+    protected String createJobFile() {
         return "touch project/jobfile.json\n"
             + "cat << EOF > project/jobfile.json\n"
             + "{\n"
             + "    \"Overrides_cfg\": {\n"
-            + "        \"general\": {\n"
-            + "            \"release\": \"$target_branch_directory\"\n"
-            + "        },\n"
             + "        \"html_theme_options\": {\n"
             + "            \"docstypo3org\": \"yes\"\n"
             + "        }\n"

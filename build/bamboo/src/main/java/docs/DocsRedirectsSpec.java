@@ -68,7 +68,19 @@ public class DocsRedirectsSpec extends AbstractSpec {
                         .tasks(new ScriptTask()
                                 .description("Collect nginx files")
                                 .interpreter(ScriptTaskProperties.Interpreter.BINSH_OR_CMDEXE)
-                                .inlineBody("#!/bin/bash\n\nif [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n    bash \"$0\" \"$@\"\n    exit \"$?\"\nfi\n\nset -x\n\nls -la\n\nmkdir nginx\n\ncurl https://intercept.typo3.com/docs-redirects/${bamboo_REDIRECT_FILE} --output nginx/${bamboo_REDIRECT_FILE}\ncurl https://intercept.typo3.com/build/nginx/redirects.conf --output nginx/redirects.conf\n\necho \"done\"\nls -la"),
+                                .inlineBody("#!/bin/bash\n\n"
+                                    + "if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n"
+                                    + "    bash \"$0\" \"$@\"\n"
+                                    + "    exit \"$?\"\n"
+                                    + "fi\n\n"
+                                    + "set -x\n\n"
+                                    + "ls -la\n\n"
+                                    + "mkdir nginx\n\n"
+                                    + "curl https://intercept.typo3.com/docs-redirects/${bamboo_REDIRECT_FILE} --output nginx/${bamboo_REDIRECT_FILE}\n"
+                                    + "curl https://intercept.typo3.com/build/nginx/redirects.conf --output nginx/redirects.conf\n\n"
+                                    + "echo \"done\"\n"
+                                    + "ls -la"
+                                ),
                             new CommandTask()
                                 .description("archive nginx configs")
                                 .executable("tar")
@@ -98,7 +110,10 @@ public class DocsRedirectsSpec extends AbstractSpec {
                                 .build()))
                         .tasks(getAuthenticatedSshTask()
                                 .description("mkdir")
-                                .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
+                                .command("set -e\n"
+                                    + "set -x\n\n"
+                                    + "mkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"
+                                ),
                             getAuthenticatedScpTask()
                                 .description("copy result")
                                 .toRemotePath("/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}")
@@ -106,7 +121,17 @@ public class DocsRedirectsSpec extends AbstractSpec {
                                     .artifact("nginx.tgz")),
                             getAuthenticatedSshTask()
                                 .description("unpack and publish docs")
-                                .command("set -e\r\nset -x\r\n\r\n# Create \r\ncd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\r\n\r\ntar xf nginx.tgz\r\n\r\n# Run Deployment script\r\n/srv/vhosts/prod.docs.typo3.com/home/bin/checkAndUpdateRedirectsConfiguration.sh ${bamboo.buildResultKey}\r\n\r\n# Cleanup your room\r\nrm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"))
+                                .command("set -e\n"
+                                    + "set -x\n\n"
+                                    + "# Create \n"
+                                    + "cd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\n\n"
+                                    + "tar xf nginx.tgz\n\n"
+                                    + "# Run Deployment script\n"
+                                    + "/srv/vhosts/prod.docs.typo3.com/home/bin/checkAndUpdateRedirectsConfiguration.sh ${bamboo.buildResultKey}\n\n"
+                                    + "# Cleanup your room\n"
+                                    + "rm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"
+                                )
+                        )
                         .requirements(new Requirement("system.hasDocker")
                                 .matchValue("1.0")
                                 .matchType(Requirement.MatchType.EQUALS),

@@ -25,7 +25,8 @@ import com.atlassian.bamboo.specs.util.BambooServer;
 import com.atlassian.bamboo.specs.util.MapBuilder;
 
 @BambooSpec
-public class DocsRenderingSurf20Spec extends AbstractSpec {
+public class DocsRenderingSurf20Spec extends AbstractSurfSpec {
+    protected static String version = "2.0";
     private static String planName = "Docs - Rendering Surf 2.0";
     private static String planKey = "DRS";
 
@@ -38,94 +39,6 @@ public class DocsRenderingSurf20Spec extends AbstractSpec {
     }
 
     public Plan plan() {
-        return new Plan(project(), planName, planKey)
-            .pluginConfigurations(new ConcurrentBuilds(),
-                new AllOtherPluginsConfiguration()
-                    .configuration(new MapBuilder()
-                        .put("custom.buildExpiryConfig", buildExpiryConfig())
-                        .build()))
-            .stages(new Stage("Render Stage")
-                    .jobs(new Job("Render",
-                        new BambooKey("JOB1"))
-                        .pluginConfigurations(new AllOtherPluginsConfiguration()
-                            .configuration(new MapBuilder()
-                                .put("custom", new MapBuilder()
-                                    .put("auto", new MapBuilder()
-                                        .put("regex", "")
-                                        .put("label", "")
-                                        .build())
-                                    .put("buildHangingConfig.enabled", "false")
-                                    .put("ncover.path", "")
-                                    .put("clover", new MapBuilder()
-                                        .put("path", "")
-                                        .put("license", "")
-                                        .put("useLocalLicenseKey", "true")
-                                        .build())
-                                    .build())
-                                .build()))
-                        .artifacts(new Artifact()
-                            .name("docs.tgz")
-                            .copyPattern("docs.tgz")
-                            .shared(true))
-                        .tasks(new ScriptTask()
-                                .description("Render documentation")
-                                .inlineBody("if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n    bash \"$0\" \"$@\"\n    exit \"$?\"\nfi\n\nset -e\nset -x\n\n# clone repo to project/ and checkout requested branch / tag\nmkdir project\ngit clone https://github.com/TYPO3/Surf.git project\ncd project && git checkout 2.0\ncd ..\n\ntouch project/jobfile.json\ncat << EOF > project/jobfile.json\n{\n    \"Overrides_cfg\": {\n        \"html_theme_options\": {\n            \"docstypo3org\": \"yes\"\n        }\n    }\n}\nEOF\n\nfunction renderDocs() {\n    docker run \\\n        -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/project:/PROJECT \\\n        -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/RenderedDocumentation/:/RESULT \\\n        --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n        --rm \\\n        --entrypoint bash \\\n        t3docs/render-documentation:v2.5.1 \\\n        -c \"/ALL/Menu/mainmenu.sh makehtml -c replace_static_in_html 1 -c make_singlehtml 1 -c jobfile /PROJECT/jobfile.json; chown ${HOST_UID} -R /PROJECT /RESULT\"\n}\nmkdir -p RenderedDocumentation\nmkdir -p FinalDocumentation\n\n# main render call - will render main documentation and localizations\nrenderDocs\n\n# Move files to target dir, including dot files\n(shopt -s dotglob; mv RenderedDocumentation/Result/project/0.0.0/* FinalDocumentation)\n# Remove the directory, all content has been moved\nrm -rf RenderedDocumentation"),
-                            new CommandTask()
-                                .description("archive rendered docs")
-                                .executable("tar")
-                                .argument("cfz docs.tgz FinalDocumentation"))
-                        .requirements(new Requirement("system.hasDocker")
-                            .matchValue("1.0")
-                            .matchType(Requirement.MatchType.EQUALS))
-                        .cleanWorkingDirectory(true)),
-                new Stage("Deploy Stage")
-                    .jobs(new Job("Deploy",
-                        new BambooKey("DEP"))
-                        .pluginConfigurations(new AllOtherPluginsConfiguration()
-                            .configuration(new MapBuilder()
-                                .put("custom", new MapBuilder()
-                                    .put("auto", new MapBuilder()
-                                        .put("regex", "")
-                                        .put("label", "")
-                                        .build())
-                                    .put("buildHangingConfig.enabled", "false")
-                                    .put("ncover.path", "")
-                                    .put("clover", new MapBuilder()
-                                        .put("path", "")
-                                        .put("license", "")
-                                        .put("useLocalLicenseKey", "true")
-                                        .build())
-                                    .build())
-                                .build()))
-                        .tasks(getAuthenticatedSshTask()
-                                .description("mkdir")
-                                .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
-                            getAuthenticatedScpTask()
-                                .description("copy result")
-                                .toRemotePath("/srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}")
-                                .fromArtifact(new ArtifactItem()
-                                    .artifact("docs.tgz")),
-                            getAuthenticatedSshTask()
-                                .description("unpack and publish docs")
-                                .command("set -e\r\nset -x\r\n\r\ncd /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}\r\n\r\nmkdir documentation_result\r\ntar xf docs.tgz -C documentation_result\r\n\r\ntarget_dir=\"/srv/vhosts/prod.docs.typo3.com/site/Web/other/typo3/surf/2.0/en-us\"\r\n\r\necho \"Deploying to ${target_dir}\"\r\n\r\nmkdir -p $target_dir\r\nrm -rf $target_dir/*\r\n\r\nmv documentation_result/FinalDocumentation/* $target_dir\r\n\r\nrm -rf /srv/vhosts/prod.docs.typo3.com/deployment/${bamboo.buildResultKey}"))
-                        .requirements(new Requirement("system.hasDocker")
-                                .matchValue("1.0")
-                                .matchType(Requirement.MatchType.EQUALS),
-                            new Requirement("system.builder.command.tar"))
-                        .artifactSubscriptions(new ArtifactSubscription()
-                            .artifact("docs.tgz"))
-                        .cleanWorkingDirectory(true)))
-            .triggers(new ScheduledTrigger()
-                .cronExpression("0 0 2 ? * *"))
-            .variables(new Variable("BUILD_INFORMATION_FILE",
-                ""))
-            .planBranchManagement(new PlanBranchManagement()
-                .delete(new BranchCleanup())
-                .notificationForCommitters())
-            .notifications(new Notification()
-                .type(new PlanCompletedNotification())
-                .recipients(new AnyNotificationRecipient(new AtlassianModule("com.atlassian.bamboo.plugins.bamboo-slack:recipient.slack"))
-                    .recipientString("https://intercept.typo3.com/bamboo|||")))
-            .forceStopHungBuilds();
+        return configurePlan(new Plan(project(), planName, planKey), version);
     }
 }

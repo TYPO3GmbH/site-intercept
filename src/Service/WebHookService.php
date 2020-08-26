@@ -187,6 +187,7 @@ class WebHookService
         unset($payload->changes);
         $payload->changes = [0 => $change];
         $versionString = (string)$change->ref->displayId;
+        $repositoryUrl = null;
         // Server (refs_changed)
         // In case of self hosted, Bitbucket provides a git clone url
         // We have to use this url, as html url will not work with git clone
@@ -196,6 +197,11 @@ class WebHookService
                 break;
             }
         }
+
+        if (null === $repositoryUrl) {
+            throw new UnsupportedWebHookRequestException('Private repositories are not supported.', 1594283381);
+        }
+
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET_SERVER);
 
