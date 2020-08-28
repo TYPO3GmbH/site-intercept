@@ -33,3 +33,5 @@ atlassian-ide-plugin.xml
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+/.ddev/keycloak-gatekeeper.conf
+/auth.json

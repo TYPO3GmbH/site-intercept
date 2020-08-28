@@ -11,8 +11,12 @@ additional_fqdns: []
 mariadb_version: "10.2"
 provider: default
 omit_containers: [dba]
-webimage_extra_packages: [php7.4-ldap]
+webimage_extra_packages: [php7.4-ldap,php7.4-gmp]
 use_dns_when_possible: true
+hooks:
+  pre-start:
+    - exec-host: php -r "file_exists('.ddev/keycloak-gatekeeper.conf') || copy('.ddev/keycloak-gatekeeper.conf.tmpl',
+        '.ddev/keycloak-gatekeeper.conf');"
 
 
 # This config.yaml was created with ddev version v1.14.0
@@ -148,9 +152,9 @@ use_dns_when_possible: true
 # In this case the user must provide all such settings.
 
 # no_project_mount: false
-# (Experimental) If true, ddev will not mount the project into the web container; 
+# (Experimental) If true, ddev will not mount the project into the web container;
 # the user is responsible for mounting it manually or via a script.
-# This is to enable experimentation with alternate file mounting strategies. 
+# This is to enable experimentation with alternate file mounting strategies.
 # For advanced users only!
 
 # provider: default # Currently either "default" or "pantheon"

@@ -1,6 +1,12 @@
 {
+    "brick/math": {
+        "version": "0.9.1"
+    },
     "brick/reflection": {
         "version": "0.2.2"
+    },
+    "clue/stream-filter": {
+        "version": "v1.4.1"
     },
     "composer/semver": {
         "version": "1.4.2"
@@ -107,6 +113,9 @@
             "ref": "e5e657ce5a4ebc99f3c76916938aa0a5f8ef7736"
         }
     },
+    "fgrosse/phpasn1": {
+        "version": "v2.1.1"
+    },
     "friendsofphp/php-cs-fixer": {
         "version": "2.2",
         "recipe": {
@@ -182,6 +191,18 @@
     "nikic/php-parser": {
         "version": "v4.1.0"
     },
+    "nyholm/psr7": {
+        "version": "1.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.0",
+            "ref": "7c0a9352a57376f04f5444e74565102c3a23d0c7"
+        },
+        "files": [
+            "config/packages/nyholm_psr7.yaml"
+        ]
+    },
     "ocramius/package-versions": {
         "version": "1.3.0"
     },
@@ -208,6 +229,48 @@
     },
     "php-cs-fixer/diff": {
         "version": "v1.3.0"
+    },
+    "php-http/cache-plugin": {
+        "version": "1.7.1"
+    },
+    "php-http/client-common": {
+        "version": "2.3.0"
+    },
+    "php-http/curl-client": {
+        "version": "2.1.0"
+    },
+    "php-http/discovery": {
+        "version": "1.9.1"
+    },
+    "php-http/httplug": {
+        "version": "2.2.0"
+    },
+    "php-http/httplug-bundle": {
+        "version": "1.6",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "1.6",
+            "ref": "87b3d491d593d2c6e3b90bf0689ac69a188bfa5f"
+        },
+        "files": [
+            "config/packages/httplug.yaml"
+        ]
+    },
+    "php-http/logger-plugin": {
+        "version": "1.1.0"
+    },
+    "php-http/message": {
+        "version": "1.9.0"
+    },
+    "php-http/message-factory": {
+        "version": "v1.0.2"
+    },
+    "php-http/promise": {
+        "version": "1.1.0"
+    },
+    "php-http/stopwatch-plugin": {
+        "version": "1.3.0"
     },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
@@ -263,6 +326,15 @@
     "psr/container": {
         "version": "1.0.0"
     },
+    "psr/event-dispatcher": {
+        "version": "1.0.0"
+    },
+    "psr/http-client": {
+        "version": "1.0.1"
+    },
+    "psr/http-factory": {
+        "version": "1.0.1"
+    },
     "psr/http-message": {
         "version": "1.0.1"
     },
@@ -277,6 +349,9 @@
     },
     "ramsey/uuid": {
         "version": "3.8.0"
+    },
+    "rbdwllr/reallysimplejwt": {
+        "version": "2.1.0"
     },
     "rector/rector": {
         "version": "v0.7.19"
@@ -328,6 +403,9 @@
     },
     "setono/cron-expression-bundle": {
         "version": "v1.0.0"
+    },
+    "spomky-labs/base64url": {
+        "version": "v2.0.2"
     },
     "swiftmailer/swiftmailer": {
         "version": "v6.2.1"
@@ -473,6 +551,9 @@
     "symfony/polyfill-php73": {
         "version": "v1.11.0"
     },
+    "symfony/polyfill-php80": {
+        "version": "v1.18.1"
+    },
     "symfony/process": {
         "version": "v4.1.7"
     },
@@ -610,6 +691,9 @@
     "symplify/smart-file-system": {
         "version": "v7.2.19"
     },
+    "t3g/symfony-keycloak-bundle": {
+        "version": "1.0.3"
+    },
     "t3g/symfony-template-bundle": {
         "version": "dev-initialize"
     },
@@ -624,6 +708,27 @@
     },
     "twig/twig": {
         "version": "v2.5.0"
+    },
+    "web-token/jwt-bundle": {
+        "version": "v2.2.1"
+    },
+    "web-token/jwt-checker": {
+        "version": "v2.2.1"
+    },
+    "web-token/jwt-core": {
+        "version": "v2.2.1"
+    },
+    "web-token/jwt-key-mgmt": {
+        "version": "v2.2.1"
+    },
+    "web-token/jwt-signature": {
+        "version": "v2.2.1"
+    },
+    "web-token/jwt-signature-algorithm-hmac": {
+        "version": "v2.2.1"
+    },
+    "web-token/jwt-signature-algorithm-rsa": {
+        "version": "v2.2.1"
     },
     "webimpress/safe-writer": {
         "version": "2.0.0"

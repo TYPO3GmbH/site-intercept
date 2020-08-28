@@ -1,0 +1,16 @@
+client-id: intercept-typo3-com
+client-secret: Something
+discovery-url: https://login.typo3.com/auth/realms/TYPO3
+enable-default-deny: true
+enable-refresh-tokens: true
+encryption-key: 4uk7syOdJxzNSzeASHpXAJ4HjDtu1lam
+listen: :3007
+redirection-url: https://intercept.ddev.site
+upstream-url: http://web:4717
+resources:
+- uri: /
+  white-listed: true
+- uri: /bundles/*
+  white-listed: true
+- uri: /build/*
+  white-listed: true
