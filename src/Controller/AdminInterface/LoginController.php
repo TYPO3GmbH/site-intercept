@@ -25,6 +25,6 @@ class LoginController extends AbstractController
      */
     public function index(): Response
     {
-        return $this->redirectToRoute('home');
+        return $this->redirectToRoute('admin_index');
     }
 }
