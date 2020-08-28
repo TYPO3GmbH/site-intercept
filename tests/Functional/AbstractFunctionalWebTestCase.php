@@ -13,7 +13,8 @@ namespace App\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 abstract class AbstractFunctionalWebTestCase extends WebTestCase
 {
@@ -25,19 +26,14 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
     protected function logInAsDocumentationMaintainer(Client $client)
     {
         $session = $client->getContainer()->get('session');
+        $firewall = 'main';
+        $token = new PostAuthenticationGuardToken(new KeyCloakUser('xX_DocsBoi_Xx', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_DOCUMENTATION_MAINTAINER'], 'oelie@boelie.nl', 'Use the force Harry, ~ Gandalf'), 'keycloak.typo3.com.user.provider', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_DOCUMENTATION_MAINTAINER']);
 
-        $firewallName = 'main';
-        $firewallContext = 'main';
-
-        $roles = [
-            'ROLE_USER',
-            'ROLE_DOCUMENTATION_MAINTAINER',
-        ];
-        $token = new UsernamePasswordToken('admin', null, $firewallName, $roles);
-        $session->set('_security_' . $firewallContext, serialize($token));
+        $session->set('_security_' . $firewall, serialize($token));
         $session->save();
 
         $cookie = new Cookie($session->getName(), $session->getId());
+
         $client->getCookieJar()->set($cookie);
     }
 
@@ -49,18 +45,14 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
     protected function logInAsAdmin(Client $client)
     {
         $session = $client->getContainer()->get('session');
+        $firewall = 'main';
+        $token = new PostAuthenticationGuardToken(new KeyCloakUser('Oelie Boelie', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_ADMIN'], 'oelie@boelie.nl', 'Oelie Boelie'), 'keycloak.typo3.com.user.provider', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_ADMIN']);
 
-        $firewallName = 'main';
-        $firewallContext = 'main';
-
-        $roles = [
-            'ROLE_ADMIN',
-        ];
-        $token = new UsernamePasswordToken('admin', null, $firewallName, $roles);
-        $session->set('_security_' . $firewallContext, serialize($token));
+        $session->set('_security_' . $firewall, serialize($token));
         $session->save();
 
         $cookie = new Cookie($session->getName(), $session->getId());
+
         $client->getCookieJar()->set($cookie);
     }
 }

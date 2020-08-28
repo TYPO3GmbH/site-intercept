@@ -10,11 +10,11 @@ declare(strict_types = 1);
 
 namespace App\Tests\Unit\Monolog\Processor;
 
-use App\Entity\User;
 use App\Monolog\Processor\AddFieldProcessor;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Security\Core\Security;
+use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 class AddFieldProcessorTest extends TestCase
 {
@@ -37,8 +37,8 @@ class AddFieldProcessorTest extends TestCase
      */
     public function addFieldProcessorAddsUsernameAndDisplayName()
     {
-        /** @var ObjectProphecy|User $user */
-        $user = $this->prophesize(User::class);
+        /** @var ObjectProphecy|KeyCloakUser $user */
+        $user = $this->prophesize(KeyCloakUser::class);
         /** @var ObjectProphecy|Security $security */
         $security = $this->prophesize(Security::class);
         $security->getUser()->shouldBeCalled()->willReturn($user->reveal());

@@ -11,7 +11,7 @@ additional_fqdns: []
 mariadb_version: "10.2"
 provider: default
 omit_containers: [dba]
-webimage_extra_packages: [php7.4-ldap,php7.4-gmp]
+webimage_extra_packages: [php7.4-gmp]
 use_dns_when_possible: true
 hooks:
   pre-start:
