@@ -27,7 +27,7 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
     {
         $session = $client->getContainer()->get('session');
         $firewall = 'main';
-        $token = new PostAuthenticationGuardToken(new KeyCloakUser('xX_DocsBoi_Xx', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_DOCUMENTATION_MAINTAINER'], 'oelie@boelie.nl', 'Use the force Harry, ~ Gandalf'), 'keycloak.typo3.com.user.provider', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_DOCUMENTATION_MAINTAINER']);
+        $token = new PostAuthenticationGuardToken(new KeyCloakUser('xX_DocsBoi_Xx', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_DOCUMENTATION_MAINTAINER'], 'oelie@boelie.nl', 'Use the force, Harry ~ Gandalf'), 'keycloak.typo3.com.user.provider', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_DOCUMENTATION_MAINTAINER']);
 
         $session->set('_security_' . $firewall, serialize($token));
         $session->save();
