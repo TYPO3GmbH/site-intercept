@@ -178,12 +178,3 @@ services:
       class: App\Security\LogoutSuccessHandler
       arguments:
         $appUrl: '%env(APP_URL)%'
-
-
-    App\Listener\HostAwareRouteSubscriber:
-      class: App\Listener\HostAwareRouteSubscriber
-      arguments:
-        - '@router'
-        - '%env(APP_URL)%'
-      tags:
-        - {name: kernel.event_subscriber}
