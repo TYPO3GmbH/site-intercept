@@ -1,0 +1,14 @@
+version: '3.6'
+
+services:
+  keycloak-gatekeeper:
+    image: bitnami/keycloak-gatekeeper:10-scratch
+    ports:
+      - '3007:3007'
+    volumes:
+      - type: "bind"
+        source: "."
+        target: "/mnt/ddev_config"
+    command:
+      - /keycloak-gatekeeper
+      - "--config=/mnt/ddev_config/keycloak-gatekeeper.conf"

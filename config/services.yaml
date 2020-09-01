@@ -1,5 +1,6 @@
 parameters:
     locale: 'en'
+    router.request_context.host: '%env(APP_URL)%'
 
 services:
     # default configuration for services in *this* file
@@ -172,24 +173,17 @@ services:
         class: Gelf\Transport\UdpTransport
         arguments: ['%env(GRAYLOG_HOST)%', '%env(int:GRAYLOG_PORT)%']
 
-    # LDAP connection for user authentication
-    Symfony\Component\Ldap\Ldap:
-        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
-    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
-        arguments:
-            -   host: ldap.typo3.org
-                port: 636
-                encryption: ssl
-                options:
-                    protocol_version: 3
-                    referrals: false
 
-    # Our custom user provider to ldap.typo3.org
-    ldap.typo3.org.user.provider:
-        class: App\Security\LdapUserProvider
-        arguments:
-            $ldap: '@Symfony\Component\Ldap\Ldap'
-            $baseDn: 'ou=people,dc=typo3,dc=org'
-            $searchDn: '%env(LDAP_SEARCH_USER)%'
-            $searchPassword: '%env(LDAP_SEARCH_PASSWORD)%'
-            $defaultRoles: [ 'ROLE_USER' ]
+    App\Security\LogoutSuccessHandler:
+      class: App\Security\LogoutSuccessHandler
+      arguments:
+        $appUrl: '%env(APP_URL)%'
+
+
+    App\Listener\HostAwareRouteSubscriber:
+      class: App\Listener\HostAwareRouteSubscriber
+      arguments:
+        - '@router'
+        - '%env(APP_URL)%'
+      tags:
+        - {name: kernel.event_subscriber}

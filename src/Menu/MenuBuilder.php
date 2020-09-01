@@ -12,7 +12,9 @@ namespace App\Menu;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuItem;
+use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 use T3G\Bundle\TemplateBundle\Menu\MenuBuilder as TemplateMenuBuider;
+use T3G\Bundle\TemplateBundle\Utility\AvatarUtility;
 
 /**
  * MenuBuilder
@@ -160,13 +162,15 @@ class MenuBuilder extends TemplateMenuBuider
             ]
         );
         if ($this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+            /** @var KeyCloakUser $user */
+            $user = $this->tokenStorage->getToken()->getUser();
             $menu->addChild(
                 'username',
                 [
-                    'label' => $this->tokenStorage->getToken()->getUsername(),
+                    'label' => $user->getDisplayName(),
                     'uri' => '#',
                     'extras' => [
-                        'icon' => 'user',
+                        'image' => AvatarUtility::getAvatarUrl($user->getEmail() ?? '', 32),
                     ],
                 ]
             );

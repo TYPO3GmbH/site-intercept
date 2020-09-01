@@ -10,8 +10,8 @@ declare(strict_types = 1);
 
 namespace App\Monolog\Processor;
 
-use App\Entity\User;
 use Symfony\Component\Security\Core\Security;
+use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 /**
  * Adds key / values to a log record. Used by graylog logging
@@ -34,7 +34,7 @@ class AddFieldProcessor
                 $record['extra'][$fieldName] = $fieldValue;
             } elseif ($fieldValue instanceof Security) {
                 $user = $fieldValue->getUser();
-                if ($user instanceof User) {
+                if ($user instanceof KeyCloakUser) {
                     // If we have a logged in user, automatically log username and display name
                     $record['extra']['username'] = $user->getUsername();
                     $record['extra']['userDisplayName'] = $user->getDisplayName();

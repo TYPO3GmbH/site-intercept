@@ -22,4 +22,7 @@ return [
     Setono\CronExpressionBundle\SetonoCronExpressionBundle::class => ['all' => true],
     T3G\Bundle\TemplateBundle\TemplateBundle::class => ['all' => true],
     T3G\Bundle\UsercentricsBundle\UsercentricsBundle::class => ['all' => true],
+    Jose\Bundle\JoseFramework\JoseFrameworkBundle::class => ['all' => true],
+    Http\HttplugBundle\HttplugBundle::class => ['all' => true],
+    T3G\Bundle\Keycloak\T3GKeycloakBundle::class => ['all' => true],
 ];
