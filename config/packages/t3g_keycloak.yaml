@@ -1,0 +1,9 @@
+# config/packages/t3g_keycloak.yaml
+t3g_keycloak:
+  keycloak:
+    # Key/value array of ldap role against the role it will represent in your app
+    role_mapping:
+      typo3.com-gmbh: ROLE_ADMIN
+      typo3.com-intercept-docs: ROLE_DOCUMENTATION_MAINTAINER
+    # The default roles every user gets
+    default_roles: ['ROLE_USER', 'ROLE_OAUTH_USER']

@@ -1,29 +1,20 @@
 security:
     providers:
-        typo3_org_ldap:
-            # Use an own user provider defined as service
-            id: ldap.typo3.org.user.provider
+      keycloak:
+        id: keycloak.typo3.com.user.provider
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
-
-            form_login_ldap:
-                login_path: admin_login
-                check_path: admin_login
-                csrf_token_generator: security.csrf.token_manager
-                service: Symfony\Component\Ldap\Ldap
-                dn_string: 'ou=people,dc=typo3,dc=org'
-                query_string: '(&(objectClass=inetOrgPerson)(uid={username}))'
-                success_handler: App\Security\AuthenticationSuccessHandler
-                search_dn: '%env(LDAP_SEARCH_USER)%'
-                search_password: '%env(LDAP_SEARCH_PASSWORD)%'
-            logout:
-                path: /logout
-                target: admin_index
+          anonymous: true
+          logout:
+            path: /logout
+            success_handler: App\Security\LogoutSuccessHandler
+          guard:
+            authenticators:
+              - T3G\Bundle\Keycloak\Security\KeyCloakAuthenticator
 
     role_hierarchy:
         # Admin role has documentation maintainer automatically
