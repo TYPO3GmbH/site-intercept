@@ -40,8 +40,9 @@
                                 {{ form_help(patchForm.set) }}
                             </div>
                             {{ form_widget(patchForm.master, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                            {{ form_widget(patchForm.branch10_4, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
                             {{ form_widget(patchForm.branch9_5, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                            {{ form_widget(patchForm._token, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                            {{ form_widget(patchForm._token) }}
                         {{ form_end(patchForm, {'render_rest': false}) }}
                     </div>
                     <div class="card-body">

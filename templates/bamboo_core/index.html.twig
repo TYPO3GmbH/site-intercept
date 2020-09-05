@@ -39,11 +39,18 @@
                                 {{ form_widget(patchForm.set) }}
                                 {{ form_help(patchForm.set) }}
                             </div>
+                            <h4>Regular builds</h4>
                             {{ form_widget(patchForm.master, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                            {{ form_widget(patchForm.branch10_4, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
                             {{ form_widget(patchForm.branch9_5, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                            {{ form_widget(patchForm.nightlyMaster, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                            {{ form_widget(patchForm.nightly9_5, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                            {{ form_widget(patchForm._token, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                            <hr>
+                            <h4>Nightly builds</h4>
+                            <p>Use with caution, triggering a nightly build will occupy Bamboo for hours!</p>
+                            {{ form_widget(patchForm.nightlyMaster, { 'attr': {'class': 'btn btn-danger mb-2'} }) }}
+                            {{ form_widget(patchForm.nightly10_4, { 'attr': {'class': 'btn btn-danger mb-2'} }) }}
+                            {{ form_widget(patchForm.nightly9_5, { 'attr': {'class': 'btn btn-danger mb-2'} }) }}
+
+                            {{ form_widget(patchForm._token) }}
                         {{ form_end(patchForm, {'render_rest': false}) }}
                     </div>
                     <div class="card-body">
@@ -79,10 +86,18 @@
                         </p>
                         {{ form_start(triggerForm) }}
                             {{ form_errors(triggerForm) }}
+
+                            <h4>Regular builds</h4>
                             {{ form_widget(triggerForm.master, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+                            {{ form_widget(triggerForm.branch10_4, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
                             {{ form_widget(triggerForm.branch9_5, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                            {{ form_widget(triggerForm.nightlyMaster, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
-                            {{ form_widget(triggerForm.nightly9_5, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
+
+                            <hr>
+                            <h4>Nightly builds</h4>
+                            <p>Use with caution, triggering a nightly build will occupy Bamboo for hours!</p>
+                            {{ form_widget(triggerForm.nightlyMaster, { 'attr': {'class': 'btn btn-danger mb-2'} }) }}
+                            {{ form_widget(triggerForm.nightly10_4, { 'attr': {'class': 'btn btn-danger mb-2'} }) }}
+                            {{ form_widget(triggerForm.nightly9_5, { 'attr': {'class': 'btn btn-danger mb-2'} }) }}
                             {{ form_widget(triggerForm._token, { 'attr': {'class': 'btn btn-primary mb-2'} }) }}
                         {{ form_end(patchForm, {'render_rest': false}) }}
                     </div>
