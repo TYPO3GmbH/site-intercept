@@ -44,6 +44,7 @@ class BambooCoreSecurityTriggerFormType extends AbstractType
                 ]
             )
             ->add('master', SubmitType::class, ['label' => 'Trigger master'])
+            ->add('branch10_4', SubmitType::class, ['label' => 'Trigger 10.4'])
             ->add('branch9_5', SubmitType::class, ['label' => 'Trigger 9.5'])
         ;
     }
