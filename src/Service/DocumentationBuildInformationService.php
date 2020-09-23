@@ -100,11 +100,10 @@ class DocumentationBuildInformationService
         if ($statusCode !== 200) {
             throw new ComposerJsonNotFoundException('Fetching composer.json did not return HTTP 200', 1557489013);
         }
-        $stream = $response->getBody();
-        $stream->rewind();
-        $json = json_decode($stream->getContents(), true, 512, JSON_THROW_ON_ERROR);
-        if (!is_array($json)) {
-            throw new ComposerJsonInvalidException('Decoding composer.json did not return an object. Invalid json syntax?', 1558022442);
+        try {
+            $json = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new ComposerJsonInvalidException('Decoding ' . $path . ' did not return an object. Invalid json syntax?', 1558022442, $e);
         }
         return $json;
     }
