@@ -1,0 +1,109 @@
+---
+version: 2
+plan:
+  project-key: CORE
+  key: DAR
+  name: Docs - API Rendering
+stages:
+
+- Render Stage:
+    manual: false
+    final: false
+    jobs:
+    - Default Job
+- Deploy Stage:
+    manual: false
+    final: false
+    jobs:
+    - Deploy
+
+Default Job:
+  key: JOB1
+  other:
+    clean-working-dir: true
+  tasks:
+    - checkout:
+        path: core
+        force-clean-build: 'false'
+    - checkout:
+        repository: github TYPO3 TYPO3.CMS 10.4
+        path: core10
+        force-clean-build: 'false'
+    - checkout:
+        repository: github TYPO3 TYPO3.CMS 9.5
+        path: core9
+        force-clean-build: 'false'
+    - script:
+        interpreter: SHELL
+        scripts:
+        - bash bamboo-specs/bin/render.sh
+    - command:
+        executable: tar
+        argument: cfz output.tgz output
+    - command:
+        executable: tar
+        argument: cfz output10.tgz output10
+    - command:
+        executable: tar
+        argument: cfz output9.tgz output9
+  artifacts:
+    - name: output
+      pattern: output.tgz
+      shared: true
+      required: true
+    - name: output10
+      pattern: output10.tgz
+      shared: true
+      required: true
+    - name: output9
+      pattern: output9.tgz
+      shared: true
+      required: true
+  requirements:
+    - system.hasDocker: '1.0'
+
+Deploy:
+  key: DEP
+  other:
+    clean-working-dir: true
+  tasks:
+    - script:
+        interpreter: SHELL
+        scripts:
+        - bash bamboo-specs/bin/deploy.sh
+  requirements:
+    - system.hasDocker: '1.0'
+    - system.builder.command.tar
+variables:
+  GITHUB_SECRET: BAMSCRT@0@0@Jc7lAPUauP5tBRLi37sAsBYgDsSVIlXz3dXFnbW6ebEaGitJJRNC5MUO4MsKyEEA
+triggers:
+  - cron: 0 30 3 ? * *
+branches:
+  create: manually
+  delete: never
+  link-to-jira: true
+notifications: []
+labels: []
+other:
+  concurrent-build-plugin: system-default
+
+---
+version: 2
+plan:
+  key: CORE-DAR
+plan-permissions:
+- users:
+  - susanne.moog
+  groups:
+  - t3g-team-dev
+  permissions:
+  - view
+  - edit
+  - build
+  - clone
+  - admin
+- roles:
+  - logged-in
+  - anonymous
+  permissions:
+  - view

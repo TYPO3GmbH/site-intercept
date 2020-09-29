@@ -4,6 +4,7 @@ bin/
 !bin/console
 !bin/splitsh-lite-darwin
 !bin/splitsh-lite-linux
+!bamboo-specs/bin
 
 # JIRA plugin
 atlassian-ide-plugin.xml
