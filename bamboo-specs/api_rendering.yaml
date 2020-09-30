@@ -36,7 +36,7 @@ Default Job:
     - script:
         interpreter: SHELL
         scripts:
-        - bash bamboo-specs/bin/render.sh
+        - bash bamboo-specs/bin/api/render.sh
     - command:
         executable: tar
         argument: cfz output.tgz output
@@ -70,7 +70,7 @@ Deploy:
     - script:
         interpreter: SHELL
         scripts:
-        - bash bamboo-specs/bin/deploy.sh
+        - bash bamboo-specs/bin/api/deploy.sh
   requirements:
     - system.hasDocker: '1.0'
     - system.builder.command.tar
