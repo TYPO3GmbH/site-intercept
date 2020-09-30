@@ -3,7 +3,7 @@ set -x
 
 echo "INFO Backup known_hosts file"
 cp ~/.ssh/known_hosts ~/.ssh/known_hosts.bak
-ssh-keyscan -t rsa srv001.typo3.com >> ~/.ssh/known_hosts
+ssh-keyscan -t rsa prod.api.docs.typo3.com >> ~/.ssh/known_hosts
 
 ssh prod.api.docs.typo3.com@prod.api.docs.typo3.com << EOF
     mkdir -p /srv/vhosts/prod.api.docs.typo3.com/deployment/${bamboo.buildResultKey}
