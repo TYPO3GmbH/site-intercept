@@ -150,19 +150,24 @@ class DocumentationService
                 $this->enrichWithComposerInformation($doc, $branchName);
                 $deploymentInformation = $this->documentationBuildInformationService
                     ->generateBuildInformationFromDocumentationJar($doc);
-            } catch (ComposerJsonNotFoundException | ComposerJsonInvalidException | DocsComposerDependencyException | DocsPackageDoNotCareBranch | DocsComposerMissingValueException | DocsPackageRegisteredWithDifferentRepositoryException $e) {
-                $this->logger->warning(
-                    'Cannot render documentation: ' . $e->getMessage(),
-                    [
-                        'type' => 'docsRendering',
-                        'status' => 'commandFailed',
-                        'triggeredBy' => 'CLI',
-                        'exceptionCode' => $e->getCode(),
-                        'exceptionMessage' => $e->getMessage(),
-                        'repository' => $documentationJar->getRepositoryUrl(),
-                        'branch' => $branchName,
-                    ]
-                );
+            } catch (
+                ComposerJsonNotFoundException |
+                ComposerJsonInvalidException |
+                DocsComposerDependencyException |
+                DocsPackageDoNotCareBranch |
+                DocsComposerMissingValueException |
+                \UnexpectedValueException |
+                DocsPackageRegisteredWithDifferentRepositoryException $e
+            ) {
+                $this->logger->warning('Cannot render documentation: ' . $e->getMessage(), [
+                    'type' => 'docsRendering',
+                    'status' => 'commandFailed',
+                    'triggeredBy' => 'CLI',
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $documentationJar->getRepositoryUrl(),
+                    'branch' => $branchName,
+                ]);
                 continue;
             }
 
