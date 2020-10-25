@@ -188,7 +188,7 @@ class DeploymentInformation
         $result = $branch;
 
         // 'master' and 'latest' become 'master'
-        if ($result === 'latest' || $result === 'master') {
+        if ($result === 'latest' || $result === 'master' || $result === 'main') {
             return 'master';
         }
 
