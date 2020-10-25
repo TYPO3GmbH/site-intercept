@@ -3,3 +3,5 @@ services:
   web:
     environment:
       - PHP_IDE_CONFIG=serverName=intercept.ddev.site
+    ports:
+      - "9930:22"

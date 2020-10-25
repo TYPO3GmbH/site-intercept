@@ -173,6 +173,9 @@
     "laminas/laminas-zendframework-bridge": {
         "version": "1.0.1"
     },
+    "migrify/migrify-kernel": {
+        "version": "0.3.50"
+    },
     "migrify/php-config-printer": {
         "version": "v0.3.31"
     },
@@ -497,6 +500,9 @@
             "ref": "9ec493d6f3575c54671493d635fa4b68658022ab"
         }
     },
+    "symfony/http-client-contracts": {
+        "version": "v2.3.1"
+    },
     "symfony/http-foundation": {
         "version": "v4.1.7"
     },
@@ -708,6 +714,9 @@
     },
     "symplify/smart-file-system": {
         "version": "v7.2.19"
+    },
+    "symplify/symplify-kernel": {
+        "version": "8.3.45"
     },
     "t3g/symfony-keycloak-bundle": {
         "version": "1.0.3"
