@@ -17,6 +17,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class GithubPullRequestIssueTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     private $body = [
         'title' => 'Pull request title',
         'body' => 'Pull request body',

@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class GerritBuildStatusMessageTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */
@@ -27,9 +28,9 @@ class GerritBuildStatusMessageTest extends TestCase
         $buildStatusProphecy->testSummary = '48491 passed';
         $buildStatusProphecy->buildUrl = 'https://bamboo.typo3.com/browse/CORE-GTC-30252';
         $subject = new GerritBuildStatusMessage($buildStatusProphecy->reveal());
-        $this->assertRegExp('/20m 34s/', $subject->message);
-        $this->assertRegExp('/Fri, 23 Nov, 10:13 AM/', $subject->message);
-        $this->assertRegExp('/48491 passed/', $subject->message);
-        $this->assertRegExp('/https:\/\/bamboo.typo3.com\/browse\/CORE-GTC-30252/', $subject->message);
+        $this->assertMatchesRegularExpression('/20m 34s/', $subject->message);
+        $this->assertMatchesRegularExpression('/Fri, 23 Nov, 10:13 AM/', $subject->message);
+        $this->assertMatchesRegularExpression('/48491 passed/', $subject->message);
+        $this->assertMatchesRegularExpression('/https:\/\/bamboo.typo3.com\/browse\/CORE-GTC-30252/', $subject->message);
     }
 }

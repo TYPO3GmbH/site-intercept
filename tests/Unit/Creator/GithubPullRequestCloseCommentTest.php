@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class GithubPullRequestCloseCommentTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */
@@ -24,6 +25,6 @@ class GithubPullRequestCloseCommentTest extends TestCase
         $pushOutput = $this->prophesize(GitPushOutput::class);
         $pushOutput->reviewUrl = 'https://review.typo3.org/#/c/58930/';
         $subject = new GithubPullRequestCloseComment($pushOutput->reveal());
-        $this->assertRegExp('/https:\/\/review.typo3.org\/#\/c\/58930\//', $subject->comment);
+        $this->assertMatchesRegularExpression('/https:\/\/review.typo3.org\/#\/c\/58930\//', $subject->comment);
     }
 }

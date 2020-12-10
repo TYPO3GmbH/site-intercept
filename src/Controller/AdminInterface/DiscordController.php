@@ -134,7 +134,7 @@ class DiscordController extends AbstractController
                 $entityManager->persist($hook);
                 $entityManager->flush();
                 $this->addFlash('success', 'Discord webhook created for channel: #' . $channel->getChannelName()
-                    . '<br>' . 'The webhook URL is: ' . $request->getScheme() . '://' . $request->getHttpHost() . '/discord/hook/' . $hook->getIdentifier());
+                    . ' The webhook URL is: ' . $request->getScheme() . '://' . $request->getHttpHost() . '/discord/hook/' . $hook->getIdentifier());
 
                 return $this->redirectToRoute('admin_discord_webhooks');
             }

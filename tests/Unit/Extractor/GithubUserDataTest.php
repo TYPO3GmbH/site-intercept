@@ -17,6 +17,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class GithubUserDataTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */

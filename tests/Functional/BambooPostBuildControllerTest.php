@@ -25,6 +25,7 @@ use Prophecy\Argument;
 
 class BambooPostBuildControllerTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @var Connection
      */

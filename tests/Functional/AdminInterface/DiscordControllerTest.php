@@ -21,7 +21,7 @@ use App\Tests\Functional\DatabasePrimer;
 
 class DiscordControllerTest extends AbstractFunctionalWebTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $kernel = new \App\Kernel('test', true);
         $kernel->boot();
