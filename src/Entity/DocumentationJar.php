@@ -37,19 +37,19 @@ class DocumentationJar
     private string $repositoryUrl;
 
     /**
-     * @ORM\Column(type="string", length=255, options={"default":""})
+     * @ORM\Column(type="string", length=255, options={"default": ""})
      * @Assert\NotBlank
      * @Assert\Url
      */
     private ?string $publicComposerJsonUrl = null;
 
     /**
-     * @ORM\Column(type="string", length=255, options={"default":""})
+     * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private string $vendor;
 
     /**
-     * @ORM\Column(type="string", length=255, options={"default":""})
+     * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private string $name;
 
@@ -65,7 +65,7 @@ class DocumentationJar
     private string $packageType;
 
     /**
-     * @ORM\Column(type="string", length=255, options={"default":""}, nullable=true)
+     * @ORM\Column(type="string", length=255, options={"default": ""}, nullable=true)
      */
     private ?string $extensionKey = null;
 
@@ -75,12 +75,12 @@ class DocumentationJar
     private string $branch;
 
     /**
-     * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private ?\DateTimeInterface $createdAt = null;
 
     /**
-     * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private ?\DateTimeInterface $lastRenderedAt = null;
 
@@ -90,47 +90,47 @@ class DocumentationJar
     private string $targetBranchDirectory;
 
     /**
-     * @ORM\Column(type="string", length=255, options={"default":""})
+     * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private string $typeLong;
 
     /**
-     * @ORM\Column(type="string", length=255, options={"default":""})
+     * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private string $typeShort;
 
     /**
-     * @ORM\Column(type="string", length=20, options={"default":""})
+     * @ORM\Column(type="string", length=20, options={"default": ""})
      */
     private string $minimumTypoVersion;
 
     /**
-     * @ORM\Column(type="string", length=20, options={"default":""})
+     * @ORM\Column(type="string", length=20, options={"default": ""})
      */
     private string $maximumTypoVersion;
 
     /**
-     * @ORM\Column(type="integer", options={"default":"0"})
+     * @ORM\Column(type="integer", options={"default": "0"})
      */
     private int $status;
 
     /**
-     * @ORM\Column(type="string", length=255, options={"default":""})
+     * @ORM\Column(type="string", length=255, options={"default": ""})
      */
     private string $buildKey;
 
     /**
-     * @ORM\Column(type="boolean", options={"default":"0"})
+     * @ORM\Column(type="boolean", options={"default": "0"})
      */
     private bool $reRenderNeeded;
 
     /**
-     * @ORM\Column(type="boolean", options={"default":"0"})
+     * @ORM\Column(type="boolean", options={"default": "0"})
      */
     private bool $new;
 
     /**
-     * @ORM\Column(type="boolean", options={"default":"1"})
+     * @ORM\Column(type="boolean", options={"default": "1"})
      */
     private bool $approved;
 
