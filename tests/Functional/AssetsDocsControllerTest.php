@@ -20,7 +20,7 @@ class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
      */
     private $client;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         self::bootKernel();

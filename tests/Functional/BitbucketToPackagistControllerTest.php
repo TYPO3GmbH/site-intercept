@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class BitbucketToPackagistControllerTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */

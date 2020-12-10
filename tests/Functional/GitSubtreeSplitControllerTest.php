@@ -20,6 +20,7 @@ use Prophecy\Argument;
 
 class GitSubtreeSplitControllerTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */

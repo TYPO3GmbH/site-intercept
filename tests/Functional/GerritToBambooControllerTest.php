@@ -18,6 +18,7 @@ use Prophecy\Argument;
 
 class GerritToBambooControllerTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */

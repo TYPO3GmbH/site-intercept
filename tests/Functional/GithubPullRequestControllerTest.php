@@ -21,6 +21,7 @@ use Redmine\Api\Issue;
 
 class GithubPullRequestControllerTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */

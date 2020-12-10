@@ -22,6 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class WebhookToDiscordControllerTest extends KernelTestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @var Connection
      */

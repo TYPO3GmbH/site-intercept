@@ -25,6 +25,7 @@ use Prophecy\Argument;
 
 class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */
@@ -108,7 +109,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
 
         $client = static::createClient();
         $client->request('GET', '/admin/bamboo/core');
-        $this->assertRegExp('/12345/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/12345/', $client->getResponse()->getContent());
     }
 
     /**
@@ -149,7 +150,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client = static::createClient();
         $client->request('GET', '/admin/bamboo/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Trigger bamboo builds/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Trigger bamboo builds/', $client->getResponse()->getContent());
     }
 
     /**
@@ -184,7 +185,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-GTC-123456/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/CORE-GTC-123456/', $client->getResponse()->getContent());
     }
 
     /**
@@ -217,7 +218,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-GTC-123456/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/CORE-GTC-123456/', $client->getResponse()->getContent());
     }
 
     /**
@@ -250,7 +251,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $form = $crawler->selectButton('bamboo_core_trigger_form_without_patch_set[nightlyMaster]')->form();
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Bamboo trigger not successful/', $client->getResponse()->getContent());
     }
 
     /**
@@ -285,7 +286,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $form['bamboo_core_trigger_form[set]'] = 3;
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Bamboo trigger not successful/', $client->getResponse()->getContent());
     }
 
     /**
@@ -319,7 +320,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $form['bamboo_core_trigger_form[set]'] = 3;
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Could not determine a changeId/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Could not determine a changeId/', $client->getResponse()->getContent());
     }
 
     /**
@@ -367,7 +368,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-GTC-123456/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/CORE-GTC-123456/', $client->getResponse()->getContent());
     }
 
     /**
@@ -415,7 +416,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-GTC-123456/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/CORE-GTC-123456/', $client->getResponse()->getContent());
     }
 
     /**
@@ -451,7 +452,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/Trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Trigger not successful/', $client->getResponse()->getContent());
     }
 
     /**
@@ -497,7 +498,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/Trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Trigger not successful/', $client->getResponse()->getContent());
     }
 
     /**
@@ -542,7 +543,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/Trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Trigger not successful/', $client->getResponse()->getContent());
     }
 
     /**
@@ -587,7 +588,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/Trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Trigger not successful/', $client->getResponse()->getContent());
     }
 
     /**
@@ -635,7 +636,7 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Bamboo trigger not successful/', $client->getResponse()->getContent());
     }
 
     /**
@@ -659,6 +660,6 @@ class BambooCoreControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/Gerrit is currently unreachable/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Gerrit is currently unreachable/', $client->getResponse()->getContent());
     }
 }

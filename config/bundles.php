@@ -25,4 +25,5 @@ return [
     Jose\Bundle\JoseFramework\JoseFrameworkBundle::class => ['all' => true],
     Http\HttplugBundle\HttplugBundle::class => ['all' => true],
     T3G\Bundle\Keycloak\T3GKeycloakBundle::class => ['all' => true],
+    Symplify\ComposerJsonManipulator\ComposerJsonManipulatorBundle::class => ['dev' => true, 'test' => true],
 ];
