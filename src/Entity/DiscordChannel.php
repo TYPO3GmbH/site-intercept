@@ -40,7 +40,7 @@ class DiscordChannel
     private string $channelName = '';
 
     /**
-     * @ORM\Column(type="integer", options={"default"="0"})
+     * @ORM\Column(type="integer", options={"default": "0"})
      */
     private int $channelType = 0;
 
