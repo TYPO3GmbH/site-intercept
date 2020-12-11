@@ -26,8 +26,6 @@ class DocsServerNginxService
 
     protected string $privateDir;
 
-    protected string $subDir;
-
     protected string $staticDir;
 
     protected Filesystem $filesystem;
@@ -47,24 +45,22 @@ location ~ ^%s(.*) {
      * @param DocsServerRedirectRepository $redirectRepository
      * @param Filesystem $fileSystem
      * @param string $privateDir
-     * @param string $subDir
      * @param $staticDir
      */
-    public function __construct(DocsServerRedirectRepository $redirectRepository, Filesystem $fileSystem, string $privateDir, string $subDir, $staticDir)
+    public function __construct(DocsServerRedirectRepository $redirectRepository, Filesystem $fileSystem, string $privateDir, $staticDir)
     {
         $this->redirectRepository = $redirectRepository;
         $this->privateDir = $privateDir;
-        $this->subDir = $subDir;
         $this->filesystem = $fileSystem;
         $this->staticDir = $staticDir;
     }
 
-    public function createRedirectConfigFile(): string
+    public function getDynamicConfiguration(): array
     {
         $redirects = $this->redirectRepository->findAll();
-        $content = '';
+        $content = [];
         foreach ($redirects as $redirect) {
-            $content .= chr(10) . sprintf(
+            $content[] = sprintf(
                 $redirect->getIsLegacy() ? $this->legacyRedirectTemplate : $this->redirectTemplate,
                 $redirect->getId(),
                 $redirect->getCreatedAt()->format('d.m.Y H:i'),
@@ -75,33 +71,7 @@ location ~ ^%s(.*) {
             );
         }
 
-        $filename = $this->getPrivateDirectory() . 'nginx_redirects_%s.conf';
-        $filename = sprintf($filename, (new \DateTime())->format('Ymd-His'));
-        $this->filesystem->dumpFile($filename, $content);
-        return $filename;
-    }
-
-    /**
-     * Finds the latest configuration file being in place
-     *
-     * @return null|SplFileInfo
-     */
-    public function findCurrentConfiguration(): ?SplFileInfo
-    {
-        if (!is_dir($this->getPrivateDirectory())) {
-            return null;
-        }
-
-        $files = (new Finder())
-            ->in($this->getPrivateDirectory())
-            ->files()
-            ->name('nginx_redirects_*.conf')
-            ->sortByName()
-            ->reverseSorting();
-
-        $iterator = $files->getIterator();
-        $iterator->rewind();
-        return $iterator->current();
+        return $content;
     }
 
     /**
@@ -123,14 +93,6 @@ location ~ ^%s(.*) {
         $iterator = $file->getIterator();
         $iterator->rewind();
         return $iterator->current();
-    }
-
-    /**
-     * @return string
-     */
-    private function getPrivateDirectory(): string
-    {
-        return rtrim($this->privateDir, '/') . '/' . rtrim($this->subDir, '/') . '/';
     }
 
     /**

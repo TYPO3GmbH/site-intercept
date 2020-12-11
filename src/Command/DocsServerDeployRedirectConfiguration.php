@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Use this command to create the nginx redirects configuration file and trigger a deployment.
  * @codeCoverageIgnore
  */
-class DocsServerRedirectCreateConfigurationFileCommand extends Command
+class DocsServerDeployRedirectConfiguration extends Command
 {
     protected static $defaultName = 'app:docs-redirect-deploy';
 
@@ -45,11 +45,8 @@ class DocsServerRedirectCreateConfigurationFileCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $io->title('Creating nginx redirect configuration file');
-        $filename = $this->nginxService->createRedirectConfigFile();
-        $io->writeln('nginx redirect configuration created: ' . $filename);
-        $io->writeln('trigger now the deployment');
-        $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
+        $io->title('Deploy nginx redirects configuration');
+        $this->bambooService->triggerDocumentationRedirectsPlan();
         $io->success('done');
 
         return 0;

@@ -99,12 +99,12 @@
                                 <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <span class="modal-title" id="currentConfigurationLabel">{{ currentConfiguration.fileName }}</span>
+                                            <span class="modal-title" id="currentConfigurationLabel">nginx_redirects_dynamic.conf</span>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
-                                        <pre><code class="language-nginx">{{ currentConfiguration.contents }}</code></pre>
+                                        <pre><code class="language-nginx">{% for redirect in currentConfiguration %}{{ redirect }}&#10;{% endfor %}</code></pre>
                                     </div>
                                 </div>
                             </div>
