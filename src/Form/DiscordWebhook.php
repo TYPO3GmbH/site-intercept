@@ -69,7 +69,7 @@ class DiscordWebhook extends AbstractType
             ->add('avatarUrl', null)
             ->add('submit', SubmitType::class, [
                 'label' => 'Save',
-                'attr' => ['class' => 'btn btn-primary pull-right'],
+                'attr' => ['class' => 'btn btn-primary'],
             ]);
     }
 

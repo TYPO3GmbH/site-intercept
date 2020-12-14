@@ -23,7 +23,7 @@
                         <tr data-id="{{ deployment.id }}" data-created="{{ deployment.createdAt|date('m/d/y, H:i', "UTC") }}">
                             <th data-type="icon">
                                 <a href="{{ deployment.repositoryUrl }}" title="{{ deployment.repositoryUrl }}" class="datatable-link-highlight" rel="noopener" target="_blank">
-                                    <i class="fab fa-fw fa-git-alt"></i>
+                                    {{ icon('actions-git') }}
                                 </a>
                             </th>
                             <th data-type="title">
@@ -67,7 +67,7 @@
                         path('admin_docs_deployments'),
                         'back to list',
                         'outline-secondary',
-                        'arrow-left'
+                        'actions-arrow-left'
                     )
                 }}
             </div>
@@ -76,8 +76,8 @@
                     <input type="hidden" name="_method" value="DELETE">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ deployment.getId()) }}">
                     <button class="btn btn-danger" id="docsformdelete">
-                        <span class="btn-icon"><i class="fa fa-trash"></i></span>
-                        <span class="btn-text">Delete</span>
+                        {{ icon('actions-delete') }}
+                        Delete
                     </button>
                 </form>
             </div>

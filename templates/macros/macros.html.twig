@@ -1,6 +1,13 @@
 {% macro linkbutton(link, label, class = 'default', icon = null) %}
     <a href="{{ link }}" class="btn btn-{{ class }}">
-        {% if icon %}<span class="btn-icon"><i class="fa fa-{{ icon }}"></i></span>{% endif %}
-        <span class="btn-text">{{ label }}</span>
+        {% if icon %}
+            {% set iconCategory = icon|split('-') %}
+            {% if iconCategory[0] in ['actions', 'apps', 'avatar', 'content', 'default', 'files', 'form', 'information', 'install', 'mimetypes', 'miscellaneous', 'module', 'modulegroup', 'overlay', 'spinner', 'status'] %}
+                {{ icon(icon) }}
+            {% else %}
+                <i class="fa fa-{{ icon }}"></i>
+            {% endif %}
+        {% endif %}
+        {{ label }}
     </a>
 {% endmacro %}
