@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 
 class GerritCommitMessageTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */
@@ -28,9 +29,9 @@ class GerritCommitMessageTest extends TestCase
         $forgeIssue = $this->prophesize(ForgeNewIssue::class);
         $forgeIssue->id = '4711';
         $subject = new GerritCommitMessage($pullRequestProphecy->reveal(), $forgeIssue->reveal());
-        $this->assertRegExp('/^\[TASK\] Patch title/', $subject->message);
-        $this->assertRegExp('/Patch body/', $subject->message);
-        $this->assertRegExp('/4711/', $subject->message);
+        $this->assertMatchesRegularExpression('/^\[TASK\] Patch title/', $subject->message);
+        $this->assertMatchesRegularExpression('/Patch body/', $subject->message);
+        $this->assertMatchesRegularExpression('/4711/', $subject->message);
     }
 
     /**
@@ -44,9 +45,9 @@ class GerritCommitMessageTest extends TestCase
         $forgeIssue = $this->prophesize(ForgeNewIssue::class);
         $forgeIssue->id = '4711';
         $subject = new GerritCommitMessage($pullRequestProphecy->reveal(), $forgeIssue->reveal());
-        $this->assertRegExp('/^\[TASK\] 0123456789012345678901234567890123456789012345678901234567890123456/', $subject->message);
-        $this->assertRegExp('/Patch body/', $subject->message);
-        $this->assertRegExp('/4711/', $subject->message);
+        $this->assertMatchesRegularExpression('/^\[TASK\] 0123456789012345678901234567890123456789012345678901234567890123456/', $subject->message);
+        $this->assertMatchesRegularExpression('/Patch body/', $subject->message);
+        $this->assertMatchesRegularExpression('/4711/', $subject->message);
     }
 
     /**
@@ -60,8 +61,8 @@ class GerritCommitMessageTest extends TestCase
         $forgeIssue = $this->prophesize(ForgeNewIssue::class);
         $forgeIssue->id = '4711';
         $subject = new GerritCommitMessage($pullRequestProphecy->reveal(), $forgeIssue->reveal());
-        $this->assertRegExp('/^\[BUGFIX\] Patch title/', $subject->message);
-        $this->assertRegExp('/Patch body/', $subject->message);
-        $this->assertRegExp('/4711/', $subject->message);
+        $this->assertMatchesRegularExpression('/^\[BUGFIX\] Patch title/', $subject->message);
+        $this->assertMatchesRegularExpression('/Patch body/', $subject->message);
+        $this->assertMatchesRegularExpression('/4711/', $subject->message);
     }
 }

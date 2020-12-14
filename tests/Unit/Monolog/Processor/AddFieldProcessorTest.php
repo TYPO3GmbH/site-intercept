@@ -18,6 +18,7 @@ use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 class AddFieldProcessorTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */

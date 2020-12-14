@@ -23,6 +23,7 @@ use Prophecy\Argument;
 
 class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */
@@ -138,8 +139,8 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
         $client = static::createClient();
         $client->request('GET', '/admin/split/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/a048046f-3204-45f6-9572-cb7af54ad7d5/', $client->getResponse()->getContent());
-        $this->assertRegExp('/Git command error output: Everything up-to-date/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/a048046f-3204-45f6-9572-cb7af54ad7d5/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Git command error output: Everything up-to-date/', $client->getResponse()->getContent());
     }
 
     /**
@@ -178,8 +179,8 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         // The branch is shown
-        $this->assertRegExp(
-            '/Triggered split job for core branch "master"/',
+        $this->assertMatchesRegularExpression(
+            '/Triggered split job for core branch &quot;master&quot;/',
             $client->getResponse()->getContent()
         );
     }
@@ -221,8 +222,8 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         // The tag is shown
-        $this->assertRegExp(
-            '/Triggered tag job with tag "v9.5.1"/',
+        $this->assertMatchesRegularExpression(
+            '/Triggered tag job with tag &quot;v9.5.1&quot;/',
             $client->getResponse()->getContent()
         );
     }

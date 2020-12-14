@@ -117,7 +117,6 @@ services:
         arguments:
             $privateDir: '%kernel.project_dir%/var'
             $staticDir: '%kernel.project_dir%/config/nginx'
-            $subDir: 'docs-redirects'
         tags:
             - testDouble
 

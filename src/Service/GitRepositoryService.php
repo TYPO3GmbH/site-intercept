@@ -35,7 +35,7 @@ class GitRepositoryService
         self::SERVICE_GITHUB => 'https://raw.githubusercontent.com/{repoName}/{version}/composer.json',
     ];
 
-    protected array $allowedBranches = ['master', 'documentation-draft'];
+    protected array $allowedBranches = ['master', 'main', 'documentation-draft'];
 
     public function resolvePublicComposerJsonUrlByPayload(stdClass $payload, string $repoService): string
     {

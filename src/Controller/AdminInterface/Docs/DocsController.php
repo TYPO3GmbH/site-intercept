@@ -83,7 +83,7 @@ class DocsController extends AbstractController
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
-                    'Triggered fluid view helper build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                    'Triggered fluid view helper build "' . $bambooTriggered->buildResultKey . '"'
                     . ' of plan key "CORE-DRF".'
                 );
                 $this->logger->info(
@@ -120,7 +120,7 @@ class DocsController extends AbstractController
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
-                    'Triggered surf 2.0 build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                    'Triggered surf 2.0 build "' . $bambooTriggered->buildResultKey . '"'
                     . ' of plan key "CORE-DRS".'
                 );
                 $this->logger->info(
@@ -157,7 +157,7 @@ class DocsController extends AbstractController
             if (!empty($bambooTriggered->buildResultKey)) {
                 $this->addFlash(
                     'success',
-                    'Triggered surf master build <a href="https://bamboo.typo3.com/browse/' . $bambooTriggered->buildResultKey . '" rel="noopener noreferrer" target="_blank">' . $bambooTriggered->buildResultKey . '</a>'
+                    'Triggered surf master build "' . $bambooTriggered->buildResultKey . '"'
                     . ' of plan key "CORE-DRSM".'
                 );
                 $this->logger->info(

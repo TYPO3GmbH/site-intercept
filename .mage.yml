@@ -43,8 +43,6 @@ magephp:
       on-deploy:
         - exec: { cmd: "rm -Rf var/log"}
         - fs/link: { from: "../../../../shared/var/log", to: "var/log" }
-        - fs/link: { from: "../../../../shared/var/docs-redirects", to: "var/docs-redirects" }
-        - fs/link: { from: "../../../../shared/var/docs-redirects", to: "public/docs-redirects" }
         - fs/link: { from: "../../../../shared/var/docs-build-information", to: "var/docs-build-information" }
         - fs/link: { from: "../../../../shared/var/docs-build-information", to: "public/docs-build-information" }
         - fs/link: { from: "../../../../shared/var/patches", to: "var/patches" }
@@ -76,8 +74,6 @@ magephp:
       on-deploy:
         - exec: { cmd: "rm -Rf var/log"}
         - fs/link: { from: "../../../../shared/var/log", to: "var/log" }
-        - fs/link: { from: "../../../../shared/var/docs-redirects", to: "var/docs-redirects" }
-        - fs/link: { from: "../../../../shared/var/docs-redirects", to: "public/docs-redirects" }
         - fs/link: { from: "../../../../shared/var/docs-build-information", to: "var/docs-build-information" }
         - fs/link: { from: "../../../../shared/var/docs-build-information", to: "public/docs-build-information" }
         - fs/link: { from: "../../../../shared/var/patches", to: "var/patches" }

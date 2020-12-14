@@ -58,7 +58,7 @@ class RedirectController extends AbstractController
         Request $request,
         PaginatorInterface $paginator
     ): Response {
-        $currentConfigurationFile = $this->nginxService->findCurrentConfiguration();
+        $currentConfigurationFile = $this->nginxService->getDynamicConfiguration();
         $staticConfigurationFile = $this->nginxService->getStaticConfiguration();
         $recentLogsMessages = $graylogService->getRecentRedirectActions();
 
@@ -132,7 +132,7 @@ class RedirectController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="admin_redirect_show", methods={"GET"})
+     * @Route("/{id<\d+>}", name="admin_redirect_show", methods={"GET"})
      * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param DocsServerRedirect $redirect
      * @return Response
@@ -149,7 +149,7 @@ class RedirectController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="admin_redirect_edit", methods={"GET","POST"})
+     * @Route("/{id<\d+>}/edit", name="admin_redirect_edit", methods={"GET","POST"})
      * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @param DocsServerRedirect $redirect
@@ -179,7 +179,7 @@ class RedirectController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="admin_redirect_delete", methods={"DELETE"})
+     * @Route("/{id<\d+>}", name="admin_redirect_delete", methods={"DELETE"})
      * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @param DocsServerRedirect $redirect
@@ -200,6 +200,24 @@ class RedirectController extends AbstractController
     }
 
     /**
+     * @Route("/dynamic", name="admin_redirect_dynamic", methods={"GET"})
+     * @return Response
+     */
+    public function getDynamicRedirects(): Response
+    {
+        return new Response(implode(chr(10), $this->nginxService->getDynamicConfiguration()));
+    }
+
+    /**
+     * @Route("/static", name="admin_redirect_static", methods={"GET"})
+     * @return Response
+     */
+    public function getStaticRedirects(): Response
+    {
+        return new Response($this->nginxService->getStaticConfiguration()->getContents());
+    }
+
+    /**
      * @param string $triggeredBySubType
      * @param DocsServerRedirect $redirect
      */
@@ -207,8 +225,7 @@ class RedirectController extends AbstractController
         string $triggeredBySubType,
         DocsServerRedirect $redirect
     ): void {
-        $filename = $this->nginxService->createRedirectConfigFile();
-        $bambooBuildTriggered = $this->bambooService->triggerDocumentationRedirectsPlan(basename($filename));
+        $bambooBuildTriggered = $this->bambooService->triggerDocumentationRedirectsPlan();
 
         $this->logger->info(
             'Triggered redirects deployment',

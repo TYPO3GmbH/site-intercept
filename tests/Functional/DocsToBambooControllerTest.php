@@ -24,6 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class DocsToBambooControllerTest extends KernelTestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @var EntityManagerInterface
      */
@@ -32,7 +33,7 @@ class DocsToBambooControllerTest extends KernelTestCase
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $kernel = self::bootKernel();
 

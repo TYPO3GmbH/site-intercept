@@ -76,8 +76,8 @@ public class DocsRedirectsSpec extends AbstractSpec {
                                     + "set -x\n\n"
                                     + "ls -la\n\n"
                                     + "mkdir nginx\n\n"
-                                    + "curl https://intercept.typo3.com/docs-redirects/${bamboo_REDIRECT_FILE} --output nginx/${bamboo_REDIRECT_FILE}\n"
-                                    + "curl https://intercept.typo3.com/build/nginx/redirects.conf --output nginx/redirects.conf\n\n"
+                                    + "curl https://intercept.typo3.com/redirect/dynamic --output nginx/nginx_redirects_dynamic.conf\n"
+                                    + "curl https://intercept.typo3.com/redirect/static --output nginx/redirects.conf\n\n"
                                     + "echo \"done\"\n"
                                     + "ls -la"
                                 ),
@@ -139,8 +139,7 @@ public class DocsRedirectsSpec extends AbstractSpec {
                         .artifactSubscriptions(new ArtifactSubscription()
                             .artifact("nginx.tgz"))
                         .cleanWorkingDirectory(true)))
-            .variables(new Variable("REDIRECT_FILE", ""),
-                new Variable("REPOSITORY_URL", ""),
+            .variables(new Variable("REPOSITORY_URL", ""),
                 new Variable("VERSION_NUMBER", "master"))
             .planBranchManagement(new PlanBranchManagement()
                 .delete(new BranchCleanup())

@@ -23,6 +23,7 @@ use Prophecy\Argument;
 
 class DocsControllerTest extends AbstractFunctionalWebTestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */
@@ -53,7 +54,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/docs');
         $response = $client->getResponse()->getContent();
-        $this->assertRegExp('/12345/', $response);
+        $this->assertMatchesRegularExpression('/12345/', $response);
     }
 
     /**
@@ -98,7 +99,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $client->request('GET', '/admin/docs');
         $response = $client->getResponse()->getContent();
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Render Fluid View Helper Reference 9.5/', $response);
+        $this->assertMatchesRegularExpression('/Render Fluid View Helper Reference 9.5/', $response);
     }
 
     /**
@@ -110,7 +111,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/docs');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Render TYPO3 Surf 2.0 Documentation/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Render TYPO3 Surf 2.0 Documentation/', $client->getResponse()->getContent());
     }
 
     /**
@@ -122,7 +123,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($client);
         $client->request('GET', '/admin/docs');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Render TYPO3 Surf Master Documentation/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Render TYPO3 Surf Master Documentation/', $client->getResponse()->getContent());
     }
 
     /**
@@ -155,7 +156,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-DRF-123/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/CORE-DRF-123/', $client->getResponse()->getContent());
     }
 
     /**
@@ -188,7 +189,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-DRS-123/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/CORE-DRS-123/', $client->getResponse()->getContent());
     }
 
     /**
@@ -221,7 +222,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
-        $this->assertRegExp('/CORE-DRSM-123/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/CORE-DRSM-123/', $client->getResponse()->getContent());
     }
 
     /**
@@ -254,7 +255,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $form = $crawler->selectButton('Render Fluid View Helper Reference 9.5')->form();
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Bamboo trigger not successful/', $client->getResponse()->getContent());
     }
 
     /**
@@ -287,7 +288,7 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $form = $crawler->selectButton('Render TYPO3 Surf 2.0 Documentation')->form();
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Bamboo trigger not successful/', $client->getResponse()->getContent());
     }
 
     /**
@@ -320,6 +321,6 @@ class DocsControllerTest extends AbstractFunctionalWebTestCase
         $form = $crawler->selectButton('Render TYPO3 Surf Master Documentation')->form();
         $client->submit($form);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRegExp('/Bamboo trigger not successful/', $client->getResponse()->getContent());
+        $this->assertMatchesRegularExpression('/Bamboo trigger not successful/', $client->getResponse()->getContent());
     }
 }

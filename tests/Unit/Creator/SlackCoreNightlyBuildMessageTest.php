@@ -31,7 +31,7 @@ class SlackCoreNightlyBuildMessageTest extends TestCase
     {
         $message = new SlackCoreNightlyBuildMessage(0, 'CORE-TL-1234', 'Core', 'Testbed lolli', 1234);
         $json = json_encode($message);
-        $this->assertRegExp('/"color":"danger"/', $json);
+        $this->assertMatchesRegularExpression('/"color":"danger"/', $json);
     }
 
     /**
@@ -41,7 +41,7 @@ class SlackCoreNightlyBuildMessageTest extends TestCase
     {
         $message = new SlackCoreNightlyBuildMessage(1, 'CORE-TL-1234', 'Core', 'Testbed lolli', 1234);
         $json = json_encode($message);
-        $this->assertRegExp('/"color":"good"/', $json);
-        $this->assertRegExp('/CORE-TL-1234/', $json);
+        $this->assertMatchesRegularExpression('/"color":"good"/', $json);
+        $this->assertMatchesRegularExpression('/CORE-TL-1234/', $json);
     }
 }

@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 
 class RabbitConsumerServiceTest extends TestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @test
      */

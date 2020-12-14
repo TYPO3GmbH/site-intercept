@@ -186,8 +186,8 @@ public class DocsRenderingSpec extends AbstractSpec {
             + "git clone ${repository_url} project\n"
             + "cd project && git checkout ${source_branch}\n"
             + "cd ..\n\n"
-            + createJobFile()
             + restoreModificationTime()
+            + createJobFile()
             + "function renderDocs() {\n"
             + "    docker run \\\n"
             + "        -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/project:/PROJECT \\\n"

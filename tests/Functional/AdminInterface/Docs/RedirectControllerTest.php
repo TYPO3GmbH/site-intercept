@@ -21,6 +21,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class RedirectControllerTest extends AbstractFunctionalWebTestCase
 {
+    use \Prophecy\PhpUnit\ProphecyTrait;
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Client
      */
@@ -46,9 +47,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains('<table class="datatable-table">', $content);
-        $this->assertContains('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertContains('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('<table class="datatable-table">', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
 
     /**
@@ -59,9 +60,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1');
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains('<table class="datatable-table">', $content);
-        $this->assertContains('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertContains('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('<table class="datatable-table">', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
 
     /**
@@ -72,8 +73,8 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertContains('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
 
     /**
@@ -87,9 +88,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $crawler = $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertContains('/p/vendor/packageNew/1.0/Foo.html', $content);
-        $this->assertContains('302', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('302', $content);
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
@@ -111,9 +112,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains('/p/vendor/packageOld/1.0/Bar.html', $content);
-        $this->assertContains('/p/vendor/packageNew/1.0/Bar.html', $content);
-        $this->assertContains('302', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Bar.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Bar.html', $content);
+        $this->assertStringContainsString('302', $content);
     }
 
     /**
@@ -146,8 +147,8 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains('/p/vendor/packageOld/4.0/Bar.html', $content);
-        $this->assertContains('/p/vendor/packageNew/4.0/Bar.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/4.0/Bar.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/4.0/Bar.html', $content);
     }
 
     /**
@@ -161,8 +162,8 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertContains('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
 
         $crawler = $this->client->request('GET', '/redirect/1/edit');
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
@@ -180,9 +181,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->client->request('GET', '/redirect/');
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertNotContains('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertNotContains('/p/vendor/packageNew/1.0/Foo.html', $content);
-        $this->assertContains('no records found', $content);
+        $this->assertStringNotContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringNotContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('no records found', $content);
     }
 
     private function createPlainBambooProphecy()
@@ -223,7 +224,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $responseCrawler->addHtmlContent($content);
         $sourceLabel = $responseCrawler->filter('#docs_server_redirect div label')->text();
         $this->assertStringContainsString('Source', $sourceLabel);
-        $this->assertStringContainsString('The path doesn\'t match the required format', $sourceLabel);
     }
 
     /**
@@ -254,7 +254,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $responseCrawler->addHtmlContent($content);
         $targetLabel = $responseCrawler->filter('#docs_server_redirect')->children()->getNode(1)->textContent;
         $this->assertStringContainsString('Target', $targetLabel);
-        $this->assertStringContainsString('The path doesn\'t match the required format', $targetLabel);
     }
 
     /**
