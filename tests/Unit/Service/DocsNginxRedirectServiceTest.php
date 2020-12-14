@@ -19,10 +19,8 @@ use Symfony\Component\Filesystem\Filesystem;
 class DocsNginxRedirectServiceTest extends TestCase
 {
     use \Prophecy\PhpUnit\ProphecyTrait;
-    /**
-     * @var DocsServerNginxService
-     */
-    private $subject;
+
+    private DocsServerNginxService $subject;
 
     public function setUp(): void
     {
@@ -56,7 +54,6 @@ class DocsNginxRedirectServiceTest extends TestCase
             $redirectRepositoryProphecy->reveal(),
             new Filesystem(),
             '/tmp/',
-            'docs-redirects',
             '/tmp/'
         );
     }
@@ -64,33 +61,9 @@ class DocsNginxRedirectServiceTest extends TestCase
     /**
      * @test
      */
-    public function createRedirectConfigFileCreatesAValidConfigFile(): void
+    public function getDynamicConfigurationCreatesValidConfig(): void
     {
-        $filename = $this->subject->createRedirectConfigFile();
-        $fileContent = file_get_contents($filename);
-
-        $this->assertNotEmpty($filename);
-        $this->assertFileExists($filename);
-        $this->assertStringContainsString('# Rule: 1 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00', $fileContent);
-        $this->assertStringContainsString('location = /p/vendor/packageOld/1.0/Foo.html {', $fileContent);
-        $this->assertStringContainsString('return 303 /p/vendor/packageNew/1.0/Foo.html;', $fileContent);
-
-        $this->assertStringContainsString('# Rule: 2 | Created: 20.03.2019 13:00 | Updated: 20.03.2019 13:00', $fileContent);
-        $this->assertStringContainsString('location = /p/vendor/packageOld/2.0/Foo.html {', $fileContent);
-        $this->assertStringContainsString('return 302 /p/vendor/packageNew/2.0/Foo.html;', $fileContent);
-
-        $this->assertStringContainsString('# Rule: 3 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00 | Legacy', $fileContent);
-        $this->assertStringContainsString('location ~ ^/typo3cms/extensions/packageOld/1.0/(.*) {', $fileContent);
-        $this->assertStringContainsString('return 303 /p/vendor/packageOld/1.0/$1;', $fileContent);
-    }
-
-    /**
-     * @test
-     */
-    public function existingConfigurationGetsContent(): void
-    {
-        $this->subject->createRedirectConfigFile();
-        $fileContent = $this->subject->findCurrentConfiguration()->getContents();
+        $fileContent = implode(chr(10), $this->subject->getDynamicConfiguration());
 
         $this->assertStringContainsString('# Rule: 1 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00', $fileContent);
         $this->assertStringContainsString('location = /p/vendor/packageOld/1.0/Foo.html {', $fileContent);
