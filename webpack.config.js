@@ -14,14 +14,6 @@ Encore
         useBuiltIns: 'usage',
         corejs: 3
     })
-    .enableSassLoader(function(sassOptions) {}, {
-        resolveUrlLoader: false
-    })
-    .enablePostCssLoader((options) => {
-        options.config = {
-            path: 'config/postcss.config.js'
-        };
-    })
     .copyFiles({
         from: './assets/images',
         to: 'images/[path][name].[hash:8].[ext]'

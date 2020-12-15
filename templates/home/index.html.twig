@@ -33,18 +33,18 @@
                         {{
                             macros.linkbutton(
                                 path('logout'),
-                                'Logout',
+                                'Sign out',
                                 'primary',
-                                'lock'
+                                'actions-logout'
                             )
                         }}
                     {% else %}
                         {{
                             macros.linkbutton(
                                 path('admin_login'),
-                                'Login',
+                                'Sign in',
                                 'primary',
-                                'unlock'
+                                'actions-login'
                             )
                         }}
                     {% endif %}

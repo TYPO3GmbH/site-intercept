@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "718387b4c80c3a59ce31dcf08dd766a0",
+    "content-hash": "4ffba41c3c699f2140bfb6615b294c3a",
     "packages": [
         {
             "name": "brick/math",
@@ -10564,16 +10564,16 @@
         },
         {
             "name": "t3g/symfony-template-bundle",
-            "version": "2.15.0",
+            "version": "2.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TYPO3GmbH/symfony-template-bundle.git",
-                "reference": "c3ff7e6c6bf9b6bfe98bf4cc1983c05fff010a2f"
+                "reference": "61bd50e786c3098dd8b4106fd7f3ac15ceebbe8b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TYPO3GmbH/symfony-template-bundle/zipball/c3ff7e6c6bf9b6bfe98bf4cc1983c05fff010a2f",
-                "reference": "c3ff7e6c6bf9b6bfe98bf4cc1983c05fff010a2f",
+                "url": "https://api.github.com/repos/TYPO3GmbH/symfony-template-bundle/zipball/61bd50e786c3098dd8b4106fd7f3ac15ceebbe8b",
+                "reference": "61bd50e786c3098dd8b4106fd7f3ac15ceebbe8b",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -10590,6 +10590,7 @@
                 "symfony/asset": "^4.4 || ^5.0",
                 "symfony/dependency-injection": "^4.4 || ^5.0",
                 "symfony/deprecation-contracts": "^2.1",
+                "symfony/form": "^4.4 || ^5.0",
                 "symfony/framework-bundle": "^4.4 || ^5.0",
                 "symfony/http-kernel": "^4.4 || ^5.0",
                 "symfony/security-bundle": "^4.4 || ^5.0",
@@ -10653,9 +10654,9 @@
                 "Templates"
             ],
             "support": {
-                "source": "https://github.com/TYPO3GmbH/symfony-template-bundle/tree/2.15.0"
+                "source": "https://github.com/TYPO3GmbH/symfony-template-bundle/tree/2.16.0"
             },
-            "time": "2020-11-16T08:10:00+00:00"
+            "time": "2020-12-14T11:03:44+00:00"
         },
         {
             "name": "t3g/symfony-usercentrics-bundle",

@@ -68,7 +68,7 @@
         "symfony/webpack-encore-bundle": "^1.0",
         "symfony/yaml": "^4.2",
         "t3g/symfony-keycloak-bundle": "^1.0",
-        "t3g/symfony-template-bundle": "^2.3",
+        "t3g/symfony-template-bundle": "^2.16",
         "t3g/symfony-usercentrics-bundle": "^1.0",
         "twig/twig": "^3.0",
         "woeler/phpdiscord": "^1.1"

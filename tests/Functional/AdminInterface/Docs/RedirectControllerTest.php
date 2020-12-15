@@ -96,7 +96,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => '/p/vendor/packageOld/1.0/Bar.html',
                 'target' => '/p/vendor/packageNew/1.0/Bar.html',
@@ -131,7 +131,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => '/p/vendor/packageOld/4.0/Bar.html',
                 'target' => '/p/vendor/packageNew/4.0/Bar.html',
@@ -208,7 +208,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => $input,
                 'target' => '/p/vendor/packageNew/4.0/Bar.html',
@@ -237,7 +237,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => '/p/vendor/packageOld/1.0/Foo.html',
                 'target' => $input,
@@ -268,7 +268,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => $input,
                 'target' => $input,

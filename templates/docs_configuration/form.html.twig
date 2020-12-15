@@ -12,13 +12,13 @@
                     <div class="text-center">
                         {% if (showPrev) %}
                         <button class="btn btn-outline-secondary" type="button" onclick="history.back();">
-                            <span class="btn-icon"><i class="fa fa-arrow-left"></i></span>
-                            <span class="btn-text">{{ button_label|default('Previous') }}</span>
+                            {{ icon('actions-arrow-left') }}
+                            Previous
                         </button>
                         {% endif %}
                         <button class="btn btn-primary pull-right">
-                            <span class="btn-icon"><i class="fa fa-arrow-right"></i></span>
-                            <span class="btn-text">{{ button_label|default('Next') }}</span>
+                            {{ icon('actions-arrow-right') }}
+                            Next
                         </button>
                     </div>
                 {{ form_end(form) }}
