@@ -149,7 +149,7 @@ abstract class AbstractSurfSpec extends AbstractSpec {
             + "        --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n"
             + "        --rm \\\n"
             + "        --entrypoint bash \\\n"
-            + "        t3docs/render-documentation:v2.6.1 \\\n"
+            + "        t3docs/render-documentation:v2.7.1 \\\n"
             + "        -c \"/ALL/Menu/mainmenu.sh makehtml -c replace_static_in_html 1 -c make_singlehtml 1 -c jobfile /PROJECT/jobfile.json; chown ${HOST_UID} -R /PROJECT /RESULT\"\n"
             + "}\n"
             + "mkdir -p RenderedDocumentation\n"
