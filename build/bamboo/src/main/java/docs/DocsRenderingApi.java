@@ -2,7 +2,6 @@ package docs;
 
 import com.atlassian.bamboo.specs.api.BambooSpec;
 import com.atlassian.bamboo.specs.api.builders.BambooKey;
-import com.atlassian.bamboo.specs.api.builders.BambooOid;
 import com.atlassian.bamboo.specs.api.builders.Variable;
 import com.atlassian.bamboo.specs.api.builders.credentials.SharedCredentialsIdentifier;
 import com.atlassian.bamboo.specs.api.builders.permission.PermissionType;
