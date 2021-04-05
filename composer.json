@@ -131,7 +131,7 @@
         "t3g:cgl:fix": [
             "php-cs-fixer fix --config build/.php_cs.dist"
         ],
-        "t3g:stan": [
+        "t3g:phpstan": [
             "phpstan analyse src/ -c build/phpstan.neon"
         ]
     },

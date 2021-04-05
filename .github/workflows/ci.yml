@@ -45,7 +45,7 @@ jobs:
         run: composer t3g:cgl
 
       - name: PHP Stan
-        run: composer t3g:stan
+        run: composer t3g:phpstan
 
       - name: Yarn install
         run: yarn install --silent
