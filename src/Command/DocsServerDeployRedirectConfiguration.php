@@ -9,8 +9,8 @@
 
 namespace App\Command;
 
-use App\Service\BambooService;
 use App\Service\DocsServerNginxService;
+use App\Service\GithubService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,15 +26,18 @@ class DocsServerDeployRedirectConfiguration extends Command
 
     protected DocsServerNginxService $nginxService;
 
-    protected BambooService $bambooService;
+    protected GithubService $githubService;
 
-    public function __construct(?string $name = null, DocsServerNginxService $nginxService, BambooService $bambooService)
+    public function __construct(?string $name = null, DocsServerNginxService $nginxService, GithubService $githubService)
     {
         parent::__construct($name);
         $this->nginxService = $nginxService;
-        $this->bambooService = $bambooService;
+        $this->githubService = $githubService;
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this
@@ -46,7 +49,7 @@ class DocsServerDeployRedirectConfiguration extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Deploy nginx redirects configuration');
-        $this->bambooService->triggerDocumentationRedirectsPlan();
+        $this->githubService->triggerDocumentationRedirectsPlan();
         $io->success('done');
 
         return 0;

@@ -34,7 +34,7 @@ class ConfigurationController extends AbstractController
 {
     /**
      * @Route("/admin/docs/deployments/add", name="admin_docs_deployments_add")
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
      * @return Response
@@ -46,7 +46,7 @@ class ConfigurationController extends AbstractController
         $documentationJar->setRepositoryUrl($repositoryUrl);
 
         $form = $this->createForm(DocumentationDeployment::class, $documentationJar);
-        $form->get('repositoryType')->setData($request->get('documentation_deployment')['repositoryType']);
+        $form->get('repositoryType')->setData($request->get('documentation_deployment')['repositoryType'] ?? '');
         $form->handleRequest($request);
         if (!empty($repositoryUrl)) {
             if (preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, $repositoryUrl) !== 1) {
@@ -72,7 +72,7 @@ class ConfigurationController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/add/step2", name="admin_docs_deployments_add_step2")
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @return Response
      */
@@ -104,7 +104,7 @@ class ConfigurationController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/add/step3", name="admin_docs_deployments_add_step3")
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @param DocumentationBuildInformationService $docBuildInfoService
      * @param BambooService $bambooService

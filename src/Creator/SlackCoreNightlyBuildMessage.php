@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 /*
@@ -67,9 +68,9 @@ class SlackCoreNightlyBuildMessage implements \JsonSerializable
     /**
      * Json ready to send to slack
      *
-     * @return array|mixed
+     * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         $failedOrSuccessful = $this->status === self::BUILD_FAILED ? ' failed.' : ' successful.';
         return [
@@ -79,12 +80,12 @@ class SlackCoreNightlyBuildMessage implements \JsonSerializable
                 [
                     'color' => $this->status === self::BUILD_FAILED ? 'danger' : 'good',
                     'text' => '<https://bamboo.typo3.com/browse/' . $this->buildKey
-                        . '|' . $this->projectName
-                        . ' › ' . $this->planName
-                        . ' › #' . $this->buildNumber . '>'
-                        . $failedOrSuccessful,
+                              . '|' . $this->projectName
+                              . ' › ' . $this->planName
+                              . ' › #' . $this->buildNumber . '>'
+                              . $failedOrSuccessful,
                     'fallback' => $this->projectName . ' › ' . $this->planName . ' › #' . $this->buildNumber . $failedOrSuccessful,
-                ]
+                ],
             ],
         ];
     }

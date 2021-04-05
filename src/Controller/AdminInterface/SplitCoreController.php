@@ -16,6 +16,7 @@ use App\Form\SplitCoreTagFormType;
 use App\Service\GraylogService;
 use App\Service\RabbitPublisherService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,7 +43,7 @@ class SplitCoreController extends AbstractController
         $tagForm = $this->createForm(SplitCoreTagFormType::class);
 
         $splitForm->handleRequest($request);
-        if ($splitForm->isSubmitted() && $splitForm->isValid()) {
+        if ($splitForm instanceof Form && $splitForm->isSubmitted() && $splitForm->isValid()) {
             $this->denyAccessUnlessGranted('ROLE_USER');
             $branch = $splitForm->getClickedButton()->getName();
             $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/heads/' . $branch]);

@@ -44,7 +44,7 @@ final class Version20190521074938 extends AbstractMigration
             ->select('id', 'package_name', 'package_type')
             ->from('documentation_jar')
             ->where(
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->eq('package_type', $queryBuilder->createNamedParameter('typo3-cms-extension')),
                     $queryBuilder->expr()->eq('package_type', $queryBuilder->createNamedParameter('typo3-cms-framework'))
                 )

@@ -3,7 +3,7 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="../config/bootstrap.php"
+         bootstrap="../tests/bootstrap.php"
 >
     <coverage processUncoveredFiles="true">
         <include>
@@ -15,6 +15,10 @@
         <env name="APP_ENV" value="test"/>
         <env name="SHELL_VERBOSITY" value="-1"/>
         <env name="GERRIT_TOKEN" value="SomeToken"/>
+        <env name="BAMBOO_AUTHORIZATION" value="Basic testing"/>
+        <env name="GERRIT_AUTHORIZATION" value="Basic testing"/>
+        <env name="FORGE_ACCESS_TOKEN" value="testing"/>
+        <env name="GITHUB_ACCESS_TOKEN" value="4711"/>
     </php>
     <testsuites>
         <testsuite name="Unit Test Suite">

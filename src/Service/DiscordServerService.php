@@ -15,6 +15,7 @@ use App\Exception\UnexpectedDiscordApiResponseException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 
@@ -119,6 +120,7 @@ class DiscordServerService
     private function request(string $url, string $method = 'GET', array $payload = []): array
     {
         $client = new Client();
+        $response = null;
         $sleep = 0;
 
         while (null !== $sleep) {
@@ -156,11 +158,13 @@ class DiscordServerService
                     throw new UnexpectedDiscordApiResponseException('Discord API responded with code ' . $e->getResponse()->getStatusCode(), 1561556560);
                 }
             }
-            $result = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+            if ($response !== null) {
+                $result = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+            }
             $sleep = $result['retry_after'] ?? null;
         }
 
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 400) {
+        if ($response instanceof ResponseInterface && ($response->getStatusCode() < 200 || $response->getStatusCode() >= 400)) {
             throw new UnexpectedDiscordApiResponseException('Discord API responded with code ' . $response->getStatusCode(), 1561556559);
         }
 

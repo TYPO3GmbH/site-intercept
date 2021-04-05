@@ -100,16 +100,6 @@ class MenuBuilder extends TemplateMenuBuider
                 ]
             );
         }
-        if ($this->authorizationChecker->isGranted('ROLE_USER')) {
-            $menu['documentation']->addChild($this->getDivider());
-            $menu['documentation']->addChild(
-                'docs_index',
-                [
-                    'route' => 'admin_docs_third_party',
-                    'label' => 'Third Party',
-                ]
-            );
-        }
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
             $menu->addChild(
                 'discord',

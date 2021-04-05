@@ -23,6 +23,7 @@ use App\Utility\BranchUtility;
 use GuzzleHttp\Exception\ServerException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -149,7 +150,7 @@ class BambooCoreController extends AbstractController
      */
     private function handlePatchForm(FormInterface $form, BambooService $bambooService): void
     {
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form instanceof Form && $form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessGranted('ROLE_USER');
             $formData = $form->getData();
             try {
@@ -206,7 +207,7 @@ class BambooCoreController extends AbstractController
      */
     private function handleTriggerForm(FormInterface $form, BambooService $bambooService): void
     {
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form instanceof Form && $form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessGranted('ROLE_USER');
             $branch = $form->getClickedButton()->getName();
             $bambooProject = BranchUtility::resolveBambooProjectKey($branch, false);

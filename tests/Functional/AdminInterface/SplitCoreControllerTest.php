@@ -20,10 +20,23 @@ use GuzzleHttp\Psr7\Response;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
+    private $graylogProphecy;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->graylogProphecy = $this->addGraylogClientProphecy();
+        $this->graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+    }
+
     /**
      * @test
      */
@@ -55,7 +68,7 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
         $rabbitClientProphecy->get(Argument::cetera())->shouldBeCalled()->willThrow(
-            new ClientException('testing', new Request('GET', ''))
+            new ClientException('testing', new Request('GET', ''), new Response())
         );
 
         $client = static::createClient();
@@ -69,6 +82,9 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
      */
     public function recentLogMessagesAreRendered()
     {
+        TestDoubleBundle::reset();
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
         TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
@@ -148,6 +164,8 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
      */
     public function splitCoreCanBeTriggered()
     {
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
         $rabbitClientProphecy->get(Argument::cetera())->willReturn(
@@ -175,7 +193,7 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger master')->form();
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         // The branch is shown
@@ -190,6 +208,8 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
      */
     public function tagCoreCanBeTriggered()
     {
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
         $rabbitClientProphecy->get(Argument::cetera())->willReturn(
@@ -218,7 +238,7 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger sub repo tagging')->form();
         $form['split_core_tag_form[tag]'] = 'v9.5.1';
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         // The tag is shown

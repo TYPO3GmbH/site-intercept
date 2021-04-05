@@ -44,6 +44,9 @@ class SendDiscordScheduledMessagesCommand extends Command
         $this->discordWebhookService = $discordWebhookService;
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this

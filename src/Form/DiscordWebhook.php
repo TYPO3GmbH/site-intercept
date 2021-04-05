@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DiscordWebhook extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $discordChannelRepository = $options['entity_manager']->getRepository(DiscordChannel::class);
         $builder

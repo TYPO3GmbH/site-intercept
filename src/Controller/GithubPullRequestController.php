@@ -61,6 +61,6 @@ class GithubPullRequestController extends AbstractController
             // should trigger a transfer of this PR
         }
 
-        return Response::create();
+        return new Response('', Response::HTTP_OK);
     }
 }

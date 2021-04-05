@@ -47,14 +47,20 @@ class BambooStatus
     {
         $this->isOnline = $online;
         if ($agentStatus !== '') {
-            $agentStatus = json_decode($agentStatus, true, 512, JSON_THROW_ON_ERROR);
-            // We consider agents that have 'enabled'=true as "online"
-            $this->onlineAgents = count(array_keys(array_column($agentStatus, 'enabled'), true, true));
-            $this->busyAgents = count(array_keys(array_column($agentStatus, 'busy'), true, true));
+            try {
+                $agentStatus = json_decode($agentStatus, true, 512, JSON_THROW_ON_ERROR);
+                // We consider agents that have 'enabled'=true as "online"
+                $this->onlineAgents = count(array_keys(array_column($agentStatus, 'enabled'), true, true));
+                $this->busyAgents = count(array_keys(array_column($agentStatus, 'busy'), true, true));
+            } catch (\JsonException $e) {
+            }
         }
         if ($queueStatus !== '') {
-            $queueStatus = json_decode($queueStatus, true, 512, JSON_THROW_ON_ERROR);
-            $this->queueLength = $queueStatus['queuedBuilds']['size'] ?? 0;
+            try {
+                $queueStatus = json_decode($queueStatus, true, 512, JSON_THROW_ON_ERROR);
+                $this->queueLength = $queueStatus['queuedBuilds']['size'] ?? 0;
+            } catch (\JsonException $e) {
+            }
         }
     }
 }

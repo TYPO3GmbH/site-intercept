@@ -10,20 +10,27 @@ declare(strict_types = 1);
 
 namespace App\GitWrapper\Event;
 
-use GitWrapper\Event\GitOutputEvent;
-use GitWrapper\Event\GitOutputListenerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symplify\GitWrapper\Event\GitOutputEvent;
 
 /**
  * A listener for git wrapper that captures stderr output, too.
  *
  * @codeCoverageIgnore Can not be tested since GitOutputEvent is final :(
  */
-class GitOutputListener implements GitOutputListenerInterface
+class GitOutputListener implements EventSubscriberInterface
 {
     /**
      * @var string Output including stderr
      */
     public string $output = '';
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            GitOutputEvent::class => ['handleOutput', 0],
+        ];
+    }
 
     /**
      * Looks ugly, but as gerrit uses stderr to output the link to the review system - even if nothing
@@ -33,7 +40,7 @@ class GitOutputListener implements GitOutputListenerInterface
      */
     public function handleOutput(GitOutputEvent $event): void
     {
-        if ($event->getType() === 'err') {
+        if ($event->isError()) {
             $this->output .= $event->getBuffer();
         }
     }

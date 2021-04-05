@@ -19,10 +19,12 @@ use App\Form\DocsDeploymentFilterType;
 use App\Repository\DocumentationJarRepository;
 use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
+use App\Service\GithubService;
 use App\Service\GraylogService;
 use App\Service\RenderDocumentationService;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -97,7 +99,7 @@ class DeploymentsController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/delete/{documentationJarId}/confirm", name="admin_docs_deployments_delete_view", requirements={"documentationJarId"="\d+"}, methods={"GET"})
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param int $documentationJarId
      * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
@@ -122,16 +124,16 @@ class DeploymentsController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/delete/{documentationJarId}", name="admin_docs_deployments_delete_action", requirements={"documentationJarId"="\d+"}, methods={"DELETE"})
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param int $documentationJarId
      * @param LoggerInterface $logger
      * @param DocumentationJarRepository $documentationJarRepository
      * @param EntityManagerInterface $entityManager
      * @param DocumentationBuildInformationService $documentationBuildInformationService
-     * @param BambooService $bambooService
-     * @return Response
+     * @param GithubService $githubService
      * @throws DocsPackageDoNotCareBranch
      * @throws ComposerJsonInvalidException
+     *@return Response
      */
     public function delete(
         int $documentationJarId,
@@ -139,30 +141,30 @@ class DeploymentsController extends AbstractController
         DocumentationJarRepository $documentationJarRepository,
         EntityManagerInterface $entityManager,
         DocumentationBuildInformationService $documentationBuildInformationService,
-        BambooService $bambooService
+        GithubService $githubService
     ): Response {
         $jar = $documentationJarRepository->find($documentationJarId);
 
         if (null !== $jar && $jar->isDeletable()) {
             $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($jar);
             $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
-            $bambooBuildTriggered = $bambooService->triggerDocumentationDeletionPlan($informationFile);
+            $buildTriggered = $githubService->triggerDocumentationDeletionPlan($informationFile);
 
             $jar
-                ->setBuildKey($bambooBuildTriggered->buildResultKey)
+                ->setBuildKey($buildTriggered->buildResultKey)
                 ->setStatus(DocumentationStatus::STATUS_DELETING);
             $entityManager->persist($jar);
             $entityManager->flush();
 
             $logger->info(
-                'Documentation deleted.',
+                'Documentation deletion triggered',
                 [
                     'type' => 'docsRendering',
                     'status' => 'packageDeleted',
                     'triggeredBy' => 'interface',
                     'repository' => $jar->getRepositoryUrl(),
                     'package' => $jar->getPackageName(),
-                    'bambooKey' => $bambooBuildTriggered->buildResultKey,
+                    'bambooKey' => $buildTriggered->buildResultKey,
                 ]
             );
         }
@@ -172,7 +174,7 @@ class DeploymentsController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/approve/{documentationJarId}", name="admin_docs_deployments_approve_action", requirements={"documentationJarId"="\d+"})
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param int $documentationJarId
      * @param DocumentationJarRepository $documentationJarRepository
      * @param EntityManagerInterface $entityManager
@@ -204,7 +206,7 @@ class DeploymentsController extends AbstractController
 
     /**
      * @Route("/admin/docs/render", name="admin_docs_render")
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @param LoggerInterface $logger
      * @param DocumentationJarRepository $documentationJarRepository
@@ -222,16 +224,16 @@ class DeploymentsController extends AbstractController
             $documentationJarId = (int)$request->get('documentation');
             $documentationJar = $documentationJarRepository->find($documentationJarId);
             if ($documentationJar === null) {
-                throw new \InvalidArgumentException('no documentationJar given', 1557930900);
+                throw new InvalidArgumentException('no documentationJar given', 1557930900);
             }
 
-            $buildInformation = $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'interface');
+            $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'interface');
             $this->addFlash('success', 'A re-rendering was triggered.');
             return $this->redirectToRoute('admin_docs_deployments');
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
             $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
+                'Cannot render documentation: ' . $e->getMessage(),
                 [
                     'type' => 'docsRendering',
                     'status' => 'unsupportedHook',
@@ -241,8 +243,7 @@ class DeploymentsController extends AbstractController
                     'exceptionCode' => $e->getCode(),
                 ]
             );
-            // 412: precondition failed
-            return Response::create('Invalid hook payload. See https://intercept.typo3.com for more information.', 412);
+            return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         } catch (DocsPackageDoNotCareBranch $e) {
             $logger->warning(
                 'Can not render documentation: ' . $e->getMessage(),
@@ -256,13 +257,13 @@ class DeploymentsController extends AbstractController
                     'sourceBranch' => $documentationJar->getBranch(),
                 ]
             );
-            return Response::create('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', 412);
+            return new Response('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         }
     }
 
     /**
      * @Route("/admin/docs/deployments/reset/{documentationJarId}", name="admin_docs_deployments_reset_action", requirements={"documentationJarId"="\d+"}, methods={"GET"})
-     * @IsGranted({"ROLE_ADMIN"})
+     * @IsGranted("ROLE_ADMIN")
      * @param int $documentationJarId
      * @param DocumentationJarRepository $documentationJarRepository
      * @param EntityManagerInterface $entityManager

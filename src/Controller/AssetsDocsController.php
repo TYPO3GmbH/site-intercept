@@ -80,8 +80,7 @@ class AssetsDocsController extends AbstractController
                 'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
             ];
         }
-
-        return JsonResponse::create($aggregatedExtensions);
+        return new JsonResponse($aggregatedExtensions);
     }
 
     /**
@@ -153,6 +152,6 @@ class AssetsDocsController extends AbstractController
 
         $javaScript = sprintf($template, $now->format(\DateTimeInterface::ATOM), $encoded);
 
-        return Response::create($javaScript, 200, ['Content-Type' => 'text/javascript']);
+        return new Response($javaScript, 200, ['Content-Type' => 'text/javascript']);
     }
 }

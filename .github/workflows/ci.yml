@@ -44,8 +44,8 @@ jobs:
       - name: (CGL) PHP
         run: composer t3g:cgl
 
-      - name: (TEST) Run unit tests
-        run: composer t3g:test:php:unit
+      - name: PHP Stan
+        run: composer t3g:stan
 
       - name: Yarn install
         run: yarn install --silent
@@ -53,8 +53,18 @@ jobs:
       - name: Yarn build
         run: yarn build
 
-      - name: (TEST) Run functional tests
-        run: composer t3g:test:php:functional
+      - name: (TEST) Run all tests with coverage
+        run: composer t3g:test:php:cover
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 2400
+
+      - name: Upload coverage results to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require twinh/php-coveralls --no-progress --no-suggest --no-interaction
+          /home/runner/.composer/vendor/bin/php-coveralls --coverage_clover=var/phpunit/coverage.xml -vvv --json_path=var/log/coveralls-upload.json
+
 
   deployment:
     name: 'Deployment'

@@ -56,7 +56,7 @@
                 <div class="card">
                     <div class="card-header" id="headingOne">
                         <button class="btn btn-link" data-toggle="collapse" data-target="#uuid{{ log.queueLog.uuid }}" aria-expanded="false" aria-controls="uuid{{ log.queueLog.uuid }}">
-                            <span>{{ localtime(log.queueLog.time) }} - </span>
+                            <span>{{ localdatetime(log.queueLog.time) }} - </span>
                             {% if log.queueLog.type == 'patch' %}
                                 <span>Split sub tree</span>
                             {% elseif log.queueLog.type == 'tag' %}
@@ -91,7 +91,7 @@
                         <div class="card-body">
                             {% for detailLog in log.detailLogs %}
                                 <div class="alert graylog-log alert-info">
-                                    <span>{{ localtime(detailLog.time) }} - </span>
+                                    <span>{{ localdatetime(detailLog.time) }} - </span>
                                     <span>Message: {{ detailLog.message }}</span>
                                 </div>
                             {% endfor %}

@@ -19,7 +19,7 @@ use Doctrine\DBAL\Types\ConversionException;
  */
 trait UtcTypeTrait
 {
-    private static ?\DateTimeZone $utc = null;
+    private static ?DateTimeZone $utc = null;
 
     /**
      * @return DateTimeZone

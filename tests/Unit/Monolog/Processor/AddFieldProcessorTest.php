@@ -12,13 +12,14 @@ namespace App\Tests\Unit\Monolog\Processor;
 
 use App\Monolog\Processor\AddFieldProcessor;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Security\Core\Security;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 class AddFieldProcessorTest extends TestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
     /**
      * @test
      */

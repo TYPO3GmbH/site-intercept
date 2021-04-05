@@ -131,8 +131,12 @@ class WebHookService
             throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
         }
         if (!empty($payload->deleted) && $payload->deleted === true) {
+            $cloneUrl = '';
+            if (is_object($payload) && isset($payload->repository)) {
+                $cloneUrl = $payload->repository->clone_url;
+            }
             throw new GitBranchDeletedException(
-                'Webhook was triggered on a deleted branch for repository ' . $payload->repository->clone_url . '.',
+                'Webhook was triggered on a deleted branch for repository' . $cloneUrl . '.',
                 1564408696
             );
         }

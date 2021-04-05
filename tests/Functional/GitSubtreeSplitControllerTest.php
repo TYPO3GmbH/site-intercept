@@ -11,16 +11,24 @@ declare(strict_types = 1);
 namespace App\Tests\Functional;
 
 use App\Bundle\TestDoubleBundle;
+use App\Kernel;
 use App\Service\CoreSplitService;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
-class GitSubtreeSplitControllerTest extends TestCase
+class GitSubtreeSplitControllerTest extends AbstractFunctionalWebTestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->addRabbitManagementClientProphecy();
+    }
+
     /**
      * @test
      */
@@ -39,7 +47,7 @@ class GitSubtreeSplitControllerTest extends TestCase
         $rabbitChannel->queue_declare('intercept-core-split-testing', false, true, false, false)->shouldBeCalled();
         $rabbitChannel->basic_publish(Argument::type(AMQPMessage::class), '', 'intercept-core-split-testing')->shouldBeCalled();
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GitSubtreeSplitPatchRequest.php';
         $response = $kernel->handle($request);
@@ -64,7 +72,7 @@ class GitSubtreeSplitControllerTest extends TestCase
         $rabbitChannel->queue_declare('intercept-core-split-testing', false, true, false, false)->shouldBeCalled();
         $rabbitChannel->basic_publish(Argument::type(AMQPMessage::class), '', 'intercept-core-split-testing')->shouldBeCalled();
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GitSubtreeSplitTagRequest.php';
         $response = $kernel->handle($request);
@@ -85,7 +93,7 @@ class GitSubtreeSplitControllerTest extends TestCase
 
         $rabbitConnectionProphecy->channel()->shouldNotBeCalled();
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GitSubtreeSplitBadRequest.php';
         $response = $kernel->handle($request);

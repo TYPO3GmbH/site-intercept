@@ -13,11 +13,12 @@ namespace App\Tests\Unit\Extractor;
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubPullRequestIssue;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Http\Message\ResponseInterface;
 
 class GithubPullRequestIssueTest extends TestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
     private $body = [
         'title' => 'Pull request title',
         'body' => 'Pull request body',

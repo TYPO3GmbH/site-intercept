@@ -9,8 +9,6 @@
 
 namespace App\Exception;
 
-use Exception;
-
-class DocsNoRstChangesException extends Exception
+class DocsNoRstChangesException extends \Exception
 {
 }

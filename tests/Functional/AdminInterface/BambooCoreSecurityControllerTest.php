@@ -21,15 +21,27 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        TestDoubleBundle::reset();
+    }
+
     /**
      * @test
      */
     public function bambooOfflineStatusIsRendered()
     {
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -46,6 +58,10 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooOnlineStatusIsRendered()
     {
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get('latest/agent/remote?os_authType=basic', Argument::cetera())->willReturn(
@@ -81,6 +97,10 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function recentLogMessagesAreRendered()
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $graylogClientProphecy = $this->prophesize(GraylogClient::class);
         TestDoubleBundle::addProphecy(GraylogClient::class, $graylogClientProphecy);
         $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
@@ -117,10 +137,14 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function renderingWorksIfGraylogThrows()
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $graylogClientProphecy = $this->prophesize(GraylogClient::class);
         TestDoubleBundle::addProphecy(GraylogClient::class, $graylogClientProphecy);
         $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willThrow(
-            new ClientException('testing', new Request('GET', ''))
+            new ClientException('testing', new Request('GET', ''), new Response())
         );
 
         $client = static::createClient();
@@ -133,6 +157,10 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function renderingWorksIfCanNotConnectGraylog()
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $graylogClientProphecy = $this->prophesize(GraylogClient::class);
         TestDoubleBundle::addProphecy(GraylogClient::class, $graylogClientProphecy);
         $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willThrow(
@@ -149,6 +177,11 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooCoreFormIsRendered()
     {
+        $this->addBambooClientProphecy();
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/bamboo/core/security');
@@ -161,6 +194,10 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooCoreCanBeTriggered()
     {
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         // Bamboo client double for the first request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
@@ -172,6 +209,10 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         // Bamboo client double for the second request
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -185,7 +226,7 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         $form = $crawler->selectButton('bamboo_core_security_trigger_form[master]')->form();
         $form['bamboo_core_security_trigger_form[change]'] = '58920';
         $form['bamboo_core_security_trigger_form[set]'] = 3;
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertMatchesRegularExpression('/CORE-GTS-123456/', $client->getResponse()->getContent());
@@ -197,6 +238,10 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
     public function bambooCoreTriggeredReturnsErrorIfBambooClientDoesNotCreateBuild()
     {
         // Bamboo client double for the first request
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -207,6 +252,10 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         // Bamboo client double for the second request
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -221,7 +270,7 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         $form = $crawler->selectButton('bamboo_core_security_trigger_form[master]')->form();
         $form['bamboo_core_security_trigger_form[change]'] = '58920';
         $form['bamboo_core_security_trigger_form[set]'] = 3;
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertMatchesRegularExpression('/Bamboo trigger not successful/', $client->getResponse()->getContent());
     }
@@ -233,6 +282,10 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
     {
         // Bamboo client double for the first request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
             new RequestException('testing', new Request('GET', ''))
@@ -243,6 +296,10 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
 
         // Bamboo client double for the second request
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
             new RequestException('testing', new Request('GET', ''))
@@ -255,7 +312,7 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         // Empty change is not allowed
         $form['bamboo_core_security_trigger_form[change]'] = '';
         $form['bamboo_core_security_trigger_form[set]'] = 3;
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertMatchesRegularExpression('/Could not determine a changeId/', $client->getResponse()->getContent());
     }
@@ -265,6 +322,9 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooCoreCanBeTriggeredByUrl()
     {
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -284,6 +344,9 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
             new Response(200, [], json_encode(['buildResultKey' => 'CORE-GTS-123456']))
         );
 
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $gerritClientProphecy = $this->prophesize(GerritClient::class);
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
         $gerritClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
@@ -297,12 +360,12 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
                     ]
                 ]
             ]))
-        );
+        )->shouldBeCalled();
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
         $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/';
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertMatchesRegularExpression('/CORE-GTS-123456/', $client->getResponse()->getContent());
@@ -313,6 +376,14 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooCoreCanBeTriggeredByUrlWithPatchSet()
     {
+        $this->tearDownProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -350,7 +421,7 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
         $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertMatchesRegularExpression('/CORE-GTS-123456/', $client->getResponse()->getContent());
@@ -361,6 +432,9 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooCoreByUrlHandlesGerritException()
     {
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -372,6 +446,9 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
             new RequestException('testing', new Request('GET', ''))
@@ -380,13 +457,13 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         $gerritClientProphecy = $this->prophesize(GerritClient::class);
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
         $gerritClientProphecy->get(Argument::cetera())->willThrow(
-            new ClientException('testing', new Request('GET', ''))
+            new ClientException('testing', new Request('GET', ''), new Response())
         );
 
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
         $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertMatchesRegularExpression('/Trigger not successful/', $client->getResponse()->getContent());
@@ -397,6 +474,9 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooCoreByUrlHandlesUnknownPatchSet()
     {
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -408,6 +488,9 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
             new RequestException('testing', new Request('GET', ''))
@@ -432,7 +515,7 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
         $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertMatchesRegularExpression('/Trigger not successful/', $client->getResponse()->getContent());
@@ -443,6 +526,9 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooCoreByUrlHandlesWrongProject()
     {
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -454,6 +540,9 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         $crawler = $client->request('GET', '/admin/bamboo/core/security');
 
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
             new RequestException('testing', new Request('GET', ''))
@@ -477,7 +566,7 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
         $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertMatchesRegularExpression('/Trigger not successful/', $client->getResponse()->getContent());
@@ -488,6 +577,12 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooCoreByUrlHandlesNonSecurityProject()
     {
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -522,7 +617,7 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
         $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/2';
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertMatchesRegularExpression('/Trigger not successful/', $client->getResponse()->getContent());
@@ -533,6 +628,12 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
      */
     public function bambooCoreByUrlHandlesBambooErrorResponse()
     {
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+        $this->addRabbitManagementClientProphecy();
+        $graylog = $this->addGraylogClientProphecy();
+        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
         $bambooClientProphecy->get(Argument::cetera())->willThrow(
@@ -570,7 +671,7 @@ class BambooCoreSecurityControllerTest extends AbstractFunctionalWebTestCase
         // Get the rendered form, feed it with some data and submit it
         $form = $crawler->selectButton('Trigger bamboo')->form();
         $form['bamboo_core_security_by_url_trigger_form[url]'] = 'https://review.typo3.org/#/c/58920/';
-        $client->submit($form);
+        $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // The build key is shown
         $this->assertMatchesRegularExpression('/Bamboo trigger not successful/', $client->getResponse()->getContent());

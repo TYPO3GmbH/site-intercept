@@ -11,6 +11,7 @@ namespace App\Extractor;
 
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
+use RuntimeException;
 
 /**
  * Holds the environment information required for rendering and deployment of documentation jobs
@@ -22,6 +23,13 @@ class DeploymentInformation
         'typo3-cms-framework' => ['c' => 'core-extension'],
         'typo3-cms-extension' => ['p' => 'extension'],
         // There is a third one 'h' => 'docs-home', handled below.
+        // There is a fourth one 'other' => 'other', handled below.
+    ];
+
+    private static array $packageTypeExceptionMap = [
+        'typo3/docs-homepage' => ['h' => 'docs-home'],
+        'typo3/view-helper-reference' => ['other' => 'other'],
+        'typo3/surf' => ['other' => 'other']
     ];
 
     /**
@@ -131,7 +139,7 @@ class DeploymentInformation
         $this->publicComposerJsonUrl = $publicComposerJsonUrl;
         $this->packageType = $composerPackageType;
         $packageName = $this->determinePackageName($composerPackageName);
-        $packageType = $this->determinePackageType($composerPackageType, $this->repositoryUrl);
+        $packageType = $this->determinePackageType($composerPackageType, $composerPackageName);
         $this->extensionKey = $extensionKey;
         $this->vendor = key($packageName);
         $this->name = current($packageName);
@@ -139,7 +147,6 @@ class DeploymentInformation
         $this->typeLong = current($packageType);
         $this->typeShort = key($packageType);
         $this->sourceBranch = $version;
-
         $this->targetBranchDirectory = $this->getTargetBranchDirectory($this->sourceBranch, $this->typeLong);
         $this->minimumTypoVersion = $minimumTypoVersion;
         $this->maximumTypoVersion = $maximumTypoVersion;
@@ -181,7 +188,7 @@ class DeploymentInformation
      * @param string $type
      * @return string
      * @throws DocsPackageDoNotCareBranch
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     private function getTargetBranchDirectory(string $branch, string $type): string
     {
@@ -225,22 +232,19 @@ class DeploymentInformation
         }
 
         // docs-home has only master branch, this is returned above already, safe to not handle this here.
-        throw new \RuntimeException('Unknown package type ' . $type);
+        throw new RuntimeException('Unknown package type ' . $type);
     }
 
     /**
      * @param string $packageType
-     * @param string $repositoryUrl
-     * @return array
+     * @param string $packageName
      * @throws ComposerJsonInvalidException
+     *@return array
      */
-    private function determinePackageType(string $packageType, string $repositoryUrl): array
+    private function determinePackageType(string $packageType, string $packageName): array
     {
-        if ($repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git') {
-            // Hard coded final location for the docs homepage repository
-            return [
-                'h' => 'docs-home',
-            ];
+        if (array_key_exists($packageName, self::$packageTypeExceptionMap)) {
+            return self::$packageTypeExceptionMap[$packageName];
         }
 
         if ($packageType === '') {

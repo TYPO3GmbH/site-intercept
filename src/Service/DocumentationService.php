@@ -35,7 +35,7 @@ class DocumentationService
 
     protected DocumentationBuildInformationService $documentationBuildInformationService;
 
-    protected BambooService $bambooService;
+    protected GithubService $githubService;
 
     protected LoggerInterface $logger;
 
@@ -46,7 +46,7 @@ class DocumentationService
         DocumentationJarRepository $documentationJarRepository,
         EntityManagerInterface $entityManager,
         DocumentationBuildInformationService $documentationBuildInformationService,
-        BambooService $bambooService,
+        GithubService $githubService,
         LoggerInterface $logger,
         SlackService $slackService
     ) {
@@ -54,7 +54,7 @@ class DocumentationService
         $this->docsRepository = $documentationJarRepository;
         $this->entityManager = $entityManager;
         $this->documentationBuildInformationService = $documentationBuildInformationService;
-        $this->bambooService = $bambooService;
+        $this->githubService = $githubService;
         $this->logger = $logger;
         $this->slackService = $slackService;
     }
@@ -81,13 +81,13 @@ class DocumentationService
 
     /**
      * @param DocumentationJar $doc
-     * @param $branchName
+     * @param string $branchName
      * @throws ComposerJsonInvalidException
      * @throws ComposerJsonNotFoundException
      * @throws DocsComposerDependencyException
      * @throws DocsComposerMissingValueException
      */
-    public function enrichWithComposerInformation(DocumentationJar $doc, $branchName): void
+    public function enrichWithComposerInformation(DocumentationJar $doc, string $branchName): void
     {
         if (empty($doc->getPublicComposerJsonUrl())) {
             $publicComposerJsonUrl = RepositoryUrlUtility::resolveComposerJsonUrl($doc->getRepositoryUrl(), $branchName);
@@ -222,6 +222,7 @@ class DocumentationService
                 $bambooBuildTriggered = $this->triggerBuild($doc);
                 $doc->setBuildKey($bambooBuildTriggered->buildResultKey);
                 $doc->setApproved(true);
+                $approved = true;
                 break;
             }
         }
@@ -258,8 +259,7 @@ class DocumentationService
      */
     public function triggerBuild(DocumentationJar $doc): BambooBuildTriggered
     {
-        $informationFile = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($doc);
-        $this->documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
-        return $this->bambooService->triggerDocumentationPlan($informationFile);
+        $deploymentInformation = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($doc);
+        return $this->githubService->triggerDocumentationPlan($deploymentInformation);
     }
 }

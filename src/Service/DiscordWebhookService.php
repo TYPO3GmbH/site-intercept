@@ -13,6 +13,7 @@ namespace App\Service;
 use App\Client\GeneralClient;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
+use JsonException;
 use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
 
 class DiscordWebhookService
@@ -60,7 +61,7 @@ class DiscordWebhookService
             try {
                 $result = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
                 $sleep = $result['retry_after'] ?? null;
-            } catch (\JsonException $e) {
+            } catch (JsonException $e) {
                 $sleep = null;
             }
         }

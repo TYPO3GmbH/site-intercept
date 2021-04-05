@@ -12,13 +12,23 @@ namespace App\Tests\Functional;
 
 use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
+use App\Kernel;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
-class GerritToBambooControllerTest extends TestCase
+class GerritToBambooControllerTest extends AbstractFunctionalWebTestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        TestDoubleBundle::reset();
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+    }
+
     /**
      * @test
      */
@@ -41,7 +51,7 @@ class GerritToBambooControllerTest extends TestCase
             ->willReturn(new Response());
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GerritToBambooGoodRequest.php';
         $response = $kernel->handle($request);
@@ -57,7 +67,7 @@ class GerritToBambooControllerTest extends TestCase
         $bambooClient->post(Argument::cetera())->shouldNotBeCalled();
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClient);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GerritToBambooBadRequest.php';
         $response = $kernel->handle($request);

@@ -13,8 +13,8 @@ namespace App\Client;
 use GuzzleHttp\Client;
 
 /**
- * Guzzle client executing calls to packagist.org API
+ * Github Guzzle Client
  */
-class PackagistClient extends Client
+class GithubClient extends Client
 {
 }

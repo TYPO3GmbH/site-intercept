@@ -21,6 +21,7 @@ use App\Service\GraylogService;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -138,7 +139,7 @@ class BambooCoreSecurityController extends AbstractController
      */
     private function handlePatchForm(FormInterface $form, BambooService $bambooService): void
     {
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form instanceof Form && $form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
             try {
                 $bambooData = new GerritToBambooCore(

@@ -26,7 +26,7 @@ class BlacklistController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/blacklist/{documentationJarId}", name="admin_docs_deployments_blacklist_action", requirements={"documentationJarId"="\d+"})
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param int $documentationJarId
      * @param DocumentationJarRepository $documentationJarRepository
      * @param EntityManagerInterface $entityManager
@@ -55,7 +55,7 @@ class BlacklistController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/blacklist", name="admin_docs_deployments_blacklist_index")
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @param PaginatorInterface $paginator
      * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
@@ -83,7 +83,7 @@ class BlacklistController extends AbstractController
 
     /**
      * @Route("/admin/docs/deployments/blacklist/delete/{entryId}", name="admin_docs_deployments_blacklist_delete_action", requirements={"entryId"="\d+"})
-     * @IsGranted({"ROLE_DOCUMENTATION_MAINTAINER"})
+     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param int $entryId
      * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
      * @param EntityManagerInterface $entityManager

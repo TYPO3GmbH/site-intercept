@@ -13,6 +13,8 @@ namespace App\Controller;
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubPushEventForCore;
 use App\Service\RabbitPublisherService;
+use Exception;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +34,8 @@ class GitSubtreeSplitController extends AbstractController
      * @Route("/split", name="core_git_split")
      * @param Request $request
      * @param RabbitPublisherService $rabbitService
-     * @throws \RuntimeException If locking goes wrong
-     * @throws \Exception
+     * @throws RuntimeException If locking goes wrong
+     * @throws Exception
      * @return Response
      */
     public function index(Request $request, RabbitPublisherService $rabbitService): Response
@@ -46,6 +48,6 @@ class GitSubtreeSplitController extends AbstractController
             // Hook payload could not be identified as hook that should trigger git split
         }
 
-        return Response::create();
+        return new Response();
     }
 }

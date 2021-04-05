@@ -13,13 +13,11 @@
                     </div>
                     {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
                         <div class="card-header-actions">
-                            {{
-                                macros.linkbutton(
-                                    path('admin_docs_deployments_add'),
-                                    'Add configuration',
-                                    'secondary'
-                                )
-                            }}
+                            {{ macros.linkbutton(
+                                path('admin_docs_deployments_add'),
+                                'Add configuration',
+                                'secondary'
+                            ) }}
                         </div>
                     {% endif %}
                 </div>
@@ -27,25 +25,25 @@
             <div class="datatable">
                 <table class="datatable-table">
                     <thead>
-                        <tr>
-                            <th scope="col" colspan="3">
-                                Package
-                                {{ knp_pagination_sortable(pagination, 'Package', 'packageName') }}
-                            </th>
-                            <th scope="col">
-                                Type
-                                {{ knp_pagination_sortable(pagination, 'Type', 'typeLong') }}
-                            </th>
-                            <th scope="col">Branch</th>
-                            <th scope="col" data-type="localdate">
-                                Last rendered
-                                {{ knp_pagination_sortable(pagination, 'Last rendered', 'lastRenderedAt') }}
-                            </th>
-                            <th scope="col">Support</th>
-                            {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
-                                <th scope="col">Actions</th>
-                            {% endif %}
-                        </tr>
+                    <tr>
+                        <th scope="col" colspan="3">
+                            Package
+                            {{ knp_pagination_sortable(pagination, 'Package', 'packageName') }}
+                        </th>
+                        <th scope="col">
+                            Type
+                            {{ knp_pagination_sortable(pagination, 'Type', 'typeLong') }}
+                        </th>
+                        <th scope="col">Branch</th>
+                        <th scope="col" data-type="localdate">
+                            Last rendered
+                            {{ knp_pagination_sortable(pagination, 'Last rendered', 'lastRenderedAt') }}
+                        </th>
+                        <th scope="col">Support</th>
+                        {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                            <th scope="col">Actions</th>
+                        {% endif %}
+                    </tr>
                     </thead>
                     <tbody>
                     {% for deployment in pagination.getItems() %}
@@ -58,7 +56,8 @@
                             <th data-type="title">
                                 <strong>{{ deployment.packageName }}</strong><br>
                                 {% if deployment.extensionKey %}
-                                    <a href="https://extensions.typo3.org/extension/{{ deployment.extensionKey }}" title="Open Extension in TER" class="datatable-link-highlight" rel="noopener noreferrer" target="_blank">
+                                    <a href="https://extensions.typo3.org/extension/{{ deployment.extensionKey }}" title="Open Extension in TER" class="datatable-link-highlight"
+                                       rel="noopener noreferrer" target="_blank">
                                         <small>ext key: {{ deployment.extensionKey }}</small>
                                     </a>
                                 {% endif %}
@@ -88,10 +87,10 @@
                             <td data-type="localdate">
                                 {% if deployment.buildKey %}
                                     <a href="https://bamboo.typo3.com/browse/{{ deployment.buildKey }}" rel="noopener noreferrer" target="_blank">
-                                        {{ localtime(deployment.lastRenderedAt) }}
+                                        {{ localdatetime(deployment.lastRenderedAt) }}
                                     </a>
                                 {% else %}
-                                    {{ localtime(deployment.lastRenderedAt) }}
+                                    {{ localdatetime(deployment.lastRenderedAt) }}
                                 {% endif %}
                             </td>
                             <td>
@@ -176,15 +175,15 @@
                             <div class="message-body">
                                 <div class="message-meta">
                                     <span class="message-date">
-                                        {{ localtime(log.time) }}
+                                        {{ localdatetime(log.time) }}
                                     </span>
                                     {% if log.userDisplayName %}
                                         <span class="message-user">- by {{ log.userDisplayName }}</span>
                                     {% endif %}
                                 </div>
                                 <div class="message-text">
-                                    {% if log.status == 'triggered' %}
-                                        <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}" rel="noopener noreferrer" target="_blank">{{ log.message }}</a>
+                                    {% if log.link %}
+                                        <a href="{{ log.link }}">{{ log.message }}</a>
                                     {% else %}
                                         {{ log.message }}
                                     {% endif %}
@@ -192,7 +191,7 @@
                                 <div class="message-detail">
                                     {% if log.bambooKey %}
                                         <div class="message-detail-item">
-                                            <span class="message-detail-key">Bamboo key</span>
+                                            <span class="message-detail-key">Build key</span>
                                             <span class="message-detail-value">{{ log.bambooKey }}</span>
                                         </div>
                                     {% endif %}

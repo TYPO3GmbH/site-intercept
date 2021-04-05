@@ -13,11 +13,12 @@ namespace App\Tests\Unit\Extractor;
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubUserData;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Http\Message\ResponseInterface;
 
 class GithubUserDataTest extends TestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
     /**
      * @test
      */
