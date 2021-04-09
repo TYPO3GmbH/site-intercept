@@ -96,8 +96,8 @@ class CoreSplitService implements CoreSplitServiceInterface
         $this->event = $event;
 
         $gitWrapper = new GitWrapper();
-        $gitWrapper->setEnvVar('HOME', getenv('GIT_HOME'));
-        $gitWrapper->setPrivateKey(getenv('GIT_SSH_PRIVATE_KEY'));
+        $gitWrapper->setEnvVar('HOME', $_ENV['GIT_HOME'] ?? '');
+        $gitWrapper->setPrivateKey($_ENV['GIT_SSH_PRIVATE_KEY'] ?? '');
         // Increase timeout to have a chance initial clone runs through
         $gitWrapper->setTimeout(300);
         $workingCopy = $gitWrapper->workingCopy($this->splitCorePath);
@@ -167,8 +167,8 @@ class CoreSplitService implements CoreSplitServiceInterface
         }
 
         $coreGitWrapper = new GitWrapper();
-        $coreGitWrapper->setEnvVar('HOME', getenv('GIT_HOME'));
-        $coreGitWrapper->setPrivateKey(getenv('GIT_SSH_PRIVATE_KEY'));
+        $coreGitWrapper->setEnvVar('HOME', $_ENV['GIT_HOME'] ?? '');
+        $coreGitWrapper->setPrivateKey($_ENV['GIT_SSH_PRIVATE_KEY'] ?? '');
         // Increase timeout to have a chance initial clone runs through
         $coreGitWrapper->setTimeout(300);
         $coreWorkingCopy = $coreGitWrapper->workingCopy($this->splitCorePath);
@@ -410,8 +410,8 @@ class CoreSplitService implements CoreSplitServiceInterface
         // different in the tagger: The splitter works on additional remotes in
         // main directory, the tagger works on clones of the extensions in own directories.
         $gitWrapper = new GitWrapper();
-        $gitWrapper->setEnvVar('HOME', getenv('GIT_HOME'));
-        $gitWrapper->setPrivateKey(getenv('GIT_SSH_PRIVATE_KEY'));
+        $gitWrapper->setEnvVar('HOME', $_ENV['GIT_HOME'] ?? '');
+        $gitWrapper->setPrivateKey($_ENV['GIT_SSH_PRIVATE_KEY'] ?? '');
         // Increase timeout to have a chance initial clone runs through
         $gitWrapper->setTimeout(300);
         $workingCopy = $gitWrapper->workingCopy($extensionCheckoutPath);

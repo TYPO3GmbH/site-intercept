@@ -92,7 +92,7 @@ class DeploymentsController extends AbstractController
                 'filter' => $form->createView(),
                 'pagination' => $pagination,
                 'logMessages' => $recentLogsMessages,
-                'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),
+                'docsLiveServer' => $_ENV['DOCS_LIVE_SERVER'] ?? '',
             ]
         );
     }
@@ -117,7 +117,7 @@ class DeploymentsController extends AbstractController
             'docs_deployments/delete.html.twig',
             [
                 'deployment' => $jar,
-                'docsLiveServer' => getenv('DOCS_LIVE_SERVER'),
+                'docsLiveServer' => $_ENV['DOCS_LIVE_SERVER'] ?? '',
             ]
         );
     }

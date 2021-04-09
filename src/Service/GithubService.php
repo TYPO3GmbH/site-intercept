@@ -50,7 +50,7 @@ class GithubService
     {
         $this->pullRequestPatchPath = $pullRequestPatchPath;
         $this->client = $client;
-        $this->accessKey = getenv('GITHUB_ACCESS_TOKEN');
+        $this->accessKey = $_ENV['GITHUB_ACCESS_TOKEN'] ?? '';
         $this->githubClient = $githubClient;
     }
 

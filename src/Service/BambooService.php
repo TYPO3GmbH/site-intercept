@@ -174,7 +174,7 @@ class BambooService
             [
                 'headers' => [
                     'accept' => 'application/json',
-                    'authorization' => $elevated ? getenv('BAMBOO_ELEVATED_AUTHORIZATION') : getenv('BAMBOO_AUTHORIZATION'),
+                    'authorization' => $elevated ? $_ENV['BAMBOO_ELEVATED_AUTHORIZATION'] ?? '' : $_ENV['BAMBOO_AUTHORIZATION'] ?? '',
                     'cache-control' => 'no-cache',
                     'content-type' => 'application/json',
                     'x-atlassian-token' => 'nocheck'

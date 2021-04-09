@@ -136,7 +136,7 @@ class GerritService
             $apiPath,
             [
                 'headers' => [
-                    'authorization' => getenv('GERRIT_AUTHORIZATION'),
+                    'authorization' => $_ENV['GERRIT_AUTHORIZATION'] ?? '',
                     'cache-control' => 'no-cache',
                     'content-type' => 'application/json'
                 ],
@@ -157,7 +157,7 @@ class GerritService
             $apiPath,
             [
                 'headers' => [
-                    'authorization' => getenv('GERRIT_AUTHORIZATION'),
+                    'authorization' => $_ENV['GERRIT_AUTHORIZATION'] ?? '',
                     'cache-control' => 'no-cache',
                     'content-type' => 'application/json'
                 ],
