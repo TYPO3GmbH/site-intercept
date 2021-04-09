@@ -133,7 +133,7 @@ class DeploymentsController extends AbstractController
      * @param GithubService $githubService
      * @throws DocsPackageDoNotCareBranch
      * @throws ComposerJsonInvalidException
-     *@return Response
+     * @return Response
      */
     public function delete(
         int $documentationJarId,

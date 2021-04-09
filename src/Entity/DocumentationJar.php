@@ -153,9 +153,9 @@ class DocumentationJar
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getTypeShort(): ?string
+    public function getTypeShort(): string
     {
         return $this->typeShort;
     }
@@ -171,9 +171,9 @@ class DocumentationJar
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getTypeLong(): ?string
+    public function getTypeLong(): string
     {
         return $this->typeLong;
     }
@@ -197,9 +197,9 @@ class DocumentationJar
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getRepositoryUrl(): ?string
+    public function getRepositoryUrl(): string
     {
         return $this->repositoryUrl;
     }

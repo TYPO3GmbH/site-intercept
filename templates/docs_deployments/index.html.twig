@@ -25,25 +25,25 @@
             <div class="datatable">
                 <table class="datatable-table">
                     <thead>
-                    <tr>
-                        <th scope="col" colspan="3">
-                            Package
-                            {{ knp_pagination_sortable(pagination, 'Package', 'packageName') }}
-                        </th>
-                        <th scope="col">
-                            Type
-                            {{ knp_pagination_sortable(pagination, 'Type', 'typeLong') }}
-                        </th>
-                        <th scope="col">Branch</th>
-                        <th scope="col" data-type="localdate">
-                            Last rendered
-                            {{ knp_pagination_sortable(pagination, 'Last rendered', 'lastRenderedAt') }}
-                        </th>
-                        <th scope="col">Support</th>
-                        {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
-                            <th scope="col">Actions</th>
-                        {% endif %}
-                    </tr>
+                        <tr>
+                            <th scope="col" colspan="3">
+                                Package
+                                {{ knp_pagination_sortable(pagination, 'Package', 'packageName') }}
+                            </th>
+                            <th scope="col">
+                                Type
+                                {{ knp_pagination_sortable(pagination, 'Type', 'typeLong') }}
+                            </th>
+                            <th scope="col">Branch</th>
+                            <th scope="col" data-type="localdate">
+                                Last rendered
+                                {{ knp_pagination_sortable(pagination, 'Last rendered', 'lastRenderedAt') }}
+                            </th>
+                            <th scope="col">Support</th>
+                            {% if is_granted('ROLE_DOCUMENTATION_MAINTAINER') %}
+                                <th scope="col">Actions</th>
+                            {% endif %}
+                        </tr>
                     </thead>
                     <tbody>
                     {% for deployment in pagination.getItems() %}

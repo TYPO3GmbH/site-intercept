@@ -239,7 +239,7 @@ class DeploymentInformation
      * @param string $packageType
      * @param string $packageName
      * @throws ComposerJsonInvalidException
-     *@return array
+     * @return array
      */
     private function determinePackageType(string $packageType, string $packageName): array
     {
