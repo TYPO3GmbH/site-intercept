@@ -194,7 +194,7 @@ class DeploymentInformation
     {
         $result = $branch;
 
-        // 'master' and 'latest' become 'master'
+        // 'master', 'latest' and 'main' become 'master'
         if ($result === 'latest' || $result === 'master' || $result === 'main') {
             return 'master';
         }
@@ -219,7 +219,7 @@ class DeploymentInformation
             return implode('.', array_slice(explode('.', $result), 0, 2));
         }
 
-        if ($type === 'core-extension' || $type === 'manual') {
+        if ($type === 'core-extension' || $type === 'manual' || $type === 'other') {
             // Rules for manuals and core extensions - render branches like '8.5' as '8.5' and '8' as '8'
             $result = str_replace(['_', '-'], '.', $result);
             if (!preg_match('/^(\d+.\d+)$/', $result) && !preg_match('/^(\d+)$/', $result)) {
