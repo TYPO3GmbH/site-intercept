@@ -129,7 +129,7 @@
                         </div>
                         <div class="card-body">
                             The static configuration file is always loaded <strong>before</strong> the dynamic configuration file.
-                            To change, create pull requests in <a href="https://bitbucket.typo3.com/projects/INT/repos/intercept/browse/config/nginx/redirects.conf">intecept</a>.
+                            To change, create pull requests in intercept.
                         </div>
                         <div class="card-footer">
                             <div class="modal fade" id="staticConfiguration" tabindex="-1" role="dialog" aria-labelledby="staticConfigurationLabel" aria-hidden="true">
@@ -179,7 +179,11 @@
                                     {% endif %}
                                 </div>
                                 <div class="message-text">
-                                    <a href="https://bamboo.typo3.com/browse/{{ log.bambooKey }}">Triggered bamboo Documentation Redirects</a>
+                                    {% if log.link %}
+                                        <a href="{{ log.link }}">Triggered redirects deployment</a>
+                                    {% else %}
+                                        {{ log.message }}
+                                    {% endif %}
                                 </div>
                                 <div class="message-detail">
                                     {% if log.bambooKey %}
