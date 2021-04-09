@@ -26,7 +26,7 @@ class AddFieldProcessor
         $this->fieldValues = $fieldValues;
     }
 
-    public function __invoke(array $record)
+    public function __invoke(array $record): array
     {
         // Additional fields are hand in via services configuration
         foreach ($this->fieldValues as $fieldName => $fieldValue) {

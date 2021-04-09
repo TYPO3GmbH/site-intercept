@@ -22,8 +22,8 @@ use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Repository\RepositoryBlacklistEntryRepository;
-use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
+use App\Service\GithubService;
 use App\Service\MailService;
 use App\Service\WebHookService;
 use Psr\Log\LoggerInterface;
@@ -36,13 +36,13 @@ use Symfony\Component\Routing\Annotation\Route;
  * Trigger documentation rendering from a repository hook that calls
  * https://docs-hook.typo3.org/ or /docs/ route
  */
-class DocsToBambooController extends AbstractController
+class DocsRenderingController extends AbstractController
 {
     /**
      * @Route("/docs", name="docs_to_bamboo")
      * @Route("/", host="docs-hook.typo3.org", name="docs_hook_to_bamboo")
      * @param Request $request
-     * @param BambooService $bambooService
+     * @param GithubService $githubService
      * @param WebHookService $webhookService
      * @param DocumentationBuildInformationService $documentationBuildInformationService
      * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
@@ -52,7 +52,7 @@ class DocsToBambooController extends AbstractController
      */
     public function index(
         Request $request,
-        BambooService $bambooService,
+        GithubService $githubService,
         WebHookService $webhookService,
         DocumentationBuildInformationService $documentationBuildInformationService,
         RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
@@ -68,7 +68,7 @@ class DocsToBambooController extends AbstractController
                 try {
                     if ($repositoryBlacklistEntryRepository->isBlacklisted($pushEvent->getRepositoryUrl())) {
                         $logger->warning(
-                            'Can not render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' due to it being blacklisted.',
+                            'Cannot render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' due to it being blacklisted.',
                             [
                                 'type' => 'docsRendering',
                                 'status' => 'blacklisted',
@@ -84,10 +84,9 @@ class DocsToBambooController extends AbstractController
                     $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
                     $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
                     $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
-                    $documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
                     $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
                     // Trigger build only if status is not already "I'm rendering". Else, only set a flag that re-rendering is needed.
-                    // The re-render flag is used and reset by the bamboo post build controller if it is set, to trigger a new
+                    // The re-render flag is used and reset by the post build controller if it is set, to trigger a new
                     // rendering. This suppresses multiple builds for one repo at the same time and prevents conditions where
                     // an older build finishes after a younger triggered build which would overwrite the result af the later build.
                     if ($documentationJar->getStatus() === DocumentationStatus::STATUS_RENDERING) {
@@ -107,15 +106,8 @@ class DocsToBambooController extends AbstractController
                     } elseif (!$documentationJar->isApproved()) {
                         $logger->info('Repository present, but not approved. Do nothing.', [$documentationJar]);
                     } else {
-                        $bambooBuildTriggered = $bambooService->triggerDocumentationPlan($buildInformation);
-                        if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
-                            && $buildInformation->sourceBranch === 'master'
-                        ) {
-                            // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
-                            $bambooService->triggerDocmuntationServerWebrootResourcesPlan();
-                        }
+                        $buildTriggered = $githubService->triggerDocumentationPlan($buildInformation);
                         $documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
-                        $documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
                         $logger->info(
                             'Triggered docs build',
                             [
@@ -126,14 +118,14 @@ class DocsToBambooController extends AbstractController
                                 'package' => $buildInformation->packageName,
                                 'sourceBranch' => $buildInformation->sourceBranch,
                                 'targetBranch' => $buildInformation->targetBranchDirectory,
-                                'bambooKey' => $bambooBuildTriggered->buildResultKey,
+                                'bambooKey' => $buildTriggered->buildResultKey,
                             ]
                         );
                     }
                 } catch (ComposerJsonNotFoundException $e) {
                     // Repository did not provide a composer.json, or fetch failed
                     $logger->warning(
-                        'Can not render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' MUST have a composer.json file on top level.',
+                        'Cannot render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' MUST have a composer.json file on top level.',
                         [
                             'type' => 'docsRendering',
                             'status' => 'noComposerJson',
@@ -150,7 +142,7 @@ class DocsToBambooController extends AbstractController
                     continue;
                 } catch (ComposerJsonInvalidException $e) {
                     $logger->warning(
-                        'Can not render documentation: ' . $e->getMessage(),
+                        'Cannot render documentation: ' . $e->getMessage(),
                         [
                             'type' => 'docsRendering',
                             'status' => 'invalidComposerJson',
@@ -183,7 +175,7 @@ class DocsToBambooController extends AbstractController
                     continue;
                 } catch (DocsPackageDoNotCareBranch $e) {
                     $logger->warning(
-                        'Can not render documentation: ' . $e->getMessage(),
+                        'Cannot render documentation: ' . $e->getMessage(),
                         [
                             'type' => 'docsRendering',
                             'status' => 'noRelevantBranchOrTag',
@@ -199,7 +191,7 @@ class DocsToBambooController extends AbstractController
                     continue;
                 } catch (DocsComposerMissingValueException $e) {
                     $logger->warning(
-                        'Can not render documentation: ' . $e->getMessage(),
+                        'Cannot render documentation: ' . $e->getMessage(),
                         [
                             'type' => 'docsRendering',
                             'status' => 'missingValueInComposerJson',
@@ -215,7 +207,7 @@ class DocsToBambooController extends AbstractController
                     continue;
                 } catch (DocsComposerDependencyException $e) {
                     $logger->warning(
-                        'Can not render documentation: ' . $e->getMessage(),
+                        'Cannot render documentation: ' . $e->getMessage(),
                         [
                             'type' => 'docsRendering',
                             'status' => 'coreDependencyNotSet',
@@ -240,24 +232,24 @@ class DocsToBambooController extends AbstractController
                 }
             }
             if (count($pushEvents) === $erroredPushes) {
-                return Response::create($errorMessage, 412);
+                return new Response($errorMessage, Response::HTTP_PRECONDITION_FAILED);
             }
 
-            return Response::create();
+            return new Response(null, Response::HTTP_NO_CONTENT);
         } catch (GithubHookPingException $e) {
             // Hook payload is a 'github ping' - log that as "info / success' with the
             // url that hook came from. This is triggered by github when a new web hook is added,
             // we want to be nice and make this one succeed.
             $logger->info(
-                'Docs hook ping from github repository ' . $e->getRespositoryUrl(),
+                'Docs hook ping from github repository ' . $e->getRepositoryUrl(),
                 [
                     'type' => 'docsRendering',
                     'status' => 'githubPing',
                     'triggeredBy' => 'api',
-                    'repository' => $e->getRespositoryUrl(),
+                    'repository' => $e->getRepositoryUrl(),
                 ]
             );
-            return Response::create('Received github ping. Please push content to the repository to render some documentation. See https://intercept.typo3.com for more information.', 200);
+            return new Response('Received github ping. Please push content to the repository to render some documentation. See https://intercept.typo3.com for more information.');
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
             $logger->warning(
@@ -271,11 +263,10 @@ class DocsToBambooController extends AbstractController
                     'exceptionCode' => $e->getCode(),
                 ]
             );
-            // 412: precondition failed
-            return Response::create('Invalid hook payload. See https://intercept.typo3.com for more information.', 412);
+            return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         } catch (GitBranchDeletedException $e) {
             $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
+                'Cannot render documentation: ' . $e->getMessage(),
                 [
                     'type' => 'docsRendering',
                     'status' => 'branchDeleted',
@@ -284,10 +275,10 @@ class DocsToBambooController extends AbstractController
                     'exceptionMessage' => $e->getMessage(),
                 ]
             );
-            return Response::create('The branch in this push event has been deleted.', 412);
+            return new Response('The branch in this push event has been deleted.', Response::HTTP_PRECONDITION_FAILED);
         } catch (DocsNoRstChangesException $e) {
             $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
+                'Cannot render documentation: ' . $e->getMessage(),
                 [
                     'type' => 'docsRendering',
                     'status' => 'branchNoRstChanges',
@@ -296,7 +287,7 @@ class DocsToBambooController extends AbstractController
                     'exceptionMessage' => $e->getMessage(),
                 ]
             );
-            return Response::create('The branch has no RST changes.', 204);
+            return new Response(null, RESPONSE::HTTP_NO_CONTENT);
         }
     }
 }

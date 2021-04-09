@@ -16,12 +16,11 @@ use App\Extractor\GithubUserData;
 use App\Extractor\GitPatchFile;
 use App\Extractor\GitPushOutput;
 use App\GitWrapper\Event\GitOutputListener;
-use GitWrapper\Event\GitLoggerEventSubscriber;
-use GitWrapper\Event\GitOutputListenerInterface;
-use GitWrapper\GitWorkingCopy;
-use GitWrapper\GitWrapper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symplify\GitWrapper\EventSubscriber\GitLoggerEventSubscriber;
+use Symplify\GitWrapper\GitWorkingCopy;
+use Symplify\GitWrapper\GitWrapper;
 
 /**
  * Apply patches to local core checkout and push to gerrit
@@ -41,7 +40,7 @@ class LocalCoreGitService
      * @param GitOutputListener $listener
      * @param string $pullRequestCorePath Absolute path of local core git checkout
      */
-    public function __construct(LoggerInterface $logger, GitOutputListenerInterface $listener, string $pullRequestCorePath)
+    public function __construct(LoggerInterface $logger, GitOutputListener $listener, string $pullRequestCorePath)
     {
         $this->listener = $listener;
         $gitWrapper = new GitWrapper();
@@ -105,9 +104,9 @@ class LocalCoreGitService
     public function pushToGerrit(GithubCorePullRequest $pullRequest): GitPushOutput
     {
         $wrapper = $this->workingCopy->getWrapper();
-        $wrapper->addOutputListener($this->listener);
+        $wrapper->addOutputEventSubscriber($this->listener);
         $this->workingCopy->push('origin', 'HEAD:refs/for/' . $pullRequest->branch);
-        $wrapper->removeOutputListener($this->listener);
+        $wrapper->removeOutputEventSubscriber($this->listener);
         return new GitPushOutput($this->listener->output);
     }
 }

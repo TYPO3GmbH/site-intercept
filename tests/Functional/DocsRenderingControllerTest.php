@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 /*
@@ -10,21 +11,24 @@ declare(strict_types = 1);
 
 namespace App\Tests\Functional;
 
-use App\Bundle\ClockMockBundle;
 use App\Bundle\TestDoubleBundle;
-use App\Client\BambooClient;
 use App\Client\GeneralClient;
+use App\Client\GithubClient;
 use App\Client\SlackClient;
 use App\Entity\DocumentationJar;
 use App\Extractor\DeploymentInformation;
+use App\Kernel;
+use App\Service\GithubService;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Bridge\PhpUnit\ClockMock;
 
-class DocsToBambooControllerTest extends KernelTestCase
+class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
+
     /**
      * @var EntityManagerInterface
      */
@@ -41,15 +45,20 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->get('doctrine')
             ->getManager();
 
-        ClockMockBundle::register(DeploymentInformation::class);
-        ClockMockBundle::withClockMock(155309515.6937);
+        ClockMock::register(DeploymentInformation::class);
+        ClockMock::register(GithubService::class);
+        ClockMock::withClockMock(155309515.6937);
     }
 
     /**
      * @test
      */
-    public function bambooBuildIsNotTriggeredWithNewRepo()
+    public function githubBuildIsNotTriggeredWithNewRepo()
     {
+        $this->addRabbitManagementClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $slackClient = $this->addSlackClientProphecy();
+        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
         $generalClientProphecy
             ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
@@ -57,11 +66,11 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy->post(Argument::cetera())->shouldNotBeCalled();
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $githubClientProphecy = $this->prophesize(GithubClient::class);
+        $githubClientProphecy->post(Argument::cetera())->shouldNotBeCalled();
+        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);
 
@@ -73,8 +82,10 @@ class DocsToBambooControllerTest extends KernelTestCase
     /**
      * @test
      */
-    public function bambooBuildIsTriggered()
+    public function githubBuildIsTriggered()
     {
+        $this->addRabbitManagementClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
         $generalClientProphecy
             ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
@@ -84,8 +95,9 @@ class DocsToBambooControllerTest extends KernelTestCase
         $slackClientProphecy = $this->prophesize(SlackClient::class);
         $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
         TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
+        $this->addSlackClientProphecy();
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);
 
@@ -106,16 +118,29 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->shouldBeCalled()
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy
+        $githubClientProphecy = $this->prophesize(GithubClient::class);
+        $githubClientProphecy
             ->post(
-                file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodBambooPostUrl.txt'),
-                require __DIR__ . '/Fixtures/DocsToBambooGoodBambooPostData.php'
+                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
+                [
+                    'json' => [
+                        'event_type' => 'render',
+                        'client_payload' => [
+                            'repository_url' => 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi.git',
+                            'source_branch' => 'latest',
+                            'target_branch_directory' => 'master',
+                            'name' => 'make-good',
+                            'vendor' => 'johndoe',
+                            'type_short' => 'm',
+                            'id' => 'a2deb251e3f9bdea5a9b1d48327e5ee7173b4622',
+                        ],
+                    ],
+                ]
             )->shouldBeCalled()
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
 
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
@@ -126,8 +151,10 @@ class DocsToBambooControllerTest extends KernelTestCase
     /**
      * @test
      */
-    public function bambooBuildForMultipleBranchesIsTriggered()
+    public function githubBuildForMultipleBranchesIsTriggered()
     {
+        $this->addRabbitManagementClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
         $generalClientProphecy
             ->request('GET', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/master/composer.json')
@@ -142,8 +169,9 @@ class DocsToBambooControllerTest extends KernelTestCase
         $slackClientProphecy = $this->prophesize(SlackClient::class);
         $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
         TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
+        $this->addSlackClientProphecy();
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);
 
@@ -160,23 +188,49 @@ class DocsToBambooControllerTest extends KernelTestCase
         }
         $this->entityManager->flush();
 
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy
+        $githubClientProphecy = $this->prophesize(GithubClient::class);
+        $githubClientProphecy
             ->post(
-                file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchBambooPostUrl.txt'),
-                require __DIR__ . '/Fixtures/DocsToBambooGoodBambooPostData.php'
+                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
+                [
+                    'json' => [
+                        'event_type' => 'render',
+                        'client_payload' => [
+                            'repository_url' => 'https://bitbucket.org/pathfindermediagroup/eso-export-addon',
+                            'source_branch' => 'master',
+                            'target_branch_directory' => 'master',
+                            'name' => 'yay',
+                            'vendor' => 'bla',
+                            'type_short' => 'm',
+                            'id' => '3c8b70e38ef356984c76e1a83a08b7c1fb75027e',
+                        ],
+                    ],
+                ]
             )->shouldBeCalled()
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-        $bambooClientProphecy
+        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
+        $githubClientProphecy
             ->post(
-                file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchBambooPostUrlWithTag.txt'),
-                require __DIR__ . '/Fixtures/DocsToBambooGoodBambooPostData.php'
+                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
+                [
+                    'json' => [
+                        'event_type' => 'render',
+                        'client_payload' => [
+                            'repository_url' => 'https://bitbucket.org/pathfindermediagroup/eso-export-addon',
+                            'source_branch' => 'v1.1',
+                            'target_branch_directory' => '1.1',
+                            'name' => 'yay',
+                            'vendor' => 'bla',
+                            'type_short' => 'm',
+                            'id' => '3c8b70e38ef356984c76e1a83a08b7c1fb75027e',
+                        ],
+                    ],
+                ]
             )->shouldBeCalled()
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
 
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php';
@@ -187,13 +241,17 @@ class DocsToBambooControllerTest extends KernelTestCase
     /**
      * @test
      */
-    public function bambooBuildIsNotTriggered()
+    public function githubBuildIsNotTriggered()
     {
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy->post(Argument::cetera())->shouldNotBeCalled();
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $this->addGeneralClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $slackClient = $this->addSlackClientProphecy();
+        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
+        $githubClientProphecy = $this->prophesize(GithubClient::class);
+        $githubClientProphecy->post(Argument::cetera())->shouldNotBeCalled();
+        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/DocsToBambooBadRequest.php';
         $response = $kernel->handle($request);
@@ -203,8 +261,11 @@ class DocsToBambooControllerTest extends KernelTestCase
     /**
      * @test
      */
-    public function bambooBuildIsNotTriggeredDueToMissingDependency(): void
+    public function githubBuildIsNotTriggeredDueToMissingDependency(): void
     {
+        $this->addRabbitManagementClientProphecy();
+        $slackClient = $this->addSlackClientProphecy();
+        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
         $generalClientProphecy
             ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
@@ -212,7 +273,7 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooBadRequestComposerWithoutDependency.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);
 
@@ -228,8 +289,10 @@ class DocsToBambooControllerTest extends KernelTestCase
      *
      * @test
      */
-    public function bambooBuildIsTriggeredForPackageThatCanNotRequireItself(): void
+    public function githubBuildIsTriggeredForPackageThatCanNotRequireItself(): void
     {
+        $this->addRabbitManagementClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
         $generalClientProphecy
             ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
@@ -239,13 +302,14 @@ class DocsToBambooControllerTest extends KernelTestCase
         $slackClientProphecy = $this->prophesize(SlackClient::class);
         $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
         TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
-        $kernel = new \App\Kernel('test', true);
+        $this->addSlackClientProphecy();
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);
 
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
         $response = $kernel->handle($request);
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(204, $response->getStatusCode());
         $kernel->terminate($request, $response);
 
         $jar = $this->entityManager
@@ -262,30 +326,47 @@ class DocsToBambooControllerTest extends KernelTestCase
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy
+        $githubClientProphecy = $this->prophesize(GithubClient::class);
+        $githubClientProphecy
             ->post(
-                'latest/queue/CORE-DR?stage=&executeAllStages=&os_authType=basic&bamboo.variable.BUILD_INFORMATION_FILE=docs-build-information%2F1553095156937&bamboo.variable.PACKAGE=typo3%2Fcms-core&bamboo.variable.DIRECTORY=master',
-                require __DIR__ . '/Fixtures/DocsToBambooGoodBambooPostData.php'
+                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
+                [
+                    'json' => [
+                        'event_type' => 'render',
+                        'client_payload' => [
+                            'repository_url' => 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi.git',
+                            'source_branch' => 'latest',
+                            'target_branch_directory' => 'master',
+                            'name' => 'cms-core',
+                            'vendor' => 'typo3',
+                            'type_short' => 'c',
+                            'id' => '48a08502e6b3bcdb2b3d4f2aed4b21dbe45421ac',
+                        ],
+                    ],
+                ]
             )->shouldBeCalled()
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
 
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
         $response = $kernel->handle($request);
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(204, $response->getStatusCode());
         $kernel->terminate($request, $response);
     }
 
     /**
      * @test
      */
-    public function bambooBuildIsNotTriggeredDueToDeletedBranch(): void
+    public function githubBuildIsNotTriggeredDueToDeletedBranch(): void
     {
-        $kernel = new \App\Kernel('test', true);
+        $this->addGeneralClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $slackClient = $this->addSlackClientProphecy();
+        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);
 
@@ -301,7 +382,11 @@ class DocsToBambooControllerTest extends KernelTestCase
      */
     public function githubPingIsHandled()
     {
-        $kernel = new \App\Kernel('test', true);
+        $this->addRabbitManagementClientProphecy();
+        $slackClient = $this->addSlackClientProphecy();
+        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
+        $this->addGeneralClientProphecy();
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);
 

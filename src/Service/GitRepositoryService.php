@@ -43,13 +43,10 @@ class GitRepositoryService
             case self::SERVICE_BITBUCKET_SERVER:
             case self::SERVICE_BITBUCKET_CLOUD:
                 return $this->getPublicComposerUrlForBitbucket($payload);
-                break;
             case self::SERVICE_GITHUB:
                 return $this->getPublicComposerUrlForGithub($payload);
-                break;
             case self::SERVICE_GITLAB:
                 return $this->getPublicComposerUrlForGitlab($payload);
-                break;
             default:
                 return '';
         }
@@ -119,7 +116,7 @@ class GitRepositoryService
 
     protected function getPublicComposerUrlForBitbucket(stdClass $payload): string
     {
-        if (isset($payload->repository->links->html->href)) {
+        if (isset($payload->repository->links->html->href, $payload->repository->full_name, $payload->push->changes[0]->new->name)) {
             return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_BITBUCKET_CLOUD], [
                 '{baseUrl}' => 'https://bitbucket.org',
                 '{repoName}' => (string)$payload->repository->full_name,

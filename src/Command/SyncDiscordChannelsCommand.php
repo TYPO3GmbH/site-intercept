@@ -64,7 +64,7 @@ class SyncDiscordChannelsCommand extends Command
         $this->logger = $logger;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Sync the database with the Discord server')

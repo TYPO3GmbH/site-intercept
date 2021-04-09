@@ -25,7 +25,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DocumentationDeployment extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $optionsStep1 = $options['step2'] || $options['step3'] ? [
             'attr' => [

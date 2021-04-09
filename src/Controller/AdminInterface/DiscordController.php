@@ -17,6 +17,7 @@ use App\Repository\DiscordScheduledMessageRepository;
 use App\Repository\DiscordWebhookRepository;
 use App\Service\DiscordWebhookService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -107,7 +108,7 @@ class DiscordController extends AbstractController
      * @param DiscordChannelRepository $discordChannelRepository
      * @param DiscordWebhookRepository $discordWebhookRepository
      * @return Response
-     * @throws \Exception
+     * @throws Exception
      */
     public function webhookAdd(
         Request $request,
@@ -309,7 +310,7 @@ class DiscordController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @param DiscordChannelRepository $discordChannelRepository
      * @return Response
-     * @throws \Exception
+     * @throws Exception
      */
     public function scheduledMessageAdd(
         Request $request,
@@ -411,7 +412,7 @@ class DiscordController extends AbstractController
      * @param array $discordScheduledMessage
      * @param EntityManagerInterface $entityManager
      * @param DiscordChannelRepository $discordChannelRepository
-     * @param DiscordScheduledMessage|null $message
+     * @param DiscordScheduledMessage $message
      * @return RedirectResponse|null
      */
     protected function handleFormSubmit(
@@ -448,7 +449,7 @@ class DiscordController extends AbstractController
 
     protected function setHookPropertiesFromRequest(
         DiscordWebhook $hook,
-        $discordWebHook,
+        array $discordWebHook,
         ?DiscordChannel $channel
     ): void {
         $hook->setName($discordWebHook['name'])

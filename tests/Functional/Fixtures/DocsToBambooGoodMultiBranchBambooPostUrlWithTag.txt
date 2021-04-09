@@ -1,1 +1,0 @@
-latest/queue/CORE-DR?stage=&executeAllStages=&os_authType=basic&bamboo.variable.BUILD_INFORMATION_FILE=docs-build-information%2F1553095156937&bamboo.variable.PACKAGE=bla%2Fyay&bamboo.variable.DIRECTORY=1.1

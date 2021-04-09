@@ -13,6 +13,8 @@ namespace App\Service;
 use App\Client\SlackClient;
 use App\Creator\SlackCoreNightlyBuildMessage;
 use App\Entity\DocumentationJar;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 
@@ -76,7 +78,12 @@ class SlackService
             ],
         ];
 
-        return $this->sendMessage($message);
+        try {
+            return $this->sendMessage($message);
+        } catch (ClientException $e) {
+            // avoid UI exceptions if slack is not available
+            return new Response();
+        }
     }
 
     /**

@@ -12,14 +12,13 @@ namespace App\Service;
 
 use App\Extractor\GithubPushEventForCore;
 use App\GitWrapper\Event\GitOutputListener;
-use GitWrapper\Event\GitOutputListenerInterface;
-use GitWrapper\GitException;
-use GitWrapper\GitWorkingCopy;
-use GitWrapper\GitWrapper;
 use PhpAmqpLib\Wire\IO\AbstractIO;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symplify\GitWrapper\Exception\GitException;
+use Symplify\GitWrapper\GitWorkingCopy;
+use Symplify\GitWrapper\GitWrapper;
 
 /**
  * Split mono repo TYPO3.CMS to single repos per extension
@@ -71,22 +70,19 @@ class CoreSplitService implements CoreSplitServiceInterface
      * @param string $splitMonoRepo
      * @param string $splitSingleRepoBase
      * @param string $splitSingleRepoPath
-     * @param GitOutputListener $gitOutputListener
      */
     public function __construct(
         LoggerInterface $logger,
         string $splitCorePath,
         string $splitMonoRepo,
         string $splitSingleRepoBase,
-        string $splitSingleRepoPath,
-        GitOutputListenerInterface $gitOutputListener
+        string $splitSingleRepoPath
     ) {
         $this->logger = $logger;
         $this->splitCorePath = $splitCorePath;
         $this->splitMonoRepo = $splitMonoRepo;
         $this->splitSingleRepoBase = $splitSingleRepoBase;
         $this->splitSingleRepoPath = $splitSingleRepoPath;
-        $this->gitOutputListener = $gitOutputListener;
     }
 
     /**
@@ -315,7 +311,7 @@ class CoreSplitService implements CoreSplitServiceInterface
     private function gitCommand(GitWorkingCopy $workingCopy, bool $silent, string $command, ...$arguments)
     {
         $gitWrapper = $workingCopy->getWrapper();
-        $gitWrapper->addOutputListener($this->gitOutputListener);
+        $gitWrapper->addOutputEventSubscriber($this->gitOutputListener);
         try {
             $standardOutput = $workingCopy->run($command, $arguments);
         } catch (GitException $e) {
@@ -326,7 +322,7 @@ class CoreSplitService implements CoreSplitServiceInterface
             }
             throw $e;
         }
-        $gitWrapper->removeOutputListener($this->gitOutputListener);
+        $gitWrapper->removeOutputEventSubscriber($this->gitOutputListener);
         $errorOutput = $this->gitOutputListener->output;
         if (!empty($standardOutput) && !$silent) {
             $this->log('Git command standard output: ' . $standardOutput);
@@ -353,7 +349,7 @@ class CoreSplitService implements CoreSplitServiceInterface
             $this->log('Initial clone of mono repo ' . $this->splitMonoRepo . ' to ' . $this->splitCorePath);
 
             $gitWrapper = $workingCopy->getWrapper();
-            $gitWrapper->addOutputListener($this->gitOutputListener);
+            $gitWrapper->addOutputEventSubscriber($this->gitOutputListener);
             try {
                 $standardOutput = $workingCopy->cloneRepository($this->splitMonoRepo);
             } catch (GitException $e) {
@@ -365,7 +361,7 @@ class CoreSplitService implements CoreSplitServiceInterface
                 throw $e;
             }
             $workingCopy->setCloned(true);
-            $gitWrapper->removeOutputListener($this->gitOutputListener);
+            $gitWrapper->removeOutputEventSubscriber($this->gitOutputListener);
             $errorOutput = $this->gitOutputListener->output;
             if (!empty($standardOutput)) {
                 $this->log('Git command standard output: ' . $standardOutput);
@@ -423,7 +419,7 @@ class CoreSplitService implements CoreSplitServiceInterface
         if (!$workingCopy->isCloned()) {
             $this->log('Initial clone of extension repo ' . $extensionRemoteUrl . ' to ' . $extensionCheckoutPath);
 
-            $gitWrapper->addOutputListener($this->gitOutputListener);
+            $gitWrapper->addOutputEventSubscriber($this->gitOutputListener);
             try {
                 $standardOutput = $workingCopy->cloneRepository($extensionRemoteUrl);
             } catch (GitException $e) {
@@ -435,7 +431,7 @@ class CoreSplitService implements CoreSplitServiceInterface
                 throw $e;
             }
             $workingCopy->setCloned(true);
-            $gitWrapper->removeOutputListener($this->gitOutputListener);
+            $gitWrapper->removeOutputEventSubscriber($this->gitOutputListener);
             $errorOutput = $this->gitOutputListener->output;
             if (!empty($standardOutput)) {
                 $this->log('Git command standard output: ' . $standardOutput);
@@ -469,7 +465,7 @@ class CoreSplitService implements CoreSplitServiceInterface
             ->depth(0)
             ->sortByName();
 
-        /** @var SplFileInfo $extension */
+        /** @var array<SplFileInfo> $extensions */
         $extensions = [];
         foreach ($extensionsInTypo3conf as $extension) {
             $extensions[] = $extension->getBasename();

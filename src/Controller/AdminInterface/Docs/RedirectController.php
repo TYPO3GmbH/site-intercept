@@ -13,8 +13,8 @@ use App\Entity\DocsServerRedirect;
 use App\Form\DocsServerRedirectType;
 use App\Form\RedirectFilterType;
 use App\Repository\DocsServerRedirectRepository;
-use App\Service\BambooService;
 use App\Service\DocsServerNginxService;
+use App\Service\GithubService;
 use App\Service\GraylogService;
 use Doctrine\Common\Collections\Criteria;
 use Knp\Component\Pager\PaginatorInterface;
@@ -32,14 +32,14 @@ class RedirectController extends AbstractController
 {
     protected DocsServerNginxService $nginxService;
 
-    protected BambooService $bambooService;
+    protected GithubService $githubService;
 
     protected LoggerInterface $logger;
 
-    public function __construct(DocsServerNginxService $nginxService, BambooService $bambooService, LoggerInterface $logger)
+    public function __construct(DocsServerNginxService $nginxService, GithubService $githubService, LoggerInterface $logger)
     {
         $this->nginxService = $nginxService;
-        $this->bambooService = $bambooService;
+        $this->githubService = $githubService;
         $this->logger = $logger;
     }
 
@@ -225,7 +225,7 @@ class RedirectController extends AbstractController
         string $triggeredBySubType,
         DocsServerRedirect $redirect
     ): void {
-        $bambooBuildTriggered = $this->bambooService->triggerDocumentationRedirectsPlan();
+        $bambooBuildTriggered = $this->githubService->triggerDocumentationRedirectsPlan();
 
         $this->logger->info(
             'Triggered redirects deployment',

@@ -60,6 +60,11 @@ indent_size = 4
 indent_style = space
 indent_size = 2
 
+# Neon-Files
+[*.neon]
+indent_style = tab
+indent_size = 4
+
 # package.json
 [package.json]
 indent_style = space

@@ -11,22 +11,24 @@ declare(strict_types = 1);
 namespace App\Tests\Functional;
 
 use App\Tests\Functional\Fixtures\AssetsDocsControllerTestData;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\BrowserKit\AbstractBrowser;
 
 class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
 {
+    use ProphecyTrait;
+
     /**
-     * @var Client
+     * @var AbstractBrowser
      */
     private $client;
 
     public function setUp(): void
     {
         parent::setUp();
-        self::bootKernel();
+        $this->client = static::createClient();
         DatabasePrimer::prime(self::$kernel);
 
-        $this->client = static::createClient();
         (new AssetsDocsControllerTestData())->load(
             self::$kernel->getContainer()->get('doctrine')->getManager()
         );

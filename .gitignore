@@ -36,3 +36,10 @@ yarn-error.log
 /.ddev/keycloak-gatekeeper.conf
 /auth.json
 /build/.phpunit.result.cache
+.phpunit.result.cache
+
+###> symfony/phpunit-bridge ###
+.phpunit
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###

@@ -69,7 +69,7 @@ class ComposerJsonTest extends TestCase
      */
     public function typeIsReturnedAsExpected(): void
     {
-        $composerJson = new ComposerJson(['type' => 'package']);
+        $composerJson = new ComposerJson(['name' => '123', 'type' => 'package']);
         $this->assertSame('package', $composerJson->getType());
     }
 

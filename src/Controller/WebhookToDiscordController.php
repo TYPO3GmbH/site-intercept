@@ -36,19 +36,19 @@ class WebhookToDiscordController extends AbstractController
         $hook = $discordWebhookRepository->findOneBy(['identifier' => $identifier]);
 
         if (null === $hook) {
-            return Response::create('Webhook not found', Response::HTTP_NOT_FOUND);
+            return new Response('Webhook not found', Response::HTTP_NOT_FOUND);
         }
 
         $channel = $hook->getChannel();
 
         if (null === $channel) {
-            return Response::create('Webhook not mapped to a Discord channel', Response::HTTP_PRECONDITION_FAILED);
+            return new Response('Webhook not mapped to a Discord channel', Response::HTTP_PRECONDITION_FAILED);
         }
 
         try {
             $transformer = DiscordTransformerFactory::getTransformer($hook->getType());
         } catch (DiscordTransformerTypeNotFoundException $e) {
-            return Response::create('Webhook is of an unknown service type', Response::HTTP_PRECONDITION_FAILED);
+            return new Response('Webhook is of an unknown service type', Response::HTTP_PRECONDITION_FAILED);
         }
 
         try {
@@ -63,12 +63,12 @@ class WebhookToDiscordController extends AbstractController
                     'Could not decode webhook payload',
                     ['hook' => $hook, 'payload' => $request->getContent(), 'error' => $e->getMessage()]
                 );
-                return Response::create('Could not decode json payload', Response::HTTP_INTERNAL_SERVER_ERROR);
+                return new Response('Could not decode json payload', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
 
         if (!$transformer->shouldBeSent($content, $hook)) {
-            return Response::create('The request was ok, but not all conditions for Discord delivery were met.', Response::HTTP_NO_CONTENT);
+            return new Response('The request was ok, but not all conditions for Discord delivery were met.', Response::HTTP_NO_CONTENT);
         }
 
         $message = $transformer->getDiscordMessage($content);
@@ -81,9 +81,9 @@ class WebhookToDiscordController extends AbstractController
         try {
             $discordWebhookService->sendMessage($message, $channel->getWebhookUrl());
         } catch (GuzzleException $e) {
-            return Response::create('Discord API returned an error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new Response('Discord API returned an error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return Response::create('Ok', Response::HTTP_OK);
+        return new Response('Ok', Response::HTTP_OK);
     }
 }

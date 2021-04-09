@@ -153,15 +153,15 @@ class DocumentationJar
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getTypeShort(): ?string
+    public function getTypeShort(): string
     {
         return $this->typeShort;
     }
 
     /**
-     * @param mixed $typeShort
+     * @param string $typeShort
      * @return DocumentationJar
      */
     public function setTypeShort(string $typeShort): self
@@ -171,15 +171,15 @@ class DocumentationJar
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getTypeLong(): ?string
+    public function getTypeLong(): string
     {
         return $this->typeLong;
     }
 
     /**
-     * @param mixed $typeLong
+     * @param string $typeLong
      * @return DocumentationJar
      */
     public function setTypeLong(string $typeLong): self
@@ -197,9 +197,9 @@ class DocumentationJar
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getRepositoryUrl(): ?string
+    public function getRepositoryUrl(): string
     {
         return $this->repositoryUrl;
     }
@@ -243,7 +243,7 @@ class DocumentationJar
     }
 
     /**
-     * @param mixed $vendor
+     * @param string $vendor
      * @return DocumentationJar
      */
     public function setVendor(string $vendor): self
@@ -292,7 +292,7 @@ class DocumentationJar
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPackageType(): string
     {
@@ -300,7 +300,7 @@ class DocumentationJar
     }
 
     /**
-     * @param mixed $packageType
+     * @param string $packageType
      * @return DocumentationJar
      */
     public function setPackageType(string $packageType): self
@@ -318,7 +318,7 @@ class DocumentationJar
     }
 
     /**
-     * @param mixed $extensionKey
+     * @param string|null $extensionKey
      * @return DocumentationJar
      */
     public function setExtensionKey(?string $extensionKey): self

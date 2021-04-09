@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -28,6 +29,7 @@ class DatabasePrimer
         }
 
         // Get the entity manager from the service container
+        /** @var EntityManagerInterface $entityManager */
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
 
         // Recreate the database

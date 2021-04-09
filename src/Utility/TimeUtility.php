@@ -26,8 +26,8 @@ class TimeUtility
      */
     public static function convertSecondsToHumanReadable(int $seconds): string
     {
-        $startTime = new \DateTime('@' . 0);
-        $givenSeconds = new \DateTime('@' . $seconds);
+        $startTime = new DateTime('@' . 0);
+        $givenSeconds = new DateTime('@' . $seconds);
         $format = '%Im %Ss';
         if ($seconds > 3600) {
             $format = '%hh %Im %Ss';

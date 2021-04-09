@@ -61,20 +61,20 @@ class GithubPushEventForDocs
      */
     private function getTagOrBranchFromRef(string $ref): string
     {
-        if (strpos($ref, 'refs/tags/') === 0) {
+        if (str_starts_with($ref, 'refs/tags/')) {
             return str_replace('refs/tags/', '', $ref);
         }
-        if (strpos($ref, 'refs/heads/') === 0) {
+        if (str_starts_with($ref, 'refs/heads/')) {
             return str_replace('refs/heads/', '', $ref);
         }
         throw new DoNotCareException('no tags, no heads in ref');
     }
 
     /**
-     * @param $repositoryUrl
+     * @param string $repositoryUrl
      * @return string
      */
-    private function extractRepositoryNameFromUrl($repositoryUrl): string
+    private function extractRepositoryNameFromUrl(string $repositoryUrl): string
     {
         // Extract repository name from URL
         $path = trim(parse_url($repositoryUrl, PHP_URL_PATH), '/');

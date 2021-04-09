@@ -43,7 +43,7 @@ class GraylogService
     public function getRecentBambooTriggersAndVotes(): array
     {
         return $this->getLogs(
-            'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND level:6 AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
             . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
             . ' AND ctxt_isSecurity:0'
         );
@@ -57,7 +57,7 @@ class GraylogService
     public function getRecentBambooCoreSecurityTriggersAndVotes(): array
     {
         return $this->getLogs(
-            'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND level:6 AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
             . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
             . ' AND ctxt_isSecurity:1'
         );
@@ -72,8 +72,7 @@ class GraylogService
     public function getRecentBambooDocsActions(): array
     {
         return $this->getLogs(
-            'application:intercept AND env:' . getenv('GRAYLOG_ENV')
-            . ' AND (ctxt_type:docsRendering)'
+            'application:intercept AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '') . ' AND (ctxt_type:docsRendering)'
         );
     }
 
@@ -86,7 +85,7 @@ class GraylogService
     public function getRecentRedirectActions(): array
     {
         return $this->getLogs(
-            'application:intercept AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
             . ' AND (ctxt_type:docsRedirect)'
         );
     }
@@ -100,7 +99,7 @@ class GraylogService
     public function getRecentBambooDocsThirdPartyTriggers(): array
     {
         return $this->getLogs(
-            'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND level:6 AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
             . ' AND (ctxt_type:triggerBambooDocsThirdParty)'
         );
     }
@@ -124,7 +123,7 @@ class GraylogService
     public function getRecentSplitActions(): array
     {
         $queueLogs = $this->getLogs(
-            'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
+            'application:intercept AND level:6 AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
             . ' AND ctxt_status:queued AND (ctxt_type:patch OR ctxt_type:tag)'
         );
         $splitActions = [];
@@ -135,7 +134,7 @@ class GraylogService
                 'detailLogs' => [],
             ];
             $detailLogs = $this->getLogs(
-                'application:intercept AND level:6 AND env:' . getenv('GRAYLOG_ENV')
+                'application:intercept AND level:6 AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
                 . ' AND !(ctxt_status:queued)'
                 . ' AND (ctxt_type:patch OR ctxt_type:tag)'
                 . ' AND ctxt_job_uuid:' . $queueLog->uuid,
@@ -170,7 +169,7 @@ class GraylogService
                 . '&sort=' . urlencode('timestamp:desc')
                 . '&pretty=true',
                 [
-                    'auth' => [getenv('GRAYLOG_TOKEN'), 'token'],
+                    'auth' => [$_ENV['GRAYLOG_TOKEN'], 'token'],
                     'headers' => ['accept' => 'application/json'],
                 ]
             );
@@ -182,15 +181,7 @@ class GraylogService
                 }
             }
             return $messages;
-        } catch (ClientException $e) {
-            // Silent fail if graylog is broken
-            $this->logger->critical($e->getMessage(), ['exception' => $e]);
-            return [];
-        } catch (ConnectException $e) {
-            // Silent fail if graylog is down
-            $this->logger->critical($e->getMessage(), ['exception' => $e]);
-            return [];
-        } catch (ServerException $e) {
+        } catch (ClientException | ConnectException | ServerException $e) {
             // Silent fail if graylog is down
             $this->logger->critical($e->getMessage(), ['exception' => $e]);
             return [];

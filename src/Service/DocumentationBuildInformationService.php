@@ -26,6 +26,7 @@ use App\Extractor\PushEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use GuzzleHttp\Exception\GuzzleException;
+use JsonException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -102,7 +103,7 @@ class DocumentationBuildInformationService
         }
         try {
             $json = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             throw new ComposerJsonInvalidException('Decoding ' . $path . ' did not return an object. Invalid json syntax?', 1558022442, $e);
         }
         return $json;
@@ -352,7 +353,7 @@ class DocumentationBuildInformationService
      */
     public function assertComposerJsonContainsNecessaryData(ComposerJson $composerJson): void
     {
-        if ($composerJson->getCoreRequirement() === null && !in_array($composerJson->getName(), ['typo3/cms', 'typo3/cms-core'], true)) {
+        if ($composerJson->getCoreRequirement() === null && !in_array($composerJson->getName(), ['typo3/cms', 'typo3/cms-core', 'typo3/surf'], true)) {
             throw new DocsComposerDependencyException('Dependency typo3/cms-core is missing', 1557310527);
         }
     }

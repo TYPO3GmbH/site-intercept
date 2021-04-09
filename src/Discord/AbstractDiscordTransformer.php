@@ -12,13 +12,12 @@ namespace App\Discord;
 
 use App\Entity\DiscordWebhook;
 use Woeler\DiscordPhp\Message\AbstractDiscordMessage;
-use Woeler\DiscordPhp\Message\DiscordEmbedsMessage;
 
 abstract class AbstractDiscordTransformer
 {
     /**
      * @param array $payload
-     * @return DiscordEmbedsMessage
+     * @return AbstractDiscordMessage
      */
     public function getDiscordMessage(array $payload): AbstractDiscordMessage
     {

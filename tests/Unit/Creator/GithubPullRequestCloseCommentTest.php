@@ -13,10 +13,11 @@ namespace App\Tests\Unit\Creator;
 use App\Creator\GithubPullRequestCloseComment;
 use App\Extractor\GitPushOutput;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class GithubPullRequestCloseCommentTest extends TestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
     /**
      * @test
      */

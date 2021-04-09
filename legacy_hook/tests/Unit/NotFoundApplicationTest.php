@@ -78,6 +78,7 @@ class NotFoundApplicationTest extends TestCase
      */
     public function statusCodeIs404()
     {
+        $this->configureRequestUriPath('');
         $response = $this->subject->handle();
         $this->assertSame(404, $response->getStatusCode(), 'Not found did not return 404 as status code.');
     }
@@ -87,6 +88,7 @@ class NotFoundApplicationTest extends TestCase
      */
     public function default404FileIsReturned()
     {
+        $this->configureRequestUriPath('');
         $response = $this->subject->handle();
         $this->assertSame(
             'default 404 page content',
@@ -130,6 +132,7 @@ class NotFoundApplicationTest extends TestCase
      */
     public function baseTagIsInserted()
     {
+        $this->configureRequestUriPath('');
         vfsStream::setup('root', null, [
             'site' => [
                 '404.html' => file_get_contents($this->getTestFile('404.html')),

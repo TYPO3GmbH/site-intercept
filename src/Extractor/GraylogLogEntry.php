@@ -113,6 +113,11 @@ class GraylogLogEntry
     public string $exceptionCode;
 
     /**
+     * @var string Optional 'link', used in docs rendering, href="..."
+     */
+    public string $link;
+
+    /**
      * @var string Optional 'repository url', used in docs rendering
      */
     public string $repository;
@@ -174,6 +179,7 @@ class GraylogLogEntry
         $this->userDisplayName = $entry['userDisplayName'] ?? '';
 
         $this->exceptionCode = (string)($entry['ctxt_exceptionCode'] ?? '');
+        $this->link = (string)($entry['ctxt_link'] ?? '');
         $this->repository = $entry['ctxt_repository'] ?? '';
         $this->composerFile = $entry['ctxt_composerFile'] ?? '';
         $this->package = $entry['ctxt_package'] ?? '';

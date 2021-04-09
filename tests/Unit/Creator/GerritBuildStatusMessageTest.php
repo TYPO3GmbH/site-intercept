@@ -13,10 +13,11 @@ namespace App\Tests\Unit\Creator;
 use App\Creator\GerritBuildStatusMessage;
 use App\Extractor\BambooBuildStatus;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class GerritBuildStatusMessageTest extends TestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
     /**
      * @test
      */

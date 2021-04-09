@@ -171,53 +171,8 @@ class BambooPostBuildController extends AbstractController
                     ]
                 );
             }
-        } elseif (strpos($buildDetails->buildKey, 'CORE-DR-') === 0) {
-            // This is a back-channel triggered by Bamboo after a "documentation rendering" build is done
-            $manager = $this->getDoctrine()->getManager();
-            $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
-            /** @var DocumentationJar $documentationJar */
-            $documentationJar = $documentationJarRepository->findOneBy(['buildKey' => $buildDetails->buildKey]);
-            if ($documentationJar instanceof DocumentationJar) {
-                if ($buildDetails->success) {
-                    // Build was successful, set status to "rendered"
-                    $documentationJar
-                        ->setLastRenderedAt(new \DateTime('now'))
-                        ->setStatus(DocumentationStatus::STATUS_RENDERED);
-                    $logger->info(
-                        'Documentation rendered due to bamboo build "' . $buildDetails->buildKey . '"',
-                        [
-                            'type' => 'docsRendering',
-                            'status' => 'documentationRendered',
-                            'triggeredBy' => 'api',
-                            'repository' => $documentationJar->getRepositoryUrl(),
-                            'package' => $documentationJar->getPackageName(),
-                            'bambooKey' => $buildDetails->buildKey,
-                        ]
-                    );
-                } else {
-                    // Build failed, set status of documentation to "rendering failed"
-                    $documentationJar->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED);
-                    $logger->warning(
-                        'Failed to render documentation due to bamboo build "' . $buildDetails->buildKey . '"',
-                        [
-                            'type' => 'docsRendering',
-                            'status' => 'documentationRenderingFailed',
-                            'triggeredBy' => 'api',
-                            'repository' => $documentationJar->getRepositoryUrl(),
-                            'package' => $documentationJar->getPackageName(),
-                            'bambooKey' => $buildDetails->buildKey,
-                        ]
-                    );
-                }
-                // If a re-rendering is registered, trigger docs rendering again and unset flag
-                if ($documentationJar->isReRenderNeeded()) {
-                    $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'api');
-                    $documentationJar->setReRenderNeeded(false);
-                }
-                $manager->flush();
-            }
         }
 
-        return Response::create();
+        return new Response(null, Response::HTTP_NO_CONTENT);
     }
 }

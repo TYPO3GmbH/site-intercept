@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class SplitCoreSplitFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('master', SubmitType::class, ['label' => 'Trigger master'])

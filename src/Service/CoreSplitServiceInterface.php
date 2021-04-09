@@ -10,9 +10,14 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Extractor\GithubPushEventForCore;
+use PhpAmqpLib\Wire\IO\AbstractIO;
+
 /**
  * @codeCoverageIgnore
  */
 interface CoreSplitServiceInterface
 {
+    public function split(GithubPushEventForCore $event, AbstractIO $rabbitIO): void;
+    public function tag(GithubPushEventForCore $event, AbstractIO $rabbitIO): void;
 }
