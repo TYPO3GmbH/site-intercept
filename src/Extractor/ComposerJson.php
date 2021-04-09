@@ -43,6 +43,9 @@ class ComposerJson
      */
     public function getType(): string
     {
+        if ($this->getName() === 'typo3/surf') {
+            return 'other';
+        }
         $this->assertPropertyContainsValue('type');
         return (string)$this->composerJson['type'];
     }
@@ -80,8 +83,8 @@ class ComposerJson
      */
     public function getMinimumTypoVersion(): string
     {
-        // Leave version constraint empty for typo3/cms-core itself
-        if ($this->getName() === 'typo3/cms-core') {
+        // Leave version constraint empty for typo3/cms-core or typo3/surf itself
+        if ($this->getName() === 'typo3/cms-core' || $this->getName() === 'typo3/surf') {
             return '';
         }
         if ($this->getCoreRequirement() === null) {
@@ -98,7 +101,7 @@ class ComposerJson
     public function getMaximumTypoVersion(): string
     {
         // Leave version constraint empty for typo3/cms-core itself
-        if ($this->getName() === 'typo3/cms-core') {
+        if ($this->getName() === 'typo3/cms-core' || $this->getName() === 'typo3/surf') {
             return '';
         }
         if ($this->getCoreRequirement() === null) {

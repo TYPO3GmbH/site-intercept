@@ -35,7 +35,7 @@ class MenuBuilder extends TemplateMenuBuider
                 'route' => 'admin_bamboo_core',
                 'label' => 'Core',
                 'extras' => [
-                    'icon' => 'box',
+                    'icon' => 'actions-extension',
                 ],
             ]
         );
@@ -54,13 +54,14 @@ class MenuBuilder extends TemplateMenuBuider
             ]
         );
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            $menu['core']->addChild($this->getDivider());
             $menu['core']->addChild(
                 'bamboo_core_security',
                 [
                     'route' => 'admin_bamboo_core_security',
                     'label' => 'Security Build Plans',
                     'extras' => [
-                        'icon' => 'lock',
+                        'icon' => 'actions-shield',
                     ],
                 ]
             );
@@ -71,7 +72,7 @@ class MenuBuilder extends TemplateMenuBuider
                 'route' => 'admin_docs_deployments',
                 'label' => 'Documentation',
                 'extras' => [
-                    'icon' => 'book',
+                    'icon' => 'actions-notebook',
                 ],
             ]
         );
@@ -83,6 +84,7 @@ class MenuBuilder extends TemplateMenuBuider
             ]
         );
         if ($this->authorizationChecker->isGranted('ROLE_DOCUMENTATION_MAINTAINER')) {
+            $menu['documentation']->addChild($this->getDivider());
             $menu['documentation']->addChild(
                 'docs_redirect_index',
                 [
@@ -95,15 +97,6 @@ class MenuBuilder extends TemplateMenuBuider
                 [
                     'route' => 'admin_docs_deployments_blacklist_index',
                     'label' => 'Blacklist',
-                ]
-            );
-        }
-        if ($this->authorizationChecker->isGranted('ROLE_USER')) {
-            $menu['documentation']->addChild(
-                'docs_index',
-                [
-                    'route' => 'admin_docs_third_party',
-                    'label' => 'Third Party',
                 ]
             );
         }
@@ -174,16 +167,16 @@ class MenuBuilder extends TemplateMenuBuider
                     ],
                 ]
             );
-            $menu->addChild(
+            $menu['username']->addChild(
                 'logout',
                 [
+                    'label' => 'Sign out',
                     'route' => 'logout',
-                    'label' => 'Logout',
                     'extras' => [
-                        'icon' => 'lock',
+                        'icon' => 'actions-logout',
                     ],
                 ]
-            )->setLinkAttribute('class', 'btn btn-primary');
+            );
         } else {
             $menu->addChild(
                 'login',
@@ -191,7 +184,7 @@ class MenuBuilder extends TemplateMenuBuider
                     'route' => 'admin_login',
                     'label' => 'Login',
                     'extras' => [
-                        'icon' => 'unlock',
+                        'icon' => 'actions-login',
                     ],
                 ]
             )->setLinkAttribute('class', 'btn btn-primary');

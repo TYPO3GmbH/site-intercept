@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Utility\BranchUtility;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -37,7 +38,7 @@ class BambooSlackMessage
      * Extract relevant information from a bamboo created slack message
      *
      * @param Request $request
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct(Request $request)
     {
@@ -50,7 +51,7 @@ class BambooSlackMessage
             $this->isNightlyBuild = BranchUtility::isBambooNightlyBuild($matches['buildKey']);
             $this->isSecurityBuild = BranchUtility::isBambooSecurityBuild($matches['buildKey']);
         } else {
-            throw new \InvalidArgumentException('Bamboo slack message could not be parsed.');
+            throw new InvalidArgumentException('Bamboo slack message could not be parsed.');
         }
     }
 }

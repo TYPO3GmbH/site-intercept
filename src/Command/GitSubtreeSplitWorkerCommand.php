@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Service\RabbitConsumerService;
+use ErrorException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,6 +46,7 @@ class GitSubtreeSplitWorkerCommand extends Command
 
     /**
      * Standard command information
+     * @return void
      */
     protected function configure()
     {
@@ -62,8 +64,8 @@ class GitSubtreeSplitWorkerCommand extends Command
      *
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return int|null|void
-     * @throws \ErrorException
+     * @return int
+     * @throws ErrorException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

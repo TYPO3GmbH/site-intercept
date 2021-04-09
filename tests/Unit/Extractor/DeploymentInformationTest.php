@@ -10,19 +10,19 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Extractor;
 
-use App\Bundle\ClockMockBundle;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\DeploymentInformation;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 
 class DeploymentInformationTest extends TestCase
 {
     public function setUp(): void
     {
         parent::setUp();
-        ClockMockBundle::register(DeploymentInformation::class);
-        ClockMockBundle::withClockMock(155309515.6937);
+        ClockMock::register(DeploymentInformation::class);
+        ClockMock::withClockMock(155309515.6937);
     }
 
     /**
@@ -241,7 +241,7 @@ class DeploymentInformationTest extends TestCase
     public function docsHomeTypeIsDetected(): void
     {
         $composerJsonAsArray = [
-            'name' => 'foobar/bazfnord',
+            'name' => 'typo3/docs-homepage',
             'type' => 'does-not-matter-here',
         ];
         $subject = new DeploymentInformation(

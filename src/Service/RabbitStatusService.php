@@ -13,6 +13,7 @@ namespace App\Service;
 use App\Client\RabbitManagementClient;
 use App\Extractor\RabbitQueueStatus;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * Service class to retrieve various rabbit mq stats and data
@@ -49,7 +50,7 @@ class RabbitStatusService
                 ]
             );
             $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger->error($e->getMessage(), ['exception' => $e]);
             $body = [];
         }

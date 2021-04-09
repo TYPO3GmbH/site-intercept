@@ -21,14 +21,14 @@ class RenderDocumentationService
 {
     protected DocumentationBuildInformationService $documentationBuildInformationService;
 
-    protected BambooService $bambooService;
+    protected GithubService $githubService;
 
     protected LoggerInterface $logger;
 
-    public function __construct(DocumentationBuildInformationService $documentationBuildInformationService, BambooService $bambooService, LoggerInterface $logger)
+    public function __construct(DocumentationBuildInformationService $documentationBuildInformationService, GithubService $githubService, LoggerInterface $logger)
     {
         $this->documentationBuildInformationService = $documentationBuildInformationService;
-        $this->bambooService = $bambooService;
+        $this->githubService = $githubService;
         $this->logger = $logger;
     }
 
@@ -42,16 +42,8 @@ class RenderDocumentationService
     public function renderDocumentationByDocumentationJar(DocumentationJar $documentationJar, string $scope): DeploymentInformation
     {
         $buildInformation = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
-        $this->documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
         $documentationJar = $this->documentationBuildInformationService->registerDocumentationRendering($buildInformation);
-        $bambooBuildTriggered = $this->bambooService->triggerDocumentationPlan($buildInformation);
-        if ($buildInformation->repositoryUrl === 'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git'
-            && $buildInformation->sourceBranch === 'master'
-        ) {
-            // Additionally trigger the docs static web root plan, if we're dealing with the homepage repository
-            /** @noinspection UnusedFunctionResultInspection */
-            $this->bambooService->triggerDocmuntationServerWebrootResourcesPlan();
-        }
+        $bambooBuildTriggered = $this->githubService->triggerDocumentationPlan($buildInformation);
         $this->documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
         $this->documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
         $this->logger->info(

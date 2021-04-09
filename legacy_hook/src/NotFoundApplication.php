@@ -78,6 +78,6 @@ class NotFoundApplication
 
     protected function getDocumentRoot(): string
     {
-        return rtrim($GLOBALS['_SERVER']['DOCUMENT_ROOT'], '/');
+        return rtrim($GLOBALS['_SERVER']['DOCUMENT_ROOT'] ?? '', '/');
     }
 }

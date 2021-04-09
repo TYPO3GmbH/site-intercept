@@ -14,10 +14,11 @@ use App\Creator\GerritCommitMessage;
 use App\Extractor\ForgeNewIssue;
 use App\Extractor\GithubPullRequestIssue;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class GerritCommitMessageTest extends TestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
     /**
      * @test
      */

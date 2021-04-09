@@ -16,17 +16,22 @@ namespace App\Tests\Functional\AdminInterface;
  * LICENSE file that was distributed with this source code.
  */
 
+use App\Kernel;
 use App\Tests\Functional\AbstractFunctionalWebTestCase;
 use App\Tests\Functional\DatabasePrimer;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class DiscordControllerTest extends AbstractFunctionalWebTestCase
 {
+    use ProphecyTrait;
+
     public function setUp(): void
     {
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         DatabasePrimer::prime($kernel);
         $kernel->shutdown();
+        $this->addRabbitManagementClientProphecy();
     }
 
     /**
@@ -34,6 +39,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordWebhookIndexIsRendered()
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord');
@@ -45,6 +52,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordWebhookAddFormIsRendered()
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/webhook/add');
@@ -56,6 +65,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordScheduledMessagesIndexIsRendered()
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/scheduled');
@@ -67,6 +78,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordScheduledMessagesAddFormIsRendered()
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/scheduled/add');
@@ -78,6 +91,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordWebhookHowToPageIsRendered()
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/howto');

@@ -11,11 +11,14 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Extractor\GithubPushEventForCore;
+use ErrorException;
+use Exception;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\IO\AbstractIO;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -85,7 +88,7 @@ class RabbitConsumerService
     /**
      * Entry point with endless loop for git split worker, used by worker command.
      *
-     * @throws \ErrorException
+     * @throws ErrorException
      * @codeCoverageIgnore Not easy to test this endless loop in a good way
      */
     public function workerLoop(): void
@@ -102,7 +105,7 @@ class RabbitConsumerService
      * Handle a single split job
      *
      * @param AMQPMessage $message
-     * @throws \Exception
+     * @throws Exception
      */
     public function handleWorkerJob(AMQPMessage $message): void
     {
@@ -110,7 +113,7 @@ class RabbitConsumerService
         $event = (new Serializer([new PropertyNormalizer()], [new JsonEncoder()]))
             ->deserialize($message->getBody(), GithubPushEventForCore::class, 'json');
         if (empty($event->jobUuid)) {
-            throw new \RuntimeException('Required job uuid missing');
+            throw new RuntimeException('Required job uuid missing');
         }
         $this->logger->info(
             'Handling a git split worker job',
@@ -145,7 +148,7 @@ class RabbitConsumerService
         );
     }
 
-    private function getCoreSplitter(GithubPushEventForCore $event): CoreSplitService
+    private function getCoreSplitter(GithubPushEventForCore $event): CoreSplitServiceInterface
     {
         if ($event->repositoryFullName === $this->eltsRepositoryNameV8) {
             return $this->coreSplitServiceV8;

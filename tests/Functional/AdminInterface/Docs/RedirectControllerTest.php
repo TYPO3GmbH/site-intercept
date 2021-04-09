@@ -11,32 +11,42 @@ declare(strict_types = 1);
 namespace App\Tests\Functional\AdminInterface\Docs;
 
 use App\Bundle\TestDoubleBundle;
-use App\Client\BambooClient;
+use App\Client\GithubClient;
 use App\Tests\Functional\AbstractFunctionalWebTestCase;
 use App\Tests\Functional\DatabasePrimer;
 use App\Tests\Functional\Fixtures\AdminInterface\Docs\RedirectControllerTestData;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DomCrawler\Crawler;
 
 class RedirectControllerTest extends AbstractFunctionalWebTestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Client
+     * @var AbstractBrowser
      */
     private $client;
+    private $graylogProphecy;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        self::bootKernel();
-        DatabasePrimer::prime(self::$kernel);
-
-        $this->client = static::createClient();
-        (new RedirectControllerTestData())->load(
-            self::$kernel->getContainer()->get('doctrine')->getManager()
-        );
+        TestDoubleBundle::reset();
+        $this->addRabbitManagementClientProphecy();
+        $graylogProphecy = $this->addGraylogClientProphecy();
+        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
     }
 
     /**
@@ -44,6 +54,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function indexRenderTableWithRedirectEntries()
     {
+        $this->addBambooClientProphecy();
+        $this->client = static::createClient();
+        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
@@ -57,6 +70,8 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function showRenderTableWithRedirectEntries()
     {
+        $this->client = static::createClient();
+        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1');
         $content = $this->client->getResponse()->getContent();
@@ -70,6 +85,8 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function editRenderTableWithRedirectEntries()
     {
+        $this->client = static::createClient();
+        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
@@ -82,8 +99,11 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function updateRenderTableWithRedirectEntries()
     {
-        $this->createPlainBambooProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $this->createPlainGithubProphecy();
         $this->client = static::createClient();
+        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/1/edit');
@@ -92,22 +112,21 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
         $this->assertStringContainsString('302', $content);
 
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        $githubClient = $this->prophesize(GithubClient::class);
+        $githubClient->post(Argument::cetera())->willReturn(new Response());
+        TestDoubleBundle::addProphecy(GithubClient::class, $githubClient);
 
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => '/p/vendor/packageOld/1.0/Bar.html',
                 'target' => '/p/vendor/packageNew/1.0/Bar.html',
                 'statusCode' => 302
             ],
         ]);
-        $this->client->submit($form);
+        $this->client->submit($form, [], []);
         $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
 
-        $this->createPlainBambooProphecy();
-        $this->client = static::createClient();
+        $this->createPlainGithubProphecy();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/1/edit');
@@ -122,27 +141,34 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function newRenderTableWithRedirectEntries()
     {
-        $this->createPlainBambooProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylogProphecy = $this->addGraylogClientProphecy();
+        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+        $graylogProphecy = $this->addGraylogClientProphecy();
+        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+
+        $this->createPlainGithubProphecy();
         $this->client = static::createClient();
+        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy = $this->prophesize(GithubClient::class);
         $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(GithubClient::class, $bambooClientProphecy);
 
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => '/p/vendor/packageOld/4.0/Bar.html',
                 'target' => '/p/vendor/packageNew/4.0/Bar.html',
                 'statusCode' => 303
             ],
         ]);
-        $this->client->submit($form);
+        $this->client->submit($form, [], []);
         $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
 
-        $this->createPlainBambooProphecy();
-        $this->client = static::createClient();
+        $this->createPlainGithubProphecy();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
@@ -156,8 +182,19 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function deleteRenderTableWithRedirectEntries()
     {
-        $this->createPlainBambooProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $graylogProphecy = $this->addGraylogClientProphecy();
+        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+        $graylogProphecy = $this->addGraylogClientProphecy();
+        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+        $graylogProphecy = $this->addGraylogClientProphecy();
+        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
+
+        $this->createPlainGithubProphecy();
         $this->client = static::createClient();
+        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
@@ -166,16 +203,15 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
 
         $crawler = $this->client->request('GET', '/redirect/1/edit');
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy = $this->prophesize(GithubClient::class);
         $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(GithubClient::class, $bambooClientProphecy);
 
         $form = $crawler->selectButton('redirectformdelete')->form();
-        $this->client->submit($form);
+        $this->client->submit($form, [], []);
         $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
 
-        $this->createPlainBambooProphecy();
-        $this->client = static::createClient();
+        $this->createPlainGithubProphecy();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
@@ -186,14 +222,11 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->assertStringContainsString('no records found', $content);
     }
 
-    private function createPlainBambooProphecy()
+    private function createPlainGithubProphecy()
     {
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-        $bambooClientProphecy->get('latest/agent/remote?os_authType=basic', Argument::cetera())->willReturn(
-            new Response(200, [], json_encode([]))
-        );
-        $bambooClientProphecy->get('latest/queue?os_authType=basic', Argument::cetera())->willReturn(
+        $bambooClientProphecy = $this->prophesize(GithubClient::class);
+        TestDoubleBundle::addProphecy(GithubClient::class, $bambooClientProphecy);
+        $bambooClientProphecy->get(Argument::any(), Argument::cetera())->willReturn(
             new Response(200, [], json_encode([]))
         );
     }
@@ -204,18 +237,20 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function invalidSourceInputTriggersValidationError(string $input)
     {
+        $this->addBambooClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => $input,
                 'target' => '/p/vendor/packageNew/4.0/Bar.html',
                 'statusCode' => 303
             ],
         ]);
-        $this->client->submit($form);
+        $this->client->submit($form, [], []);
         $response = $this->client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
         $content = $response->getContent();
@@ -233,11 +268,14 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function invalidTargetInputTriggersValidationError(string $input)
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => '/p/vendor/packageOld/1.0/Foo.html',
                 'target' => $input,
@@ -245,7 +283,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
             ],
         ]);
 
-        $this->client->submit($form);
+        $this->client->submit($form, [], []);
         $response = $this->client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
         $content = $response->getContent();
@@ -263,23 +301,25 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function validTargetInputTriggersFormSubmit(string $input)
     {
-        $this->createPlainBambooProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $this->createPlainGithubProphecy();
         $this->client = static::createClient();
+        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
-        $form = $crawler->selectButton('redirectformaction')->form([
+        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
             'docs_server_redirect' => [
                 'source' => $input,
                 'target' => $input,
                 'statusCode' => 303
             ],
         ]);
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
+        $bambooClientProphecy = $this->prophesize(GithubClient::class);
         $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
+        TestDoubleBundle::addProphecy(GithubClient::class, $bambooClientProphecy);
 
-        $this->client->submit($form);
+        $this->client->submit($form, [], []);
         $response = $this->client->getResponse();
         $this->assertEquals(302, $response->getStatusCode());
         $content = $response->getContent();
@@ -317,5 +357,13 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
                 '/p/packageOld/2.0/Foo.html',
             ],
         ];
+    }
+
+    private function manualSetup(): void
+    {
+        DatabasePrimer::prime(self::$kernel);
+        (new RedirectControllerTestData())->load(
+            self::$kernel->getContainer()->get('doctrine')->getManager()
+        );
     }
 }

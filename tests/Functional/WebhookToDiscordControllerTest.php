@@ -14,15 +14,23 @@ use App\Client\GeneralClient;
 use App\Discord\DiscordTransformerFactory;
 use App\Entity\DiscordChannel;
 use App\Entity\DiscordWebhook;
+use App\Kernel;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Tools\SchemaTool;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
-class WebhookToDiscordControllerTest extends KernelTestCase
+class WebhookToDiscordControllerTest extends AbstractFunctionalWebTestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->addRabbitManagementClientProphecy();
+    }
+
     /**
      * @var Connection
      */
@@ -34,7 +42,7 @@ class WebhookToDiscordControllerTest extends KernelTestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         static::$dbConnection = $kernel->getContainer()->get('doctrine.dbal.default_connection');
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
@@ -93,7 +101,7 @@ class WebhookToDiscordControllerTest extends KernelTestCase
             ->willReturn(new Response(200, []));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
 
         $request = require __DIR__ . '/Fixtures/BambooToDiscordGoodRequest.php';
@@ -113,7 +121,7 @@ class WebhookToDiscordControllerTest extends KernelTestCase
             ->willReturn(new Response(200, []));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
 
         $request = require __DIR__ . '/Fixtures/BambooToDiscordGoodWwwEncodedRequest.php';
@@ -126,7 +134,8 @@ class WebhookToDiscordControllerTest extends KernelTestCase
      */
     public function discordWebhookIsNotFound()
     {
-        $kernel = new \App\Kernel('test', true);
+        $this->addGeneralClientProphecy();
+        $kernel = new Kernel('test', true);
         $kernel->boot();
 
         $request = require __DIR__ . '/Fixtures/BambooToDiscordNotFoundRequest.php';
@@ -141,7 +150,8 @@ class WebhookToDiscordControllerTest extends KernelTestCase
      */
     public function discordWebhookHasNoChannelReturnsPreconditionFailed()
     {
-        $kernel = new \App\Kernel('test', true);
+        $this->addGeneralClientProphecy();
+        $kernel = new Kernel('test', true);
         $kernel->boot();
 
         $request = require __DIR__ . '/Fixtures/BambooToDiscordHasNoChannelRequest.php';

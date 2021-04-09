@@ -40,10 +40,14 @@
                     {% for redirect in pagination.getItems() %}
                         <tr data-id="{{ redirect.id }}">
                             <th scope="row">
-                                <span class="datatable-text"><i class="fa fa-size-small fa-style-fade fa-arrow-left"></i></span>
-                                <span class="datatable-text">{{ redirect.source }}</span><br>
-                                <span class="datatable-text"><i class="fa fa-size-small fa-style-fade fa-arrow-right"></i></span>
-                                <span class="datatable-text"><a class="datatable-link-highlight" href="{{ redirect.target|intercept_docs_server_link }}" target="_blank">{{ redirect.target }}</a></span>
+                                <div class="d-flex align-items-center mb-1">
+                                    {{ icon('actions-arrow-left') }}
+                                    <div class="ml-1">{{ redirect.source }}</div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    {{ icon('actions-arrow-right') }}
+                                    <div class="ml-1"><a class="datatable-link-highlight" href="{{ redirect.target|intercept_docs_server_link }}" target="_blank">{{ redirect.target }}</a></div>
+                                </div>
                             </th>
                             <th scope="row">
                                 {% if redirect.isLegacy %}
@@ -53,11 +57,11 @@
                             <td>{{ redirect.statusCode }}</td>
                             <td data-type="actions" data-label="Actions">
                                 <a class="datatable-action" href="{{ path('admin_redirect_show', {'id': redirect.id}) }}">
-                                    <span class="datatable-action-icon"><i class="fa fa-eye"></i></span>
+                                    <span class="datatable-action-icon">{{ icon('actions-eye') }}</span>
                                     <span class="datatable-action-label datatable-visually-hidden">Show</span>
                                 </a>
                                 <a class="datatable-action" href="{{ path('admin_redirect_edit', {'id': redirect.id}) }}">
-                                    <span class="datatable-action-icon"><i class="fa fa-pencil-alt"></i></span>
+                                    <span class="datatable-action-icon">{{ icon('actions-open') }}</span>
                                     <span class="datatable-action-label datatable-visually-hidden">Edit</span>
                                 </a>
                             </td>
@@ -168,7 +172,7 @@
                             <div class="message-body">
                                 <div class="message-meta">
                                     <span class="message-date">
-                                        {{ localtime(log.time) }}
+                                        {{ localdatetime(log.time) }}
                                     </span>
                                     {% if log.userDisplayName %}
                                         <span class="message-user">- by {{ log.userDisplayName }}</span>

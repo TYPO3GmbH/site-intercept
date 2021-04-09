@@ -1,6 +1,7 @@
+package docs;
+
 import com.atlassian.bamboo.specs.api.BambooSpec;
 import com.atlassian.bamboo.specs.api.builders.BambooKey;
-import com.atlassian.bamboo.specs.api.builders.BambooOid;
 import com.atlassian.bamboo.specs.api.builders.Variable;
 import com.atlassian.bamboo.specs.api.builders.credentials.SharedCredentialsIdentifier;
 import com.atlassian.bamboo.specs.api.builders.permission.PermissionType;
@@ -31,7 +32,7 @@ import com.atlassian.bamboo.specs.util.BambooServer;
 import com.atlassian.bamboo.specs.util.MapBuilder;
 
 @BambooSpec
-public class PlanSpec {
+public class DocsRenderingApi {
 
     public Plan plan() {
         final Plan plan = new Plan(new Project()
@@ -104,7 +105,7 @@ public class PlanSpec {
                                             .path("core9")),
                                 new ScriptTask()
                                     .description("Generate all docs")
-                                    .inlineBody("if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n    bash \"$0\" \"$@\"\n    exit \"$?\"\nfi\n\nset -e\nset -x\n\nmkdir output\nmkdir output10\nmkdir output9\ngit clone https://github.com/TYPO3GmbH/doxygenapi.git doxygen\n\ncd doxygen\n# Render master\necho -e \"\\nPROJECT_NAME           = TYPO3 CMS\" >> Doxyfile\necho -e \"\\nPROJECT_NUMBER         = master\" >> Doxyfile\ncat Doxyfile\ndocker run \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/core:/mnt/doxygen \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/doxygen/:/mnt/doxyconf \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/output/:/mnt/output \\\n    --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n    --rm \\\n     ghcr.io/typo3gmbh/doxygenapi /mnt/doxyconf/Doxyfile\n     \n# Render 10.4\necho -e \"\\nPROJECT_NUMBER         = 10.4\" >> Doxyfile\ncat Doxyfile\ndocker run \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/core:/mnt/doxygen \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/doxygen/:/mnt/doxyconf \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/output10/:/mnt/output \\\n    --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n    --rm \\\n     ghcr.io/typo3gmbh/doxygenapi /mnt/doxyconf/Doxyfile\n     \n# Render 9.5\necho -e \"\\nPROJECT_NUMBER         = 9.5\" >> Doxyfile\ncat Doxyfile\ndocker run \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/core:/mnt/doxygen \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/doxygen/:/mnt/doxyconf \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/output9/:/mnt/output \\\n    --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n    --rm \\\n     ghcr.io/typo3gmbh/doxygenapi /mnt/doxyconf/Doxyfile"),
+                                    .inlineBody("if [ \"$(ps -p \"$$\" -o comm=)\" != \"bash\" ]; then\n    bash \"$0\" \"$@\"\n    exit \"$?\"\nfi\n\nset -e\nset -x\n\nmkdir output\nmkdir output10\nmkdir output9\ngit clone https://github.com/TYPO3GmbH/doxygenapi.git doxygen\n\ncd doxygen\n# Render master\necho -e \"\\nPROJECT_NAME           = TYPO3 CMS\" >> Doxyfile\necho -e \"\\nPROJECT_NUMBER         = master\" >> Doxyfile\ncat Doxyfile\ndocker run \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/core:/mnt/doxygen \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/doxygen/:/mnt/doxyconf \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/output/:/mnt/output \\\n    --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n    --rm \\\n     ghcr.io/typo3gmbh/doxygenapi /mnt/doxyconf/Doxyfile\n     \n# Render 10.4\necho -e \"\\nPROJECT_NUMBER         = 10.4\" >> Doxyfile\ncat Doxyfile\ndocker run \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/core10:/mnt/doxygen \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/doxygen/:/mnt/doxyconf \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/output10/:/mnt/output \\\n    --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n    --rm \\\n     ghcr.io/typo3gmbh/doxygenapi /mnt/doxyconf/Doxyfile\n     \n# Render 9.5\necho -e \"\\nPROJECT_NUMBER         = 9.5\" >> Doxyfile\ncat Doxyfile\ndocker run \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/core9:/mnt/doxygen \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/doxygen/:/mnt/doxyconf \\\n    -v /bamboo-data/${BAMBOO_COMPOSE_PROJECT_NAME}/${bamboo_buildKey}/output9/:/mnt/output \\\n    --name ${BAMBOO_COMPOSE_PROJECT_NAME}sib_adhoc \\\n    --rm \\\n     ghcr.io/typo3gmbh/doxygenapi /mnt/doxyconf/Doxyfile"),
                                 new CommandTask()
                                     .description("archive master")
                                     .executable("tar")
@@ -140,38 +141,38 @@ public class PlanSpec {
                                                     .build())
                                                 .build())
                                             .build()))
-                            .tasks(new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@srv007"))
+                            .tasks(new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@prod.api.docs.typo3.com"))
                                     .description("mkdir")
-                                    .host("srv007.typo3.com")
+                                    .host("prod.api.docs.typo3.com")
                                     .username("prod.api.docs.typo3.com")
                                     .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.api.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
                                 new ScpTask()
                                     .description("copy result")
-                                    .host("srv007.typo3.com")
+                                    .host("prod.api.docs.typo3.com")
                                     .username("prod.api.docs.typo3.com")
                                     .toRemotePath("/srv/vhosts/prod.api.docs.typo3.com/deployment/${bamboo.buildResultKey}")
-                                    .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@srv007"))
+                                    .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@prod.api.docs.typo3.com"))
                                     .fromArtifact(new ArtifactItem()
                                         .artifact("output")),
                                 new ScpTask()
                                     .description("copy 10")
-                                    .host("srv007.typo3.com")
+                                    .host("prod.api.docs.typo3.com")
                                     .username("prod.api.docs.typo3.com")
                                     .toRemotePath("/srv/vhosts/prod.api.docs.typo3.com/deployment/${bamboo.buildResultKey}")
-                                    .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@srv007"))
+                                    .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@prod.api.docs.typo3.com"))
                                     .fromArtifact(new ArtifactItem()
                                         .artifact("output10")),
                                 new ScpTask()
                                     .description("copy 9")
-                                    .host("srv007.typo3.com")
+                                    .host("prod.api.docs.typo3.com")
                                     .username("prod.api.docs.typo3.com")
                                     .toRemotePath("/srv/vhosts/prod.api.docs.typo3.com/deployment/${bamboo.buildResultKey}")
-                                    .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@srv007"))
+                                    .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@prod.api.docs.typo3.com"))
                                     .fromArtifact(new ArtifactItem()
                                         .artifact("output9")),
-                                new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@srv007"))
+                                new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@prod.api.docs.typo3.com"))
                                     .description("unpack and publish docs")
-                                    .host("srv007.typo3.com")
+                                    .host("prod.api.docs.typo3.com")
                                     .username("prod.api.docs.typo3.com")
                                     .command("set -e\r\nset -x\r\n\r\nsource_dir=\"/srv/vhosts/prod.api.docs.typo3.com/deployment/${bamboo.buildResultKey}/\"\r\ncd ${source_dir} || exit 1\r\n\r\n# master\r\nmkdir output\r\ntar xf output.tgz\r\ncd output/html/\r\ntarget_dir=\"/srv/vhosts/prod.api.docs.typo3.com/site/Web/master\"\r\nrm -Rf ${target_dir}\r\nmkdir ${target_dir}\r\nfind . -maxdepth 1 ! -path . -exec mv -t ../../../../site/Web/master/ {} +\r\n\r\n#10.4\r\ncd ${source_dir} \r\nmkdir output10\r\ntar xf output10.tgz\r\ncd output10/html/\r\ntarget_dir=\"/srv/vhosts/prod.api.docs.typo3.com/site/Web/10.4\"\r\nrm -Rf ${target_dir}\r\nmkdir ${target_dir}\r\nfind . -maxdepth 1 ! -path . -exec mv -t ../../../../site/Web/10.4/ {} +\r\n\r\n#9.5\r\ncd ${source_dir} \r\nmkdir output9\r\ntar xf output9.tgz\r\ncd output9/html/\r\ntarget_dir=\"/srv/vhosts/prod.api.docs.typo3.com/site/Web/9.5\"\r\nrm -Rf ${target_dir}\r\nmkdir ${target_dir}\r\nfind . -maxdepth 1 ! -path . -exec mv -t ../../../../site/Web/9.5/ {} +\r\n\r\n# And clean the temp deployment dir afterwards\r\n#rm -rf ${source_dir}"))
                             .requirements(new Requirement("system.hasDocker")
@@ -214,7 +215,7 @@ public class PlanSpec {
     public static void main(String... argv) {
         //By default credentials are read from the '.credentials' file.
         BambooServer bambooServer = new BambooServer("https://bamboo.typo3.com");
-        final PlanSpec planSpec = new PlanSpec();
+        final DocsRenderingApi planSpec = new DocsRenderingApi();
 
         final Plan plan = planSpec.plan();
         bambooServer.publish(plan);

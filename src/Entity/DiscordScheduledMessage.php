@@ -163,10 +163,10 @@ class DiscordScheduledMessage
     }
 
     /**
-     * @param $timezone
+     * @param string $timezone
      * @return DiscordScheduledMessage
      */
-    public function setTimezone($timezone): self
+    public function setTimezone(string $timezone): self
     {
         $this->timezone = $timezone;
         return $this;

@@ -14,7 +14,7 @@ use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInterface
 {

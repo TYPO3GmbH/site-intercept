@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DiscordWebhook extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $discordChannelRepository = $options['entity_manager']->getRepository(DiscordChannel::class);
         $builder
@@ -69,7 +69,7 @@ class DiscordWebhook extends AbstractType
             ->add('avatarUrl', null)
             ->add('submit', SubmitType::class, [
                 'label' => 'Save',
-                'attr' => ['class' => 'btn btn-primary pull-right'],
+                'attr' => ['class' => 'btn btn-primary'],
             ]);
     }
 

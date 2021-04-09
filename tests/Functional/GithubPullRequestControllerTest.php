@@ -14,14 +14,23 @@ use App\Bundle\TestDoubleBundle;
 use App\Client\ForgeClient;
 use App\Client\GeneralClient;
 use App\Extractor\GitPushOutput;
+use App\Kernel;
 use App\Service\LocalCoreGitService;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Redmine\Api\Issue;
+use SimpleXMLElement;
 
-class GithubPullRequestControllerTest extends TestCase
+class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->addRabbitManagementClientProphecy();
+    }
+
     /**
      * @test
      */
@@ -61,7 +70,7 @@ class GithubPullRequestControllerTest extends TestCase
                 ]
             ])
             ->shouldBeCalled()
-            ->willReturn(new \SimpleXMLElement('<?xml version="1.0"?><root><id>42</id></root>'));
+            ->willReturn(new SimpleXMLElement('<?xml version="1.0"?><root><id>42</id></root>'));
 
         $generalClientProphecy
             ->get('https://github.com/psychomieze/TYPO3.CMS/pull/1.diff')
@@ -102,7 +111,7 @@ class GithubPullRequestControllerTest extends TestCase
             )
             ->shouldBeCalled();
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GithubPullRequestGoodRequest.php';
         $response = $kernel->handle($request);
@@ -123,7 +132,7 @@ class GithubPullRequestControllerTest extends TestCase
 
         $generalClientProphecy->get(Argument::cetera())->shouldNotBeCalled();
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/GithubPullRequestBadRequest.php';
         $response = $kernel->handle($request);

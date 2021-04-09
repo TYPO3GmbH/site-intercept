@@ -7,7 +7,7 @@
     {% frame %}
         <div class="card">
             <div class="card-body">
-                {{ include('docs_redirect/_form.html.twig') }}
+                {{ form(form) }}
             </div>
         </div>
         <div class="row mt-4 justify-content-between">
@@ -17,7 +17,7 @@
                         path('admin_redirect_index'),
                         'back to list',
                         'outline-secondary',
-                        'arrow-left'
+                        'actions-arrow-left'
                     )
                 }}
             </div>

@@ -13,12 +13,14 @@ namespace App\Tests\Unit\Service;
 use App\Entity\DocsServerRedirect;
 use App\Repository\DocsServerRedirectRepository;
 use App\Service\DocsServerNginxService;
+use DateTime;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Filesystem\Filesystem;
 
 class DocsNginxRedirectServiceTest extends TestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
 
     private DocsServerNginxService $subject;
 
@@ -31,22 +33,22 @@ class DocsNginxRedirectServiceTest extends TestCase
                 ->setId(1)
                 ->setSource('/p/vendor/packageOld/1.0/Foo.html')
                 ->setTarget('/p/vendor/packageNew/1.0/Foo.html')
-                ->setCreatedAt(new \DateTime('2019-03-21 13:00:00'))
-                ->setUpdatedAt(new \DateTime('2019-03-21 13:00:00'))
+                ->setCreatedAt(new DateTime('2019-03-21 13:00:00'))
+                ->setUpdatedAt(new DateTime('2019-03-21 13:00:00'))
                 ->setStatusCode(303),
             (new DocsServerRedirect())
                 ->setId(2)
                 ->setSource('/p/vendor/packageOld/2.0/Foo.html')
                 ->setTarget('/p/vendor/packageNew/2.0/Foo.html')
-                ->setCreatedAt(new \DateTime('2019-03-20 13:00:00'))
-                ->setUpdatedAt(new \DateTime('2019-03-20 13:00:00'))
+                ->setCreatedAt(new DateTime('2019-03-20 13:00:00'))
+                ->setUpdatedAt(new DateTime('2019-03-20 13:00:00'))
                 ->setStatusCode(302),
             (new DocsServerRedirect())
                 ->setId(3)
                 ->setSource('/typo3cms/extensions/packageOld/1.0/')
                 ->setTarget('/p/vendor/packageOld/1.0/')
-                ->setCreatedAt(new \DateTime('2019-03-21 13:00:00'))
-                ->setUpdatedAt(new \DateTime('2019-03-21 13:00:00'))
+                ->setCreatedAt(new DateTime('2019-03-21 13:00:00'))
+                ->setUpdatedAt(new DateTime('2019-03-21 13:00:00'))
                 ->setStatusCode(303)
                 ->setIsLegacy(true),
         ]);

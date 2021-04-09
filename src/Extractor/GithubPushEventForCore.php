@@ -26,32 +26,32 @@ class GithubPushEventForCore
     private const TYPE_TAG = 'tag';
 
     /**
-     * @var string Used especially in logging as context.
+     * @var string|null Used especially in logging as context.
      */
     public ?string $jobUuid = null;
 
     /**
-     * @var string Either 'patch' if a merged patch should be split, or 'tag' to apply tags to sub reps
+     * @var string|null Either 'patch' if a merged patch should be split, or 'tag' to apply tags to sub reps
      */
     public ?string $type = null;
 
     /**
-     * @var string The source branch to split FROM, eg. 'TYPO3_8-7', '9.2', 'master'
+     * @var string|null The source branch to split FROM, eg. 'TYPO3_8-7', '9.2', 'master'
      */
     public ?string $sourceBranch = null;
 
     /**
-     * @var string The target branch to split TO, eg. '8.7', '9.2', 'master'
+     * @var string|null The target branch to split TO, eg. '8.7', '9.2', 'master'
      */
     public ?string $targetBranch = null;
 
     /**
-     * @var string Set to the tag that has been pushed for type=tag
+     * @var string|null Set to the tag that has been pushed for type=tag
      */
     public ?string $tag = null;
 
     /**
-     * @var string the full name of the repository
+     * @var string|null the full name of the repository
      */
     public ?string $repositoryFullName = null;
 
@@ -93,7 +93,7 @@ class GithubPushEventForCore
      */
     private function isPushedPatch(array $requestInformation): bool
     {
-        return strpos($requestInformation['ref'], 'refs/heads/') === 0;
+        return str_starts_with($requestInformation['ref'], 'refs/heads/');
     }
 
     /**
@@ -105,8 +105,8 @@ class GithubPushEventForCore
      */
     private function isPushedTag(array $requestInformation): bool
     {
-        return strpos($requestInformation['ref'], 'refs/tags/') === 0
-            && $requestInformation['created'] === true;
+        return str_starts_with($requestInformation['ref'], 'refs/tags/')
+               && $requestInformation['created'] === true;
     }
 
     /**

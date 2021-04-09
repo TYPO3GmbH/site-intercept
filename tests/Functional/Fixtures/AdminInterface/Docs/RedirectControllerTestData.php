@@ -12,7 +12,7 @@ namespace App\Tests\Functional\Fixtures\AdminInterface\Docs;
 use App\Entity\DocsServerRedirect;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 class RedirectControllerTestData extends Fixture implements OrderedFixtureInterface
 {

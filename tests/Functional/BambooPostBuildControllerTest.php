@@ -14,18 +14,16 @@ use App\Bundle\TestDoubleBundle;
 use App\Client\BambooClient;
 use App\Client\GerritClient;
 use App\Client\SlackClient;
-use App\Entity\DocumentationJar;
-use App\Enum\DocumentationStatus;
+use App\Kernel;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
-class BambooPostBuildControllerTest extends TestCase
+class BambooPostBuildControllerTest extends AbstractFunctionalWebTestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
     /**
      * @var Connection
      */
@@ -37,7 +35,7 @@ class BambooPostBuildControllerTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         static::$dbConnection = $kernel->getContainer()->get('doctrine.dbal.default_connection');
         $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
@@ -45,6 +43,15 @@ class BambooPostBuildControllerTest extends TestCase
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->updateSchema($metaData);
         $kernel->shutdown();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->addGerritClientProphecy();
+        $this->addSlackClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $this->addGeneralClientProphecy();
     }
 
     /**
@@ -68,6 +75,10 @@ class BambooPostBuildControllerTest extends TestCase
      */
     public function gerritVoteIsCalled(): void
     {
+        TestDoubleBundle::reset();
+        $this->addSlackClientProphecy();
+        $this->addGeneralClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
             ->get(
@@ -87,7 +98,7 @@ class BambooPostBuildControllerTest extends TestCase
             ->willReturn(new Response());
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodRequest.php';
         $response = $kernel->handle($request);
@@ -115,7 +126,7 @@ class BambooPostBuildControllerTest extends TestCase
             ->willReturn(new Response());
         TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/BambooPostBuildFailedNightlyBuildRequest.php';
         $response = $kernel->handle($request);
@@ -128,6 +139,10 @@ class BambooPostBuildControllerTest extends TestCase
      */
     public function slackMessageForFailedNightlyIsSendForSecondFail(): void
     {
+        TestDoubleBundle::reset();
+        $this->addGerritClientProphecy();
+        $this->addRabbitManagementClientProphecy();
+        $this->addGeneralClientProphecy();
         $bambooClientProphecy = $this->prophesize(BambooClient::class);
         $bambooClientProphecy
             ->get(
@@ -139,211 +154,13 @@ class BambooPostBuildControllerTest extends TestCase
 
         $slackClientProphecy = $this->prophesize(SlackClient::class);
         $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response());
+        $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response());
         TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
 
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $request = require __DIR__ . '/Fixtures/BambooPostBuildFailedNightlyBuildRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
-    }
-
-    /**
-     * @test
-     */
-    public function triggeredDeletionRemovesDatabaseRow(): void
-    {
-        $bambooBuildKey = 'CORE-DDEL-4711';
-
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy
-            ->get(
-                'latest/result/' . $bambooBuildKey . '?os_authType=basic&expand=labels',
-                Argument::cetera()
-            )->shouldBeCalled()
-            ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildGoodBambooDetailsDocsDeletionResponse.php');
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-
-        $kernel = new \App\Kernel('test', true);
-        $kernel->boot();
-
-        /** @var EntityManager $entityManager */
-        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
-        $documentationJar = $this->generateRandomJar()
-            ->setStatus(DocumentationStatus::STATUS_DELETING)
-            ->setReRenderNeeded(false)
-            ->setBuildKey($bambooBuildKey);
-        $entityManager->persist($documentationJar);
-        $entityManager->flush();
-
-        $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodDocsDeletionRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
-
-        $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
-        $result = $documentationJarRepository->findBy([
-            'buildKey' => $bambooBuildKey,
-        ]);
-
-        $this->assertCount(0, $result);
-    }
-
-    /**
-     * @test
-     */
-    public function triggeredDeletionFailsAndResetsStatus(): void
-    {
-        $bambooBuildKey = 'CORE-DDEL-4711';
-
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy
-            ->get(
-                'latest/result/' . $bambooBuildKey . '?os_authType=basic&expand=labels',
-                Argument::cetera()
-            )->shouldBeCalled()
-            ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildBadBambooDetailsDocsDeletionFailedResponse.php');
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-
-        $kernel = new \App\Kernel('test', true);
-        $kernel->boot();
-
-        /** @var EntityManager $entityManager */
-        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
-        $documentationJar = $this->generateRandomJar()
-            ->setStatus(DocumentationStatus::STATUS_DELETING)
-            ->setReRenderNeeded(false)
-            ->setBuildKey($bambooBuildKey);
-        $entityManager->persist($documentationJar);
-        $entityManager->flush();
-
-        $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodDocsDeletionRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
-
-        $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
-        $result = $documentationJarRepository->findBy([
-            'packageName' => $documentationJar->getPackageName(),
-            'packageType' => $documentationJar->getPackageType(),
-            'branch' => $documentationJar->getBranch(),
-            'status' => DocumentationStatus::STATUS_RENDERED
-        ]);
-
-        $this->assertCount(1, $result);
-        $this->assertSame(DocumentationStatus::STATUS_RENDERED, current($result)->getStatus());
-    }
-
-    /**
-     * @test
-     */
-    public function successfulRenderingSetsStatusToRendered(): void
-    {
-        $bambooBuildKey = 'CORE-DR-42';
-
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy
-            ->get(
-                'latest/result/' . $bambooBuildKey . '?os_authType=basic&expand=labels',
-                Argument::cetera()
-            )->shouldBeCalled()
-            ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildGoodBambooDetailsDocsRenderingResponse.php');
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-
-        $kernel = new \App\Kernel('test', true);
-        $kernel->boot();
-
-        /** @var EntityManager $entityManager */
-        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
-        $documentationJar = $this->generateRandomJar()
-            ->setStatus(DocumentationStatus::STATUS_RENDERING)
-            ->setReRenderNeeded(false)
-            ->setBuildKey($bambooBuildKey);
-        $entityManager->persist($documentationJar);
-        $entityManager->flush();
-
-        $request = require __DIR__ . '/Fixtures/BambooPostBuildGoodDocsRenderingRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
-
-        $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
-        $result = $documentationJarRepository->findOneBy([
-            'packageName' => $documentationJar->getPackageName(),
-            'packageType' => $documentationJar->getPackageType(),
-            'branch' => $documentationJar->getBranch(),
-            'status' => DocumentationStatus::STATUS_RENDERED
-        ]);
-
-        // Ensure 'last' build key is still set
-        $this->assertEquals('CORE-DR-42', $result->getBuildKey());
-    }
-
-    /**
-     * @test
-     */
-    public function failedRenderingSetsStatusToRenderingFailed(): void
-    {
-        $bambooBuildKey = 'CORE-DR-43';
-
-        $bambooClientProphecy = $this->prophesize(BambooClient::class);
-        $bambooClientProphecy
-            ->get(
-                'latest/result/' . $bambooBuildKey . '?os_authType=basic&expand=labels',
-                Argument::cetera()
-            )->shouldBeCalled()
-            ->willReturn(require __DIR__ . '/Fixtures/BambooPostBuildBadBambooDetailsDocsRenderingFailedResponse.php');
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClientProphecy);
-
-        $kernel = new \App\Kernel('test', true);
-        $kernel->boot();
-
-        /** @var EntityManager $entityManager */
-        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
-        $documentationJar = $this->generateRandomJar()
-            ->setStatus(DocumentationStatus::STATUS_RENDERING)
-            ->setReRenderNeeded(false)
-            ->setBuildKey($bambooBuildKey);
-        $entityManager->persist($documentationJar);
-        $entityManager->flush();
-
-        $request = require __DIR__ . '/Fixtures/BambooPostBuildBadDocsRenderingRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
-
-        $documentationJarRepository = $entityManager->getRepository(DocumentationJar::class);
-        $result = $documentationJarRepository->findBy([
-            'packageName' => $documentationJar->getPackageName(),
-            'packageType' => $documentationJar->getPackageType(),
-            'branch' => $documentationJar->getBranch(),
-            'status' => DocumentationStatus::STATUS_RENDERING_FAILED
-        ]);
-
-        $this->assertCount(1, $result);
-    }
-
-    private function generateRandomJar(): DocumentationJar
-    {
-        $faker = \Faker\Factory::create();
-        $vendor = $faker->userName;
-        $name = $faker->slug;
-        $packageName = $vendor . '/' . $name;
-        $branch = $faker->randomElement(['master', 'draft', '8.7']);
-
-        $documentationJar = (new DocumentationJar())
-            ->setVendor($vendor)
-            ->setName($name)
-            ->setPackageName($packageName)
-            ->setPackageType('typo3-cms-extension')
-            ->setExtensionKey($name)
-            ->setTypeShort('c')
-            ->setTypeLong('core-extension')
-            ->setRepositoryUrl('https://github.com/' . $packageName . '/')
-            ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/' . $packageName . '/' . $branch . '/composer.json')
-            ->setBranch($branch)
-            ->setTargetBranchDirectory($branch)
-            ->setMinimumTypoVersion('9.5')
-            ->setMaximumTypoVersion('9.5')
-            ->setNew(false)
-            ->setApproved(true);
-
-        return $documentationJar;
     }
 }

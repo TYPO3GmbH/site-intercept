@@ -14,6 +14,15 @@ eight_points_guzzle:
             class: App\Client\GerritClient
         general:
             class: App\Client\GeneralClient
+        github:
+            class: App\Client\GithubClient
+            base_url: "https://api.github.com/"
+            options:
+              auth:
+                - '%env(GITHUB_API_USERNAME)%'
+                - '%env(GITHUB_API_PASSWORD_TOKEN)%'
+              headers:
+                Accept: "application/json"
         graylog:
             base_url: '%env(GRAYLOG_API)%'
             class: App\Client\GraylogClient

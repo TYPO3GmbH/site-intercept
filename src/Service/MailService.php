@@ -13,15 +13,17 @@ namespace App\Service;
 use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Extractor\ComposerJson;
 use App\Extractor\PushEvent;
+use Swift_Mailer;
+use Swift_Message;
 use Twig\Environment;
 
 class MailService
 {
-    private \Swift_Mailer $mailer;
+    private Swift_Mailer $mailer;
 
     private Environment $templating;
 
-    public function __construct(\Swift_Mailer $mailer, Environment $templating)
+    public function __construct(Swift_Mailer $mailer, Environment $templating)
     {
         $this->mailer = $mailer;
         $this->templating = $templating;
@@ -66,21 +68,21 @@ class MailService
      * @param string $subject
      * @param string $templateFile
      * @param array $templateVariables
-     * @return \Swift_Message
+     * @return Swift_Message
      */
-    private function createMessageWithTemplate(string $subject, string $templateFile, array $templateVariables): \Swift_Message
+    private function createMessageWithTemplate(string $subject, string $templateFile, array $templateVariables): Swift_Message
     {
-        $message = new \Swift_Message($subject);
+        $message = new Swift_Message($subject);
         $message->setBody($this->templating->render($templateFile, $templateVariables), 'text/html');
 
         return $message;
     }
 
     /**
-     * @param \Swift_Message $message
+     * @param Swift_Message $message
      * @return int
      */
-    private function send(\Swift_Message $message): int
+    private function send(Swift_Message $message): int
     {
         return $this->mailer->send($message);
     }

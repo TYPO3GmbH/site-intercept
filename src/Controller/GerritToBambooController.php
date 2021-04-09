@@ -38,7 +38,7 @@ class GerritToBambooController extends AbstractController
     public function index(Request $request, LoggerInterface $logger, BambooService $bambooService, GerritService $gerritService): Response
     {
         if (!$gerritService->requestIsAuthorized($request)) {
-            return Response::create('Incorrect Gerrit token.', Response::HTTP_UNAUTHORIZED);
+            return new Response('Incorrect Gerrit token.', Response::HTTP_UNAUTHORIZED);
         }
 
         try {
@@ -71,6 +71,6 @@ class GerritToBambooController extends AbstractController
             // Do not care if pushed to some other branch than the
             // ones we do want to handle.
         }
-        return Response::create();
+        return new Response();
     }
 }

@@ -20,7 +20,7 @@
                                 <td>{{ repository.repositoryUrl }}</td>
                                 <td data-type="actions" data-label="Actions">
                                     <a class="datatable-action" title="Delete" href="{{ path('admin_docs_deployments_blacklist_delete_action', {'entryId': repository.getId()}) }}">
-                                        <span class="datatable-action-icon"><i class="fa fa-trash"></i></span>
+                                        <span class="datatable-action-icon">{{ icon('actions-delete') }}</span>
                                         <span class="datatable-action-label datatable-visually-hidden">Delete</span>
                                     </a>
                                 </td>

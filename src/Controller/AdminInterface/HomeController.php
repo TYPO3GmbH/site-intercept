@@ -23,6 +23,7 @@ class HomeController extends AbstractController
      * @Route("/admin", name="admin_index")
      * @Route("/", host="intercept.typo3.com", name="admin")
      * @Route("/", host="stage.intercept.typo3.com", name="admin_stage")
+     * @Route("/", host="intercept.ddev.site", name="admin_local")
      * @return Response
      */
     public function index(): Response

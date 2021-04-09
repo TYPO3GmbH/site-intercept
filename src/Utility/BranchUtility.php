@@ -80,7 +80,7 @@ class BranchUtility
         $identifier = mb_strtolower(str_replace(['branch', 'nightly', 'TYPO3_', '_', '-'], ['', '', '', '.', '.'], $identifier));
         if ($identifier !== 'master') {
             $sanityCheck = explode('.', $identifier);
-            if (count($sanityCheck) !== 2 || (int)$sanityCheck[0] < 7 || (int)$sanityCheck < 0) {
+            if (count($sanityCheck) !== 2 || (int)$sanityCheck[0] < 7 || (int)$sanityCheck[1] < 0) {
                 throw new DoNotCareException('I do not care');
             }
             $identifier = (int)$sanityCheck[0] . '.' . (int)$sanityCheck[1];
@@ -107,7 +107,7 @@ class BranchUtility
         $splitBranch = str_replace('-', '.', $splitBranch);
         if ($splitBranch !== 'master') {
             $sanityCheck = explode('.', $splitBranch);
-            if (count($sanityCheck) !== 2 || (int)$sanityCheck[0] < 8 || (int)$sanityCheck < 0) {
+            if (count($sanityCheck) !== 2 || (int)$sanityCheck[0] < 8 || (int)$sanityCheck[1] < 0) {
                 throw new DoNotCareException('I do not care');
             }
             $splitBranch = (int)$sanityCheck[0] . '.' . (int)$sanityCheck[1];

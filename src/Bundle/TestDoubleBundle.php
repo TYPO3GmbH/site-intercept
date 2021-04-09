@@ -60,7 +60,7 @@ class TestDoubleBundle extends Bundle implements CompilerPassInterface
      * @param string $serviceId
      * @param object $prophecy
      */
-    public static function addProphecy(string $serviceId, object $prophecy)
+    public static function addProphecy(string $serviceId, object $prophecy): void
     {
         if (!isset(static::$prophecies[$serviceId])) {
             static::$prophecies[$serviceId] = [];
@@ -75,6 +75,8 @@ class TestDoubleBundle extends Bundle implements CompilerPassInterface
      * Note if a functional symfony test does multiple requests (eg. render
      * a page first, then fetch the form, feed it and send it: These are two requests),
      * then TWO prophecies have to be added - one per request.
+     *
+     * @return void
      */
     public function boot()
     {
@@ -91,10 +93,16 @@ class TestDoubleBundle extends Bundle implements CompilerPassInterface
      * symfony, NOT for each request and NOT for each functional test run.
      *
      * @param ContainerBuilder $containerBuilder
+     * @return void
      */
     public function build(ContainerBuilder $containerBuilder)
     {
         $containerBuilder->addCompilerPass($this);
+    }
+
+    public static function reset(): void
+    {
+        static::$prophecies = [];
     }
 
     /**
@@ -103,6 +111,7 @@ class TestDoubleBundle extends Bundle implements CompilerPassInterface
      * exactly once per full functional test run.
      *
      * @param ContainerBuilder $containerBuilder
+     * @return void
      */
     public function process(ContainerBuilder $containerBuilder)
     {
@@ -111,7 +120,7 @@ class TestDoubleBundle extends Bundle implements CompilerPassInterface
         foreach (array_keys($servicesTaggedWithTestDouble) as $serviceId) {
             $definition = $containerBuilder->getDefinition($serviceId);
             // Mark this service as NOT private, so boot() can set single objects
-            $definition->setPrivate(false);
+            $definition->setPublic(true);
             $containerBuilder->setDefinition($serviceId, $definition);
             $doubledServices[$serviceId] = $definition->getClass();
         }

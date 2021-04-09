@@ -10,15 +10,21 @@ declare(strict_types = 1);
 
 namespace App\Tests\Functional\AdminInterface;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\Functional\AbstractFunctionalWebTestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
-class HomeControllerTest extends WebTestCase
+class HomeControllerTest extends AbstractFunctionalWebTestCase
 {
+    use ProphecyTrait;
+
     /**
      * @test
      */
     public function indexPageIsRendered()
     {
+        $this->addBambooClientProphecy();
+        $this->addBambooClientProphecy();
+        $this->addRabbitManagementClientProphecy();
         $client = static::createClient();
         $client->request('GET', '/admin');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());

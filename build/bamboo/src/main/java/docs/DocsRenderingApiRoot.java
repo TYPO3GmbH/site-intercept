@@ -1,3 +1,5 @@
+package docs;
+
 import com.atlassian.bamboo.specs.api.BambooSpec;
 import com.atlassian.bamboo.specs.api.builders.BambooKey;
 import com.atlassian.bamboo.specs.api.builders.BambooOid;
@@ -27,7 +29,7 @@ import com.atlassian.bamboo.specs.util.BambooServer;
 import com.atlassian.bamboo.specs.util.MapBuilder;
 
 @BambooSpec
-public class PlanSpec {
+public class DocsRenderingApiRoot {
 
     public Plan plan() {
         final Plan plan = new Plan(new Project()
@@ -101,22 +103,22 @@ public class PlanSpec {
                                                     .build())
                                                 .build())
                                             .build()))
-                            .tasks(new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@srv007"))
+                            .tasks(new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@prod.api.docs.typo3.com"))
                                     .description("mkdir")
-                                    .host("srv007.typo3.com")
+                                    .host("prod.api.docs.typo3.com")
                                     .username("prod.api.docs.typo3.com")
                                     .command("set -e\r\nset -x\r\n\r\nmkdir -p /srv/vhosts/prod.api.docs.typo3.com/deployment/${bamboo.buildResultKey}"),
                                 new ScpTask()
                                     .description("copy result")
-                                    .host("srv007.typo3.com")
+                                    .host("prod.api.docs.typo3.com")
                                     .username("prod.api.docs.typo3.com")
                                     .toRemotePath("/srv/vhosts/prod.api.docs.typo3.com/deployment/${bamboo.buildResultKey}")
-                                    .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@srv007"))
+                                    .authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@prod.api.docs.typo3.com"))
                                     .fromArtifact(new ArtifactItem()
                                         .artifact("resources.tgz")),
-                                new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@srv007"))
+                                new SshTask().authenticateWithSshSharedCredentials(new SharedCredentialsIdentifier("prod.api.docs.typo3.com@prod.api.docs.typo3.com"))
                                     .description("unpack and publish docs")
-                                    .host("srv007.typo3.com")
+                                    .host("prod.api.docs.typo3.com")
                                     .username("prod.api.docs.typo3.com")
                                     .command("set -e\r\nset -x\r\n\r\nsource_dir=\"/srv/vhosts/prod.api.docs.typo3.com/deployment/${bamboo.buildResultKey}/\"\r\ncd ${source_dir} || exit 1\r\n\r\ntar xf resources.tgz\r\n\r\ntarget_dir=\"/srv/vhosts/prod.api.docs.typo3.com/site/Web/\"\r\n\r\ncd ${target_dir} || exit 1\r\n\r\n# Move the single resource files and directories\r\nrm -f robots.txt\r\nmv ${source_dir}project/WebRootResources-api.typo3.org/index.html .\r\n\r\nrm -f favicon.ico\r\nmv ${source_dir}project/WebRootResources-api.typo3.org/favicon.ico .\r\n\r\n# And clean the temp deployment dir afterwards\r\nrm -rf ${source_dir}"))
                             .requirements(new Requirement("system.hasDocker")
@@ -149,7 +151,7 @@ public class PlanSpec {
     public static void main(String... argv) {
         //By default credentials are read from the '.credentials' file.
         BambooServer bambooServer = new BambooServer("https://bamboo.typo3.com");
-        final PlanSpec planSpec = new PlanSpec();
+        final DocsRenderingApiRoot planSpec = new DocsRenderingApiRoot();
 
         final Plan plan = planSpec.plan();
         bambooServer.publish(plan);

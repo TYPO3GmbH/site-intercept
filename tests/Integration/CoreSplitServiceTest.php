@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace App\Tests\Integration;
 
 use App\Extractor\GithubPushEventForCore;
+use App\Kernel;
 use App\Service\CoreSplitService;
 use PHPUnit\Framework\TestCase;
 
@@ -69,7 +70,7 @@ class CoreSplitServiceTest extends TestCase
      */
     public function monoRepoIsSplit()
     {
-        $kernel = new \App\Kernel('test', true);
+        $kernel = new Kernel('test', true);
         $kernel->boot();
         $container = $kernel->getContainer();
         /** @var CoreSplitService $subject */
