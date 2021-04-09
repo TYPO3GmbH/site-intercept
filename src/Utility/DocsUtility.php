@@ -25,7 +25,7 @@ class DocsUtility
      */
     public static function generateLinkToDocs(DocumentationJar $documentationJar): string
     {
-        $server = getenv('DOCS_LIVE_SERVER');
+        $server = $_ENV['DOCS_LIVE_SERVER'] ?? '';
         return sprintf('%s%s/%s/%s/en-us', $server, $documentationJar->getTypeShort(), $documentationJar->getPackageName(), $documentationJar->getTargetBranchDirectory());
     }
 }

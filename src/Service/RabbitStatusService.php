@@ -44,9 +44,9 @@ class RabbitStatusService
     {
         try {
             $response = $this->client->get(
-                'api/queues/%2f/' . getenv('RABBITMQ_SPLIT_QUEUE'),
+                'api/queues/%2f/' . $_ENV['RABBITMQ_SPLIT_QUEUE'] ?? '',
                 [
-                    'auth' => [getenv('RABBITMQ_USER'), getenv('RABBITMQ_PASSWORD')]
+                    'auth' => [$_ENV['RABBITMQ_USER'], $_ENV['RABBITMQ_PASSWORD'] ?? '']
                 ]
             );
             $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);

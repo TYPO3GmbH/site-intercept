@@ -98,7 +98,7 @@ class DocumentationDeployment extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => DocumentationJar::class,
-            'csrf_protection' => getenv('APP_ENV') !== 'test',
+            'csrf_protection' => $_ENV['APP_ENV'] ?? '' !== 'test',
             'validation_groups' => false,
             'step1' => true,
             'step2' => false,

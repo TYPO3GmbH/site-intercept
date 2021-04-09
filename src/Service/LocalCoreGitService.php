@@ -44,8 +44,8 @@ class LocalCoreGitService
     {
         $this->listener = $listener;
         $gitWrapper = new GitWrapper();
-        $gitWrapper->setEnvVar('HOME', getenv('GIT_HOME'));
-        $gitWrapper->setPrivateKey(getenv('GIT_SSH_PRIVATE_KEY'));
+        $gitWrapper->setEnvVar('HOME', $_ENV['GIT_HOME'] ?? '');
+        $gitWrapper->setPrivateKey($_ENV['GIT_SSH_PRIVATE_KEY'] ?? '');
         $gitWrapper->addLoggerEventSubscriber(new GitLoggerEventSubscriber($logger));
         // Increase timeout to have a chance initial clone runs through
         $gitWrapper->setTimeout(300);
