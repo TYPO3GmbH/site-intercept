@@ -61,6 +61,7 @@ services:
             $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO_V8)%'
             $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V8)%'
             $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v8/'
+            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
         tags:
             - testDouble
 
@@ -73,6 +74,7 @@ services:
             $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO)%'
             $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE)%'
             $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions/'
+            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
         tags:
             - testDouble
 
