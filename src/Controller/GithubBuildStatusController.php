@@ -56,6 +56,8 @@ class GithubBuildStatusController extends AbstractController
                 $documentationJar
                     ->setLastRenderedAt(new DateTime('now'))
                     ->setStatus(DocumentationStatus::STATUS_RENDERED);
+                // persist immediately
+                $manager->flush();
                 $logger->info(
                     'Documentation rendered on Github',
                     [
@@ -71,6 +73,8 @@ class GithubBuildStatusController extends AbstractController
             } else {
                 // Build failed, set status of documentation to "rendering failed"
                 $documentationJar->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED);
+                // persist immediately
+                $manager->flush();
                 $logger->warning(
                     'Failed to render documentation',
                     [
@@ -88,8 +92,9 @@ class GithubBuildStatusController extends AbstractController
             if ($documentationJar->isReRenderNeeded()) {
                 $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'api');
                 $documentationJar->setReRenderNeeded(false);
+                // persist immediately
+                $manager->flush();
             }
-            $manager->flush();
         }
         return new Response();
     }

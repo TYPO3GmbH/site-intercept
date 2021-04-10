@@ -76,13 +76,15 @@ class CoreSplitService implements CoreSplitServiceInterface
         string $splitCorePath,
         string $splitMonoRepo,
         string $splitSingleRepoBase,
-        string $splitSingleRepoPath
+        string $splitSingleRepoPath,
+        GitOutputListener $gitOutputListener
     ) {
         $this->logger = $logger;
         $this->splitCorePath = $splitCorePath;
         $this->splitMonoRepo = $splitMonoRepo;
         $this->splitSingleRepoBase = $splitSingleRepoBase;
         $this->splitSingleRepoPath = $splitSingleRepoPath;
+        $this->gitOutputListener = $gitOutputListener;
     }
 
     /**
