@@ -108,6 +108,7 @@ class DocsRenderingController extends AbstractController
                     } else {
                         $buildTriggered = $githubService->triggerDocumentationPlan($buildInformation);
                         $documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
+                        $documentationBuildInformationService->updateBuildKey($documentationJar, $buildTriggered->buildResultKey);
                         $logger->info(
                             'Triggered docs build',
                             [
