@@ -148,8 +148,8 @@ class WebHookService
                 $files = array_merge($commit->added ?? [], $commit->modified ?? [], $commit->removed ?? []);
                 foreach ($files as $file) {
                     if (strpos($file, 'Documentation/') === 0
-                        || strpos($file, 'README.md') === 0
-                        || strpos($file, 'README.rst') === 0
+                        || $file === 'README.md'
+                        || $file === 'README.rst'
                     ) {
                         $triggeringChange = true;
                         break 2;
