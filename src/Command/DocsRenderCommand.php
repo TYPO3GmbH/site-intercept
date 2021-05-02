@@ -71,8 +71,8 @@ class DocsRenderCommand extends Command
                         } catch (DuplicateDocumentationRepositoryException | DocsPackageDoNotCareBranch $exception) {
                             $io->error($exception->getMessage());
                         }
-                        // sleep half a second to not hammer bamboo too heavily, otherwise builds may be lost
-                        usleep(500000);
+                        // sleep half a minute to allow sloooow rendering on github ;)
+                        sleep(30);
                     }
                     $io->success('Triggered re-rendering of all docs.');
                 } else {
