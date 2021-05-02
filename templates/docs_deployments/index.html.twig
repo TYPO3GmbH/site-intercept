@@ -85,7 +85,13 @@
                                 <a href="{{ deployment|intercept_link_to_docs }}" rel="noopener noreferrer" target="_blank">{{ deployment.targetBranchDirectory }}</a>
                             </td>
                             <td data-type="localdate">
-                                {{ localdatetime(deployment.lastRenderedAt) }}
+                                {% if deployment.lastRenderedLink %}
+                                    <a href="{{ deployment.lastRenderedLink }}">
+                                        {{ localdatetime(deployment.lastRenderedAt) }}
+                                    </a>
+                                {% else %}
+                                    {{ localdatetime(deployment.lastRenderedAt) }}
+                                {% endif %}
                             </td>
                             <td>
                                 {% if deployment.minimumTypoVersion == deployment.maximumTypoVersion %}

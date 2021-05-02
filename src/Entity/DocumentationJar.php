@@ -135,79 +135,53 @@ class DocumentationJar
     private bool $approved;
 
     /**
-     * @return bool
+     * @ORM\Column(type="string", length=255, options={"default": ""})
      */
+    private string $lastRenderedLink = '';
+
     public function isReRenderNeeded(): bool
     {
         return (bool)$this->reRenderNeeded;
     }
 
-    /**
-     * @param bool $needed
-     * @return DocumentationJar
-     */
     public function setReRenderNeeded(bool $needed): self
     {
         $this->reRenderNeeded = $needed;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTypeShort(): string
     {
         return $this->typeShort;
     }
 
-    /**
-     * @param string $typeShort
-     * @return DocumentationJar
-     */
     public function setTypeShort(string $typeShort): self
     {
         $this->typeShort = $typeShort;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTypeLong(): string
     {
         return $this->typeLong;
     }
 
-    /**
-     * @param string $typeLong
-     * @return DocumentationJar
-     */
     public function setTypeLong(string $typeLong): self
     {
         $this->typeLong = $typeLong;
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getRepositoryUrl(): string
     {
         return $this->repositoryUrl;
     }
 
-    /**
-     * @param string $repositoryUrl
-     * @return DocumentationJar
-     */
     public function setRepositoryUrl(string $repositoryUrl): self
     {
         $this->repositoryUrl = $repositoryUrl;
@@ -215,18 +189,17 @@ class DocumentationJar
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
+    public function setLastRenderedLink(string $lastRenderedLink): self
+    {
+        $this->lastRenderedLink = $lastRenderedLink;
+        return $this;
+    }
+
     public function getPublicComposerJsonUrl(): ?string
     {
         return $this->publicComposerJsonUrl;
     }
 
-    /**
-     * @param string $publicComposerJsonUrl
-     * @return DocumentationJar
-     */
     public function setPublicComposerJsonUrl(string $publicComposerJsonUrl): self
     {
         $this->publicComposerJsonUrl = $publicComposerJsonUrl;
@@ -234,18 +207,11 @@ class DocumentationJar
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getVendor(): string
     {
         return $this->vendor;
     }
 
-    /**
-     * @param string $vendor
-     * @return DocumentationJar
-     */
     public function setVendor(string $vendor): self
     {
         $this->vendor = $vendor;
@@ -253,18 +219,11 @@ class DocumentationJar
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     * @return DocumentationJar
-     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -272,18 +231,11 @@ class DocumentationJar
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getPackageName(): string
     {
         return $this->packageName;
     }
 
-    /**
-     * @param string $packageName
-     * @return DocumentationJar
-     */
     public function setPackageName(string $packageName): self
     {
         $this->packageName = $packageName;
@@ -291,36 +243,22 @@ class DocumentationJar
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getPackageType(): string
     {
         return $this->packageType;
     }
 
-    /**
-     * @param string $packageType
-     * @return DocumentationJar
-     */
     public function setPackageType(string $packageType): self
     {
         $this->packageType = $packageType;
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getExtensionKey(): ?string
     {
         return $this->extensionKey;
     }
 
-    /**
-     * @param string|null $extensionKey
-     * @return DocumentationJar
-     */
     public function setExtensionKey(?string $extensionKey): self
     {
         $this->extensionKey = $extensionKey;
@@ -332,10 +270,6 @@ class DocumentationJar
         return $this->branch;
     }
 
-    /**
-     * @param string $branch
-     * @return DocumentationJar
-     */
     public function setBranch(string $branch): self
     {
         $this->branch = $branch;
@@ -415,9 +349,6 @@ class DocumentationJar
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getBuildKey(): ?string
     {
         return $this->buildKey;
@@ -458,13 +389,22 @@ class DocumentationJar
         return $this;
     }
 
+    public function getLastRenderedLink(): string
+    {
+        return $this->lastRenderedLink;
+    }
+
     public function isRenderable(): bool
     {
         return !empty($this->publicComposerJsonUrl)
-            && in_array($this->status, [
-                DocumentationStatus::STATUS_RENDERED,
-                DocumentationStatus::STATUS_RENDERING_FAILED
-            ], true);
+               && in_array(
+                   $this->status,
+                   [
+                       DocumentationStatus::STATUS_RENDERED,
+                       DocumentationStatus::STATUS_RENDERING_FAILED,
+                   ],
+                   true
+               );
     }
 
     public function isDeletable(): bool
