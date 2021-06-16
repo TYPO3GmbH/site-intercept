@@ -43,7 +43,11 @@ class ComposerJson
      */
     public function getType(): string
     {
-        if ($this->getName() === 'typo3/surf') {
+        $specialTypeOther = [
+            'typo3/surf',
+            'typo3/tailor',
+        ];
+        if (in_array($this->getName(), $specialTypeOther)) {
             return 'other';
         }
         $this->assertPropertyContainsValue('type');

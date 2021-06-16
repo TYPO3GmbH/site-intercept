@@ -198,9 +198,13 @@ class DeploymentInformationTest extends TestCase
     public function packageTypeDataProvider(): array
     {
         return [
-            'manual' => ['typo3-cms-documentation', 'manual', 'm'],
-            'core' => ['typo3-cms-framework', 'core-extension', 'c'],
-            'extension' => ['typo3-cms-extension', 'extension', 'p'],
+            'manual' => ['typo3-cms-documentation', 'foobar/bazfnord', 'manual', 'm'],
+            'core' => ['typo3-cms-framework', 'foobar/bazfnord', 'core-extension', 'c'],
+            'extension' => ['typo3-cms-extension', 'foobar/bazfnord', 'extension', 'p'],
+            'docs homepage' => ['', 'typo3/docs-homepage', 'docs-home', 'h'],
+            'viewhelper reference' => ['', 'typo3/view-helper-reference', 'other', 'other'],
+            'typo3 surf' => ['', 'typo3/surf', 'other', 'other'],
+            'typo3 tailor' => ['', 'typo3/tailor', 'other', 'other'],
         ];
     }
 
@@ -211,10 +215,10 @@ class DeploymentInformationTest extends TestCase
      * @dataProvider packageTypeDataProvider
      * @test
      */
-    public function packageTypePartsAreCorrectlyResolved(string $type, string $expectedLong, string $expectedShort): void
+    public function packageTypePartsAreCorrectlyResolved(string $type, string $packageName, string $expectedLong, string $expectedShort): void
     {
         $composerJsonAsArray = [
-            'name' => 'foobar/bazfnord',
+            'name' => $packageName,
             'type' => $type,
             'require' => ['typo3/cms-core' => '^9.5'],
         ];

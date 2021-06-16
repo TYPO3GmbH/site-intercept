@@ -29,7 +29,8 @@ class DeploymentInformation
     private static array $packageTypeExceptionMap = [
         'typo3/docs-homepage' => ['h' => 'docs-home'],
         'typo3/view-helper-reference' => ['other' => 'other'],
-        'typo3/surf' => ['other' => 'other']
+        'typo3/surf' => ['other' => 'other'],
+        'typo3/tailor' => ['other' => 'other'],
     ];
 
     /**
