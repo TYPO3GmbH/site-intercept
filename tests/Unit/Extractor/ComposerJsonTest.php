@@ -74,6 +74,27 @@ class ComposerJsonTest extends TestCase
     }
 
     /**
+     * @test
+     * @dataProvider otherTypeDataProvider
+     */
+    public function typeIsReturnedAsExpectedIfShouldBeOther($value): void
+    {
+        $composerJson = new ComposerJson(['name' => $value, 'type' => 'package']);
+        $this->assertSame('other', $composerJson->getType());
+    }
+
+    /**
+     * @return array
+     */
+    public function otherTypeDataProvider(): array
+    {
+        return [
+            ['typo3/surf'],
+            ['typo3/tailor'],
+        ];
+    }
+
+    /**
      * @return array
      */
     public function emptyTypeDataProvider(): array
