@@ -152,6 +152,7 @@ class GithubBuildStatusController extends AbstractController
         $result = new GithubBuildInfo($request);
         $buildKey = $result->buildKey;
         $success = $result->success;
+        $manager = $this->getDoctrine()->getManager();
         // This is a back-channel triggered by Github after a "documentation rendering" build is done
         $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
         /** @var DocumentationJar $documentationJar */
@@ -159,9 +160,8 @@ class GithubBuildStatusController extends AbstractController
         if ($documentationJar instanceof DocumentationJar) {
             if ($success) {
                 // Build was successful, set status to "deleted"
-                $documentationJar
-                    ->setLastRenderedAt(new DateTime('now'))
-                    ->setStatus(DocumentationStatus::STATUS_DELETED);
+                $manager->remove($documentationJar);
+                $manager->flush();
                 $logger->info(
                     'Documentation deleted by Github',
                     [
