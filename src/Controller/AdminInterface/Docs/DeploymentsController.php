@@ -17,7 +17,6 @@ use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Form\DocsDeploymentFilterType;
 use App\Repository\DocumentationJarRepository;
-use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\GithubService;
 use App\Service\GraylogService;

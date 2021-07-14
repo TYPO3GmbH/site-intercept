@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace App\Tests\Functional;
 
 use App\Bundle\TestDoubleBundle;
-use App\Client\BambooClient;
 use App\Client\GeneralClient;
 use App\Client\GerritClient;
 use App\Client\GraylogClient;

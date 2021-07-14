@@ -33,8 +33,6 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
 
         $this->graylogProphecy = $this->addGraylogClientProphecy();
         $this->graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-
-
     }
 
     /**
@@ -83,7 +81,6 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
     public function recentLogMessagesAreRendered()
     {
         TestDoubleBundle::reset();
-
 
         TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);

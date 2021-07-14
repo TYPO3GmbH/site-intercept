@@ -39,8 +39,6 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordWebhookIndexIsRendered()
     {
-
-
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord');
@@ -52,8 +50,6 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordWebhookAddFormIsRendered()
     {
-
-
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/webhook/add');
@@ -65,8 +61,6 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordScheduledMessagesIndexIsRendered()
     {
-
-
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/scheduled');
@@ -78,8 +72,6 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordScheduledMessagesAddFormIsRendered()
     {
-
-
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/scheduled/add');
@@ -91,8 +83,6 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordWebhookHowToPageIsRendered()
     {
-
-
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/howto');
