@@ -87,8 +87,12 @@ class ComposerJson
      */
     public function getMinimumTypoVersion(): string
     {
-        // Leave version constraint empty for typo3/cms-core or typo3/surf itself
-        if ($this->getName() === 'typo3/cms-core' || $this->getName() === 'typo3/surf') {
+        // Leave version constraint empty for typo3/cms-core itself or other products like typo3/surf or typo3/tailor
+        if (
+            $this->getName() === 'typo3/cms-core' ||
+            $this->getName() === 'typo3/surf' ||
+            $this->getName() === 'typo3/tailor'
+        ) {
             return '';
         }
         if ($this->getCoreRequirement() === null) {
@@ -104,8 +108,12 @@ class ComposerJson
      */
     public function getMaximumTypoVersion(): string
     {
-        // Leave version constraint empty for typo3/cms-core itself
-        if ($this->getName() === 'typo3/cms-core' || $this->getName() === 'typo3/surf') {
+        // Leave version constraint empty for typo3/cms-core itself or other products like typo3/surf or typo3/tailor
+        if (
+            $this->getName() === 'typo3/cms-core' ||
+            $this->getName() === 'typo3/surf' ||
+            $this->getName() === 'typo3/tailor'
+        ) {
             return '';
         }
         if ($this->getCoreRequirement() === null) {
