@@ -84,15 +84,6 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
         return $gerritClient;
     }
 
-    protected function addBambooClientProphecy(): ObjectProphecy
-    {
-        $bambooClient = $this->prophesize(BambooClient::class);
-        $bambooClient->get('latest/agent/remote?os_authType=basic', Argument::cetera())->willReturn(new Response());
-        $bambooClient->get('latest/queue?os_authType=basic', Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClient);
-        return $bambooClient;
-    }
-
     protected function addGraylogClientProphecy(): ObjectProphecy
     {
         $gray = $this->prophesize(GraylogClient::class);

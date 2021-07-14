@@ -34,7 +34,7 @@ class ForgeService
     private ForgeClient $client;
 
     /**
-     * BambooService constructor.
+     * ForgeService constructor.
      *
      * @param ForgeClient $client
      */

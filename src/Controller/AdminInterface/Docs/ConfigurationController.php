@@ -107,8 +107,6 @@ class ConfigurationController extends AbstractController
      * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
      * @param DocumentationBuildInformationService $docBuildInfoService
-     * @param BambooService $bambooService
-     * @param DocumentationJarRepository $docsRepository
      * @param DocumentationService $docService
      * @return Response
      * @throws DocsPackageDoNotCareBranch
@@ -117,8 +115,6 @@ class ConfigurationController extends AbstractController
     public function addConfigurationStep3(
         Request $request,
         DocumentationBuildInformationService $docBuildInfoService,
-        BambooService $bambooService,
-        DocumentationJarRepository $docsRepository,
         DocumentationService $docService
     ): Response {
         $deploymentParams = $request->get('documentation_deployment');

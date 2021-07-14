@@ -43,7 +43,6 @@ class DeploymentsController extends AbstractController
      *
      * @param Request $request
      * @param PaginatorInterface $paginator
-     * @param BambooService $bambooService
      * @param GraylogService $graylogService
      * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
@@ -51,7 +50,6 @@ class DeploymentsController extends AbstractController
     public function index(
         Request $request,
         PaginatorInterface $paginator,
-        BambooService $bambooService,
         GraylogService $graylogService,
         DocumentationJarRepository $documentationJarRepository
     ): Response {

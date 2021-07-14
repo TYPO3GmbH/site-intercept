@@ -39,8 +39,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordWebhookIndexIsRendered()
     {
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
+
+
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord');
@@ -52,8 +52,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordWebhookAddFormIsRendered()
     {
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
+
+
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/webhook/add');
@@ -65,8 +65,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordScheduledMessagesIndexIsRendered()
     {
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
+
+
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/scheduled');
@@ -78,8 +78,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordScheduledMessagesAddFormIsRendered()
     {
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
+
+
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/scheduled/add');
@@ -91,8 +91,8 @@ class DiscordControllerTest extends AbstractFunctionalWebTestCase
      */
     public function discordWebhookHowToPageIsRendered()
     {
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
+
+
         $client = static::createClient();
         $this->logInAsAdmin($client);
         $client->request('GET', '/admin/discord/howto');
