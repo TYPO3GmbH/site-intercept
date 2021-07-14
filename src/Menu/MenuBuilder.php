@@ -32,40 +32,13 @@ class MenuBuilder extends TemplateMenuBuider
         $menu->addChild(
             'core',
             [
-                'route' => 'admin_bamboo_core',
-                'label' => 'Core',
+                'route' => 'admin_split_core',
+                'label' => 'Split Core',
                 'extras' => [
                     'icon' => 'actions-extension',
                 ],
             ]
         );
-        $menu['core']->addChild(
-            'bamboo_core',
-            [
-                'route' => 'admin_bamboo_core',
-                'label' => 'Build Plans',
-            ]
-        );
-        $menu['core']->addChild(
-            'split_core',
-            [
-                'route' => 'admin_split_core',
-                'label' => 'Split Core',
-            ]
-        );
-        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            $menu['core']->addChild($this->getDivider());
-            $menu['core']->addChild(
-                'bamboo_core_security',
-                [
-                    'route' => 'admin_bamboo_core_security',
-                    'label' => 'Security Build Plans',
-                    'extras' => [
-                        'icon' => 'actions-shield',
-                    ],
-                ]
-            );
-        }
         $menu->addChild(
             'documentation',
             [

@@ -37,16 +37,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->addRabbitManagementClientProphecy();
         $graylogProphecy = $this->addGraylogClientProphecy();
         $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
     }
 
     /**
@@ -54,7 +44,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function indexRenderTableWithRedirectEntries()
     {
-        $this->addBambooClientProphecy();
         $this->client = static::createClient();
         $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
@@ -237,7 +226,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function invalidSourceInputTriggersValidationError(string $input)
     {
-        $this->addBambooClientProphecy();
         $this->addRabbitManagementClientProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
@@ -268,8 +256,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      */
     public function invalidTargetInputTriggersValidationError(string $input)
     {
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
         $this->addRabbitManagementClientProphecy();
         $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);

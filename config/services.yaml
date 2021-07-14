@@ -26,7 +26,6 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\Client\BambooClient: '@eight_points_guzzle.client.bamboo'
     App\Client\GerritClient: '@eight_points_guzzle.client.gerrit'
     App\Client\GeneralClient: '@eight_points_guzzle.client.general'
     App\Client\GraylogClient: '@eight_points_guzzle.client.graylog'
@@ -120,12 +119,6 @@ services:
             $staticDir: '%kernel.project_dir%/config/nginx'
         tags:
             - testDouble
-
-    App\Service\GerritService:
-        class: App\Service\GerritService
-        public: true
-        arguments:
-            $gerritToken: '%env(GERRIT_TOKEN)%'
 
     App\Service\RabbitPublisherService:
         class: App\Service\RabbitPublisherService

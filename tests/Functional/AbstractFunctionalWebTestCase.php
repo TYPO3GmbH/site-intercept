@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace App\Tests\Functional;
 
 use App\Bundle\TestDoubleBundle;
-use App\Client\BambooClient;
 use App\Client\GeneralClient;
 use App\Client\GerritClient;
 use App\Client\GraylogClient;
@@ -82,15 +81,6 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
         $gerritClient = $this->prophesize(GerritClient::class);
         TestDoubleBundle::addProphecy(GerritClient::class, $gerritClient);
         return $gerritClient;
-    }
-
-    protected function addBambooClientProphecy(): ObjectProphecy
-    {
-        $bambooClient = $this->prophesize(BambooClient::class);
-        $bambooClient->get('latest/agent/remote?os_authType=basic', Argument::cetera())->willReturn(new Response());
-        $bambooClient->get('latest/queue?os_authType=basic', Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(BambooClient::class, $bambooClient);
-        return $bambooClient;
     }
 
     protected function addGraylogClientProphecy(): ObjectProphecy
