@@ -22,8 +22,6 @@ class HomeControllerTest extends AbstractFunctionalWebTestCase
      */
     public function indexPageIsRendered()
     {
-        $this->addBambooClientProphecy();
-        $this->addBambooClientProphecy();
         $this->addRabbitManagementClientProphecy();
         $client = static::createClient();
         $client->request('GET', '/admin');

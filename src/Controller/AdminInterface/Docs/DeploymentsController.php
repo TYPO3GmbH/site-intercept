@@ -17,7 +17,6 @@ use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Form\DocsDeploymentFilterType;
 use App\Repository\DocumentationJarRepository;
-use App\Service\BambooService;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\GithubService;
 use App\Service\GraylogService;
@@ -43,7 +42,6 @@ class DeploymentsController extends AbstractController
      *
      * @param Request $request
      * @param PaginatorInterface $paginator
-     * @param BambooService $bambooService
      * @param GraylogService $graylogService
      * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
@@ -51,7 +49,6 @@ class DeploymentsController extends AbstractController
     public function index(
         Request $request,
         PaginatorInterface $paginator,
-        BambooService $bambooService,
         GraylogService $graylogService,
         DocumentationJarRepository $documentationJarRepository
     ): Response {

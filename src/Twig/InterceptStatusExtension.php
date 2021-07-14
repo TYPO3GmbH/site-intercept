@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace App\Twig;
 
-use App\Service\BambooService;
 use App\Service\RabbitStatusService;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
@@ -18,14 +17,11 @@ use Twig\TwigFunction;
 
 class InterceptStatusExtension extends AbstractExtension
 {
-    protected BambooService $bambooService;
     protected RabbitStatusService $rabbitService;
 
     public function __construct(
-        BambooService $bambooService,
         RabbitStatusService $rabbitService
     ) {
-        $this->bambooService = $bambooService;
         $this->rabbitService = $rabbitService;
     }
 
@@ -50,7 +46,6 @@ class InterceptStatusExtension extends AbstractExtension
         return $environment->render(
             'extension/interceptStatus.html.twig',
             [
-                'bambooStatus' => $this->bambooService->getBambooStatus(),
                 'rabbitStatus' => $this->rabbitService->getStatus(),
             ]
         );
