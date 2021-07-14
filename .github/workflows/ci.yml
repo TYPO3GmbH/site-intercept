@@ -28,18 +28,6 @@ jobs:
 
       - name: (COMPOSER) Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
-        env:
-          COMPOSER_AUTH: '{
-              "http-basic": {
-                "repo.packagist.com": {
-                  "username": "token",
-                  "password": "${{ secrets.PACKAGIST_AUTH_TOKEN }}"
-                }
-              },
-              "github-oauth": {
-                "github.com": "${{ secrets.ACTIONS_TOKEN }}"
-              }
-            }'
 
       - name: (CGL) PHP
         run: composer t3g:cgl
