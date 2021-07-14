@@ -8,25 +8,9 @@ Processes, setup, architecture and so on are found in this README.
 
 ## Services
 
-#### Bamboo post build
-
-End point "/bamboo" - Called by bamboo when a core build finished. Triggers votes
-on gerrit for pending (pre-merge) patches, retriggers a failed nightly build once,
-escalates a finally failed nightly core build to slack.
-
-#### Docs to bamboo
-
-Hook end point for domain "docs-hook.typo3.com" (primary) or "intercept.typo3.com/docs"
-(test use only!). Triggers rendering and deployment of a documentation to new docs server.
-
 ##### Legacy Documentation Rendering Hook
 
 Please check the information in `legacy_hook/` folder
-
-#### Gerrit to bamboo
-
-End point "/gerrit". A hook fired by gerrit for core patch push events to trigger
-a bamboo pre-merge build.
 
 #### Github pull request
 
@@ -47,10 +31,6 @@ use the bitbucket _server_ payloads directly. Requests to the hook have to be se
 
 ## Web interface
 
-#### Bamboo control
-
-Trigger single bamboo builds manually for core patches.
-
 #### Git subtree split control
 
 Trigger subtree splitting and tagging manually.
@@ -65,23 +45,22 @@ Interface to link other services to Discord webhooks.
 
 ## List of services interacted with
 
--   forge.typo3.com - Create an issue on forge if a github core pull request is transformed
+- forge.typo3.com - Create an issue on forge if a github core pull request is transformed
     to a gerrit core patch and forge issue.
--   review.typo3.com (gerrit) - Gerrit calls /gerrit if new core patches are pushed, intercept
+- review.typo3.com (gerrit) - Gerrit calls /gerrit if new core patches are pushed, intercept
     votes on gerrit for completed bamboo builds, intercept pushes patches to gerrit if a
     github pull request is transformed to a gerrit core patch and forge issue.
--   bamboo.typo3.com - Trigger test builds for core patches, trigger documentation rendering builds
--   github.com - repository hooks trigger: git subtree split, git subtree tagging, pull request
+- github.com - repository hooks trigger: git subtree split, git subtree tagging, pull request
     handling, documentation rendering. intercept pushes patches and tags to core subtree split
     repositories.
--   rabbitmq.typo3.com - intercept web controls push new subtree split & tag jobs to a rabbitmq queue,
+- rabbitmq.typo3.com - intercept web controls push new subtree split & tag jobs to a rabbitmq queue,
     a intercept cli job connects to rabbit to handle these jobs.
--   elk.typo3.com (graylog) - intercept logs details to graylog, the web intercept interface reads various
+- elk.typo3.com (graylog) - intercept logs details to graylog, the web intercept interface reads various
     log entries and renders them.
--   typo3.slack.com - intercept pushs messages to slack for failed nightly builds
--   sqlite - a local sqlite, stores users, documentation details, information if a single core
+- typo3.slack.com - intercept pushs messages to slack for failed nightly builds
+- sqlite - a local sqlite, stores users, documentation details, information if a single core
     nightly build has been rebuild already
--   Discord - Creating and sending webhooks in Discord
+- Discord - Creating and sending webhooks in Discord
 
 ## Architecture
 
@@ -116,13 +95,10 @@ service.
 
 ## Git branches
 
-Changes to intercept should go to the develop branch. This branch is deployed to life
-https://intercept.typo3.com/ immediately by bamboo deployment if the test build goes green.
-The master branch is currently not maintained.
+Changes to intercept should go to the develop branch. This branch is deployed to stage
+https://stage.intercept.typo3.com/ - the master branch is updated by creating a new release
+via gitflow workflow and is deployed to live by github actionts.
 
-Test coverage can be found (for TYPO3 GmbH members) at https://bamboo.typo3.com/browse/T3G-IN
--> a single run -> the test job -> tab 'Artifacts' for the raw html output by phpunit and
-tab 'Clover' for a summary graph.
 
 ## Installation & upgrading
 
