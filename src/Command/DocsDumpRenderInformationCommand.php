@@ -122,7 +122,7 @@ class DocsDumpRenderInformationCommand extends Command
         }
         $documentationJar = $this->documentationJarRepository->findByPackageIdentifier($package);
         if ($documentationJar === null) {
-            throw new InvalidArgumentException('no valid documentationJar could be resolved for packageIdentifier', 1558610587);
+            throw new InvalidArgumentException('no valid documentationJar could be resolved for packageIdentifier:' . $package, 1558610587);
         }
         $this->renderDocumentation($documentationJar);
     }
