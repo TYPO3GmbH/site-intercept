@@ -24,9 +24,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @codeCoverageIgnore No business logic code, no production app code, just glue
  */
-class DocsRenderCommand extends Command
+class DocsDumpRenderInformationCommand extends Command
 {
-    protected static $defaultName = 'app:docs-render';
+    protected static $defaultName = 'app:docs-dump-render-info';
 
     protected RenderDocumentationService $renderDocumentationService;
 
@@ -43,31 +43,48 @@ class DocsRenderCommand extends Command
     {
         $this
             ->setDescription('Command to re-render all docs or one specific')
-            ->addOption('configuration', 'c', InputOption::VALUE_OPTIONAL, 'render configuration by given ID')
-            ->addOption('package', 'p', InputOption::VALUE_OPTIONAL, 'render configuration by given package and target directory, e.g. typo3/team-t3docteam:master')
+            ->addOption('all', 'a', InputOption::VALUE_NONE, 're-dump all existing configurations')
+            ->addOption('configuration', 'c', InputOption::VALUE_OPTIONAL, 'dump configuration by given ID')
+            ->addOption('package', 'p', InputOption::VALUE_OPTIONAL, 'dump configuration by given package and target directory, e.g. typo3/team-t3docteam:master')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $all = $input->getOption('all') ?? false;
         $id = $input->getOption('configuration');
         $package = $input->getOption('package');
 
         $io->title('Render Documentation');
 
-        if ($id === null && $package === null) {
+        if ($all === false && $id === null && $package === null) {
             $io->error('At least one option is required: --all, --configuration or --package');
             return 1;
         }
 
         try {
-            if ($id !== null) {
+            if ($all) {
+                if ($io->confirm('Are you really sure, you want to dump info about ALL docs?', false)) {
+                    foreach ($this->documentationJarRepository->findAll() as $documentationJar) {
+                        try {
+                            $this->renderDocumentation($documentationJar);
+                            $io->success('Dumped info for package "' . $documentationJar->getPackageName() . '" with target branch "' . $documentationJar->getTargetBranchDirectory() . '"');
+                            // avoid stopping the whole queue because of a broken / irrelevant package
+                        } catch (DuplicateDocumentationRepositoryException | DocsPackageDoNotCareBranch $exception) {
+                            $io->error($exception->getMessage());
+                        }
+                    }
+                    $io->success('Dumped all docs.');
+                } else {
+                    $io->success('Dumping of ALL documentations aborted');
+                }
+            } elseif ($id !== null) {
                 $this->renderConfiguration((int)$id);
-                $io->success('Rendering started. This will require some time.');
+                $io->success('Info dumped.');
             } elseif ($package !== null) {
                 $this->renderPackage($package);
-                $io->success('Rendering started. This will require some time.');
+                $io->success('Info dumped');
             } else {
                 $io->error('Something went wrong, please check your input options');
             }
@@ -118,6 +135,6 @@ class DocsRenderCommand extends Command
     protected function renderDocumentation(DocumentationJar $documentationJar): void
     {
         /** @noinspection UnusedFunctionResultInspection */
-        $this->renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'CLI');
+        $this->renderDocumentationService->dumpRenderingInformationByDocumentationJar($documentationJar);
     }
 }

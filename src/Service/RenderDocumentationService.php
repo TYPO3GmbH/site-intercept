@@ -61,4 +61,11 @@ class RenderDocumentationService
         );
         return $buildInformation;
     }
+
+    public function dumpRenderingInformationByDocumentationJar(DocumentationJar $documentationJar): DeploymentInformation
+    {
+        $buildInformation = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
+        $this->documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
+        return $buildInformation;
+    }
 }

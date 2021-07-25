@@ -241,3 +241,30 @@ ddev exec -s graylogmongo rm -rf /dump
 
 If the instance runs with ddev, a `.env.local` file inside `.ddev` is mandatory. It can be copied from the existing .env.example
 file. For no performance profiling tasks, the values may be empty. Else, put your account data here. If in doubt, reach out to Susi.
+
+## Re-Render all locally
+
+### Prerequisites
+
+- Server with enough power, `git`, `parallel`, `docker` and ssh access to the docs server (DO NOT DO THIS ON SRV001!)
+- up-to-date intercept database (Get a copy of `var/data.db` from the live system before you start)
+- clone of this repository
+
+### Commands
+
+```bash
+# rm build dir if it exists
+rm -Rf var/docs-build-information/
+# generate build information - writes build information files to disk at var/docs-build-information/
+./bin/console app:docs-dump-render-info --all
+# go to the build folder
+cd build
+# download and update repositories
+time find ../var/docs-build-information/ ! -type d | parallel --progress "./download-update.sh {}"
+# render all documents (~1h on a modern notebook)
+time find ../var/docs-build-information/ ! -type d | parallel --progress "./render.sh {}"
+# move docs to final structure locally
+time find ../var/docs-build-information/ ! -type d | parallel "./move.sh {}"
+# rsync rendered docs to live
+./upload.sh
+```
