@@ -118,7 +118,7 @@ class DocsDumpRenderInformationCommand extends Command
     {
         [$packageName, $version] = explode(':', $package);
         if (empty($packageName) || empty($version)) {
-            throw new InvalidArgumentException('no valid package identifier given', 1558609831);
+            throw new InvalidArgumentException('no valid package identifier given: ' . $package, 1558609831);
         }
         $documentationJar = $this->documentationJarRepository->findByPackageIdentifier($package);
         if ($documentationJar === null) {
