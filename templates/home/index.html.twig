@@ -59,39 +59,6 @@
                 <div class="card-header">
                     <div class="card-header-bar">
                         <div class="card-header-title">
-                            <h3>Pre-Merge Testing</h3>
-                        </div>
-                        <div class="card-header-status">
-                            <span class="badge badge-success">Active</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <p>
-                        If a core patch is pushed to the gerrit review system at
-                        <a href="https://review.typo3.org/">review.typo3.org</a>,
-                        intercept triggers the according "pre-merge" core test suite at
-                        <a href="https://bamboo.typo3.com/">bamboo.typo3.com</a> and reports
-                        the result back to the review system by voting on the patch.
-                    </p>
-                </div>
-                <div class="card-footer">
-                    <p class="text-muted">
-                        Logged in users can trigger tests manually.
-                    </p>
-                    {{
-                        macros.linkbutton(
-                            path('admin_split_core'),
-                            'Build Plans',
-                            'light'
-                        )
-                    }}
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-header-bar">
-                        <div class="card-header-title">
                             <h3>GitHub Pull-Requests</h3>
                         </div>
                         <div class="card-header-status">
@@ -103,39 +70,9 @@
                     If a pull request is opened on the github main core repository at
                     <a href="https://github.com/typo3/typo3.cms">github/typo3/typo3.cms</a>,
                     intercept creates an issue from that pull request at <a href="https://forge.typo3.org">
-                    forge.typo3.org</a>, transfers the pull reqeust to a gerrit review
+                    forge.typo3.org</a>, transfers the pull request to a gerrit review
                     <a href="https://review.typo3.org">review.typo3.org</a> and closes the pull request
                     with a remark that it has been transferred.
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-header-bar">
-                        <div class="card-header-title">
-                            <h3>Nightly Builds</h3>
-                        </div>
-                        <div class="card-header-status">
-                            <span class="badge badge-success">Active</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <a href="https://bamboo.typo3.org">Bamboo</a> executes a nightly test build of
-                    all active TYPO3 core development branches. Intercept re-triggers those nightlies
-                    once if they failed, and reports a failing nightly build to <a href="https://typo3.slack.com">
-                    slack channel #typo3-cms-coredev</a> if it continues to fail.
-                </div>
-                <div class="card-footer">
-                    <p class="text-muted">
-                        Logged in users can trigger tests manually.
-                    </p>
-                    {{
-                        macros.linkbutton(
-                            path('admin_split_core'),
-                            'Build Plans',
-                            'light'
-                        )
-                    }}
                 </div>
             </div>
             <div class="card">
