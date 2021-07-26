@@ -43,3 +43,5 @@ yarn-error.log
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+/build/docker-compose.yml
+/build/jobfile.json

@@ -9,6 +9,10 @@
         <include>
             <directory suffix=".php">../src/*/</directory>
         </include>
+        <exclude>
+            <directory>../src/Entity/</directory>
+            <directory>../src/Migrations/</directory>
+        </exclude>
     </coverage>
     <php>
         <ini name="error_reporting" value="-1"/>
