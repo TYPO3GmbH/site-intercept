@@ -109,7 +109,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: typo3
           SENTRY_PROJECT: intercept
-          SENTRY_LOG_LEVEL: debug
         run: |
           # Install Sentry CLI
           curl -sL https://sentry.io/get-cli/ | bash
