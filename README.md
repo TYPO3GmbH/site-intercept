@@ -67,7 +67,7 @@ Interface to link other services to Discord webhooks.
 intercept is sort of a spider that hangs in between different services to communicate
 and translate between them. On testing side, only the simple data munging parts are
 unit tested, the main testing logic lies in the functional tests. The coverage is very
-hight to specify in detail what intercept does, and which data is expected from a given
+high to specify in detail what intercept does, and which data is expected from a given
 service.
 
 #### Class folders
