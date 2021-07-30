@@ -71,7 +71,7 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add ~/.ssh/deploy_rsa
       - uses: actions/checkout@v2
-      - uses: shivammathur/setup-php@v1
+      - uses: shivammathur/setup-php@v2
       - name: Install Magallanes
         run: |
           composer global require "andres-montanez/magallanes" --no-progress
@@ -103,3 +103,22 @@ jobs:
         with:
           name: logs
           path: .mage/logs
+
+      - name: Create Sentry release
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: typo3
+          SENTRY_PROJECT: intercept
+          SENTRY_LOG_LEVEL: debug
+        run: |
+          # Install Sentry CLI
+          curl -sL https://sentry.io/get-cli/ | bash
+
+          # Create new Sentry release
+          export SENTRY_RELEASE=$(sentry-cli releases propose-version)
+          sentry-cli --url https://sentry.typo3.com releases new -p $SENTRY_PROJECT $SENTRY_RELEASE
+          sentry-cli --url https://sentry.typo3.com releases set-commits --auto $SENTRY_RELEASE
+          sentry-cli --url https://sentry.typo3.com releases finalize $SENTRY_RELEASE
+
+          # Create new deploy for this Sentry release
+          sentry-cli --url https://sentry.typo3.com releases deploys $SENTRY_RELEASE new -e ${{ steps.environment.outputs.target }}

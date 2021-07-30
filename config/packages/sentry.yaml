@@ -1,0 +1,7 @@
+sentry:
+  dsn: '%env(SENTRY_DSN)%'
+  register_error_listener: false
+services:
+  Monolog\Processor\PsrLogMessageProcessor:
+    tags: { name: monolog.processor, handler: sentry }
+

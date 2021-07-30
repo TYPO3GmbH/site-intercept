@@ -1,13 +1,19 @@
 monolog:
-    handlers:
-        main:
-            type: group
-            members: [file, graylog]
-        file:
-            type: rotating_file
-            level: INFO
-            path: "%kernel.logs_dir%/%kernel.environment%.log"
-        graylog:
-            type: gelf
-            level: INFO
-            publisher: "gelf.publisher"
+  handlers:
+    main:
+      type: group
+      members: [ file, graylog ]
+    file:
+      type: rotating_file
+      level: !php/const Monolog\Logger::WARNING
+      path: "%kernel.logs_dir%/%kernel.environment%.log"
+    graylog:
+      type: gelf
+      level: !php/const Monolog\Logger::INFO
+      publisher: "gelf.publisher"
+    sentry:
+      type: sentry
+      level: !php/const Monolog\Logger::WARNING
+      hub_id: Sentry\State\HubInterface
+sentry:
+  register_error_listener: false
