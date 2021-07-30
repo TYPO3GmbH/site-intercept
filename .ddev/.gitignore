@@ -22,6 +22,7 @@
 /db_snapshots
 /import-db
 /import.yaml
+/mutagen.yml
 /nginx_full/nginx-site.conf
 /sequelpro.spf
 /**/README.*
