@@ -105,11 +105,20 @@ jobs:
           path: .mage/logs
 
       - name: Create Sentry release
-        uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: typo3
           SENTRY_PROJECT: 7
           SENTRY_LOG_LEVEL: debug
-        with:
-          environment: ${{ steps.environment.outputs.target }}
+        run: |
+          # Install Sentry CLI
+          curl -sL https://sentry.io/get-cli/ | bash
+
+          # Create new Sentry release
+          export SENTRY_RELEASE=$(sentry-cli releases propose-version)
+          sentry-cli --url https://sentry.typo3.com releases new -p $SENTRY_PROJECT $SENTRY_RELEASE
+          sentry-cli --url https://sentry.typo3.com releases set-commits --auto $SENTRY_RELEASE
+          sentry-cli --url https://sentry.typo3.com releases finalize $SENTRY_RELEASE
+
+          # Create new deploy for this Sentry release
+          sentry-cli --url https://sentry.typo3.com releases deploys $SENTRY_RELEASE new -e ${{ steps.environment.outputs.target }}
