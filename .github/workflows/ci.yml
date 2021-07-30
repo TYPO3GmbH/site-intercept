@@ -71,7 +71,7 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add ~/.ssh/deploy_rsa
       - uses: actions/checkout@v2
-      - uses: shivammathur/setup-php@v1
+      - uses: shivammathur/setup-php@v2
       - name: Install Magallanes
         run: |
           composer global require "andres-montanez/magallanes" --no-progress
@@ -108,7 +108,8 @@ jobs:
         uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_ORG: typo3
+          SENTRY_PROJECT: 7
+          SENTRY_LOG_LEVEL: debug
         with:
           environment: ${{ steps.environment.outputs.target }}
