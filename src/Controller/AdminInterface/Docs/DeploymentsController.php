@@ -10,27 +10,31 @@ declare(strict_types = 1);
 
 namespace App\Controller\AdminInterface\Docs;
 
+use App\Entity\HistoryEntry;
+use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\DocumentationStatus;
+use App\Enum\HistoryEntryTrigger;
+use App\Enum\HistoryEntryType;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Form\DocsDeploymentFilterType;
 use App\Repository\DocumentationJarRepository;
+use App\Repository\HistoryEntryRepository;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\GithubService;
-use App\Service\GraylogService;
 use App\Service\RenderDocumentationService;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Knp\Component\Pager\PaginatorInterface;
-use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 /**
  * Show and manipulate all docs deployments managed by intercept
@@ -39,20 +43,19 @@ class DeploymentsController extends AbstractController
 {
     /**
      * @Route("/admin/docs/deployments", name="admin_docs_deployments")
-     *
      * @param Request $request
      * @param PaginatorInterface $paginator
-     * @param GraylogService $graylogService
+     * @param HistoryEntryRepository $historyEntryRepository
      * @param DocumentationJarRepository $documentationJarRepository
      * @return Response
      */
     public function index(
         Request $request,
         PaginatorInterface $paginator,
-        GraylogService $graylogService,
+        HistoryEntryRepository $historyEntryRepository,
         DocumentationJarRepository $documentationJarRepository
     ): Response {
-        $recentLogsMessages = $graylogService->getRecentBambooDocsActions();
+        $recentLogsMessages = $historyEntryRepository->findByType('docsRendering', 30);
         $criteria = Criteria::create();
 
         $requestSortDirection = $request->query->get('direction');
@@ -89,7 +92,9 @@ class DeploymentsController extends AbstractController
                 'filter' => $form->createView(),
                 'pagination' => $pagination,
                 'logMessages' => $recentLogsMessages,
-                'docsLiveServer' => $_ENV['DOCS_LIVE_SERVER'] ?? '',
+                'warnings' => DocsRenderingHistoryStatus::$warnings,
+                'translations' => DocsRenderingHistoryStatus::$messages,
+                'docsLiveServer' => $_ENV['DOCS_LIVE_SERVER'] ?? ''
             ]
         );
     }
@@ -123,7 +128,6 @@ class DeploymentsController extends AbstractController
      * @Route("/admin/docs/deployments/delete/{documentationJarId}", name="admin_docs_deployments_delete_action", requirements={"documentationJarId"="\d+"}, methods={"DELETE"})
      * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param int $documentationJarId
-     * @param LoggerInterface $logger
      * @param DocumentationJarRepository $documentationJarRepository
      * @param EntityManagerInterface $entityManager
      * @param DocumentationBuildInformationService $documentationBuildInformationService
@@ -134,7 +138,6 @@ class DeploymentsController extends AbstractController
      */
     public function delete(
         int $documentationJarId,
-        LoggerInterface $logger,
         DocumentationJarRepository $documentationJarRepository,
         EntityManagerInterface $entityManager,
         DocumentationBuildInformationService $documentationBuildInformationService,
@@ -151,19 +154,28 @@ class DeploymentsController extends AbstractController
                 ->setBuildKey($buildTriggered->buildResultKey)
                 ->setStatus(DocumentationStatus::STATUS_DELETING);
             $entityManager->persist($jar);
-            $entityManager->flush();
-
-            $logger->info(
-                'Documentation deletion triggered',
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'packageDeleted',
-                    'triggeredBy' => 'interface',
-                    'repository' => $jar->getRepositoryUrl(),
-                    'package' => $jar->getPackageName(),
-                    'bambooKey' => $buildTriggered->buildResultKey,
-                ]
+            $user = $this->getUser();
+            $userIdentifier = 'Anon.';
+            if ($user instanceof KeyCloakUser) {
+                $userIdentifier = $user->getDisplayName();
+            }
+            $entityManager->persist(
+                (new HistoryEntry())
+                    ->setType('docsRendering')
+                    ->setStatus(DocsRenderingHistoryStatus::PACKAGE_DELETED)
+                    ->setData(
+                        [
+                            'type' => HistoryEntryType::DOCS_RENDERING,
+                            'status' => DocsRenderingHistoryStatus::PACKAGE_DELETED,
+                            'triggeredBy' => HistoryEntryTrigger::WEB,
+                            'repository' => $jar->getRepositoryUrl(),
+                            'package' => $jar->getPackageName(),
+                            'bambooKey' => $buildTriggered->buildResultKey,
+                            'user' => $userIdentifier
+                        ]
+                    )
             );
+            $entityManager->flush();
         }
 
         return $this->redirectToRoute('admin_docs_deployments');
@@ -205,18 +217,23 @@ class DeploymentsController extends AbstractController
      * @Route("/admin/docs/render", name="admin_docs_render")
      * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param Request $request
-     * @param LoggerInterface $logger
+     * @param EntityManagerInterface $entityManager
      * @param DocumentationJarRepository $documentationJarRepository
      * @param RenderDocumentationService $renderDocumentationService
-     * @return Response
      * @throws DuplicateDocumentationRepositoryException
+     * @return Response
      */
     public function renderDocs(
         Request $request,
-        LoggerInterface $logger,
+        EntityManagerInterface $entityManager,
         DocumentationJarRepository $documentationJarRepository,
         RenderDocumentationService $renderDocumentationService
     ): Response {
+        $user = $this->getUser();
+        $userIdentifier = 'Anon.';
+        if ($user instanceof KeyCloakUser) {
+            $userIdentifier = $user->getDisplayName();
+        }
         try {
             $documentationJarId = (int)$request->get('documentation');
             $documentationJar = $documentationJarRepository->find($documentationJarId);
@@ -229,31 +246,43 @@ class DeploymentsController extends AbstractController
             return $this->redirectToRoute('admin_docs_deployments');
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
-            $logger->warning(
-                'Cannot render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'unsupportedHook',
-                    'headers' => $request->headers,
-                    'payload' => $request->getContent(),
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                ]
+            $entityManager->persist(
+                (new HistoryEntry())
+                    ->setType('docsRendering')
+                    ->setStatus(DocsRenderingHistoryStatus::UNSUPPORTED_HOOK)
+                    ->setData(
+                        [
+                            'type' => 'docsRendering',
+                            'status' => DocsRenderingHistoryStatus::UNSUPPORTED_HOOK,
+                            'headers' => $request->headers,
+                            'payload' => $request->getContent(),
+                            'triggeredBy' => HistoryEntryTrigger::API,
+                            'exceptionCode' => $e->getCode(),
+                            'user' => $userIdentifier
+                        ]
+                    )
             );
+            $entityManager->flush();
             return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         } catch (DocsPackageDoNotCareBranch $e) {
-            $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'noRelevantBranchOrTag',
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                    'exceptionMessage' => $e->getMessage(),
-                    'repository' => $documentationJar->getRepositoryUrl(),
-                    'sourceBranch' => $documentationJar->getBranch(),
-                ]
+            $entityManager->persist(
+                (new HistoryEntry())
+                    ->setType(HistoryEntryType::DOCS_RENDERING)
+                    ->setStatus(DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG)
+                    ->setData(
+                        [
+                            'type' => HistoryEntryType::DOCS_RENDERING,
+                            'status' => DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG,
+                            'triggeredBy' => HistoryEntryTrigger::API,
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $documentationJar->getRepositoryUrl(),
+                            'sourceBranch' => $documentationJar->getBranch(),
+                            'user' => $userIdentifier
+                        ]
+                    )
             );
+            $entityManager->flush();
             return new Response('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         }
     }

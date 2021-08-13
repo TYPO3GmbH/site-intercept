@@ -36,47 +36,6 @@ class GraylogService
     }
 
     /**
-     * Get a list of graylog bamboo trigger calls and gerrit votes
-     *
-     * @return GraylogLogEntry[]
-     */
-    public function getRecentBambooTriggersAndVotes(): array
-    {
-        return $this->getLogs(
-            'application:intercept AND level:6 AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
-            . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
-            . ' AND ctxt_isSecurity:0'
-        );
-    }
-
-    /**
-     * Get a list of graylog bamboo trigger calls and gerrit votes of core security builds
-     *
-     * @return GraylogLogEntry[]
-     */
-    public function getRecentBambooCoreSecurityTriggersAndVotes(): array
-    {
-        return $this->getLogs(
-            'application:intercept AND level:6 AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
-            . ' AND (ctxt_type:triggerBamboo OR ctxt_type:voteGerrit OR ctxt_type:rebuildNightly OR ctxt_type:reportBrokenNightly)'
-            . ' AND ctxt_isSecurity:1'
-        );
-    }
-
-    /**
-     * Log entries related to documentation rendering via bamboo to (new)
-     * docs server.
-     *
-     * @return GraylogLogEntry[]
-     */
-    public function getRecentBambooDocsActions(): array
-    {
-        return $this->getLogs(
-            'application:intercept AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '') . ' AND (ctxt_type:docsRendering)'
-        );
-    }
-
-    /**
      * Log entries related to documentation redirects via bamboo to (new)
      * docs server.
      *
@@ -87,20 +46,6 @@ class GraylogService
         return $this->getLogs(
             'application:intercept AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
             . ' AND (ctxt_type:docsRedirect)'
-        );
-    }
-
-    /**
-     * Log entries related to documentation third party packages rendering tasks.
-     * Shown on documentation site in web interface.
-     *
-     * @return GraylogLogEntry[]
-     */
-    public function getRecentBambooDocsThirdPartyTriggers(): array
-    {
-        return $this->getLogs(
-            'application:intercept AND level:6 AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
-            . ' AND (ctxt_type:triggerBambooDocsThirdParty)'
         );
     }
 

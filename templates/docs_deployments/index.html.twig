@@ -162,73 +162,83 @@
             <div class="card">
                 <div class="message-list">
                     {% for log in logMessages %}
-                        <div class="message {% if log.level == '6' %}message-success{% else %}message-warning{% endif %}">
+                        <div class="message {% if log.data.status in warnings %}message-warning{% else %}message-success{% endif %}">
                             <div class="message-badge">
-                                {% if log.triggeredBy == 'api' %}
+                                {% if log.data.triggeredBy == 'api' %}
                                     <span class="badge badge-secondary">API</span>
-                                {% elseif log.triggeredBy == 'interface' %}
+                                {% elseif log.data.triggeredBy == 'interface' %}
                                     <span class="badge badge-secondary">WEB</span>
-                                {% elseif log.triggeredBy == 'CLI' %}
+                                {% elseif log.data.triggeredBy == 'CLI' %}
                                     <span class="badge badge-secondary">CLI</span>
                                 {% endif %}
                             </div>
                             <div class="message-body">
                                 <div class="message-meta">
                                     <span class="message-date">
-                                        {{ localdatetime(log.time) }}
+                                        {{ localdatetime(log.createdAt) }}
                                     </span>
-                                    {% if log.userDisplayName %}
-                                        <span class="message-user">- by {{ log.userDisplayName }}</span>
+                                    {% if log.data.user is defined %}
+                                        <span class="message-user">- by {{ log.data.user }}</span>
                                     {% endif %}
                                 </div>
                                 <div class="message-text">
-                                    {% if log.link %}
-                                        <a href="{{ log.link }}">{{ log.message }}</a>
+                                    {% if log.data.link is defined %}
+                                        <a href="{{ log.data.link }}">
+                                            {% if log.data.message is defined %}
+                                                {{ log.data.message }}
+                                            {% else %}
+                                                {{ attribute(translations, log.data.status) }}
+                                            {% endif %}
+                                        </a>
                                     {% else %}
-                                        {{ log.message }}
+                                        {% if log.data.message is defined %}
+                                            {{ log.data.message }}
+                                        {% else %}
+                                            {{ attribute(translations, log.data.status) }}
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                                 <div class="message-detail">
-                                    {% if log.bambooKey %}
+                                    {% if log.data.bambooKey is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Build key</span>
-                                            <span class="message-detail-value">{{ log.bambooKey }}</span>
+                                            <span class="message-detail-value">{{ log.data.bambooKey }}</span>
                                         </div>
                                     {% endif %}
-                                    {% if log.package %}
+                                    {% if log.data.package is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Package</span>
-                                            <span class="message-detail-value">{{ log.package }}</span>
+                                            <span class="message-detail-value">{{ log.data.package }}</span>
                                         </div>
                                     {% endif %}
-                                    {% if log.sourceBranch %}
+                                    {% if log.data.sourceBranch is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Branch</span>
-                                            <span class="message-detail-value">{{ log.sourceBranch }}</span>
+                                            <span class="message-detail-value">{{ log.data.sourceBranch }}</span>
                                         </div>
                                     {% endif %}
-                                    {% if log.targetBranch %}
+                                    {% if log.data.targetBranch is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Target directory</span>
-                                            <span class="message-detail-value">{{ log.targetBranch }}</span>
+                                            <span class="message-detail-value">{{ log.data.targetBranch }}</span>
                                         </div>
                                     {% endif %}
-                                    {% if log.repository %}
+                                    {% if log.data.repository is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Repository</span>
-                                            <span class="message-detail-value">{{ log.repository }}</span>
+                                            <span class="message-detail-value">{{ log.data.repository }}</span>
                                         </div>
                                     {% endif %}
-                                    {% if log.composerFile %}
+                                    {% if log.data.composerFile is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Composer file</span>
-                                            <span class="message-detail-value">{{ log.composerFile }}</span>
+                                            <span class="message-detail-value">{{ log.data.composerFile }}</span>
                                         </div>
                                     {% endif %}
-                                    {% if log.exceptionCode %}
+                                    {% if log.data.exceptionCode is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Exception Code</span>
-                                            <span class="message-detail-value">{{ log.exceptionCode }}</span>
+                                            <span class="message-detail-value">{{ log.data.exceptionCode }}</span>
                                         </div>
                                     {% endif %}
                                 </div>
