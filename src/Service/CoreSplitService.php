@@ -35,12 +35,12 @@ class CoreSplitService implements CoreSplitServiceInterface
     private string $splitCorePath;
 
     /**
-     * @var string Link to github mono repo, eg. 'git@github.com:TYPO3/TYPO3.CMS.git'
+     * @var string Link to github mono repo, eg. 'git://github.com/TYPO3/TYPO3.CMS.git'
      */
     private string $splitMonoRepo;
 
     /**
-     * @var string Base link to github single repos, eg. 'git@github.com:TYPO3-CMS/'
+     * @var string Base link to github single repos, eg. 'git://github.com/TYPO3-CMS/'
      */
     private string $splitSingleRepoBase;
 
