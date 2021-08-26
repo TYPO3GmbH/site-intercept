@@ -36,20 +36,6 @@ class GraylogService
     }
 
     /**
-     * Log entries related to documentation redirects via bamboo to (new)
-     * docs server.
-     *
-     * @return GraylogLogEntry[]
-     */
-    public function getRecentRedirectActions(): array
-    {
-        return $this->getLogs(
-            'application:intercept AND env:' . ($_ENV['GRAYLOG_ENV'] ?? '')
-            . ' AND (ctxt_type:docsRedirect)'
-        );
-    }
-
-    /**
      * Returns an array of split / tag log entries grouped by job uuid:
      *
      * [

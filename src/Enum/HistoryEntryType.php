@@ -14,4 +14,5 @@ namespace App\Enum;
 class HistoryEntryType
 {
     public const DOCS_RENDERING = 'docsRendering';
+    public const DOCS_REDIRECT = 'docsRedirect';
 }
