@@ -246,6 +246,7 @@ class RedirectController extends AbstractController
             (new HistoryEntry())
                 ->setType(HistoryEntryType::DOCS_REDIRECT)
                 ->setStatus(DocsRenderingHistoryStatus::TRIGGERED)
+                ->setGroup($bambooBuildTriggered->buildResultKey)
                 ->setData(
                     [
                         'type' => HistoryEntryType::DOCS_REDIRECT,

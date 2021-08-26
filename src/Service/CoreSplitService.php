@@ -513,13 +513,14 @@ class CoreSplitService implements CoreSplitServiceInterface
     private function writeHistoryEntry(string $message, string $level = LogLevel::INFO): void
     {
         if (empty($this->event)) {
-            throw new \RuntimeException('Logger helper can only be called if a rabbit message has been set.');
+            throw new \RuntimeException('Helper can only be called if a rabbit message has been set.');
         }
         $type = $this->event->type === 'patch' ? HistoryEntryType::PATCH : HistoryEntryType::TAG;
         $this->entityManager->persist(
             (new HistoryEntry())
                 ->setType($type)
                 ->setStatus(SplitterStatus::WORK)
+                ->setGroup($this->event->jobUuid)
                 ->setData(
                     [
                         'type' => $type,

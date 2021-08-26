@@ -136,6 +136,7 @@ class DocsRenderingController extends AbstractController
                             (new HistoryEntry())
                                 ->setType(HistoryEntryType::DOCS_RENDERING)
                                 ->setStatus(HistoryEntryTrigger::API)
+                                ->setGroup($buildTriggered->buildResultKey)
                                 ->setData(
                                     [
                                         'type' => HistoryEntryType::DOCS_RENDERING,

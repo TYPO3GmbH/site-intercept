@@ -36,6 +36,13 @@ class HistoryEntry
     private string $status;
 
     /**
+     * Allow grouping of history entries
+     *
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $group = 'default';
+
+    /**
      * @ORM\Column(type="json")
      */
     private array $data = [];
@@ -70,6 +77,17 @@ class HistoryEntry
     public function setStatus(string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+    public function getGroup(): ?string
+    {
+        return $this->group;
+    }
+
+    public function setGroup(string $group): self
+    {
+        $this->group = $group;
 
         return $this;
     }
