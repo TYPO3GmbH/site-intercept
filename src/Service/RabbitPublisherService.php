@@ -10,7 +10,12 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Entity\HistoryEntry;
+use App\Enum\HistoryEntryTrigger;
+use App\Enum\HistoryEntryType;
+use App\Enum\SplitterStatus;
 use App\Extractor\GithubPushEventForCore;
+use Doctrine\ORM\EntityManagerInterface;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -30,20 +35,24 @@ class RabbitPublisherService
      */
     private string $queueName;
 
-    private LoggerInterface $logger;
+    private EntityManagerInterface $entityManager;
 
     /**
      * RabbitPublisherService constructor.
      *
-     * @param LoggerInterface $logger
+     * @param EntityManagerInterface $entityManager
      * @param AMQPStreamConnection $rabbitConnection
      * @param string $rabbitSplitQueue
      */
-    public function __construct(LoggerInterface $logger, AMQPStreamConnection $rabbitConnection, string $rabbitSplitQueue)
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        AMQPStreamConnection $rabbitConnection,
+        string $rabbitSplitQueue
+    )
     {
-        $this->logger = $logger;
         $this->queueName = $rabbitSplitQueue;
         $this->rabbitConnection = $rabbitConnection;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -60,18 +69,25 @@ class RabbitPublisherService
         $rabbitChannel = $this->rabbitConnection->channel();
         $rabbitChannel->queue_declare($this->queueName, false, true, false, false);
         $rabbitChannel->basic_publish($rabbitMessage, '', $this->queueName);
-        $this->logger->info(
-            'Queued a core split job to queue ' . $this->queueName . ' with message ' . $jsonMessage,
-            [
-                'job_uuid' => $message->jobUuid,
-                'type' => $message->type,
-                'triggeredBy' => $trigger,
-                'repository' => $message->repositoryFullName,
-                'sourceBranch' => $message->sourceBranch,
-                'targetBranch' => $message->targetBranch,
-                'tag' => $message->tag,
-                'status' => 'queued',
-            ]
+        $type = $message->type === 'patch' ? HistoryEntryType::PATCH : HistoryEntryType::TAG;
+        $this->entityManager->persist(
+            (new HistoryEntry())
+                ->setType($type)
+                ->setStatus(SplitterStatus::QUEUED)
+                ->setData(
+                    [
+                        'type' => $type,
+                        'status' => SplitterStatus::QUEUED,
+                        'triggeredBy' => $trigger === HistoryEntryTrigger::API ? HistoryEntryTrigger::API : HistoryEntryTrigger::WEB,
+                        'message' => 'Queued a core split job to queue ' . $this->queueName . ' with message ' . $jsonMessage,
+                        'job_uuid' => $message->jobUuid,
+                        'repository' => $message->repositoryFullName,
+                        'sourceBranch' => $message->sourceBranch,
+                        'targetBranch' => $message->targetBranch,
+                        'tag' => $message->tag,
+                    ]
+                )
         );
+        $this->entityManager->flush();
     }
 }

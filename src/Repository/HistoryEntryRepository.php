@@ -10,8 +10,11 @@
 namespace App\Repository;
 
 use App\Entity\HistoryEntry;
+use App\Enum\HistoryEntryType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @method HistoryEntry|null find($id, $lockMode = null, $lockVersion = null)
@@ -31,6 +34,25 @@ class HistoryEntryRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('h')
             ->andWhere('h.type = :val')
             ->setParameter('val', $type)
+            ->orderBy('h.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findSplitLogsByStatus(array $status, int $limit = 100): array
+    {
+        $qb = $this->createQueryBuilder('h');
+        return $qb
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->orX(
+                        $qb->expr()->eq('h.type', HistoryEntryType::PATCH),
+                        $qb->expr()->eq('h.type', HistoryEntryType::TAG),
+                    ),
+                    $qb->expr()->in('h.status', $status)
+                )
+            )
             ->orderBy('h.createdAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()

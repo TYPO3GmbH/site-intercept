@@ -11,10 +11,10 @@ declare(strict_types = 1);
 
 namespace App\Enum;
 
-class HistoryEntryType
+final class SplitterStatus
 {
-    public const DOCS_RENDERING = 'docsRendering';
-    public const DOCS_REDIRECT = 'docsRedirect';
-    public const PATCH = 'patch';
-    public const TAG = 'tag';
+    public const DISPATCH = 'dispatch';
+    public const QUEUED = 'queued';
+    public const WORK = 'work';
+    public const DONE = 'done';
 }
