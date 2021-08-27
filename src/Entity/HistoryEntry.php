@@ -37,10 +37,9 @@ class HistoryEntry
 
     /**
      * Allow grouping of history entries
-     *
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, options={"default": "default"})
      */
-    private string $group = 'default';
+    private string $groupEntry = 'default';
 
     /**
      * @ORM\Column(type="json")
@@ -80,14 +79,14 @@ class HistoryEntry
 
         return $this;
     }
-    public function getGroup(): ?string
+    public function getGroupEntry(): ?string
     {
-        return $this->group;
+        return $this->groupEntry;
     }
 
-    public function setGroup(string $group): self
+    public function setGroupEntry(string $groupEntry): self
     {
-        $this->group = $group;
+        $this->groupEntry = $groupEntry;
 
         return $this;
     }

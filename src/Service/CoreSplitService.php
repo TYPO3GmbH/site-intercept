@@ -520,7 +520,7 @@ class CoreSplitService implements CoreSplitServiceInterface
             (new HistoryEntry())
                 ->setType($type)
                 ->setStatus(SplitterStatus::WORK)
-                ->setGroup($this->event->jobUuid)
+                ->setGroupEntry($this->event->jobUuid)
                 ->setData(
                     [
                         'type' => $type,

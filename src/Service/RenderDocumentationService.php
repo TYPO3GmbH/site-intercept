@@ -67,7 +67,7 @@ class RenderDocumentationService
             (new HistoryEntry())
                 ->setType('docsRendering')
                 ->setStatus('triggered')
-                ->setGroup($bambooBuildTriggered->buildResultKey)
+                ->setGroupEntry($bambooBuildTriggered->buildResultKey)
                 ->setData(
                     [
                         'type' => 'docsRendering',

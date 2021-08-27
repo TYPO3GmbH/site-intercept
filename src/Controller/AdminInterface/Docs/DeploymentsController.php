@@ -163,7 +163,7 @@ class DeploymentsController extends AbstractController
                 (new HistoryEntry())
                     ->setType('docsRendering')
                     ->setStatus(DocsRenderingHistoryStatus::PACKAGE_DELETED)
-                    ->setGroup($buildTriggered->buildResultKey)
+                    ->setGroupEntry($buildTriggered->buildResultKey)
                     ->setData(
                         [
                             'type' => HistoryEntryType::DOCS_RENDERING,

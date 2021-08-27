@@ -73,7 +73,7 @@ class SplitCoreController extends AbstractController
         $queueLogs = $historyEntryRepository->findSplitLogsByStatus([SplitterStatus::QUEUED]);
         $splitActions = [];
         foreach ($queueLogs as $queueLog) {
-            $splitActions[$queueLog->getGroup()] = [
+            $splitActions[$queueLog->getGroupEntry()] = [
                 'queueLog' => $queueLog,
                 'finished' => false,
                 'detailLogs' => [],
@@ -85,14 +85,14 @@ class SplitCoreController extends AbstractController
                     SplitterStatus::WORK,
                     SplitterStatus::DONE,
                 ],
-                $queueLog->getGroup(),
+                $queueLog->getGroupEntry(),
                 500
             );
             foreach ($detailLogs as $detailLog) {
-                $splitActions[$queueLog->getGroup()]['detailLogs'][] = $detailLog;
+                $splitActions[$queueLog->getGroupEntry()]['detailLogs'][] = $detailLog;
                 if (($detailLog->getData()['status'] ?? '') === SplitterStatus::DONE) {
-                    $splitActions[$queueLog->getGroup()]['finished'] = true;
-                    $splitActions[$queueLog->getGroup()]['timeTaken'] = $detailLog->getCreatedAt()->diff($queueLog->getCreatedAt());
+                    $splitActions[$queueLog->getGroupEntry()]['finished'] = true;
+                    $splitActions[$queueLog->getGroupEntry()]['timeTaken'] = $detailLog->getCreatedAt()->diff($queueLog->getCreatedAt());
                 }
             }
         }

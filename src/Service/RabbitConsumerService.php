@@ -123,7 +123,7 @@ class RabbitConsumerService
             (new HistoryEntry())
                 ->setType($type)
                 ->setStatus(SplitterStatus::DISPATCH)
-                ->setGroup($event->jobUuid)
+                ->setGroupEntry($event->jobUuid)
                 ->setData(
                     [
                         'type' => $type,
@@ -149,7 +149,7 @@ class RabbitConsumerService
             (new HistoryEntry())
                 ->setType($type)
                 ->setStatus(SplitterStatus::DONE)
-                ->setGroup($event->jobUuid)
+                ->setGroupEntry($event->jobUuid)
                 ->setData(
                     [
                         'type' => $type,
