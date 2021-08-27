@@ -196,11 +196,11 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->assertStringContainsString('no records found', $content);
     }
 
-    private function createPlainGithubProphecy()
+    private function createPlainGithubProphecy(): void
     {
-        $bambooClientProphecy = $this->prophesize(GithubClient::class);
-        TestDoubleBundle::addProphecy(GithubClient::class, $bambooClientProphecy);
-        $bambooClientProphecy->get(Argument::any(), Argument::cetera())->willReturn(
+        $github = $this->prophesize(GithubClient::class);
+        TestDoubleBundle::addProphecy(GithubClient::class, $github);
+        $github->get(Argument::any(), Argument::cetera())->willReturn(
             new Response(200, [], json_encode([]))
         );
     }

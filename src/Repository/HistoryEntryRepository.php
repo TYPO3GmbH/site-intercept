@@ -75,4 +75,18 @@ class HistoryEntryRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function deleteOldEntries(): void
+    {
+        $date = (new \DateTimeImmutable('-2 months'));
+        $qb = $this->_em->createQueryBuilder();
+        $qb
+            ->delete('App:HistoryEntry', 'h')
+            ->where(
+                $qb->expr()->lt('h.createdAt', ':date')
+            )
+            ->setParameter('date', $date->format('Y-m-d H:i:s'))
+            ->getQuery()
+            ->execute();
+    }
 }

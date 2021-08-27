@@ -154,3 +154,8 @@ services:
       class: App\Security\LogoutSuccessHandler
       arguments:
         $appUrl: '%env(APP_URL)%'
+
+
+    App\EventListener\KernelTerminateListener:
+      tags:
+        - { name: kernel.event_listener, event: kernel.terminate }
