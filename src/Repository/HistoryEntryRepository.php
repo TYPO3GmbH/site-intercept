@@ -58,6 +58,25 @@ class HistoryEntryRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function findSplitLogsByStatusAndGroup(array $status, string $group, int $limit = 100): array
+    {
+        $qb = $this->createQueryBuilder('h');
+        return $qb
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->orX(
+                        $qb->expr()->eq('h.type', HistoryEntryType::PATCH),
+                        $qb->expr()->eq('h.type', HistoryEntryType::TAG),
+                    ),
+                    $qb->expr()->in('h.status', $status),
+                    $qb->expr()->eq('h.group', $group),
+                )
+            )
+            ->orderBy('h.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 
     /*
     public function findOneBySomeField($value): ?HistoryEntry

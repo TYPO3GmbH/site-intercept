@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 /*
@@ -10,10 +11,12 @@ declare(strict_types = 1);
 
 namespace App\Controller\AdminInterface;
 
+use App\Entity\HistoryEntry;
+use App\Enum\SplitterStatus;
 use App\Extractor\GithubPushEventForCore;
 use App\Form\SplitCoreSplitFormType;
 use App\Form\SplitCoreTagFormType;
-use App\Service\GraylogService;
+use App\Repository\HistoryEntryRepository;
 use App\Service\RabbitPublisherService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
@@ -30,14 +33,14 @@ class SplitCoreController extends AbstractController
      * @Route("/admin/split/core", name="admin_split_core")
      * @param Request $request
      * @param RabbitPublisherService $rabbitService
-     * @param GraylogService $graylogService
-     * @return Response
+     * @param HistoryEntryRepository $historyEntryRepository
      * @throws \Exception
+     * @return Response
      */
     public function index(
         Request $request,
         RabbitPublisherService $rabbitService,
-        GraylogService $graylogService
+        HistoryEntryRepository $historyEntryRepository
     ): Response {
         $splitForm = $this->createForm(SplitCoreSplitFormType::class);
         $tagForm = $this->createForm(SplitCoreTagFormType::class);
@@ -66,14 +69,40 @@ class SplitCoreController extends AbstractController
             );
         }
 
-        $recentLogs = $graylogService->getRecentSplitActions();
+        /** @var HistoryEntry[] $queueLogs */
+        $queueLogs = $historyEntryRepository->findSplitLogsByStatus([SplitterStatus::QUEUED]);
+        $splitActions = [];
+        foreach ($queueLogs as $queueLog) {
+            $splitActions[$queueLog->getGroup()] = [
+                'queueLog' => $queueLog,
+                'finished' => false,
+                'detailLogs' => [],
+            ];
+            /** @var HistoryEntry[] $detailLogs */
+            $detailLogs = $historyEntryRepository->findSplitLogsByStatusAndGroup(
+                [
+                    SplitterStatus::DISPATCH,
+                    SplitterStatus::WORK,
+                    SplitterStatus::DONE,
+                ],
+                $queueLog->getGroup(),
+                500
+            );
+            foreach ($detailLogs as $detailLog) {
+                $splitActions[$queueLog->getGroup()]['detailLogs'][] = $detailLog;
+                if (($detailLog->getData()['status'] ?? '') === SplitterStatus::DONE) {
+                    $splitActions[$queueLog->getGroup()]['finished'] = true;
+                    $splitActions[$queueLog->getGroup()]['timeTaken'] = $detailLog->getCreatedAt()->diff($queueLog->getCreatedAt());
+                }
+            }
+        }
 
         return $this->render(
             'split_core/index.html.twig',
             [
                 'splitCoreSplit' => $splitForm->createView(),
                 'splitCoreTag' => $tagForm->createView(),
-                'logs' => $recentLogs,
+                'logs' => $splitActions,
             ]
         );
     }
