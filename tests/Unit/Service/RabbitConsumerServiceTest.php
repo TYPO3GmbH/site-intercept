@@ -14,13 +14,13 @@ use App\Extractor\GithubPushEventForCore;
 use App\Service\CoreSplitService;
 use App\Service\CoreSplitServiceV8;
 use App\Service\RabbitConsumerService;
+use Doctrine\ORM\EntityManagerInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\IO\AbstractIO;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Psr\Log\LoggerInterface;
 
 class RabbitConsumerServiceTest extends TestCase
 {
@@ -30,7 +30,7 @@ class RabbitConsumerServiceTest extends TestCase
      */
     public function handleWorkerJobThrowsWithMissingJobUuid()
     {
-        $loggerProphecy = $this->prophesize(LoggerInterface::class);
+        $entityManager = $this->prophesize(EntityManagerInterface::class);
         $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
         $rabbitChannel = $this->prophesize(AMQPChannel::class);
         $rabbitIo = $this->prophesize(AbstractIO::class);
@@ -40,7 +40,7 @@ class RabbitConsumerServiceTest extends TestCase
         $coreSplitServiceV8 = $this->prophesize(CoreSplitServiceV8::class);
 
         $subject = new RabbitConsumerService(
-            $loggerProphecy->reveal(),
+            $entityManager->reveal(),
             $rabbitConnection->reveal(),
             $coreSplitService->reveal(),
             $coreSplitServiceV8->reveal(),
@@ -61,7 +61,7 @@ class RabbitConsumerServiceTest extends TestCase
      */
     public function handleWorkerJobCallsSplitService()
     {
-        $loggerProphecy = $this->prophesize(LoggerInterface::class);
+        $entityManager = $this->prophesize(EntityManagerInterface::class);
         $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
         $rabbitChannel = $this->prophesize(AMQPChannel::class);
         $rabbitIo = $this->prophesize(AbstractIO::class);
@@ -71,7 +71,7 @@ class RabbitConsumerServiceTest extends TestCase
         $coreSplitServiceV8 = $this->prophesize(CoreSplitServiceV8::class);
 
         $subject = new RabbitConsumerService(
-            $loggerProphecy->reveal(),
+            $entityManager->reveal(),
             $rabbitConnection->reveal(),
             $coreSplitService->reveal(),
             $coreSplitServiceV8->reveal(),
@@ -102,7 +102,7 @@ class RabbitConsumerServiceTest extends TestCase
      */
     public function handleWorkerJobCallsTagService()
     {
-        $loggerProphecy = $this->prophesize(LoggerInterface::class);
+        $entityManager = $this->prophesize(EntityManagerInterface::class);
         $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
         $rabbitChannel = $this->prophesize(AMQPChannel::class);
         $rabbitIo = $this->prophesize(AbstractIO::class);
@@ -112,7 +112,7 @@ class RabbitConsumerServiceTest extends TestCase
         $coreSplitServiceV8 = $this->prophesize(CoreSplitServiceV8::class);
 
         $subject = new RabbitConsumerService(
-            $loggerProphecy->reveal(),
+            $entityManager->reveal(),
             $rabbitConnection->reveal(),
             $coreSplitService->reveal(),
             $coreSplitServiceV8->reveal(),

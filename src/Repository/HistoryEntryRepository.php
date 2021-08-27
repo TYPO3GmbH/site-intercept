@@ -14,8 +14,6 @@ use App\Enum\HistoryEntryType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-use function Doctrine\ORM\QueryBuilder;
-
 /**
  * @method HistoryEntry|null find($id, $lockMode = null, $lockVersion = null)
  * @method HistoryEntry|null findOneBy(array $criteria, array $orderBy = null)
@@ -46,47 +44,35 @@ class HistoryEntryRepository extends ServiceEntityRepository
         return $qb
             ->where(
                 $qb->expr()->andX(
-                    $qb->expr()->orX(
-                        $qb->expr()->eq('h.type', HistoryEntryType::PATCH),
-                        $qb->expr()->eq('h.type', HistoryEntryType::TAG),
-                    ),
-                    $qb->expr()->in('h.status', $status)
+                    $qb->expr()->in('h.type', [HistoryEntryType::PATCH, HistoryEntryType::TAG]),
+                    $qb->expr()->in('h.status', ':status')
                 )
             )
-            ->orderBy('h.createdAt', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
-    public function findSplitLogsByStatusAndGroup(array $status, string $group, int $limit = 100): array
-    {
-        $qb = $this->createQueryBuilder('h');
-        return $qb
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->orX(
-                        $qb->expr()->eq('h.type', HistoryEntryType::PATCH),
-                        $qb->expr()->eq('h.type', HistoryEntryType::TAG),
-                    ),
-                    $qb->expr()->in('h.status', $status),
-                    $qb->expr()->eq('h.group', $group),
-                )
-            )
+            ->setParameter('status', $status)
             ->orderBy('h.createdAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
 
-    /*
-    public function findOneBySomeField($value): ?HistoryEntry
+    public function findSplitLogsByStatusAndGroup(array $status, string $group, int $limit = 100): array
     {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
+        $qb = $this->createQueryBuilder('h');
+        return $qb
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->in('h.type', [HistoryEntryType::PATCH, HistoryEntryType::TAG]),
+                    $qb->expr()->in('h.status', ':status'),
+                    $qb->expr()->eq('h.groupEntry', ':group'),
+                )
+            )
+            ->setParameters([
+                                'status' => $status,
+                                'group' => $group,
+                            ])
+            ->orderBy('h.createdAt', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult();
     }
-    */
 }

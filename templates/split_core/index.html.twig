@@ -54,8 +54,8 @@
             {% for log in logs %}
                 <div class="card">
                     <div class="card-header" id="headingOne">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#uuid{{ log.queueLog.uuid }}" aria-expanded="false" aria-controls="uuid{{ log.queueLog.uuid }}">
-                            <span>{{ localdatetime(log.queueLog.time) }} - </span>
+                        <button class="btn btn-link" data-toggle="collapse" data-target="#uuid{{ log.queueLog.groupEntry }}" aria-expanded="false" aria-controls="uuid{{ log.queueLog.groupEntry }}">
+                            <span>{{ localdatetime(log.queueLog.createdAt) }} - </span>
                             {% if log.queueLog.type == 'patch' %}
                                 <span>Split sub tree</span>
                             {% elseif log.queueLog.type == 'tag' %}
@@ -66,32 +66,31 @@
                             {% else %}
                                 | <span>Finished: No</span>
                             {% endif %}
-                            {% if log.queueLog.sourceBranch %}
-                                | <span>Source branch: {{ log.queueLog.sourceBranch }}</span>
+                            {% if log.queueLog.data.sourceBranch is defined %}
+                                | <span>Source branch: {{ log.queueLog.data.sourceBranch }}</span>
                             {% endif %}
-                            {% if log.queueLog.targetBranch %}
-                                | <span>Target branch: {{ log.queueLog.targetBranch }}</span>
+                            {% if log.queueLog.data.targetBranch is defined %}
+                                | <span>Target branch: {{ log.queueLog.data.targetBranch }}</span>
                             {% endif %}
-                            {% if log.queueLog.tag %}
-                                | <span>Tag: {{ log.queueLog.tag }}</span>
+                            {% if log.queueLog.data.tag is defined %}
+                                | <span>Tag: {{ log.queueLog.data.tag }}</span>
                             {% endif %}
-                            | <span>Job ID: {{ log.queueLog.uuid }}</span>
-                            {% if log.queueLog.triggeredBy == 'api' %}
+                            | <span>Job ID: {{ log.queueLog.groupEntry }}</span>
+                            {% if log.queueLog.data.triggeredBy is defined and log.queueLog.data.triggeredBy == 'api' %}
                                 | <span>Trigger: API</span>
-                            {% elseif log.queueLog.triggeredBy == 'interface' %}
+                            {% elseif log.queueLog.data.triggeredBy is defined and log.queueLog.data.triggeredBy == 'interface' %}
                                 | <span>Trigger: Web</span>
-                            {% endif %}
-                            {% if log.queueLog.userDisplayName %}
-                                | <span>User: {{ log.queueLog.userDisplayName }}</span>
                             {% endif %}
                         </button>
                     </div>
-                    <div id="uuid{{ log.queueLog.uuid }}" class="collapse" aria-labelledby="uuid{{ log.queueLog.uuid }}" data-parent="#accordion">
+                    <div id="uuid{{ log.queueLog.groupEntry }}" class="collapse" aria-labelledby="uuid{{ log.queueLog.groupEntry }}" data-parent="#accordion">
                         <div class="card-body">
                             {% for detailLog in log.detailLogs %}
                                 <div class="alert graylog-log alert-info">
-                                    <span>{{ localdatetime(detailLog.time) }} - </span>
-                                    <span>Message: {{ detailLog.message }}</span>
+                                    <span>{{ localdatetime(detailLog.createdAt) }} - </span>
+                                    {% if detailLog.data.message is defined %}
+                                        <span>Message: {{ detailLog.data.message }}</span>
+                                    {% endif %}
                                 </div>
                             {% endfor %}
                         </div>

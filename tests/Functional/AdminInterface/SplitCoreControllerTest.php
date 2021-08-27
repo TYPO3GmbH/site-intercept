@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 /*
@@ -13,6 +14,8 @@ namespace App\Tests\Functional\AdminInterface;
 use App\Bundle\TestDoubleBundle;
 use App\Client\RabbitManagementClient;
 use App\Tests\Functional\AbstractFunctionalWebTestCase;
+use App\Tests\Functional\DatabasePrimer;
+use App\Tests\Functional\Fixtures\AdminInterface\SplitCoreControllerTestHistoryData;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -25,10 +28,11 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
 {
     use ProphecyTrait;
 
+
     /**
      * @test
      */
-    public function rabbitDataIsRendered()
+    public function rabbitDataIsRendered(): void
     {
         TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
 
@@ -49,7 +53,7 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function rabbitDownIsRendered()
+    public function rabbitDownIsRendered(): void
     {
         TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
 
@@ -68,10 +72,9 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function recentLogMessagesAreRendered()
+    public function recentLogMessagesAreRendered(): void
     {
         TestDoubleBundle::reset();
-
         TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
@@ -80,6 +83,10 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
         );
 
         $client = static::createClient();
+        DatabasePrimer::prime(self::$kernel);
+        (new SplitCoreControllerTestHistoryData())->load(
+            self::$kernel->getContainer()->get('doctrine')->getManager()
+        );
         $client->request('GET', '/admin/split/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertMatchesRegularExpression('/a048046f-3204-45f6-9572-cb7af54ad7d5/', $client->getResponse()->getContent());
@@ -89,7 +96,7 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function splitCoreCanBeTriggered()
+    public function splitCoreCanBeTriggered(): void
     {
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
@@ -131,7 +138,7 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function tagCoreCanBeTriggered()
+    public function tagCoreCanBeTriggered(): void
     {
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);

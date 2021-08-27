@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Entity\HistoryEntry;
-use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\HistoryEntryTrigger;
 use App\Enum\HistoryEntryType;
 use App\Enum\SplitterStatus;

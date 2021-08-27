@@ -193,8 +193,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->client->request('GET', '/redirect/');
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringNotContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertStringNotContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
         $this->assertStringContainsString('no records found', $content);
     }
 

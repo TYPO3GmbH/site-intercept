@@ -18,7 +18,6 @@ use App\Extractor\GithubPushEventForCore;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -48,8 +47,7 @@ class RabbitPublisherService
         EntityManagerInterface $entityManager,
         AMQPStreamConnection $rabbitConnection,
         string $rabbitSplitQueue
-    )
-    {
+    ) {
         $this->queueName = $rabbitSplitQueue;
         $this->rabbitConnection = $rabbitConnection;
         $this->entityManager = $entityManager;

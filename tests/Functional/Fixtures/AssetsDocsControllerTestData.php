@@ -9,7 +9,6 @@
 
 namespace App\Tests\Functional\Fixtures;
 
-use App\Entity\DocsServerRedirect;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use Doctrine\Bundle\FixturesBundle\Fixture;

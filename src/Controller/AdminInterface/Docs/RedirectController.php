@@ -21,7 +21,6 @@ use App\Repository\HistoryEntryRepository;
 use App\Service\DocsServerNginxService;
 use App\Service\GithubService;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -46,8 +45,7 @@ class RedirectController extends AbstractController
         DocsServerNginxService $nginxService,
         GithubService $githubService,
         Security $security
-    )
-    {
+    ) {
         $this->nginxService = $nginxService;
         $this->githubService = $githubService;
         $this->security = $security;
