@@ -23,9 +23,6 @@ eight_points_guzzle:
                 - '%env(GITHUB_API_PASSWORD_TOKEN)%'
               headers:
                 Accept: "application/json"
-        graylog:
-            base_url: '%env(GRAYLOG_API)%'
-            class: App\Client\GraylogClient
         rabbitManagement:
             base_url: '%env(RABBITMQ_MANAGEMENT)%'
             class: App\Client\RabbitManagementClient

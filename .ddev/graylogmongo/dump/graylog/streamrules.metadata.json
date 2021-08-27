@@ -1,1 +1,0 @@
-{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"graylog.streamrules"},{"v":2,"key":{"stream_id":1},"name":"stream_id_1","ns":"graylog.streamrules"}],"uuid":"06447b9489db48278ee4fa5097730472"}

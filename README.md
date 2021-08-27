@@ -55,8 +55,6 @@ Interface to link other services to Discord webhooks.
     repositories.
 - rabbitmq.typo3.com - intercept web controls push new subtree split & tag jobs to a rabbitmq queue,
     a intercept cli job connects to rabbit to handle these jobs.
-- elk.typo3.com (graylog) - intercept logs details to graylog, the web intercept interface reads various
-    log entries and renders them.
 - typo3.slack.com - intercept pushs messages to slack for failed nightly builds
 - sqlite - a local sqlite, stores users, documentation details, information if a single core
     nightly build has been rebuild already
@@ -87,7 +85,6 @@ service.
 -   GitWrapper/ contains helper classes for details with managing git repositories via PHP.
     This is used for the github pull request to gerrit service, and by the sub tree split worker.
 -   Migrations/ contains doctrine database migration classes.
--   Monolog/ contains helper classes for logging data to graylog
 -   Repository/ contains doctrine orm repositories
 -   Service/ contains classes doing the heavy lifting, usually calling Client/ objects and
     returning Extractor/ objects
@@ -110,17 +107,6 @@ file and write proper values to a `.env.local` file!
 
 ### First install ddev based
 
-On linux, the elasticsearch container for graylog needs an kernel argument: On the host,
-edit file `/etc/sysctl.conf` and add:
-
-```
-$ sudo vi /etc/sysctl.conf
-
-# elasticsearch processes / containers
-vm.max_map_count = 262144
-```
-
-Then, either reboot, or issue command `sudo sysctl -w vm.max_map_count=262144` once.
 
 ```bash
 # Clone repo
@@ -129,15 +115,11 @@ ddev composer install
 ddev exec bin/console doctrine:migrations:migrate -n
 ddev exec yarn install
 ddev exec yarn encore dev
-docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
-ddev exec -s graylogmongo mongorestore -d graylog /dump/graylog
-ddev exec -s graylogmongo rm -rf /dump
 ```
 
 ### URL's
 
 -   http://intercept.ddev.site/admin/ - intercept web interface
--   http://intercept.ddev.site:9101/ - graylog interface, user: admin, password: foo
 -   http://intercept.ddev.site:15672/ - rabbitmq interface, user: admin, password: foo
 
 ### Upgrading ddev based
@@ -150,9 +132,6 @@ ddev exec bin/console cache:clear
 ddev exec bin/console doctrine:migrations:migrate -n
 ddev exec yarn install
 ddev exec yarn encore dev
-docker cp .ddev/graylogmongo/dump/ ddev-intercept-graylogmongo:/dump
-ddev exec -s graylogmongo mongorestore -d graylog /dump/graylog
-ddev exec -s graylogmongo rm -rf /dump
 ddev exec -s rabbitmq rabbitmqadmin -u admin -p foo declare queue name=intercept-core-split-testing
 ```
 
@@ -218,23 +197,6 @@ ddev composer t3g:test:php:cover
 
 ```
 ddev composer t3g:cgl
-```
-
-### Creating a new mongo dump
-
-The graylog configuration is stored in mongodb. If fiddling with the interface and
-adding stuff, the mongodb should be dumped afterwards and committed for other ddev
-users to fetch this new config. Note: Do not use important passwords on the ddev
-based graylog instance, those would be within that dump!
-
-```bash
-ddev exec -s graylogmongo rm -rf /dump
-ddev exec -s graylogmongo mongodump --out /dump
-cd .ddev/graylogmongo
-rm -rf dump
-docker cp ddev-intercept-graylogmongo:/dump .
-ddev exec -s graylogmongo rm -rf /dump
-# commit stuff to git
 ```
 
 ### BlackfireIo

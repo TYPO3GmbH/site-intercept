@@ -2,17 +2,12 @@ monolog:
   handlers:
     main:
       type: group
-      members: [ file, graylog ]
+      members: [ file ]
     file:
       type: rotating_file
       level: !php/const Monolog\Logger::ERROR
       path: "%kernel.logs_dir%/%kernel.environment%.log"
       max_files: 10
-    graylog:
-      type: gelf
-      # use INFO for Gelf as intercept extracts info level messages for display
-      level: !php/const Monolog\Logger::INFO
-      publisher: "gelf.publisher"
     sentry:
       type: sentry
       level: !php/const Monolog\Logger::ERROR

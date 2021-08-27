@@ -11,7 +11,6 @@ declare(strict_types = 1);
 namespace App\Tests\Functional\AdminInterface;
 
 use App\Bundle\TestDoubleBundle;
-use App\Client\GraylogClient;
 use App\Client\RabbitManagementClient;
 use App\Tests\Functional\AbstractFunctionalWebTestCase;
 use GuzzleHttp\Exception\ClientException;
@@ -25,15 +24,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
 {
     use ProphecyTrait;
-    private $graylogProphecy;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->graylogProphecy = $this->addGraylogClientProphecy();
-        $this->graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-    }
 
     /**
      * @test
@@ -89,66 +79,6 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
             new Response(200, [], json_encode(['consumers' => 1, 'messages' => 2]))
         );
 
-        $graylogClientProphecy = $this->prophesize(GraylogClient::class);
-        TestDoubleBundle::addProphecy(GraylogClient::class, $graylogClientProphecy);
-        // first ->get() call to elastic returns one 'queued' log entry
-        $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
-            new Response(200, [], json_encode([
-                'messages' => [
-                    0 => [
-                        'message' => [
-                            'application' => 'intercept',
-                            'env' => 'prod',
-                            'level' => 6,
-                            'message' => 'Queued a core split job to queue',
-                            'ctxt_job_uuid' => 'a048046f-3204-45f6-9572-cb7af54ad7d5',
-                            'ctxt_type' => 'patch',
-                            'ctxt_status' => 'queued',
-                            'ctxt_sourceBranch' => 'master',
-                            'ctxt_targetBranch' => 'master',
-                            'ctxt_triggeredBy' => 'api',
-                            'timestamp' => '2019-03-11T10:33:16.803Z',
-                        ]
-                    ]
-                ]
-            ]))
-        );
-        // second ->get() call to elastic returns one detail log row and a done message
-        $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
-            new Response(200, [], json_encode([
-                'messages' => [
-                    0 => [
-                        'message' => [
-                            'application' => 'intercept',
-                            'env' => 'prod',
-                            'level' => 6,
-                            'message' => 'Git command error output: Everything up-to-date',
-                            'ctxt_job_uuid' => 'a048046f-3204-45f6-9572-cb7af54ad7d5',
-                            'ctxt_type' => 'patch',
-                            'ctxt_status' => 'work',
-                            'ctxt_sourceBranch' => 'master',
-                            'ctxt_targetBranch' => 'master',
-                            'timestamp' => '2019-03-11T10:34:22.803Z',
-                        ]
-                    ],
-                    1 => [
-                        'message' => [
-                            'application' => 'intercept',
-                            'env' => 'prod',
-                            'level' => 6,
-                            'message' => 'Finished a git split worker job',
-                            'ctxt_job_uuid' => 'a048046f-3204-45f6-9572-cb7af54ad7d5',
-                            'ctxt_type' => 'patch',
-                            'ctxt_status' => 'done',
-                            'ctxt_sourceBranch' => 'master',
-                            'ctxt_targetBranch' => 'master',
-                            'timestamp' => '2019-03-11T10:36:27.256Z',
-                        ]
-                    ]
-                ]
-            ]))
-        );
-
         $client = static::createClient();
         $client->request('GET', '/admin/split/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -161,8 +91,6 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
      */
     public function splitCoreCanBeTriggered()
     {
-        $graylog = $this->addGraylogClientProphecy();
-        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
         $rabbitClientProphecy->get(Argument::cetera())->willReturn(
@@ -205,8 +133,6 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
      */
     public function tagCoreCanBeTriggered()
     {
-        $graylog = $this->addGraylogClientProphecy();
-        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
         $rabbitClientProphecy->get(Argument::cetera())->willReturn(

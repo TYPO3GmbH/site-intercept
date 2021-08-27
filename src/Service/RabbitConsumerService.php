@@ -58,7 +58,6 @@ class RabbitConsumerService
     /**
      * RabbitPublisherService constructor.
      *
-     * @param LoggerInterface $logger
      * @param AMQPStreamConnection $rabbitConnection
      * @param CoreSplitService $coreSplitService
      * @param CoreSplitServiceV8 $coreSplitServiceV8

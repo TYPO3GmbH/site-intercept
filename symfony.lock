@@ -14,9 +14,6 @@
     "composer/xdebug-handler": {
         "version": "1.1.0"
     },
-    "danielstjules/stringy": {
-        "version": "3.1.0"
-    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -182,18 +179,6 @@
     "myclabs/deep-copy": {
         "version": "1.8.1"
     },
-    "nette/caching": {
-        "version": "v3.1.1"
-    },
-    "nette/finder": {
-        "version": "v2.5.2"
-    },
-    "nette/neon": {
-        "version": "v3.2.2"
-    },
-    "nette/robot-loader": {
-        "version": "v3.4.0"
-    },
     "nette/utils": {
         "version": "v3.1.1"
     },
@@ -296,14 +281,8 @@
     "phpspec/prophecy-phpunit": {
         "version": "v2.0.1"
     },
-    "phpstan/phpdoc-parser": {
-        "version": "0.5.3"
-    },
     "phpstan/phpstan": {
         "version": "0.12.82"
-    },
-    "phpstan/phpstan-phpunit": {
-        "version": "0.12.18"
     },
     "phpstan/phpstan-symfony": {
         "version": "0.12.22"
@@ -361,30 +340,6 @@
     },
     "rbdwllr/reallysimplejwt": {
         "version": "2.1.0"
-    },
-    "rector/rector": {
-        "version": "0.10.3"
-    },
-    "rector/rector-cakephp": {
-        "version": "0.10.1"
-    },
-    "rector/rector-doctrine": {
-        "version": "0.10.0"
-    },
-    "rector/rector-installer": {
-        "version": "0.10.1"
-    },
-    "rector/rector-laravel": {
-        "version": "0.10.0"
-    },
-    "rector/rector-nette": {
-        "version": "0.10.1"
-    },
-    "rector/rector-phpunit": {
-        "version": "0.10.2"
-    },
-    "rector/rector-symfony": {
-        "version": "0.10.0"
     },
     "roave/security-advisories": {
         "version": "dev-master"
@@ -593,9 +548,6 @@
     "symfony/options-resolver": {
         "version": "v4.1.2"
     },
-    "symfony/orm-pack": {
-        "version": "v1.0.5"
-    },
     "symfony/password-hasher": {
         "version": "v5.3.4"
     },
@@ -646,9 +598,6 @@
     },
     "symfony/process": {
         "version": "v4.1.7"
-    },
-    "symfony/profiler-pack": {
-        "version": "v1.0.3"
     },
     "symfony/property-access": {
         "version": "v4.2.1"
@@ -775,50 +724,8 @@
     "symfony/yaml": {
         "version": "v4.1.7"
     },
-    "symplify/astral": {
-        "version": "v9.2.14"
-    },
-    "symplify/autowire-array-parameter": {
-        "version": "v9.2.14"
-    },
-    "symplify/composer-json-manipulator": {
-        "version": "v9.2.14"
-    },
-    "symplify/console-color-diff": {
-        "version": "v9.2.14"
-    },
-    "symplify/console-package-builder": {
-        "version": "v9.2.14"
-    },
-    "symplify/easy-testing": {
-        "version": "v9.2.14"
-    },
     "symplify/git-wrapper": {
         "version": "v9.2.12"
-    },
-    "symplify/package-builder": {
-        "version": "v9.2.14"
-    },
-    "symplify/rule-doc-generator-contracts": {
-        "version": "v9.2.14"
-    },
-    "symplify/set-config-resolver": {
-        "version": "v9.2.14"
-    },
-    "symplify/simple-php-doc-parser": {
-        "version": "v9.2.14"
-    },
-    "symplify/skipper": {
-        "version": "v9.2.14"
-    },
-    "symplify/smart-file-system": {
-        "version": "v9.2.14"
-    },
-    "symplify/symfony-php-config": {
-        "version": "v9.2.13"
-    },
-    "symplify/symplify-kernel": {
-        "version": "v9.2.14"
     },
     "t3g/symfony-keycloak-bundle": {
         "version": "1.0.3"
@@ -831,9 +738,6 @@
     },
     "theseer/tokenizer": {
         "version": "1.1.0"
-    },
-    "tracy/tracy": {
-        "version": "v2.8.4"
     },
     "twig/twig": {
         "version": "v2.5.0"

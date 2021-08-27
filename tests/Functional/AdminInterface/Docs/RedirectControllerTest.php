@@ -28,15 +28,12 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      * @var AbstractBrowser
      */
     private $client;
-    private $graylogProphecy;
 
     protected function setUp(): void
     {
         parent::setUp();
         TestDoubleBundle::reset();
         $this->addRabbitManagementClientProphecy();
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
     }
 
     /**
@@ -132,10 +129,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
     {
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
 
         $this->createPlainGithubProphecy();
         $this->client = static::createClient();
@@ -174,12 +167,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
 
         $this->createPlainGithubProphecy();
         $this->client = static::createClient();

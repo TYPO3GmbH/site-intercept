@@ -11,9 +11,6 @@ services:
   App\Client\GeneralClient:
     tags:
       - testDouble
-  App\Client\GraylogClient:
-    tags:
-      - testDouble
   App\Client\RabbitManagementClient:
     tags:
       - testDouble
