@@ -10,14 +10,18 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Entity\HistoryEntry;
+use App\Enum\HistoryEntryTrigger;
+use App\Enum\HistoryEntryType;
+use App\Enum\SplitterStatus;
 use App\Extractor\GithubPushEventForCore;
+use Doctrine\ORM\EntityManagerInterface;
 use ErrorException;
 use Exception;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\IO\AbstractIO;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
@@ -40,8 +44,6 @@ class RabbitConsumerService
      */
     private string $queueName;
 
-    private LoggerInterface $logger;
-
     private CoreSplitServiceInterface $coreSplitService;
 
     private CoreSplitServiceInterface $coreSplitServiceV8;
@@ -50,11 +52,11 @@ class RabbitConsumerService
      * @var string the v8 ELTS repository name
      */
     private string $eltsRepositoryNameV8;
+    private EntityManagerInterface $entityManager;
 
     /**
      * RabbitPublisherService constructor.
      *
-     * @param LoggerInterface $logger
      * @param AMQPStreamConnection $rabbitConnection
      * @param CoreSplitService $coreSplitService
      * @param CoreSplitServiceV8 $coreSplitServiceV8
@@ -62,14 +64,13 @@ class RabbitConsumerService
      * @param string $eltsRepositoryNameV8
      */
     public function __construct(
-        LoggerInterface $logger,
+        EntityManagerInterface $entityManager,
         AMQPStreamConnection $rabbitConnection,
         CoreSplitServiceInterface $coreSplitService,
         CoreSplitServiceInterface $coreSplitServiceV8,
         string $rabbitSplitQueue,
         string $eltsRepositoryNameV8
     ) {
-        $this->logger = $logger;
         $this->queueName = $rabbitSplitQueue;
         $this->eltsRepositoryNameV8 = $eltsRepositoryNameV8;
         $this->coreSplitService = $coreSplitService;
@@ -83,6 +84,7 @@ class RabbitConsumerService
         // Default heartbeat: 60 seconds, so any single job running longer than 2 minutes (two heartbeats missed), will crash.
         // Thus, the IO object is given down to jobs, to send a heartbeat in between single units of jobs
         $this->rabbitIO = $rabbitConnection->getIO();
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -115,17 +117,26 @@ class RabbitConsumerService
         if (empty($event->jobUuid)) {
             throw new RuntimeException('Required job uuid missing');
         }
-        $this->logger->info(
-            'Handling a git split worker job',
-            [
-                'job_uuid' => $event->jobUuid,
-                'type' => $event->type,
-                'sourceBranch' => $event->sourceBranch,
-                'targetBranch' => $event->targetBranch,
-                'tag' => $event->tag,
-                'status' => 'dispatch',
-            ]
+        $type = $event->type === 'patch' ? HistoryEntryType::PATCH : HistoryEntryType::TAG;
+        $this->entityManager->persist(
+            (new HistoryEntry())
+                ->setType($type)
+                ->setStatus(SplitterStatus::DISPATCH)
+                ->setGroupEntry($event->jobUuid)
+                ->setData(
+                    [
+                        'type' => $type,
+                        'status' => SplitterStatus::DISPATCH,
+                        'triggeredBy' => HistoryEntryTrigger::CLI,
+                        'message' => 'Handling a git split worker job',
+                        'job_uuid' => $event->jobUuid,
+                        'sourceBranch' => $event->sourceBranch,
+                        'targetBranch' => $event->targetBranch,
+                        'tag' => $event->tag,
+                    ]
+                )
         );
+        $this->entityManager->flush();
         $splitter = $this->getCoreSplitter($event);
         if ($event->type === 'patch') {
             $splitter->split($event, $this->rabbitIO);
@@ -133,19 +144,27 @@ class RabbitConsumerService
             $splitter->tag($event, $this->rabbitIO);
         }
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
-        $this->logger->info(
-            'Finished a git split worker job',
-            [
-                'job_uuid' => $event->jobUuid,
-                'type' => $event->type,
-                'splitter' => get_class($splitter),
-                'repository' => $event->repositoryFullName,
-                'sourceBranch' => $event->sourceBranch,
-                'targetBranch' => $event->targetBranch,
-                'tag' => $event->tag,
-                'status' => 'done',
-            ]
+        $this->entityManager->persist(
+            (new HistoryEntry())
+                ->setType($type)
+                ->setStatus(SplitterStatus::DONE)
+                ->setGroupEntry($event->jobUuid)
+                ->setData(
+                    [
+                        'type' => $type,
+                        'status' => SplitterStatus::DONE,
+                        'triggeredBy' => HistoryEntryTrigger::CLI,
+                        'message' => 'Handling a git split worker job',
+                        'tag' => $event->tag,
+                        'job_uuid' => $event->jobUuid,
+                        'splitter' => get_class($splitter),
+                        'repository' => $event->repositoryFullName,
+                        'sourceBranch' => $event->sourceBranch,
+                        'targetBranch' => $event->targetBranch,
+                    ]
+                )
         );
+        $this->entityManager->flush();
     }
 
     private function getCoreSplitter(GithubPushEventForCore $event): CoreSplitServiceInterface

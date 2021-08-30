@@ -10,20 +10,25 @@
 namespace App\Controller\AdminInterface\Docs;
 
 use App\Entity\DocsServerRedirect;
+use App\Entity\HistoryEntry;
+use App\Enum\DocsRenderingHistoryStatus;
+use App\Enum\HistoryEntryTrigger;
+use App\Enum\HistoryEntryType;
 use App\Form\DocsServerRedirectType;
 use App\Form\RedirectFilterType;
 use App\Repository\DocsServerRedirectRepository;
+use App\Repository\HistoryEntryRepository;
 use App\Service\DocsServerNginxService;
 use App\Service\GithubService;
-use App\Service\GraylogService;
 use Doctrine\Common\Collections\Criteria;
 use Knp\Component\Pager\PaginatorInterface;
-use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
+use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 /**
  * @Route("/redirect")
@@ -34,33 +39,36 @@ class RedirectController extends AbstractController
 
     protected GithubService $githubService;
 
-    protected LoggerInterface $logger;
+    private Security $security;
 
-    public function __construct(DocsServerNginxService $nginxService, GithubService $githubService, LoggerInterface $logger)
-    {
+    public function __construct(
+        DocsServerNginxService $nginxService,
+        GithubService $githubService,
+        Security $security
+    ) {
         $this->nginxService = $nginxService;
         $this->githubService = $githubService;
-        $this->logger = $logger;
+        $this->security = $security;
     }
 
     /**
      * @Route("/", name="admin_redirect_index", methods={"GET"})
      * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
      * @param DocsServerRedirectRepository $redirectRepository
-     * @param GraylogService $graylogService
+     * @param HistoryEntryRepository $historyEntryRepository
      * @param Request $request
      * @param PaginatorInterface $paginator
      * @return Response
      */
     public function index(
         DocsServerRedirectRepository $redirectRepository,
-        GraylogService $graylogService,
+        HistoryEntryRepository $historyEntryRepository,
         Request $request,
         PaginatorInterface $paginator
     ): Response {
         $currentConfigurationFile = $this->nginxService->getDynamicConfiguration();
         $staticConfigurationFile = $this->nginxService->getStaticConfiguration();
-        $recentLogsMessages = $graylogService->getRecentRedirectActions();
+        $recentLogsMessages = $historyEntryRepository->findByType(HistoryEntryType::DOCS_REDIRECT);
 
         $criteria = Criteria::create();
 
@@ -226,17 +234,29 @@ class RedirectController extends AbstractController
         DocsServerRedirect $redirect
     ): void {
         $bambooBuildTriggered = $this->githubService->triggerDocumentationRedirectsPlan();
-
-        $this->logger->info(
-            'Triggered redirects deployment',
-            [
-                'type' => 'docsRedirect',
-                'status' => 'triggered',
-                'triggeredBy' => 'interface',
-                'subType' => $triggeredBySubType,
-                'redirect' => $redirect->toArray(),
-                'bambooKey' => $bambooBuildTriggered->buildResultKey,
-            ]
+        $user = $this->security->getUser();
+        $userIdentifier = 'Anon.';
+        if ($user instanceof KeyCloakUser) {
+            $userIdentifier = $user->getDisplayName();
+        }
+        $manager = $this->getDoctrine()->getManager();
+        $manager->persist(
+            (new HistoryEntry())
+                ->setType(HistoryEntryType::DOCS_REDIRECT)
+                ->setStatus(DocsRenderingHistoryStatus::TRIGGERED)
+                ->setGroupEntry($bambooBuildTriggered->buildResultKey)
+                ->setData(
+                    [
+                        'type' => HistoryEntryType::DOCS_REDIRECT,
+                        'status' => DocsRenderingHistoryStatus::TRIGGERED,
+                        'triggeredBy' => HistoryEntryTrigger::WEB,
+                        'subType' => $triggeredBySubType,
+                        'redirect' => $redirect->toArray(),
+                        'bambooKey' => $bambooBuildTriggered->buildResultKey,
+                        'user' => $userIdentifier
+                    ]
+                )
         );
+        $manager->flush();
     }
 }

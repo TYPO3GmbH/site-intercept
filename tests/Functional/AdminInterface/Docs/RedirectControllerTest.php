@@ -28,15 +28,12 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
      * @var AbstractBrowser
      */
     private $client;
-    private $graylogProphecy;
 
     protected function setUp(): void
     {
         parent::setUp();
         TestDoubleBundle::reset();
         $this->addRabbitManagementClientProphecy();
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
     }
 
     /**
@@ -132,10 +129,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
     {
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
 
         $this->createPlainGithubProphecy();
         $this->client = static::createClient();
@@ -174,12 +167,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-        $graylogProphecy = $this->addGraylogClientProphecy();
-        $graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
 
         $this->createPlainGithubProphecy();
         $this->client = static::createClient();
@@ -206,16 +193,14 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->client->request('GET', '/redirect/');
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringNotContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertStringNotContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
         $this->assertStringContainsString('no records found', $content);
     }
 
-    private function createPlainGithubProphecy()
+    private function createPlainGithubProphecy(): void
     {
-        $bambooClientProphecy = $this->prophesize(GithubClient::class);
-        TestDoubleBundle::addProphecy(GithubClient::class, $bambooClientProphecy);
-        $bambooClientProphecy->get(Argument::any(), Argument::cetera())->willReturn(
+        $github = $this->prophesize(GithubClient::class);
+        TestDoubleBundle::addProphecy(GithubClient::class, $github);
+        $github->get(Argument::any(), Argument::cetera())->willReturn(
             new Response(200, [], json_encode([]))
         );
     }

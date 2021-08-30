@@ -1,1 +1,0 @@
-{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"graylog.roles"},{"v":2,"unique":true,"key":{"name_lower":1},"name":"name_lower_1","ns":"graylog.roles"}],"uuid":"893fec9ea223477d9c53a733fe80c5d2"}

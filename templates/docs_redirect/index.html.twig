@@ -163,58 +163,66 @@
                     {% for log in logMessages %}
                         <div class="message message-info">
                             <div class="message-badge">
-                                {% if log.triggeredBy == 'api' %}
+                                {% if log.data.triggeredBy == 'api' %}
                                     <span class="badge badge-secondary">API</span>
-                                {% elseif log.triggeredBy == 'interface' %}
+                                {% elseif log.data.triggeredBy == 'interface' %}
                                     <span class="badge badge-secondary">WEB</span>
+                                {% elseif log.data.triggeredBy == 'CLI' %}
+                                    <span class="badge badge-secondary">CLI</span>
                                 {% endif %}
                             </div>
                             <div class="message-body">
                                 <div class="message-meta">
                                     <span class="message-date">
-                                        {{ localdatetime(log.time) }}
+                                        {{ localdatetime(log.createdAt) }}
                                     </span>
-                                    {% if log.userDisplayName %}
-                                        <span class="message-user">- by {{ log.userDisplayName }}</span>
+                                    {% if log.data.user is defined %}
+                                        <span class="message-user">- by {{ log.data.user }}</span>
                                     {% endif %}
                                 </div>
                                 <div class="message-text">
-                                    {% if log.link %}
-                                        <a href="{{ log.link }}">Triggered redirects deployment</a>
+                                    {% if log.data.link is defined %}
+                                        <a href="{{ log.data.link }}">
+                                            {% if log.data.message is defined %}
+                                                {{ log.data.message }}
+                                            {% endif %}
+                                        </a>
                                     {% else %}
-                                        {{ log.message }}
+                                        {% if log.data.message is defined %}
+                                            {{ log.data.message }}
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                                 <div class="message-detail">
-                                    {% if log.bambooKey %}
+                                    {% if log.data.bambooKey is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Bamboo key</span>
-                                            <span class="message-detail-value">{{ log.bambooKey }}</span>
+                                            <span class="message-detail-value">{{ log.data.bambooKey }}</span>
                                         </div>
                                     {% endif %}
-                                    {% if log.subType %}
+                                    {% if log.data.subType is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Action</span>
-                                            <span class="message-detail-value">{{ log.subType }}</span>
+                                            <span class="message-detail-value">{{ log.data.subType }}</span>
                                         </div>
                                     {% endif %}
-                                    {% if log.redirect %}
-                                        {% if log.redirect.id %}
+                                    {% if log.data.redirect is defined %}
+                                        {% if log.data.redirect.id is defined %}
                                             <div class="message-detail-item">
                                                 <span class="message-detail-key">ID</span>
-                                                <span class="message-detail-value">{{ log.redirect.id }}</span>
+                                                <span class="message-detail-value">{{ log.data.redirect.id }}</span>
                                             </div>
                                         {% endif %}
-                                        {% if log.redirect.source %}
+                                        {% if log.data.redirect.source is defined %}
                                             <div class="message-detail-item">
                                                 <span class="message-detail-key">Source</span>
-                                                <span class="message-detail-value">{{ log.redirect.source }}</span>
+                                                <span class="message-detail-value">{{ log.data.redirect.source }}</span>
                                             </div>
                                         {% endif %}
-                                        {% if log.redirect.target %}
+                                        {% if log.data.redirect.target is defined %}
                                             <div class="message-detail-item">
                                                 <span class="message-detail-key">Target</span>
-                                                <span class="message-detail-value">{{ log.redirect.target }}</span>
+                                                <span class="message-detail-value">{{ log.data.redirect.target }}</span>
                                             </div>
                                         {% endif %}
                                     {% endif %}

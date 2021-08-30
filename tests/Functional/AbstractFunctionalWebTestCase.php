@@ -14,14 +14,11 @@ namespace App\Tests\Functional;
 use App\Bundle\TestDoubleBundle;
 use App\Client\GeneralClient;
 use App\Client\GerritClient;
-use App\Client\GraylogClient;
-use App\Client\PackagistClient;
 use App\Client\RabbitManagementClient;
 use App\Client\SlackClient;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
@@ -83,25 +80,11 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
         return $gerritClient;
     }
 
-    protected function addGraylogClientProphecy(): ObjectProphecy
-    {
-        $gray = $this->prophesize(GraylogClient::class);
-        TestDoubleBundle::addProphecy(GraylogClient::class, $gray);
-        return $gray;
-    }
-
     protected function addRabbitManagementClientProphecy(): ObjectProphecy
     {
         $prophecy = $this->prophesize(RabbitManagementClient::class);
         $prophecy->get(Argument::containingString('api/queues/%2f/'), Argument::cetera())->willReturn(new Response(200, [], '{}'));
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $prophecy);
-        return $prophecy;
-    }
-
-    protected function addPackagistClientProphecy(): ObjectProphecy
-    {
-        $prophecy = $this->prophesize(PackagistClient::class);
-        TestDoubleBundle::addProphecy(PackagistClient::class, $prophecy);
         return $prophecy;
     }
 

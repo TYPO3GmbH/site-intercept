@@ -7,7 +7,7 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Functional\Fixtures;
+namespace App\Tests\Functional\Fixtures\AdminInterface\Docs;
 
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
@@ -15,9 +15,9 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInterface
+class DeploymentsControllerTestData extends Fixture implements OrderedFixtureInterface
 {
-    public function load(ObjectManager $manager): void
+    public function load(ObjectManager $manager)
     {
         // Home page
         $documentationJar = (new DocumentationJar())
@@ -223,13 +223,13 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
             ->setTargetBranchDirectory('master')
             ->setTypeLong('extension')
             ->setTypeShort('p')
-            ->setStatus(DocumentationStatus::STATUS_RENDERED)
+            ->setStatus(DocumentationStatus::STATUS_AWAITING_APPROVAL)
             ->setBuildKey('')
             ->setMinimumTypoVersion('9.5')
             ->setMaximumTypoVersion('9.5')
             ->setReRenderNeeded(false)
-            ->setNew(false)
-            ->setApproved(true)
+            ->setNew(true)
+            ->setApproved(false)
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
         $manager->flush();
