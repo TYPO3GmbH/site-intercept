@@ -45,6 +45,10 @@ class DocumentationVersions
         $currentLanguage = array_slice($pathSegments, 4, 1)[0];
         // further path to currently viewed sub file, eg. '[subPage, Index.html]'
         $pathAfterEntryPoint = array_slice($pathSegments, 5);
+        // ensure singlehtml is not part of the path (see handling for singlepath below) - @see resolvePathInformation
+        if (($pathAfterEntryPoint[0] ?? '') === 'singlehtml') {
+            unset($pathAfterEntryPoint[0]);
+        }
         $absolutePathToDocsEntryPoint = $GLOBALS['_SERVER']['DOCUMENT_ROOT'] . '/' . $entryPoint;
 
         if (empty($currentVersion) || empty($currentLanguage)
