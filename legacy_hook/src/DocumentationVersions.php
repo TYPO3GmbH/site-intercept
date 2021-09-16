@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App;
@@ -28,6 +29,7 @@ class DocumentationVersions
 
     /**
      * Creates a HTML response which contains a list if <dd> tags with links to all versions
+     *
      * @return Response
      */
     public function getVersions(): Response
@@ -66,7 +68,7 @@ class DocumentationVersions
         // find versions and language variants of this project
         $validatedVersions = $this->resolveVersionsAndLanguages($absolutePathToDocsEntryPoint);
         // final version entries
-        $validatedVersions = $this->resolvePathInformation($validatedVersions, $pathAfterEntryPoint, $absolutePathToDocsEntryPoint);
+        $validatedVersions = $this->resolvePathInformation($validatedVersions, $pathAfterEntryPoint, $absolutePathToDocsEntryPoint, $entryPoint, $currentVersion, $currentLanguage);
 
         return $this->getHTMLResponse($validatedVersions);
     }
@@ -97,31 +99,54 @@ class DocumentationVersions
                 [$version, $language] = explode('/', $result->getRelativePathname());
                 $validatedVersions[] = [
                     'version' => $version,
-                    'language' => $language
+                    'language' => $language,
                 ];
             }
         }
         return $validatedVersions;
     }
 
-    protected function resolvePathInformation(array $validatedVersions, array $pathAfterEntryPoint, string $absolutePathToDocsEntryPoint): array
-    {
+    protected function resolvePathInformation(
+        array $validatedVersions,
+        array $pathAfterEntryPoint,
+        string $absolutePathToDocsEntryPoint,
+        string $entryPoint,
+        string $currentVersion,
+        string $currentLanguage
+    ): array {
+        $mapping = [];
+        try {
+            $mapping = json_decode(file_get_contents(__DIR__ . '/../versionconfig.json'), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            // purposefully left blank
+        }
+
         $entries = [];
         // One entry per version that is deployed
         foreach ($validatedVersions as $validatedVersion) {
             $checkSubPaths = $pathAfterEntryPoint;
             $subPathCount = count($checkSubPaths);
             $found = false;
-            for ($i = 0; $i < $subPathCount; $i++) {
-                // Traverse sub path segments up until one has been found in filesystem, to find the
-                // "nearest" matching version of currently viewed file
-                $pathToCheck = $absolutePathToDocsEntryPoint . '/' . $validatedVersion['version'] . '/' . $validatedVersion['language'] . '/' . implode('/', $checkSubPaths);
-                if (is_file($pathToCheck) || is_dir($pathToCheck)) {
-                    $validatedVersion['path'] = $pathToCheck;
-                    $found = true;
-                    break;
+            $mappedPath = $mapping[$entryPoint][$currentVersion][$currentLanguage][implode('/', $pathAfterEntryPoint)][$validatedVersion['version']] ?? false;
+            $docsRootPath = rtrim(str_replace($entryPoint, '', $absolutePathToDocsEntryPoint), '/');
+            if (
+                $mappedPath &&
+                (is_file($docsRootPath . '/' . $mappedPath) || is_dir($docsRootPath . '/' . $mappedPath))
+            ) {
+                $validatedVersion['path'] = $docsRootPath . '/' . ltrim($mappedPath, '/');
+                $found = true;
+            } else {
+                for ($i = 0; $i < $subPathCount; $i++) {
+                    // Traverse sub path segments up until one has been found in filesystem, to find the
+                    // "nearest" matching version of currently viewed file
+                    $pathToCheck = $absolutePathToDocsEntryPoint . '/' . $validatedVersion['version'] . '/' . $validatedVersion['language'] . '/' . implode('/', $checkSubPaths);
+                    if (is_file($pathToCheck) || is_dir($pathToCheck)) {
+                        $validatedVersion['path'] = $pathToCheck;
+                        $found = true;
+                        break;
+                    }
+                    array_pop($checkSubPaths);
                 }
-                array_pop($checkSubPaths);
             }
             if (!$found) {
                 $validatedVersion['path'] = $absolutePathToDocsEntryPoint . '/' . $validatedVersion['version'] . '/' . $validatedVersion['language'] . '/';
@@ -146,7 +171,11 @@ class DocumentationVersions
             $singleUrl = str_replace($GLOBALS['_SERVER']['DOCUMENT_ROOT'], '', $entry['single_path'] ?? '');
             $title = $entry['version'] . ' ' . $entry['language'];
             $firstEntries[] = $url !== '' ? '<dd><a href="' . htmlspecialchars($url, ENT_QUOTES | ENT_HTML5) . '">' . htmlspecialchars($title, ENT_QUOTES | ENT_HTML5) . '</a></dd>' : '';
-            $secondEntries[] = $singleUrl !== '' ? '<dd><a href="' . htmlspecialchars($singleUrl, ENT_QUOTES | ENT_HTML5) . '">' . htmlspecialchars('In one file: ' . $title, ENT_QUOTES | ENT_HTML5) . '</a></dd>' : '';
+            $secondEntries[] = $singleUrl !== '' ? '<dd><a href="' .
+                                                   htmlspecialchars($singleUrl, ENT_QUOTES | ENT_HTML5) .
+                                                   '">' .
+                                                   htmlspecialchars('In one file: ' . $title, ENT_QUOTES | ENT_HTML5) .
+                                                   '</a></dd>' : '';
         }
 
         $firstEntries = array_reverse($firstEntries);
