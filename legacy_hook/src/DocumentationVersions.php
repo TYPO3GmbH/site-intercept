@@ -129,9 +129,10 @@ class DocumentationVersions
             $found = false;
             $mappedPath = $mapping[$entryPoint][$currentVersion][$currentLanguage][implode('/', $pathAfterEntryPoint)][$validatedVersion['version']] ?? false;
             $docsRootPath = rtrim(str_replace($entryPoint, '', $absolutePathToDocsEntryPoint), '/');
+            $mappedPathWithoutAnchor = is_string($mappedPath) && strpos($mappedPath, '#') > 0 ? substr($mappedPath, 0, strpos($mappedPath, '#')) : $mappedPath;
             if (
                 $mappedPath &&
-                (is_file($docsRootPath . '/' . $mappedPath) || is_dir($docsRootPath . '/' . $mappedPath))
+                (is_file($docsRootPath . '/' . $mappedPathWithoutAnchor) || is_dir($docsRootPath . '/' . $mappedPathWithoutAnchor))
             ) {
                 $validatedVersion['path'] = $docsRootPath . '/' . ltrim($mappedPath, '/');
                 $found = true;

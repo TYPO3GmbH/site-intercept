@@ -165,19 +165,19 @@
           "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/Index.html"
         },
         "QuickInstall/GetAndUnpack/Index.html": {
-          "master": "/m/typo3/tutorial-getting-started/draft/en-us/Installation/LegacyInstallation.html"
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/LegacyInstallation.html"
         },
         "QuickInstall/TheInstallTool/Index.html": {
-          "master": "/m/typo3/tutorial-getting-started/draft/en-us/Installation/Index.html"
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/Index.html"
         },
         "QuickInstall/IntroductionPackage/Index.html": {
-          "master": "/m/typo3/tutorial-getting-started/draft/en-us/IntroductionPackage/Index.html"
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/IntroductionPackage/Index.html"
         },
         "In-depth/Index.html": {
           "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/Index.html"
         },
         "In-depth/SystemRequirements/Index.html": {
-          "master": "/m/typo3/tutorial-getting-started/draft/en-us/SystemRequirements/Index.html"
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/SystemRequirements/Index.html"
         },
         "ReleaseIntegrity/Index.html": {
           "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/ReleaseIntegrity.html"
