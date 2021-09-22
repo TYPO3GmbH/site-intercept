@@ -12,7 +12,6 @@ namespace App\Tests\Unit\Service;
 
 use App\Extractor\GithubPushEventForCore;
 use App\Service\CoreSplitService;
-use App\Service\CoreSplitServiceV8;
 use App\Service\RabbitConsumerService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -21,14 +20,16 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\IO\AbstractIO;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class RabbitConsumerServiceTest extends TestCase
 {
-    use \Prophecy\PhpUnit\ProphecyTrait;
+    use ProphecyTrait;
+
     /**
      * @test
      */
-    public function handleWorkerJobThrowsWithMissingJobUuid()
+    public function handleWorkerJobThrowsWithMissingJobUuid(): void
     {
         $entityManager = $this->prophesize(EntityManagerInterface::class);
         $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
@@ -37,15 +38,12 @@ class RabbitConsumerServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
-        $coreSplitServiceV8 = $this->prophesize(CoreSplitServiceV8::class);
 
         $subject = new RabbitConsumerService(
             $entityManager->reveal(),
             $rabbitConnection->reveal(),
-            $coreSplitService->reveal(),
-            $coreSplitServiceV8->reveal(),
+            [$coreSplitService->reveal()],
             'intercept-core-split-testing',
-            'foo'
         );
 
         $message = $this->prophesize(AMQPMessage::class);
@@ -59,7 +57,7 @@ class RabbitConsumerServiceTest extends TestCase
     /**
      * @test
      */
-    public function handleWorkerJobCallsSplitService()
+    public function handleWorkerJobCallsSplitService(): void
     {
         $entityManager = $this->prophesize(EntityManagerInterface::class);
         $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
@@ -68,15 +66,13 @@ class RabbitConsumerServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
-        $coreSplitServiceV8 = $this->prophesize(CoreSplitServiceV8::class);
+        $coreSplitService->getMonoRepository()->willReturn('typo3/typo3');
 
         $subject = new RabbitConsumerService(
             $entityManager->reveal(),
             $rabbitConnection->reveal(),
-            $coreSplitService->reveal(),
-            $coreSplitServiceV8->reveal(),
+            [$coreSplitService->reveal()],
             'intercept-core-split-testing',
-            'foo'
         );
 
         $message = $this->prophesize(AMQPMessage::class);
@@ -89,7 +85,8 @@ class RabbitConsumerServiceTest extends TestCase
             'targetBranch' => 'target-branch',
             'jobUuid' => 'job-uuid',
             'type' => 'patch',
-        ]);
+            'repositoryFullName' => 'typo3/typo3',
+        ], JSON_THROW_ON_ERROR);
         $message->getBody()->shouldBeCalled()->willReturn($messageBody);
 
         $coreSplitService->split(Argument::type(GithubPushEventForCore::class), Argument::type(AbstractIO::class))->shouldBeCalled();
@@ -100,7 +97,7 @@ class RabbitConsumerServiceTest extends TestCase
     /**
      * @test
      */
-    public function handleWorkerJobCallsTagService()
+    public function handleWorkerJobCallsTagService(): void
     {
         $entityManager = $this->prophesize(EntityManagerInterface::class);
         $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
@@ -109,15 +106,13 @@ class RabbitConsumerServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
-        $coreSplitServiceV8 = $this->prophesize(CoreSplitServiceV8::class);
+        $coreSplitService->getMonoRepository()->willReturn('typo3/typo3');
 
         $subject = new RabbitConsumerService(
             $entityManager->reveal(),
             $rabbitConnection->reveal(),
-            $coreSplitService->reveal(),
-            $coreSplitServiceV8->reveal(),
+            [$coreSplitService->reveal()],
             'intercept-core-split-testing',
-            'foo'
         );
 
         $message = $this->prophesize(AMQPMessage::class);
@@ -131,10 +126,55 @@ class RabbitConsumerServiceTest extends TestCase
             'jobUuid' => 'job-uuid',
             'type' => 'tag',
             'tag' => 'v9.5.1',
-        ], JSON_THROW_ON_ERROR, 512);
+            'repositoryFullName' => 'typo3/typo3',
+        ], JSON_THROW_ON_ERROR);
         $message->getBody()->shouldBeCalled()->willReturn($messageBody);
 
         $coreSplitService->tag(Argument::type(GithubPushEventForCore::class), Argument::type(AbstractIO::class))->shouldBeCalled();
+
+        $subject->handleWorkerJob($message->reveal());
+    }
+    /**
+     * @test
+     */
+    public function handleWorkerJobThrowsExceptionOnUnknownSplitter(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not find a CoreSplitService matching the repository "typo3/typo3"');
+        $this->expectExceptionCode(1632319341);
+
+        $entityManager = $this->prophesize(EntityManagerInterface::class);
+        $rabbitConnection = $this->prophesize(AMQPStreamConnection::class);
+        $rabbitChannel = $this->prophesize(AMQPChannel::class);
+        $rabbitIo = $this->prophesize(AbstractIO::class);
+        $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
+        $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
+        $coreSplitService = $this->prophesize(CoreSplitService::class);
+        $coreSplitService->getMonoRepository()->willReturn('foo');
+
+        $subject = new RabbitConsumerService(
+            $entityManager->reveal(),
+            $rabbitConnection->reveal(),
+            [$coreSplitService->reveal()],
+            'intercept-core-split-testing',
+        );
+
+        $message = $this->prophesize(AMQPMessage::class);
+        $message->delivery_info = [
+            'channel' => $rabbitChannel->reveal(),
+            'delivery_tag' => 'delivery-tag',
+        ];
+        $messageBody = json_encode([
+            'sourceBranch' => 'source-branch',
+            'targetBranch' => 'target-branch',
+            'jobUuid' => 'job-uuid',
+            'type' => 'tag',
+            'tag' => 'v9.5.1',
+            'repositoryFullName' => 'typo3/typo3',
+        ], JSON_THROW_ON_ERROR);
+        $message->getBody()->shouldBeCalled()->willReturn($messageBody);
+
+        $coreSplitService->tag(Argument::cetera())->shouldNotBeCalled();
 
         $subject->handleWorkerJob($message->reveal());
     }

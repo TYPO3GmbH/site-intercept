@@ -29,6 +29,8 @@ use Symfony\Component\Serializer\Serializer;
 
 class RabbitConsumerService
 {
+    private EntityManagerInterface $entityManager;
+
     /**
      * @var AMQPChannel The rabbit channel to messages to and fetch from
      */
@@ -40,16 +42,14 @@ class RabbitConsumerService
     private AbstractIO $rabbitIO;
 
     /**
-     * @var string Name of the queue to push to and fetch from
-     */
-    private string $queueName;
-
-    /**
      * @var CoreSplitService[]
      */
     private array $coreSplitters;
 
-    private EntityManagerInterface $entityManager;
+    /**
+     * @var string Name of the queue to push to and fetch from
+     */
+    private string $queueName;
 
     /**
      * RabbitPublisherService constructor.
@@ -63,6 +63,7 @@ class RabbitConsumerService
         array $coreSplitters,
         string $rabbitSplitQueue
     ) {
+        $this->entityManager = $entityManager;
         $this->queueName = $rabbitSplitQueue;
         $this->rabbitChannel = $rabbitConnection->channel();
         $this->rabbitChannel->queue_declare($this->queueName, false, true, false, false);
@@ -73,7 +74,6 @@ class RabbitConsumerService
         // Default heartbeat: 60 seconds, so any single job running longer than 2 minutes (two heartbeats missed), will crash.
         // Thus, the IO object is given down to jobs, to send a heartbeat in between single units of jobs
         $this->rabbitIO = $rabbitConnection->getIO();
-        $this->entityManager = $entityManager;
         $this->coreSplitters = $coreSplitters;
     }
 

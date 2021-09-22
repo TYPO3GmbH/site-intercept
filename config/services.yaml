@@ -78,6 +78,20 @@ services:
             - core_splitter
             - testDouble
 
+    core_splitter_v9:
+        class: App\Service\CoreSplitService
+        public: true
+        arguments:
+            $logger: '@monolog.logger.request'
+            $splitCorePath: '%kernel.project_dir%/var/git-core-split-v9/'
+            $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO_V9)%'
+            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V9)%'
+            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v9/'
+            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
+        tags:
+            - core_splitter
+            - testDouble
+
     App\Service\DiscordServerService:
         class: App\Service\DiscordServerService
         public: true
