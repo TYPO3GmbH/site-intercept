@@ -50,20 +50,7 @@ services:
         tags:
             - testDouble
 
-    App\Service\CoreSplitServiceV8:
-        class: App\Service\CoreSplitService
-        public: true
-        arguments:
-            $logger: '@monolog.logger.request'
-            $splitCorePath: '%kernel.project_dir%/var/git-core-split-v8/'
-            $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO_V8)%'
-            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V8)%'
-            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v8/'
-            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
-        tags:
-            - testDouble
-
-    App\Service\CoreSplitService:
+    core_splitter:
         class: App\Service\CoreSplitService
         public: true
         arguments:
@@ -74,6 +61,21 @@ services:
             $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions/'
             $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
         tags:
+            - core_splitter
+            - testDouble
+
+    core_splitter_v8:
+        class: App\Service\CoreSplitService
+        public: true
+        arguments:
+            $logger: '@monolog.logger.request'
+            $splitCorePath: '%kernel.project_dir%/var/git-core-split-v8/'
+            $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO_V8)%'
+            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V8)%'
+            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v8/'
+            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
+        tags:
+            - core_splitter
             - testDouble
 
     App\Service\DiscordServerService:
@@ -129,10 +131,8 @@ services:
         class: App\Service\RabbitConsumerService
         arguments:
             $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
-            $coreSplitService: '@App\Service\CoreSplitService'
-            $coreSplitServiceV8: '@App\Service\CoreSplitServiceV8'
+            $coreSplitters: !tagged 'core_splitter'
             $rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
-            $eltsRepositoryNameV8: '%env(CORE_SPLIT_MAIN_REPO_FULLNAME_V8)%'
 
     App\Service\RabbitStatusService:
         class: App\Service\RabbitStatusService

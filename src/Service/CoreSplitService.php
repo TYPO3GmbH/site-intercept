@@ -32,7 +32,7 @@ use Symplify\GitWrapper\GitWrapper;
  *
  * @codeCoverageIgnore Covered by integration tests
  */
-class CoreSplitService implements CoreSplitServiceInterface
+class CoreSplitService
 {
     private LoggerInterface $logger;
 
@@ -95,6 +95,17 @@ class CoreSplitService implements CoreSplitServiceInterface
         $this->splitSingleRepoPath = $splitSingleRepoPath;
         $this->gitOutputListener = $gitOutputListener;
         $this->entityManager = $entityManager;
+    }
+
+    public function getMonoRepository(): string
+    {
+        $repositoryNameRegex = '/^.+:(.*)\.git$/';
+
+        if (preg_match($repositoryNameRegex, $this->splitMonoRepo, $matches)) {
+            return $matches[1];
+        }
+
+        throw new \InvalidArgumentException(sprintf('Cannot extract repository from clone URL %s', $this->splitMonoRepo), 1632320303);
     }
 
     /**
