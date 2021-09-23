@@ -18,18 +18,6 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
 
         types:
-            utc_date:
-                class: App\DBAL\Types\UtcDateType
-            utc_datetime:
-                class: App\DBAL\Types\UtcDateTimeType
-            utc_time:
-                class: App\DBAL\Types\UtcTimeType
-            date:
-                class: App\DBAL\Types\UtcDateType
-            datetime:
-                class: App\DBAL\Types\UtcDateTimeType
-            time:
-                class: App\DBAL\Types\UtcTimeType
             cron_expression:
                 class: Setono\CronExpressionBundle\Doctrine\DBAL\Types\CronExpressionType
                 commented: false
