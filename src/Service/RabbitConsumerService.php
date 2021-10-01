@@ -55,7 +55,7 @@ class RabbitConsumerService
      * RabbitPublisherService constructor.
      *
      * @param AMQPStreamConnection $rabbitConnection
-     * @param iterable<CoreSplitService>
+     * @param iterable<CoreSplitService> $coreSplitters
      * @param string $rabbitSplitQueue
      */
     public function __construct(
@@ -161,7 +161,7 @@ class RabbitConsumerService
     private function getCoreSplitter(GithubPushEventForCore $event): CoreSplitService
     {
         foreach ($this->coreSplitters as $coreSplitter) {
-            if ($coreSplitter->getMonoRepository() === $event->repositoryFullName) {
+            if ($coreSplitter->getRepositoryName() === $event->repositoryFullName) {
                 return $coreSplitter;
             }
         }

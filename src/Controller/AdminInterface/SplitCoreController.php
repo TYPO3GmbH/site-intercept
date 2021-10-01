@@ -18,6 +18,7 @@ use App\Form\SplitCoreSplitFormType;
 use App\Form\SplitCoreTagFormType;
 use App\Repository\HistoryEntryRepository;
 use App\Service\RabbitPublisherService;
+use App\Utility\RepositoryUrlUtility;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,22 +35,33 @@ class SplitCoreController extends AbstractController
      * @param Request $request
      * @param RabbitPublisherService $rabbitService
      * @param HistoryEntryRepository $historyEntryRepository
+     * @param array $coreRepositories
      * @throws \Exception
      * @return Response
      */
     public function index(
         Request $request,
         RabbitPublisherService $rabbitService,
-        HistoryEntryRepository $historyEntryRepository
+        HistoryEntryRepository $historyEntryRepository,
+        array $coreRepositories
     ): Response {
-        $splitForm = $this->createForm(SplitCoreSplitFormType::class);
+        $splitForm = $this->createForm(SplitCoreSplitFormType::class, null, [
+            'repositories' => $coreRepositories
+        ]);
         $tagForm = $this->createForm(SplitCoreTagFormType::class);
 
         $splitForm->handleRequest($request);
         if ($splitForm instanceof Form && $splitForm->isSubmitted() && $splitForm->isValid()) {
             $this->denyAccessUnlessGranted('ROLE_USER');
-            $branch = $splitForm->getClickedButton()->getName();
-            $pushEventInformation = new GithubPushEventForCore(['ref' => 'refs/heads/' . $branch]);
+            $clickedButton = $splitForm->getClickedButton();
+            $branch = $clickedButton->getName();
+            $repository = RepositoryUrlUtility::extractRepositoryNameFromCloneUrl($coreRepositories[$branch]['monoRepository']);
+            $pushEventInformation = new GithubPushEventForCore([
+                'ref' => 'refs/heads/' . $branch,
+                'repository' => [
+                    'full_name' => $repository
+                ]
+            ]);
             $rabbitService->pushNewCoreSplitJob($pushEventInformation, 'interface');
             $this->addFlash(
                 'success',

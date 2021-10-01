@@ -66,7 +66,7 @@ class RabbitConsumerServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
-        $coreSplitService->getMonoRepository()->willReturn('typo3/typo3');
+        $coreSplitService->getRepositoryName()->willReturn('typo3/typo3');
 
         $subject = new RabbitConsumerService(
             $entityManager->reveal(),
@@ -106,7 +106,7 @@ class RabbitConsumerServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
-        $coreSplitService->getMonoRepository()->willReturn('typo3/typo3');
+        $coreSplitService->getRepositoryName()->willReturn('typo3/typo3');
 
         $subject = new RabbitConsumerService(
             $entityManager->reveal(),
@@ -150,7 +150,7 @@ class RabbitConsumerServiceTest extends TestCase
         $rabbitConnection->channel()->willReturn($rabbitChannel->reveal());
         $rabbitConnection->getIO()->willReturn($rabbitIo->reveal());
         $coreSplitService = $this->prophesize(CoreSplitService::class);
-        $coreSplitService->getMonoRepository()->willReturn('foo');
+        $coreSplitService->getRepositoryName()->willReturn('foo');
 
         $subject = new RabbitConsumerService(
             $entityManager->reveal(),

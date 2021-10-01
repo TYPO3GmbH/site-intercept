@@ -17,6 +17,7 @@ use App\Enum\HistoryEntryType;
 use App\Enum\SplitterStatus;
 use App\Extractor\GithubPushEventForCore;
 use App\GitWrapper\Event\GitOutputListener;
+use App\Utility\RepositoryUrlUtility;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpAmqpLib\Wire\IO\AbstractIO;
 use Psr\Log\LoggerInterface;
@@ -97,15 +98,12 @@ class CoreSplitService
         $this->entityManager = $entityManager;
     }
 
-    public function getMonoRepository(): string
+    /**
+     * @codeCoverageIgnore This is just a wrapper method to get a substring of a protected property
+     */
+    public function getRepositoryName(): string
     {
-        $repositoryNameRegex = '/^.+:(.*)\.git$/';
-
-        if (preg_match($repositoryNameRegex, $this->splitMonoRepo, $matches)) {
-            return $matches[1];
-        }
-
-        throw new \InvalidArgumentException(sprintf('Cannot extract repository from clone URL %s', $this->splitMonoRepo), 1632320303);
+        return RepositoryUrlUtility::extractRepositoryNameFromCloneUrl($this->splitMonoRepo);
     }
 
     /**

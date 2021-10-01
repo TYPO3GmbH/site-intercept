@@ -2,6 +2,23 @@ parameters:
     locale: 'en'
     router.request_context.host: '%env(APP_URL)%'
 
+    core_repositories:
+      master:
+        version: 'master'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
+      branch11_5:
+        version: '11.5'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
+      branch10_4:
+        version: '10.4'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
+      branch9_5:
+        version: '9.5'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO_V9)%'
+      branch8_7:
+        version: '8.7'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO_V8)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -11,6 +28,7 @@ services:
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
         bind:
+          $coreRepositories: '%core_repositories%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -56,7 +74,7 @@ services:
         arguments:
             $logger: '@monolog.logger.request'
             $splitCorePath: '%kernel.project_dir%/var/git-core-split/'
-            $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO)%'
+            $splitMonoRepo: '@=parameter("core_repositories")["master"]["monoRepository"]'
             $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE)%'
             $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions/'
             $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
@@ -70,7 +88,7 @@ services:
         arguments:
             $logger: '@monolog.logger.request'
             $splitCorePath: '%kernel.project_dir%/var/git-core-split-v8/'
-            $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO_V8)%'
+            $splitMonoRepo: '@=parameter("core_repositories")["branch8_7"]["monoRepository"]'
             $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V8)%'
             $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v8/'
             $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
@@ -84,7 +102,7 @@ services:
         arguments:
             $logger: '@monolog.logger.request'
             $splitCorePath: '%kernel.project_dir%/var/git-core-split-v9/'
-            $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO_V9)%'
+            $splitMonoRepo: '@=parameter("core_repositories")["branch9_5"]["monoRepository"]'
             $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V9)%'
             $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v9/'
             $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
