@@ -42,9 +42,9 @@ class RabbitConsumerService
     private AbstractIO $rabbitIO;
 
     /**
-     * @var CoreSplitService[]
+     * @var iterable<CoreSplitService>
      */
-    private array $coreSplitters;
+    private iterable $coreSplitters;
 
     /**
      * @var string Name of the queue to push to and fetch from
@@ -55,12 +55,13 @@ class RabbitConsumerService
      * RabbitPublisherService constructor.
      *
      * @param AMQPStreamConnection $rabbitConnection
+     * @param iterable<CoreSplitService>
      * @param string $rabbitSplitQueue
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         AMQPStreamConnection $rabbitConnection,
-        array $coreSplitters,
+        iterable $coreSplitters,
         string $rabbitSplitQueue
     ) {
         $this->entityManager = $entityManager;
