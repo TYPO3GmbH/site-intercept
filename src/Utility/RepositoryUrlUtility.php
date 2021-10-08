@@ -95,4 +95,15 @@ class RepositoryUrlUtility
         }
         return $url;
     }
+
+    public static function extractRepositoryNameFromCloneUrl(string $url): string
+    {
+        $repositoryNameRegex = '/^.+:(.*)\.git$/';
+
+        if (preg_match($repositoryNameRegex, $url, $matches)) {
+            return $matches[1];
+        }
+
+        throw new \InvalidArgumentException(sprintf('Cannot extract repository from clone URL %s', $url), 1632320303);
+    }
 }

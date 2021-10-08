@@ -18,7 +18,7 @@ use Composer\Semver\Semver;
  */
 class ComposerJson
 {
-    private const ALLOWED_TYPO3_VERSIONS = ['6.2', '7.6', '8.7', '9.5', '10.4'];
+    private const ALLOWED_TYPO3_VERSIONS = ['6.2', '7.6', '8.7', '9.5', '10.4', '11.5'];
 
     private array $composerJson;
 

@@ -29,6 +29,8 @@ use Symfony\Component\Serializer\Serializer;
 
 class RabbitConsumerService
 {
+    private EntityManagerInterface $entityManager;
+
     /**
      * @var AMQPChannel The rabbit channel to messages to and fetch from
      */
@@ -40,41 +42,30 @@ class RabbitConsumerService
     private AbstractIO $rabbitIO;
 
     /**
+     * @var iterable<CoreSplitService>
+     */
+    private iterable $coreSplitters;
+
+    /**
      * @var string Name of the queue to push to and fetch from
      */
     private string $queueName;
-
-    private CoreSplitServiceInterface $coreSplitService;
-
-    private CoreSplitServiceInterface $coreSplitServiceV8;
-
-    /**
-     * @var string the v8 ELTS repository name
-     */
-    private string $eltsRepositoryNameV8;
-    private EntityManagerInterface $entityManager;
 
     /**
      * RabbitPublisherService constructor.
      *
      * @param AMQPStreamConnection $rabbitConnection
-     * @param CoreSplitService $coreSplitService
-     * @param CoreSplitServiceV8 $coreSplitServiceV8
+     * @param iterable<CoreSplitService> $coreSplitters
      * @param string $rabbitSplitQueue
-     * @param string $eltsRepositoryNameV8
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         AMQPStreamConnection $rabbitConnection,
-        CoreSplitServiceInterface $coreSplitService,
-        CoreSplitServiceInterface $coreSplitServiceV8,
-        string $rabbitSplitQueue,
-        string $eltsRepositoryNameV8
+        iterable $coreSplitters,
+        string $rabbitSplitQueue
     ) {
+        $this->entityManager = $entityManager;
         $this->queueName = $rabbitSplitQueue;
-        $this->eltsRepositoryNameV8 = $eltsRepositoryNameV8;
-        $this->coreSplitService = $coreSplitService;
-        $this->coreSplitServiceV8 = $coreSplitServiceV8;
         $this->rabbitChannel = $rabbitConnection->channel();
         $this->rabbitChannel->queue_declare($this->queueName, false, true, false, false);
         // Note getIO() is 'internal' / 'deprecated' in amqplib 2.9.2. However, there is
@@ -84,7 +75,7 @@ class RabbitConsumerService
         // Default heartbeat: 60 seconds, so any single job running longer than 2 minutes (two heartbeats missed), will crash.
         // Thus, the IO object is given down to jobs, to send a heartbeat in between single units of jobs
         $this->rabbitIO = $rabbitConnection->getIO();
-        $this->entityManager = $entityManager;
+        $this->coreSplitters = $coreSplitters;
     }
 
     /**
@@ -167,11 +158,14 @@ class RabbitConsumerService
         $this->entityManager->flush();
     }
 
-    private function getCoreSplitter(GithubPushEventForCore $event): CoreSplitServiceInterface
+    private function getCoreSplitter(GithubPushEventForCore $event): CoreSplitService
     {
-        if ($event->repositoryFullName === $this->eltsRepositoryNameV8) {
-            return $this->coreSplitServiceV8;
+        foreach ($this->coreSplitters as $coreSplitter) {
+            if ($coreSplitter->getRepositoryName() === $event->repositoryFullName) {
+                return $coreSplitter;
+            }
         }
-        return $this->coreSplitService;
+
+        throw new \InvalidArgumentException(sprintf('Could not find a CoreSplitService matching the repository "%s"', $event->repositoryFullName), 1632319341);
     }
 }

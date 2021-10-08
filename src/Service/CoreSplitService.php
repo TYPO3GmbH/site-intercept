@@ -17,6 +17,7 @@ use App\Enum\HistoryEntryType;
 use App\Enum\SplitterStatus;
 use App\Extractor\GithubPushEventForCore;
 use App\GitWrapper\Event\GitOutputListener;
+use App\Utility\RepositoryUrlUtility;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpAmqpLib\Wire\IO\AbstractIO;
 use Psr\Log\LoggerInterface;
@@ -32,7 +33,7 @@ use Symplify\GitWrapper\GitWrapper;
  *
  * @codeCoverageIgnore Covered by integration tests
  */
-class CoreSplitService implements CoreSplitServiceInterface
+class CoreSplitService
 {
     private LoggerInterface $logger;
 
@@ -95,6 +96,14 @@ class CoreSplitService implements CoreSplitServiceInterface
         $this->splitSingleRepoPath = $splitSingleRepoPath;
         $this->gitOutputListener = $gitOutputListener;
         $this->entityManager = $entityManager;
+    }
+
+    /**
+     * @codeCoverageIgnore This is just a wrapper method to get a substring of a protected property
+     */
+    public function getRepositoryName(): string
+    {
+        return RepositoryUrlUtility::extractRepositoryNameFromCloneUrl($this->splitMonoRepo);
     }
 
     /**
