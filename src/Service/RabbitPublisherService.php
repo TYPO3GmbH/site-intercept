@@ -72,6 +72,7 @@ class RabbitPublisherService
             (new HistoryEntry())
                 ->setType($type)
                 ->setStatus(SplitterStatus::QUEUED)
+                ->setGroupEntry($message->jobUuid)
                 ->setData(
                     [
                         'type' => $type,
