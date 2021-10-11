@@ -110,28 +110,38 @@ class GithubService
     ): void {
         $client = $this->client;
 
-        $url = $pullRequest->pullRequestUrl . '?access_token=' . $this->accessKey;
+        $url = $pullRequest->pullRequestUrl;
         $client->patch(
             $url,
             [
+                'headers' => [
+                    'Authorization' => 'token ' . $this->accessKey
+                ],
                 'json' => [
                     'state' => 'closed',
                 ]
             ]
         );
 
-        $url = $pullRequest->commentsUrl . '?access_token=' . $this->accessKey;
+        $url = $pullRequest->commentsUrl;
         $client->post(
             $url,
             [
+                'headers' => [
+                    'Authorization' => 'token ' . $this->accessKey
+                ],
                 'json' => [
                     'body' => $closeComment->comment,
                 ],
             ]
         );
 
-        $url = $pullRequest->issueUrl . '/lock?access_token=' . $this->accessKey;
-        $client->put($url);
+        $url = $pullRequest->issueUrl . '/lock';
+        $client->put($url, [
+            'headers' => [
+                'Authorization' => 'token ' . $this->accessKey
+            ],
+        ]);
     }
 
     /**
