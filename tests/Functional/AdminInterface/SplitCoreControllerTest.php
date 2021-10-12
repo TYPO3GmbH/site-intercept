@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 /*
@@ -11,9 +12,10 @@ declare(strict_types = 1);
 namespace App\Tests\Functional\AdminInterface;
 
 use App\Bundle\TestDoubleBundle;
-use App\Client\GraylogClient;
 use App\Client\RabbitManagementClient;
 use App\Tests\Functional\AbstractFunctionalWebTestCase;
+use App\Tests\Functional\DatabasePrimer;
+use App\Tests\Functional\Fixtures\AdminInterface\SplitCoreControllerTestHistoryData;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -25,20 +27,12 @@ use Prophecy\PhpUnit\ProphecyTrait;
 class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
 {
     use ProphecyTrait;
-    private $graylogProphecy;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->graylogProphecy = $this->addGraylogClientProphecy();
-        $this->graylogProphecy->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
-    }
 
     /**
      * @test
      */
-    public function rabbitDataIsRendered()
+    public function rabbitDataIsRendered(): void
     {
         TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
 
@@ -59,7 +53,7 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function rabbitDownIsRendered()
+    public function rabbitDownIsRendered(): void
     {
         TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
 
@@ -78,10 +72,9 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function recentLogMessagesAreRendered()
+    public function recentLogMessagesAreRendered(): void
     {
         TestDoubleBundle::reset();
-
         TestDoubleBundle::addProphecy(AMQPStreamConnection::class, $this->prophesize(AMQPStreamConnection::class));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
@@ -89,67 +82,11 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
             new Response(200, [], json_encode(['consumers' => 1, 'messages' => 2]))
         );
 
-        $graylogClientProphecy = $this->prophesize(GraylogClient::class);
-        TestDoubleBundle::addProphecy(GraylogClient::class, $graylogClientProphecy);
-        // first ->get() call to elastic returns one 'queued' log entry
-        $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
-            new Response(200, [], json_encode([
-                'messages' => [
-                    0 => [
-                        'message' => [
-                            'application' => 'intercept',
-                            'env' => 'prod',
-                            'level' => 6,
-                            'message' => 'Queued a core split job to queue',
-                            'ctxt_job_uuid' => 'a048046f-3204-45f6-9572-cb7af54ad7d5',
-                            'ctxt_type' => 'patch',
-                            'ctxt_status' => 'queued',
-                            'ctxt_sourceBranch' => 'master',
-                            'ctxt_targetBranch' => 'master',
-                            'ctxt_triggeredBy' => 'api',
-                            'timestamp' => '2019-03-11T10:33:16.803Z',
-                        ]
-                    ]
-                ]
-            ]))
-        );
-        // second ->get() call to elastic returns one detail log row and a done message
-        $graylogClientProphecy->get(Argument::cetera())->shouldBeCalled()->willReturn(
-            new Response(200, [], json_encode([
-                'messages' => [
-                    0 => [
-                        'message' => [
-                            'application' => 'intercept',
-                            'env' => 'prod',
-                            'level' => 6,
-                            'message' => 'Git command error output: Everything up-to-date',
-                            'ctxt_job_uuid' => 'a048046f-3204-45f6-9572-cb7af54ad7d5',
-                            'ctxt_type' => 'patch',
-                            'ctxt_status' => 'work',
-                            'ctxt_sourceBranch' => 'master',
-                            'ctxt_targetBranch' => 'master',
-                            'timestamp' => '2019-03-11T10:34:22.803Z',
-                        ]
-                    ],
-                    1 => [
-                        'message' => [
-                            'application' => 'intercept',
-                            'env' => 'prod',
-                            'level' => 6,
-                            'message' => 'Finished a git split worker job',
-                            'ctxt_job_uuid' => 'a048046f-3204-45f6-9572-cb7af54ad7d5',
-                            'ctxt_type' => 'patch',
-                            'ctxt_status' => 'done',
-                            'ctxt_sourceBranch' => 'master',
-                            'ctxt_targetBranch' => 'master',
-                            'timestamp' => '2019-03-11T10:36:27.256Z',
-                        ]
-                    ]
-                ]
-            ]))
-        );
-
         $client = static::createClient();
+        DatabasePrimer::prime(self::$kernel);
+        (new SplitCoreControllerTestHistoryData())->load(
+            self::$kernel->getContainer()->get('doctrine')->getManager()
+        );
         $client->request('GET', '/admin/split/core');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertMatchesRegularExpression('/a048046f-3204-45f6-9572-cb7af54ad7d5/', $client->getResponse()->getContent());
@@ -159,10 +96,8 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function splitCoreCanBeTriggered()
+    public function splitCoreCanBeTriggered(): void
     {
-        $graylog = $this->addGraylogClientProphecy();
-        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
         $rabbitClientProphecy->get(Argument::cetera())->willReturn(
@@ -203,10 +138,8 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function tagCoreCanBeTriggered()
+    public function tagCoreCanBeTriggered(): void
     {
-        $graylog = $this->addGraylogClientProphecy();
-        $graylog->get(Argument::cetera())->willReturn(new Response(200, [], '{}'));
         $rabbitClientProphecy = $this->prophesize(RabbitManagementClient::class);
         TestDoubleBundle::addProphecy(RabbitManagementClient::class, $rabbitClientProphecy);
         $rabbitClientProphecy->get(Argument::cetera())->willReturn(

@@ -53,7 +53,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function githubBuildIsNotTriggeredWithNewRepo()
+    public function githubBuildIsNotTriggeredWithNewRepo(): void
     {
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
@@ -82,7 +82,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function githubBuildIsTriggered()
+    public function githubBuildIsTriggered(): void
     {
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
@@ -122,20 +122,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $githubClientProphecy
             ->post(
                 '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
-                [
-                    'json' => [
-                        'event_type' => 'render',
-                        'client_payload' => [
-                            'repository_url' => 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi.git',
-                            'source_branch' => 'latest',
-                            'target_branch_directory' => 'master',
-                            'name' => 'make-good',
-                            'vendor' => 'johndoe',
-                            'type_short' => 'm',
-                            'id' => 'a2deb251e3f9bdea5a9b1d48327e5ee7173b4622',
-                        ],
-                    ],
-                ]
+                Argument::any()
             )->shouldBeCalled()
             ->willReturn(new Response());
         TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
@@ -151,7 +138,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function githubBuildForMultipleBranchesIsTriggered()
+    public function githubBuildForMultipleBranchesIsTriggered(): void
     {
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
@@ -192,40 +179,14 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $githubClientProphecy
             ->post(
                 '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
-                [
-                    'json' => [
-                        'event_type' => 'render',
-                        'client_payload' => [
-                            'repository_url' => 'https://bitbucket.org/pathfindermediagroup/eso-export-addon',
-                            'source_branch' => 'master',
-                            'target_branch_directory' => 'master',
-                            'name' => 'yay',
-                            'vendor' => 'bla',
-                            'type_short' => 'm',
-                            'id' => '3c8b70e38ef356984c76e1a83a08b7c1fb75027e',
-                        ],
-                    ],
-                ]
+                Argument::any()
             )->shouldBeCalled()
             ->willReturn(new Response());
         TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
         $githubClientProphecy
             ->post(
                 '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
-                [
-                    'json' => [
-                        'event_type' => 'render',
-                        'client_payload' => [
-                            'repository_url' => 'https://bitbucket.org/pathfindermediagroup/eso-export-addon',
-                            'source_branch' => 'v1.1',
-                            'target_branch_directory' => '1.1',
-                            'name' => 'yay',
-                            'vendor' => 'bla',
-                            'type_short' => 'm',
-                            'id' => '3c8b70e38ef356984c76e1a83a08b7c1fb75027e',
-                        ],
-                    ],
-                ]
+                Argument::any()
             )->shouldBeCalled()
             ->willReturn(new Response());
         TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
@@ -241,7 +202,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function githubBuildIsNotTriggered()
+    public function githubBuildIsNotTriggered(): void
     {
         $this->addGeneralClientProphecy();
         $this->addRabbitManagementClientProphecy();
@@ -330,20 +291,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $githubClientProphecy
             ->post(
                 '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
-                [
-                    'json' => [
-                        'event_type' => 'render',
-                        'client_payload' => [
-                            'repository_url' => 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi.git',
-                            'source_branch' => 'latest',
-                            'target_branch_directory' => 'master',
-                            'name' => 'cms-core',
-                            'vendor' => 'typo3',
-                            'type_short' => 'c',
-                            'id' => '48a08502e6b3bcdb2b3d4f2aed4b21dbe45421ac',
-                        ],
-                    ],
-                ]
+                Argument::any()
             )->shouldBeCalled()
             ->willReturn(new Response());
         TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
@@ -380,7 +328,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function githubPingIsHandled()
+    public function githubPingIsHandled(): void
     {
         $this->addRabbitManagementClientProphecy();
         $slackClient = $this->addSlackClientProphecy();

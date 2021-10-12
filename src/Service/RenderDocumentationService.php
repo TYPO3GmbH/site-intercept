@@ -11,25 +11,37 @@ declare(strict_types = 1);
 namespace App\Service;
 
 use App\Entity\DocumentationJar;
+use App\Entity\HistoryEntry;
+use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\DocumentationStatus;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Extractor\DeploymentInformation;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Security;
+use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 class RenderDocumentationService
 {
     protected DocumentationBuildInformationService $documentationBuildInformationService;
-
     protected GithubService $githubService;
-
     protected LoggerInterface $logger;
+    protected EntityManagerInterface $entityManager;
+    protected Security $security;
 
-    public function __construct(DocumentationBuildInformationService $documentationBuildInformationService, GithubService $githubService, LoggerInterface $logger)
-    {
+    public function __construct(
+        DocumentationBuildInformationService $documentationBuildInformationService,
+        GithubService $githubService,
+        LoggerInterface $logger,
+        EntityManagerInterface $entityManager,
+        Security $security
+    ) {
         $this->documentationBuildInformationService = $documentationBuildInformationService;
         $this->githubService = $githubService;
         $this->logger = $logger;
+        $this->entityManager = $entityManager;
+        $this->security = $security;
     }
 
     /**
@@ -46,19 +58,31 @@ class RenderDocumentationService
         $bambooBuildTriggered = $this->githubService->triggerDocumentationPlan($buildInformation);
         $this->documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
         $this->documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
-        $this->logger->info(
-            'Triggered docs build',
-            [
-                'type' => 'docsRendering',
-                'status' => 'triggered',
-                'triggeredBy' => $scope,
-                'repository' => $buildInformation->repositoryUrl,
-                'package' => $buildInformation->packageName,
-                'sourceBranch' => $buildInformation->sourceBranch,
-                'targetBranch' => $buildInformation->targetBranchDirectory,
-                'bambooKey' => $bambooBuildTriggered->buildResultKey,
-            ]
+        $user = $this->security->getUser();
+        $userIdentifier = 'Anon.';
+        if ($user instanceof KeyCloakUser) {
+            $userIdentifier = $user->getDisplayName();
+        }
+        $this->entityManager->persist(
+            (new HistoryEntry())
+                ->setType('docsRendering')
+                ->setStatus('triggered')
+                ->setGroupEntry($bambooBuildTriggered->buildResultKey)
+                ->setData(
+                    [
+                        'type' => 'docsRendering',
+                        'status' => DocsRenderingHistoryStatus::TRIGGERED,
+                        'triggeredBy' => $scope,
+                        'repository' => $buildInformation->repositoryUrl,
+                        'package' => $buildInformation->packageName,
+                        'sourceBranch' => $buildInformation->sourceBranch,
+                        'targetBranch' => $buildInformation->targetBranchDirectory,
+                        'bambooKey' => $bambooBuildTriggered->buildResultKey,
+                        'user' => $userIdentifier
+                    ]
+                )
         );
+        $this->entityManager->flush();
         return $buildInformation;
     }
 

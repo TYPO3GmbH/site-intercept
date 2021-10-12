@@ -2,6 +2,23 @@ parameters:
     locale: 'en'
     router.request_context.host: '%env(APP_URL)%'
 
+    core_repositories:
+      master:
+        version: 'master'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
+      branch11_5:
+        version: '11.5'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
+      branch10_4:
+        version: '10.4'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
+      branch9_5:
+        version: '9.5'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO_V9)%'
+      branch8_7:
+        version: '8.7'
+        monoRepository: '%env(CORE_SPLIT_MAIN_REPO_V8)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -11,6 +28,7 @@ services:
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
         bind:
+          $coreRepositories: '%core_repositories%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -28,7 +46,6 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Client\GerritClient: '@eight_points_guzzle.client.gerrit'
     App\Client\GeneralClient: '@eight_points_guzzle.client.general'
-    App\Client\GraylogClient: '@eight_points_guzzle.client.graylog'
     App\Client\RabbitManagementClient: '@eight_points_guzzle.client.rabbitManagement'
     App\Client\SlackClient: '@eight_points_guzzle.client.slack'
     App\Client\GithubClient: '@eight_points_guzzle.client.github'
@@ -51,30 +68,46 @@ services:
         tags:
             - testDouble
 
-    App\Service\CoreSplitServiceV8:
-        class: App\Service\CoreSplitService
-        public: true
-        arguments:
-            $logger: '@monolog.logger.request'
-            $splitCorePath: '%kernel.project_dir%/var/git-core-split-v8/'
-            $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO_V8)%'
-            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V8)%'
-            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v8/'
-            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
-        tags:
-            - testDouble
-
-    App\Service\CoreSplitService:
+    core_splitter:
         class: App\Service\CoreSplitService
         public: true
         arguments:
             $logger: '@monolog.logger.request'
             $splitCorePath: '%kernel.project_dir%/var/git-core-split/'
-            $splitMonoRepo: '%env(CORE_SPLIT_MAIN_REPO)%'
+            $splitMonoRepo: '@=parameter("core_repositories")["master"]["monoRepository"]'
             $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE)%'
             $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions/'
             $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
         tags:
+            - core_splitter
+            - testDouble
+
+    core_splitter_v8:
+        class: App\Service\CoreSplitService
+        public: true
+        arguments:
+            $logger: '@monolog.logger.request'
+            $splitCorePath: '%kernel.project_dir%/var/git-core-split-v8/'
+            $splitMonoRepo: '@=parameter("core_repositories")["branch8_7"]["monoRepository"]'
+            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V8)%'
+            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v8/'
+            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
+        tags:
+            - core_splitter
+            - testDouble
+
+    core_splitter_v9:
+        class: App\Service\CoreSplitService
+        public: true
+        arguments:
+            $logger: '@monolog.logger.request'
+            $splitCorePath: '%kernel.project_dir%/var/git-core-split-v9/'
+            $splitMonoRepo: '@=parameter("core_repositories")["branch9_5"]["monoRepository"]'
+            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V9)%'
+            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v9/'
+            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
+        tags:
+            - core_splitter
             - testDouble
 
     App\Service\DiscordServerService:
@@ -123,19 +156,15 @@ services:
     App\Service\RabbitPublisherService:
         class: App\Service\RabbitPublisherService
         arguments:
-            $logger: '@monolog.logger.request'
             $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
             $rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
 
     App\Service\RabbitConsumerService:
         class: App\Service\RabbitConsumerService
         arguments:
-            $logger: '@monolog.logger.request'
             $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
-            $coreSplitService: '@App\Service\CoreSplitService'
-            $coreSplitServiceV8: '@App\Service\CoreSplitServiceV8'
+            $coreSplitters: !tagged 'core_splitter'
             $rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
-            $eltsRepositoryNameV8: '%env(CORE_SPLIT_MAIN_REPO_FULLNAME_V8)%'
 
     App\Service\RabbitStatusService:
         class: App\Service\RabbitStatusService
@@ -153,21 +182,12 @@ services:
         tags:
             - testDouble
 
-    # graylog log setup and enrichment of log rows with static
-    # data for easy search on elk.typo3.com. Works on dev / local too since
-    # errors are ignored when sending.
-    gelf.publisher:
-        class: Gelf\Publisher
-        arguments: ['@gelf.ignore_error_transport']
-    gelf.ignore_error_transport:
-        class: Gelf\Transport\IgnoreErrorTransportWrapper
-        arguments: ['@gelf.transport']
-    gelf.transport:
-        class: Gelf\Transport\UdpTransport
-        arguments: ['%env(GRAYLOG_HOST)%', '%env(int:GRAYLOG_PORT)%']
-
-
     App\Security\LogoutSuccessHandler:
       class: App\Security\LogoutSuccessHandler
       arguments:
         $appUrl: '%env(APP_URL)%'
+
+
+    App\EventListener\KernelTerminateListener:
+      tags:
+        - { name: kernel.event_listener, event: kernel.terminate }

@@ -1,0 +1,314 @@
+{
+  "m/typo3/tutorial-getting-started": {
+    "master": {
+      "en-us": {
+        "Concepts/Index.html": {
+          "10.4": "/m/typo3/tutorial-getting-started/10.4/en-us/GeneralPrinciples/Index.html",
+          "9.5": "/m/typo3/tutorial-getting-started/9.5/en-us/GeneralPrinciples/Index.html",
+          "8.7": "/m/typo3/tutorial-getting-started/8.7/en-us/GeneralPrinciples/Index.html",
+          "7.6": "/m/typo3/tutorial-getting-started/7.6/en-us/GeneralPrinciples/Index.html"
+        },
+        "SystemRequirements/Index.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/In-depth/SystemRequirements/Index.html#system-requirements",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/In-depth/SystemRequirements/Index.html#system-requirements",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/In-depth/SystemRequirements/Index.html#system-requirements",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/In-depth/SystemRequirements/Index.html#system-requirements"
+        },
+        "Installation/Install.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/QuickInstall/Composer/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/QuickInstall/Composer/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/QuickInstall/Composer/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/QuickInstall/Composer/Index.html"
+        },
+        "Installation/ReleaseIntegrity.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/ReleaseIntegrity/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/ReleaseIntegrity/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/ReleaseIntegrity/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/ReleaseIntegrity/Index.html"
+        },
+        "Installation/LegacyInstallation.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/QuickInstall/GetAndUnpack/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/QuickInstall/GetAndUnpack/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/QuickInstall/GetAndUnpack/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/QuickInstall/GetAndUnpack/Index.html"
+        },
+        "Setup/Index.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/In-depth/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/In-depth/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/In-depth/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/In-depth/Index.html"
+        },
+        "Setup/SiteRecords.html": {
+          "10.4": "/m/typo3/reference-coreapi/10.4/en-us/ApiOverview/SiteHandling/CreateNew.html",
+          "9.5": "/m/typo3/reference-coreapi/9.5/en-us/ApiOverview/SiteHandling/CreateNew.html"
+        },
+        "Setup/BackendUsers.html": {
+          "10.4": "/m/typo3/reference-coreapi/10.4/en-us/ApiOverview/AccessControl/Index.html",
+          "9.5": "/m/typo3/reference-coreapi/9.5/en-us/ApiOverview/AccessControl/Index.html"
+        },
+        "Setup/BackendLanguages.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/In-depth/TranslatingTheBackend/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/In-depth/TranslatingTheBackend/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/In-depth/TranslatingTheBackend/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/In-depth/TranslatingTheBackend/Index.html"
+        },
+        "Troubleshooting/TYPO3.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/Troubleshooting/Index.html#lost-passwords",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/Troubleshooting/Index.html#lost-passwords",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/Troubleshooting/Index.html#lost-passwords",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/Troubleshooting/Index.html#lost-passwords"
+        },
+        "Troubleshooting/SystemModules.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/In-depth/TheInstallTool/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/In-depth/TheInstallTool/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/In-depth/TheInstallTool/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/In-depth/TheInstallTool/Index.html"
+        },
+        "Troubleshooting/PHP.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/Troubleshooting/Index.html#php",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/Troubleshooting/Index.html#php",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/Troubleshooting/Index.html#php",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/Troubleshooting/Index.html#php"
+        },
+        "Troubleshooting/WebServer.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/Troubleshooting/Index.html#apache",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/Troubleshooting/Index.html#apache",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/Troubleshooting/Index.html#apache",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/Troubleshooting/Index.html#apache"
+        },
+        "Troubleshooting/Database.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/Troubleshooting/Index.html#mysql",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/Troubleshooting/Index.html#mysql",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/Troubleshooting/Index.html#mysql",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/Troubleshooting/Index.html#mysql"
+        },
+        "Extensions/Index.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/ExtensionInstallation/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/ExtensionInstallation/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/ExtensionInstallation/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/ExtensionInstallation/Index.html"
+        },
+        "Extensions/Management.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/ExtensionInstallation/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/ExtensionInstallation/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/ExtensionInstallation/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/ExtensionInstallation/Index.html"
+        },
+        "Extensions/LegacyManagement.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/ExtensionInstallation/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/ExtensionInstallation/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/ExtensionInstallation/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/ExtensionInstallation/Index.html"
+        },
+        "IntroductionPackage/Index.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/QuickInstall/IntroductionPackage/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/QuickInstall/IntroductionPackage/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/QuickInstall/IntroductionPackage/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/QuickInstall/IntroductionPackage/Index.html"
+        },
+        "NextSteps/Index.html": {
+          "10.4": "/m/typo3/tutorial-getting-started/10.4/en-us/NextSteps/Index.html",
+          "9.5": "/m/typo3/tutorial-getting-started/9.5/en-us/NextSteps/Index.html",
+          "8.7": "/m/typo3/tutorial-getting-started/8.7/en-us/NextSteps/Index.html",
+          "7.6": "/m/typo3/tutorial-getting-started/7.6/en-us/NextSteps/Index.html"
+        }
+      }
+    },
+    "11.5": {
+      "en-us": {
+        "Concepts/Index.html": {
+          "10.4": "/m/typo3/tutorial-getting-started/10.4/en-us/GeneralPrinciples/Index.html",
+          "9.5": "/m/typo3/tutorial-getting-started/9.5/en-us/GeneralPrinciples/Index.html",
+          "8.7": "/m/typo3/tutorial-getting-started/8.7/en-us/GeneralPrinciples/Index.html",
+          "7.6": "/m/typo3/tutorial-getting-started/7.6/en-us/GeneralPrinciples/Index.html"
+        },
+        "SystemRequirements/Index.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/In-depth/SystemRequirements/Index.html#system-requirements",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/In-depth/SystemRequirements/Index.html#system-requirements",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/In-depth/SystemRequirements/Index.html#system-requirements",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/In-depth/SystemRequirements/Index.html#system-requirements"
+        },
+        "Installation/Install.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/QuickInstall/Composer/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/QuickInstall/Composer/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/QuickInstall/Composer/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/QuickInstall/Composer/Index.html"
+        },
+        "Installation/ReleaseIntegrity.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/ReleaseIntegrity/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/ReleaseIntegrity/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/ReleaseIntegrity/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/ReleaseIntegrity/Index.html"
+        },
+        "Installation/LegacyInstallation.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/QuickInstall/GetAndUnpack/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/QuickInstall/GetAndUnpack/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/QuickInstall/GetAndUnpack/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/QuickInstall/GetAndUnpack/Index.html"
+        },
+        "Setup/Index.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/In-depth/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/In-depth/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/In-depth/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/In-depth/Index.html"
+        },
+        "Setup/SiteRecords.html": {
+          "10.4": "/m/typo3/reference-coreapi/10.4/en-us/ApiOverview/SiteHandling/CreateNew.html",
+          "9.5": "/m/typo3/reference-coreapi/9.5/en-us/ApiOverview/SiteHandling/CreateNew.html"
+        },
+        "Setup/BackendUsers.html": {
+          "10.4": "/m/typo3/reference-coreapi/10.4/en-us/ApiOverview/AccessControl/Index.html",
+          "9.5": "/m/typo3/reference-coreapi/9.5/en-us/ApiOverview/AccessControl/Index.html"
+        },
+        "Setup/BackendLanguages.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/In-depth/TranslatingTheBackend/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/In-depth/TranslatingTheBackend/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/In-depth/TranslatingTheBackend/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/In-depth/TranslatingTheBackend/Index.html"
+        },
+        "Troubleshooting/TYPO3.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/Troubleshooting/Index.html#lost-passwords",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/Troubleshooting/Index.html#lost-passwords",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/Troubleshooting/Index.html#lost-passwords",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/Troubleshooting/Index.html#lost-passwords"
+        },
+        "Troubleshooting/SystemModules.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/In-depth/TheInstallTool/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/In-depth/TheInstallTool/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/In-depth/TheInstallTool/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/In-depth/TheInstallTool/Index.html"
+        },
+        "Troubleshooting/PHP.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/Troubleshooting/Index.html#php",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/Troubleshooting/Index.html#php",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/Troubleshooting/Index.html#php",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/Troubleshooting/Index.html#php"
+        },
+        "Troubleshooting/WebServer.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/Troubleshooting/Index.html#apache",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/Troubleshooting/Index.html#apache",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/Troubleshooting/Index.html#apache",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/Troubleshooting/Index.html#apache"
+        },
+        "Troubleshooting/Database.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/Troubleshooting/Index.html#mysql",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/Troubleshooting/Index.html#mysql",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/Troubleshooting/Index.html#mysql",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/Troubleshooting/Index.html#mysql"
+        },
+        "Extensions/Index.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/ExtensionInstallation/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/ExtensionInstallation/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/ExtensionInstallation/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/ExtensionInstallation/Index.html"
+        },
+        "Extensions/Management.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/ExtensionInstallation/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/ExtensionInstallation/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/ExtensionInstallation/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/ExtensionInstallation/Index.html"
+        },
+        "Extensions/LegacyManagement.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/ExtensionInstallation/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/ExtensionInstallation/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/ExtensionInstallation/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/ExtensionInstallation/Index.html"
+        },
+        "IntroductionPackage/Index.html": {
+          "10.4": "/m/typo3/guide-installation/10.4/en-us/QuickInstall/IntroductionPackage/Index.html",
+          "9.5": "/m/typo3/guide-installation/9.5/en-us/QuickInstall/IntroductionPackage/Index.html",
+          "8.7": "/m/typo3/guide-installation/8.7/en-us/QuickInstall/IntroductionPackage/Index.html",
+          "7.6": "/m/typo3/guide-installation/7.6/en-us/QuickInstall/IntroductionPackage/Index.html"
+        },
+        "NextSteps/Index.html": {
+          "10.4": "/m/typo3/tutorial-getting-started/10.4/en-us/NextSteps/Index.html",
+          "9.5": "/m/typo3/tutorial-getting-started/9.5/en-us/NextSteps/Index.html",
+          "8.7": "/m/typo3/tutorial-getting-started/8.7/en-us/NextSteps/Index.html",
+          "7.6": "/m/typo3/tutorial-getting-started/7.6/en-us/NextSteps/Index.html"
+        }
+      }
+    },
+    "10.4": {
+      "en-us": {
+        "Introduction/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Index.html"
+        },
+        "GeneralPrinciples/*": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Concepts/Index.html"
+        },
+        "ListModule/*": {
+          "master": "/m/typo3/tutorial-editors/master/en-us/ListModule/Index.html"
+        },
+        "FileModule/*": {
+          "master": "/m/typo3/tutorial-editors/master/en-us/FileModule/Index.html"
+        },
+        "UserManagement/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Setup/BackendUsers.html"
+        },
+        "UserManagement/BackendPrivileges/Index.html": {
+          "master": "/m/typo3/reference-coreapi/master/en-us/ApiOverview/AccessControl/Index.html"
+        },
+        "UserManagement/BackendUsers/Index.html": {
+          "master": "/m/typo3/reference-coreapi/master/en-us/ApiOverview/AccessControl/UsersAndGroups/Index.html"
+        },
+        "UserManagement/Groups/Index.html": {
+          "master": "/m/typo3/reference-coreapi/master/en-us/ApiOverview/AccessControl/UsersAndGroups/Index.html"
+        },
+        "UserManagement/PagePermissions/Index.html": {
+          "master": "/m/typo3/reference-coreapi/master/en-us/ApiOverview/AccessControl/AccessControlOptions/Index.html#page-permissions"
+        },
+        "UserManagement/UserSetup/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Setup/BackendUsers.html"
+        },
+        "OtherBackendModules/BackendLocalization/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/draft/en-us/Setup/BackendLanguages.html"
+        },
+        "Templating/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/draft/en-us/NextSteps/Index.html#fluid-templating"
+        }
+      }
+    }
+  },
+  "m/typo3/guide-installation": {
+    "10.4": {
+      "en-us": {
+        "QuickInstall/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/Index.html",
+          "11.5": "/m/typo3/tutorial-getting-started/11.5/en-us/Installation/Index.html"
+        },
+        "QuickInstall/Composer/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/Index.html",
+          "11.5": "/m/typo3/tutorial-getting-started/11.5/en-us/Installation/Index.html"
+        },
+        "QuickInstall/GetAndUnpack/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/LegacyInstallation.html",
+          "11.5": "/m/typo3/tutorial-getting-started/11.5/en-us/Installation/LegacyInstallation.html"
+        },
+        "QuickInstall/TheInstallTool/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/Index.html",
+          "11.5": "/m/typo3/tutorial-getting-started/11.5/en-us/Installation/Index.html"
+        },
+        "QuickInstall/IntroductionPackage/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/IntroductionPackage/Index.html",
+          "11.5": "/m/typo3/tutorial-getting-started/11.5/en-us/IntroductionPackage/Index.html"
+        },
+        "In-depth/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/Index.html",
+          "11.5": "/m/typo3/tutorial-getting-started/11.5/en-us/Installation/Index.html"
+        },
+        "In-depth/SystemRequirements/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/SystemRequirements/Index.html",
+          "11.5": "/m/typo3/tutorial-getting-started/11.5/en-us/SystemRequirements/Index.html"
+        },
+        "ReleaseIntegrity/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Installation/ReleaseIntegrity.html",
+          "11.5": "/m/typo3/tutorial-getting-started/11.5/en-us/Installation/ReleaseIntegrity.html"
+        },
+        "Troubleshooting/Index.html": {
+          "master": "/m/typo3/tutorial-getting-started/master/en-us/Troubleshooting/Index.html",
+          "11.5": "/m/typo3/tutorial-getting-started/11.5/en-us/Troubleshooting/Index.html"
+        }
+      }
+    }
+  }
+}

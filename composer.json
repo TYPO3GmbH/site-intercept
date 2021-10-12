@@ -20,12 +20,12 @@
         "doctrine/collections": "^1.5",
         "doctrine/dbal": "^2.9",
         "doctrine/doctrine-bundle": "^2.3.0",
+        "doctrine/doctrine-migrations-bundle": "^3.1",
         "doctrine/migrations": "^3.1.1",
         "doctrine/orm": "^2.6",
         "doctrine/persistence": "^2.1",
         "dragonmantank/cron-expression": "^2.3",
         "eightpoints/guzzle-bundle": "^v8.2.0",
-        "graylog2/gelf-php": "^1.6",
         "guzzlehttp/guzzle": "^6.3",
         "kbsali/redmine-api": "~1.0",
         "knplabs/knp-menu": "^3.0",
@@ -52,7 +52,6 @@
         "symfony/http-kernel": "^5.0",
         "symfony/monolog-bundle": "^3.3",
         "symfony/options-resolver": "^5.0",
-        "symfony/orm-pack": "^1.0",
         "symfony/process": "^5.0",
         "symfony/routing": "^5.0",
         "symfony/security-bundle": "^5.0",
@@ -77,19 +76,18 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.1",
         "fakerphp/faker": "^1.8",
-        "friendsofphp/php-cs-fixer": "^2.12",
+        "friendsofphp/php-cs-fixer": "^3.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/phpstan-symfony": "^0.12.22",
         "phpunit/phpunit": "^9.5",
-        "rector/rector": "^0.10.3",
-        "rector/rector-symfony": "^0.10.0",
         "roave/security-advisories": "dev-latest",
         "symfony/browser-kit": "^4.2",
         "symfony/css-selector": "^4.2",
         "symfony/maker-bundle": "^1.10",
         "symfony/phpunit-bridge": "^5.2",
-        "symfony/profiler-pack": "^1.0",
-        "symfony/var-dumper": "^4.2"
+        "symfony/stopwatch": "^5.3",
+        "symfony/var-dumper": "^4.2",
+        "symfony/web-profiler-bundle": "^5.3"
     },
     "config": {
         "bin-dir": "bin/",
@@ -127,10 +125,10 @@
             "@t3g:test:php:unit"
         ],
         "t3g:cgl": [
-            "php-cs-fixer fix --config build/.php_cs.dist -v --dry-run"
+            "php-cs-fixer fix --config build/.php-cs-fixer.dist.php -v --dry-run"
         ],
         "t3g:cgl:fix": [
-            "php-cs-fixer fix --config build/.php_cs.dist"
+            "php-cs-fixer fix --config build/.php-cs-fixer.dist.php"
         ],
         "t3g:phpstan": [
             "phpstan analyse src/ -c build/phpstan.neon"

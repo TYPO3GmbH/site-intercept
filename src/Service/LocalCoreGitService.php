@@ -52,7 +52,7 @@ class LocalCoreGitService
         $this->workingCopy = $gitWrapper->workingCopy($pullRequestCorePath);
         if (!$this->workingCopy->isCloned()) {
             // Initial clone
-            $this->workingCopy->cloneRepository('git://github.com/typo3/typo3.git');
+            $this->workingCopy->cloneRepository('git@github.com:typo3/typo3.git');
             $this->workingCopy->setCloned(true);
             // Enable commit hook
             $filesystem = new Filesystem();

@@ -10,7 +10,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\HistoryEntry;
+use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\DocumentationStatus;
+use App\Enum\HistoryEntryTrigger;
+use App\Enum\HistoryEntryType;
 use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
@@ -31,6 +35,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 /**
  * Trigger documentation rendering from a repository hook that calls
@@ -59,6 +64,12 @@ class DocsRenderingController extends AbstractController
         LoggerInterface $logger,
         MailService $mailService
     ): Response {
+        $manager = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+        $userIdentifier = 'Anon.';
+        if ($user instanceof KeyCloakUser) {
+            $userIdentifier = $user->getDisplayName();
+        }
         try {
             $pushEvents = $webhookService->createPushEvent($request);
             $erroredPushes = 0;
@@ -67,17 +78,23 @@ class DocsRenderingController extends AbstractController
             foreach ($pushEvents as $pushEvent) {
                 try {
                     if ($repositoryBlacklistEntryRepository->isBlacklisted($pushEvent->getRepositoryUrl())) {
-                        $logger->warning(
-                            'Cannot render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' due to it being blacklisted.',
-                            [
-                                'type' => 'docsRendering',
-                                'status' => 'blacklisted',
-                                'triggeredBy' => 'api',
-                                'repository' => $pushEvent->getRepositoryUrl(),
-                                'composerFile' => $pushEvent->getUrlToComposerFile(),
-                                'payload' => $request->getContent(),
-                            ]
+                        $manager->persist(
+                            (new HistoryEntry())
+                                ->setType(HistoryEntryType::DOCS_RENDERING)
+                                ->setStatus(DocsRenderingHistoryStatus::BLACKLISTED)
+                                ->setData(
+                                    [
+                                        'type' => HistoryEntryType::DOCS_RENDERING,
+                                        'status' => DocsRenderingHistoryStatus::BLACKLISTED,
+                                        'triggeredBy' => HistoryEntryTrigger::API,
+                                        'repository' => $pushEvent->getRepositoryUrl(),
+                                        'composerFile' => $pushEvent->getUrlToComposerFile(),
+                                        'payload' => $request->getContent(),
+                                        'user' => $userIdentifier
+                                    ]
+                                )
                         );
+                        $manager->flush();
                         continue;
                     }
                     $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
@@ -91,134 +108,183 @@ class DocsRenderingController extends AbstractController
                     // an older build finishes after a younger triggered build which would overwrite the result af the later build.
                     if ($documentationJar->getStatus() === DocumentationStatus::STATUS_RENDERING) {
                         $documentationBuildInformationService->updateReRenderNeeded($documentationJar, true);
-                        $logger->info(
-                            'Registered docs build for re-rendering',
-                            [
-                                'type' => 'docsRendering',
-                                'status' => 're-render-needed',
-                                'triggeredBy' => 'api',
-                                'repository' => $buildInformation->repositoryUrl,
-                                'package' => $buildInformation->packageName,
-                                'sourceBranch' => $buildInformation->sourceBranch,
-                                'targetBranch' => $buildInformation->targetBranchDirectory,
-                            ]
+                        $manager->persist(
+                            (new HistoryEntry())
+                                ->setType(HistoryEntryType::DOCS_RENDERING)
+                                ->setStatus(DocsRenderingHistoryStatus::RE_RENDER_NEEDED)
+                                ->setData(
+                                    [
+                                        'type' => HistoryEntryType::DOCS_RENDERING,
+                                        'status' => DocsRenderingHistoryStatus::RE_RENDER_NEEDED,
+                                        'triggeredBy' => HistoryEntryTrigger::API,
+                                        'repository' => $buildInformation->repositoryUrl,
+                                        'package' => $buildInformation->packageName,
+                                        'sourceBranch' => $buildInformation->sourceBranch,
+                                        'targetBranch' => $buildInformation->targetBranchDirectory,
+                                        'user' => $userIdentifier
+                                    ]
+                                )
                         );
+                        $manager->flush();
                     } elseif (!$documentationJar->isApproved()) {
                         $logger->info('Repository present, but not approved. Do nothing.', [$documentationJar]);
                     } else {
                         $buildTriggered = $githubService->triggerDocumentationPlan($buildInformation);
                         $documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
                         $documentationBuildInformationService->updateBuildKey($documentationJar, $buildTriggered->buildResultKey);
-                        $logger->info(
-                            'Triggered docs build',
-                            [
-                                'type' => 'docsRendering',
-                                'status' => 'triggered',
-                                'triggeredBy' => 'api',
-                                'repository' => $buildInformation->repositoryUrl,
-                                'package' => $buildInformation->packageName,
-                                'sourceBranch' => $buildInformation->sourceBranch,
-                                'targetBranch' => $buildInformation->targetBranchDirectory,
-                                'bambooKey' => $buildTriggered->buildResultKey,
-                            ]
+                        $manager->persist(
+                            (new HistoryEntry())
+                                ->setType(HistoryEntryType::DOCS_RENDERING)
+                                ->setStatus(HistoryEntryTrigger::API)
+                                ->setGroupEntry($buildTriggered->buildResultKey)
+                                ->setData(
+                                    [
+                                        'type' => HistoryEntryType::DOCS_RENDERING,
+                                        'status' => DocsRenderingHistoryStatus::TRIGGERED,
+                                        'triggeredBy' => HistoryEntryTrigger::API,
+                                        'repository' => $buildInformation->repositoryUrl,
+                                        'package' => $buildInformation->packageName,
+                                        'sourceBranch' => $buildInformation->sourceBranch,
+                                        'targetBranch' => $buildInformation->targetBranchDirectory,
+                                        'bambooKey' => $buildTriggered->buildResultKey,
+                                        'user' => $userIdentifier
+                                    ]
+                                )
                         );
+                        $manager->flush();
                     }
                 } catch (ComposerJsonNotFoundException $e) {
                     // Repository did not provide a composer.json, or fetch failed
-                    $logger->warning(
-                        'Cannot render documentation: The repository at ' . $pushEvent->getRepositoryUrl() . ' MUST have a composer.json file on top level.',
-                        [
-                            'type' => 'docsRendering',
-                            'status' => 'noComposerJson',
-                            'triggeredBy' => 'api',
-                            'exceptionCode' => $e->getCode(),
-                            'exceptionMessage' => $e->getMessage(),
-                            'repository' => $pushEvent->getRepositoryUrl(),
-                            'composerFile' => $pushEvent->getUrlToComposerFile(),
-                            'payload' => $request->getContent(),
-                        ]
+                    $manager->persist(
+                        (new HistoryEntry())
+                        ->setType(HistoryEntryType::DOCS_RENDERING)
+                        ->setStatus(DocsRenderingHistoryStatus::NO_COMPOSER_JSON)
+                        ->setData(
+                            [
+                                'type' => HistoryEntryType::DOCS_RENDERING,
+                                'status' => DocsRenderingHistoryStatus::NO_COMPOSER_JSON,
+                                'triggeredBy' => HistoryEntryTrigger::API,
+                                'exceptionCode' => $e->getCode(),
+                                'exceptionMessage' => $e->getMessage(),
+                                'repository' => $pushEvent->getRepositoryUrl(),
+                                'composerFile' => $pushEvent->getUrlToComposerFile(),
+                                'payload' => $request->getContent(),
+                                'user' => $userIdentifier
+                            ]
+                        )
                     );
+                    $manager->flush();
                     $erroredPushes++;
                     $errorMessage = 'No composer.json found, invalid or unable to fetch. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (ComposerJsonInvalidException $e) {
-                    $logger->warning(
-                        'Cannot render documentation: ' . $e->getMessage(),
-                        [
-                            'type' => 'docsRendering',
-                            'status' => 'invalidComposerJson',
-                            'triggeredBy' => 'api',
-                            'exceptionCode' => $e->getCode(),
-                            'exceptionMessage' => $e->getMessage(),
-                            'repository' => $pushEvent->getRepositoryUrl(),
-                            'composerFile' => $pushEvent->getUrlToComposerFile(),
-                            'payload' => $request->getContent(),
-                        ]
+                    $manager->persist(
+                        (new HistoryEntry())
+                            ->setType(HistoryEntryType::DOCS_RENDERING)
+                            ->setStatus(DocsRenderingHistoryStatus::INVALID_COMPOSER_JSON)
+                            ->setData(
+                                [
+                                    'type' => HistoryEntryType::DOCS_RENDERING,
+                                    'status' => DocsRenderingHistoryStatus::INVALID_COMPOSER_JSON,
+                                    'triggeredBy' => HistoryEntryTrigger::API,
+                                    'exceptionCode' => $e->getCode(),
+                                    'exceptionMessage' => $e->getMessage(),
+                                    'repository' => $pushEvent->getRepositoryUrl(),
+                                    'composerFile' => $pushEvent->getUrlToComposerFile(),
+                                    'payload' => $request->getContent(),
+                                    'user' => $userIdentifier
+                                ]
+                            )
                     );
+                    $manager->flush();
                     $erroredPushes++;
                     $errorMessage = 'Invalid composer.json. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (DocsPackageRegisteredWithDifferentRepositoryException $e) {
-                    $logger->warning(
-                        'Can not render documentation: ' . $e->getMessage(),
-                        [
-                            'type' => 'docsRendering',
-                            'status' => 'packageRegisteredWithDifferentRepository',
-                            'triggeredBy' => 'api',
-                            'exceptionCode' => $e->getCode(),
-                            'exceptionMessage' => $e->getMessage(),
-                            'repository' => $pushEvent->getRepositoryUrl(),
-                            'package' => $buildInformation->packageName,
-                        ]
+                    $manager->persist(
+                        (new HistoryEntry())
+                        ->setType(HistoryEntryType::DOCS_RENDERING)
+                        ->setStatus(DocsRenderingHistoryStatus::PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY)
+                        ->setData(
+                            [
+                                'type' => HistoryEntryType::DOCS_RENDERING,
+                                'status' => DocsRenderingHistoryStatus::PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY,
+                                'triggeredBy' => HistoryEntryTrigger::API,
+                                'exceptionCode' => $e->getCode(),
+                                'exceptionMessage' => $e->getMessage(),
+                                'repository' => $pushEvent->getRepositoryUrl(),
+                                'package' => $buildInformation->packageName,
+                                'user' => $userIdentifier
+                            ]
+                        )
                     );
+                    $manager->flush();
                     $erroredPushes++;
                     $errorMessage = 'Package already registered for different repository. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (DocsPackageDoNotCareBranch $e) {
-                    $logger->warning(
-                        'Cannot render documentation: ' . $e->getMessage(),
-                        [
-                            'type' => 'docsRendering',
-                            'status' => 'noRelevantBranchOrTag',
-                            'triggeredBy' => 'api',
-                            'exceptionCode' => $e->getCode(),
-                            'exceptionMessage' => $e->getMessage(),
-                            'repository' => $pushEvent->getRepositoryUrl(),
-                            'sourceBranch' => $pushEvent->getVersionString(),
-                        ]
+                    $manager->persist(
+                        (new HistoryEntry())
+                            ->setType(HistoryEntryType::DOCS_RENDERING)
+                            ->setStatus(DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG)
+                            ->setData(
+                                [
+                                    'type' => HistoryEntryType::DOCS_RENDERING,
+                                    'status' => DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG,
+                                    'triggeredBy' => HistoryEntryTrigger::API,
+                                    'exceptionCode' => $e->getCode(),
+                                    'exceptionMessage' => $e->getMessage(),
+                                    'repository' => $pushEvent->getRepositoryUrl(),
+                                    'sourceBranch' => $pushEvent->getVersionString(),
+                                    'user' => $userIdentifier
+                                ]
+                            )
                     );
+                    $manager->flush();
                     $erroredPushes++;
                     $errorMessage = 'Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (DocsComposerMissingValueException $e) {
-                    $logger->warning(
-                        'Cannot render documentation: ' . $e->getMessage(),
-                        [
-                            'type' => 'docsRendering',
-                            'status' => 'missingValueInComposerJson',
-                            'triggeredBy' => 'api',
-                            'exceptionCode' => $e->getCode(),
-                            'exceptionMessage' => $e->getMessage(),
-                            'repository' => $pushEvent->getRepositoryUrl(),
-                            'sourceBranch' => $pushEvent->getVersionString(),
-                        ]
+                    $manager->persist(
+                        (new HistoryEntry())
+                            ->setType(HistoryEntryType::DOCS_RENDERING)
+                            ->setStatus(DocsRenderingHistoryStatus::MISSING_VALUE_IN_COMPOSER_JSON)
+                            ->setData(
+                                [
+                                    'type' => HistoryEntryType::DOCS_RENDERING,
+                                    'status' => DocsRenderingHistoryStatus::MISSING_VALUE_IN_COMPOSER_JSON,
+                                    'triggeredBy' => HistoryEntryTrigger::API,
+                                    'exceptionCode' => $e->getCode(),
+                                    'exceptionMessage' => $e->getMessage(),
+                                    'repository' => $pushEvent->getRepositoryUrl(),
+                                    'sourceBranch' => $pushEvent->getVersionString(),
+                                    'user' => $userIdentifier
+                                ]
+                            )
                     );
+                    $manager->flush();
                     $erroredPushes++;
                     $errorMessage = 'A mandatory value is missing in the composer.json. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (DocsComposerDependencyException $e) {
-                    $logger->warning(
-                        'Cannot render documentation: ' . $e->getMessage(),
-                        [
-                            'type' => 'docsRendering',
-                            'status' => 'coreDependencyNotSet',
-                            'triggeredBy' => 'api',
-                            'exceptionCode' => $e->getCode(),
-                            'exceptionMessage' => $e->getMessage(),
-                            'repository' => $pushEvent->getRepositoryUrl(),
-                            'sourceBranch' => $pushEvent->getVersionString(),
-                        ]
+                    $manager->persist(
+                        (new HistoryEntry())
+                            ->setType(HistoryEntryType::DOCS_RENDERING)
+                            ->setStatus(DocsRenderingHistoryStatus::CORE_DEPENDENCY_NOT_SET)
+                            ->setData(
+                                [
+                                    'type' => HistoryEntryType::DOCS_RENDERING,
+                                    'status' => DocsRenderingHistoryStatus::CORE_DEPENDENCY_NOT_SET,
+                                    'triggeredBy' => HistoryEntryTrigger::API,
+                                    'exceptionCode' => $e->getCode(),
+                                    'exceptionMessage' => $e->getMessage(),
+                                    'repository' => $pushEvent->getRepositoryUrl(),
+                                    'sourceBranch' => $pushEvent->getVersionString(),
+                                    'user' => $userIdentifier
+                                ]
+                            )
                     );
+                    $manager->flush();
                     try {
                         $author = $composerAsObject->getFirstAuthor();
                         if (filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
@@ -241,53 +307,76 @@ class DocsRenderingController extends AbstractController
             // Hook payload is a 'github ping' - log that as "info / success' with the
             // url that hook came from. This is triggered by github when a new web hook is added,
             // we want to be nice and make this one succeed.
-            $logger->info(
-                'Docs hook ping from github repository ' . $e->getRepositoryUrl(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'githubPing',
-                    'triggeredBy' => 'api',
-                    'repository' => $e->getRepositoryUrl(),
-                ]
+            $manager->persist(
+                (new HistoryEntry())
+                    ->setType(HistoryEntryType::DOCS_RENDERING)
+                    ->setStatus(DocsRenderingHistoryStatus::GITHUB_PING)
+                    ->setData(
+                        [
+                            'type' => HistoryEntryType::DOCS_RENDERING,
+                            'status' => DocsRenderingHistoryStatus::GITHUB_PING,
+                            'triggeredBy' => HistoryEntryTrigger::API,
+                            'repository' => $e->getRepositoryUrl(),
+                        ]
+                    )
             );
+            $manager->flush();
             return new Response('Received github ping. Please push content to the repository to render some documentation. See https://intercept.typo3.com for more information.');
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
-            $logger->warning(
-                'Can not render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'unsupportedHook',
-                    'headers' => $request->headers,
-                    'payload' => $request->getContent(),
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                ]
+            $manager->persist(
+                (new HistoryEntry())
+                    ->setType(HistoryEntryType::DOCS_RENDERING)
+                    ->setStatus(DocsRenderingHistoryStatus::UNSUPPORTED_HOOK)
+                    ->setData(
+                        [
+                            'type' => HistoryEntryType::DOCS_RENDERING,
+                            'status' => DocsRenderingHistoryStatus::UNSUPPORTED_HOOK,
+                            'headers' => $request->headers,
+                            'payload' => $request->getContent(),
+                            'triggeredBy' => HistoryEntryTrigger::API,
+                            'exceptionCode' => $e->getCode(),
+                            'user' => $userIdentifier
+                        ]
+                    )
             );
+            $manager->flush();
             return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         } catch (GitBranchDeletedException $e) {
-            $logger->warning(
-                'Cannot render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'branchDeleted',
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                    'exceptionMessage' => $e->getMessage(),
-                ]
+            $manager->persist(
+                (new HistoryEntry())
+                    ->setType(HistoryEntryType::DOCS_RENDERING)
+                    ->setStatus(DocsRenderingHistoryStatus::BRANCH_DELETED)
+                    ->setData(
+                        [
+                            'type' => HistoryEntryType::DOCS_RENDERING,
+                            'status' => DocsRenderingHistoryStatus::BRANCH_DELETED,
+                            'triggeredBy' => HistoryEntryTrigger::API,
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'user' => $userIdentifier
+                        ]
+                    )
             );
+            $manager->flush();
             return new Response('The branch in this push event has been deleted.', Response::HTTP_PRECONDITION_FAILED);
         } catch (DocsNoRstChangesException $e) {
-            $logger->warning(
-                'Cannot render documentation: ' . $e->getMessage(),
-                [
-                    'type' => 'docsRendering',
-                    'status' => 'branchNoRstChanges',
-                    'triggeredBy' => 'api',
-                    'exceptionCode' => $e->getCode(),
-                    'exceptionMessage' => $e->getMessage(),
-                ]
+            $manager->persist(
+                (new HistoryEntry())
+                    ->setType(HistoryEntryType::DOCS_RENDERING)
+                    ->setStatus(DocsRenderingHistoryStatus::BRANCH_NO_RST_CHANGES)
+                    ->setData(
+                        [
+                            'type' => HistoryEntryType::DOCS_RENDERING,
+                            'status' => DocsRenderingHistoryStatus::BRANCH_NO_RST_CHANGES,
+                            'triggeredBy' => HistoryEntryTrigger::API,
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'user' => $userIdentifier
+                        ]
+                    )
             );
+            $manager->flush();
             return new Response(null, RESPONSE::HTTP_NO_CONTENT);
         }
     }

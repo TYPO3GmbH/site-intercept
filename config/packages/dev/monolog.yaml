@@ -2,15 +2,11 @@ monolog:
   handlers:
     main:
       type: group
-      members: [ file, graylog ]
+      members: [ file ]
     file:
       type: rotating_file
       level: !php/const Monolog\Logger::WARNING
       path: "%kernel.logs_dir%/%kernel.environment%.log"
-    graylog:
-      type: gelf
-      level: !php/const Monolog\Logger::INFO
-      publisher: "gelf.publisher"
     sentry:
       type: sentry
       level: !php/const Monolog\Logger::WARNING

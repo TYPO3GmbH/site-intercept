@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 /*
@@ -10,10 +11,17 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
+use App\Entity\HistoryEntry;
+use App\Enum\HistoryEntryTrigger;
+use App\Enum\HistoryEntryType;
+use App\Enum\SplitterStatus;
 use App\Extractor\GithubPushEventForCore;
 use App\GitWrapper\Event\GitOutputListener;
+use App\Utility\RepositoryUrlUtility;
+use Doctrine\ORM\EntityManagerInterface;
 use PhpAmqpLib\Wire\IO\AbstractIO;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symplify\GitWrapper\Exception\GitException;
@@ -25,7 +33,7 @@ use Symplify\GitWrapper\GitWrapper;
  *
  * @codeCoverageIgnore Covered by integration tests
  */
-class CoreSplitService implements CoreSplitServiceInterface
+class CoreSplitService
 {
     private LoggerInterface $logger;
 
@@ -63,6 +71,7 @@ class CoreSplitService implements CoreSplitServiceInterface
      * @var GithubPushEventForCore Runtime rabbit message
      */
     private GithubPushEventForCore $event;
+    private EntityManagerInterface $entityManager;
 
     /**
      * @param LoggerInterface $logger
@@ -77,7 +86,8 @@ class CoreSplitService implements CoreSplitServiceInterface
         string $splitMonoRepo,
         string $splitSingleRepoBase,
         string $splitSingleRepoPath,
-        GitOutputListener $gitOutputListener
+        GitOutputListener $gitOutputListener,
+        EntityManagerInterface $entityManager
     ) {
         $this->logger = $logger;
         $this->splitCorePath = $splitCorePath;
@@ -85,6 +95,15 @@ class CoreSplitService implements CoreSplitServiceInterface
         $this->splitSingleRepoBase = $splitSingleRepoBase;
         $this->splitSingleRepoPath = $splitSingleRepoPath;
         $this->gitOutputListener = $gitOutputListener;
+        $this->entityManager = $entityManager;
+    }
+
+    /**
+     * @codeCoverageIgnore This is just a wrapper method to get a substring of a protected property
+     */
+    public function getRepositoryName(): string
+    {
+        return RepositoryUrlUtility::extractRepositoryNameFromCloneUrl($this->splitMonoRepo);
     }
 
     /**
@@ -110,7 +129,7 @@ class CoreSplitService implements CoreSplitServiceInterface
 
         $splitBinary = $this->getSplitBinary();
         $extensions = $this->getExtensions();
-        $this->log('Extensions to split: ' . implode(' ', $extensions));
+        $this->writeHistoryEntry('Extensions to split: ' . implode(' ', $extensions));
 
         // Add remotes per extension if needed and fetch them. Note this is
         // different in the tagger: The splitter works on additional remotes in
@@ -118,7 +137,7 @@ class CoreSplitService implements CoreSplitServiceInterface
         $existingRemotes = explode(chr(10), $this->gitCommand($workingCopy, true, 'remote'));
         foreach ($extensions as $extension) {
             $fullRemotePath = $this->splitSingleRepoBase . $extension . '.git';
-            $this->log('Fetching extension ' . $extension . ' from ' . $fullRemotePath);
+            $this->writeHistoryEntry('Fetching extension ' . $extension . ' from ' . $fullRemotePath);
             if (!in_array($extension, $existingRemotes)) {
                 $this->gitCommand($workingCopy, false, 'remote', 'add', $extension, $this->splitSingleRepoBase . $extension . '.git');
             }
@@ -132,17 +151,17 @@ class CoreSplitService implements CoreSplitServiceInterface
             $execOutput = [];
             $execExitCode = 0;
             $command = 'cd ' . escapeshellarg($this->splitCorePath) . ' && '
-                . escapeshellcmd('../../bin/' . $splitBinary)
-                . ' --prefix=' . escapeshellarg('typo3/sysext/' . $extension)
-                . ' --origin=' . escapeshellarg('origin/' . $event->sourceBranch)
-                . ' 2>&1';
+                       . escapeshellcmd('../../bin/' . $splitBinary)
+                       . ' --prefix=' . escapeshellarg('typo3/sysext/' . $extension)
+                       . ' --origin=' . escapeshellarg('origin/' . $event->sourceBranch)
+                       . ' 2>&1';
             $splitSha = exec($command, $execOutput, $execExitCode);
-            $this->log('Split operation extension "' . $extension . '" result "' . $execExitCode . '" with sha "' . $splitSha . '" Full output: "' . implode($execOutput) . '"');
+            $this->writeHistoryEntry('Split operation extension "' . $extension . '" result "' . $execExitCode . '" with sha "' . $splitSha . '" Full output: "' . implode($execOutput) . '"');
             if ($execExitCode !== 0) {
                 throw new \RuntimeException('Splitting went wrong. Aborting.');
             }
             $remoteRef = $splitSha . ':refs/heads/' . $event->targetBranch;
-            $this->log('Pushing extension "' . $extension . '" to remote ' . $remoteRef);
+            $this->writeHistoryEntry('Pushing extension "' . $extension . '" to remote ' . $remoteRef);
             $this->gitCommand($workingCopy, false, 'push', $extension, $remoteRef);
             // Send a heartbeat after each push
             $rabbitIO->read(0);
@@ -161,7 +180,7 @@ class CoreSplitService implements CoreSplitServiceInterface
 
         // If given tag does not start with "v" ... ignore this job
         if (strpos($event->tag, 'v') !== 0) {
-            $this->log(
+            $this->writeHistoryEntry(
                 'Job ignored: The tagger only handles tags starting with "v", "' . $event->tag . '" given.',
                 'WARNING'
             );
@@ -183,7 +202,7 @@ class CoreSplitService implements CoreSplitServiceInterface
         try {
             $branchesContainTag = $this->gitCommand($coreWorkingCopy, false, 'branch', '-r', '--contains', $event->tag);
         } catch (GitException $e) {
-            $this->log('Job ignored: No branch contains given tag "' . $event->tag . '"', 'WARNING');
+            $this->writeHistoryEntry('Job ignored: No branch contains given tag "' . $event->tag . '"', 'WARNING');
             return;
         }
         $branchesContainTag = explode(chr(10), $branchesContainTag);
@@ -200,7 +219,7 @@ class CoreSplitService implements CoreSplitServiceInterface
             }
         }
         if (!$responsibleForBranch) {
-            $this->log(
+            $this->writeHistoryEntry(
                 'Job ignored: Skipped tagging sub tree repositories: The given tag "' . $event->tag . '" is not in one of the branches we do care of - "TYPO3_8-7", ">=9.x.y" or "master"',
                 'WARNING'
             );
@@ -279,7 +298,7 @@ class CoreSplitService implements CoreSplitServiceInterface
                 throw new \RuntimeException('Unable to match core tree hashes to extension hashes. Aborting');
             }
 
-            $this->log(
+            $this->writeHistoryEntry(
                 'Tagging and pushing commit "' . $foundCommitHash . '" of extension "' . $extension . '" with tag "' . $event->tag . '"'
             );
             $this->gitCommand($extensionWorkingCopy, true, 'tag', '-f', $event->tag, $foundCommitHash);
@@ -320,17 +339,17 @@ class CoreSplitService implements CoreSplitServiceInterface
             // Log and throw up if command was not successful
             $errorOutput = $this->gitOutputListener->output;
             if (!empty($errorOutput)) {
-                $this->log('Git command error output: ' . $errorOutput, 'WARNING');
+                $this->writeHistoryEntry('Git command error output: ' . $errorOutput, 'WARNING');
             }
             throw $e;
         }
         $gitWrapper->removeOutputEventSubscriber($this->gitOutputListener);
         $errorOutput = $this->gitOutputListener->output;
         if (!empty($standardOutput) && !$silent) {
-            $this->log('Git command standard output: ' . $standardOutput);
+            $this->writeHistoryEntry('Git command standard output: ' . $standardOutput);
         }
         if (!empty($errorOutput)) {
-            $this->log('Git command error output: ' . $errorOutput);
+            $this->writeHistoryEntry('Git command error output: ' . $errorOutput);
         }
         $this->gitOutputListener->output = '';
         return $standardOutput;
@@ -348,7 +367,7 @@ class CoreSplitService implements CoreSplitServiceInterface
     {
         $standardOutput = '';
         if (!$workingCopy->isCloned()) {
-            $this->log('Initial clone of mono repo ' . $this->splitMonoRepo . ' to ' . $this->splitCorePath);
+            $this->writeHistoryEntry('Initial clone of mono repo ' . $this->splitMonoRepo . ' to ' . $this->splitCorePath);
 
             $gitWrapper = $workingCopy->getWrapper();
             $gitWrapper->addOutputEventSubscriber($this->gitOutputListener);
@@ -358,7 +377,7 @@ class CoreSplitService implements CoreSplitServiceInterface
                 // Log and throw up if command was not successful
                 $errorOutput = $this->gitOutputListener->output;
                 if (!empty($errorOutput)) {
-                    $this->log('Git command error output: ' . $errorOutput, 'WARNING');
+                    $this->writeHistoryEntry('Git command error output: ' . $errorOutput, 'WARNING');
                 }
                 throw $e;
             }
@@ -366,16 +385,16 @@ class CoreSplitService implements CoreSplitServiceInterface
             $gitWrapper->removeOutputEventSubscriber($this->gitOutputListener);
             $errorOutput = $this->gitOutputListener->output;
             if (!empty($standardOutput)) {
-                $this->log('Git command standard output: ' . $standardOutput);
+                $this->writeHistoryEntry('Git command standard output: ' . $standardOutput);
             }
             if (!empty($errorOutput)) {
-                $this->log('Git command error output: ' . $errorOutput);
+                $this->writeHistoryEntry('Git command error output: ' . $errorOutput);
             }
             $this->gitOutputListener->output = '';
 
             $this->gitCommand($workingCopy, false, 'checkout', $sourceBranch);
         } else {
-            $this->log('Updating clone and checkout of ' . $sourceBranch);
+            $this->writeHistoryEntry('Updating clone and checkout of ' . $sourceBranch);
             // First fetch to make sure new branches are there
             $this->gitCommand($workingCopy, false, 'fetch');
             $this->gitCommand($workingCopy, false, 'checkout', $sourceBranch);
@@ -419,7 +438,7 @@ class CoreSplitService implements CoreSplitServiceInterface
         $workingCopy = $gitWrapper->workingCopy($extensionCheckoutPath);
 
         if (!$workingCopy->isCloned()) {
-            $this->log('Initial clone of extension repo ' . $extensionRemoteUrl . ' to ' . $extensionCheckoutPath);
+            $this->writeHistoryEntry('Initial clone of extension repo ' . $extensionRemoteUrl . ' to ' . $extensionCheckoutPath);
 
             $gitWrapper->addOutputEventSubscriber($this->gitOutputListener);
             try {
@@ -428,7 +447,7 @@ class CoreSplitService implements CoreSplitServiceInterface
                 // Log and throw up if command was not successful
                 $errorOutput = $this->gitOutputListener->output;
                 if (!empty($errorOutput)) {
-                    $this->log('Git command error output: ' . $errorOutput, 'WARNING');
+                    $this->writeHistoryEntry('Git command error output: ' . $errorOutput, 'WARNING');
                 }
                 throw $e;
             }
@@ -436,14 +455,14 @@ class CoreSplitService implements CoreSplitServiceInterface
             $gitWrapper->removeOutputEventSubscriber($this->gitOutputListener);
             $errorOutput = $this->gitOutputListener->output;
             if (!empty($standardOutput)) {
-                $this->log('Git command standard output: ' . $standardOutput);
+                $this->writeHistoryEntry('Git command standard output: ' . $standardOutput);
             }
             if (!empty($errorOutput)) {
-                $this->log('Git command error output: ' . $errorOutput);
+                $this->writeHistoryEntry('Git command error output: ' . $errorOutput);
             }
             $this->gitOutputListener->output = '';
         } else {
-            $this->log('Fetching extension "' . $extension . '"');
+            $this->writeHistoryEntry('Fetching extension "' . $extension . '"');
             $this->gitCommand($workingCopy, false, 'fetch', '--quiet', '--all');
             $this->gitCommand($workingCopy, false, 'fetch', '--quiet', '--tags');
         }
@@ -499,19 +518,31 @@ class CoreSplitService implements CoreSplitServiceInterface
      * @param string $message
      * @param string $level
      */
-    private function log(string $message, $level = 'INFO'): void
+    private function writeHistoryEntry(string $message, string $level = LogLevel::INFO): void
     {
         if (empty($this->event)) {
-            throw new \RuntimeException('Logger helper can only be called if a rabbit message has been set.');
+            throw new \RuntimeException('Helper can only be called if a rabbit message has been set.');
         }
-        $defaultLogContext = [
-            'job_uuid' => $this->event->jobUuid,
-            'type' => $this->event->type,
-            'sourceBranch' => $this->event->sourceBranch,
-            'targetBranch' => $this->event->targetBranch,
-            'tag' => $this->event->tag,
-            'status' => 'work',
-        ];
-        $this->logger->log($level, $message, $defaultLogContext);
+        $type = $this->event->type === 'patch' ? HistoryEntryType::PATCH : HistoryEntryType::TAG;
+        $this->entityManager->persist(
+            (new HistoryEntry())
+                ->setType($type)
+                ->setStatus(SplitterStatus::WORK)
+                ->setGroupEntry($this->event->jobUuid)
+                ->setData(
+                    [
+                        'type' => $type,
+                        'status' => SplitterStatus::WORK,
+                        'triggeredBy' => HistoryEntryTrigger::CLI,
+                        'job_uuid' => $this->event->jobUuid,
+                        'message' => $message,
+                        'sourceBranch' => $this->event->sourceBranch,
+                        'targetBranch' => $this->event->targetBranch,
+                        'tag' => $this->event->tag,
+                        'level' => $level
+                    ]
+                )
+        );
+        $this->entityManager->flush();
     }
 }

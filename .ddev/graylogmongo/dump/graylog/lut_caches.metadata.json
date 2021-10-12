@@ -1,1 +1,0 @@
-{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"graylog.lut_caches"},{"v":2,"unique":true,"key":{"name":1},"name":"name_1","ns":"graylog.lut_caches"}],"uuid":"c843c10196f84aad9bcfaed1ce699beb"}

@@ -85,8 +85,11 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
 
         $generalClientProphecy
             ->patch(
-                'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1?access_token=4711',
+                'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1',
                 [
+                    'headers' => [
+                        'Authorization' => 'token 4711'
+                    ],
                     'json' => [
                         'state' => 'closed'
                     ]
@@ -96,8 +99,11 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
 
         $generalClientProphecy
             ->post(
-                'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments?access_token=4711',
+                'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments',
                 [
+                    'headers' => [
+                        'Authorization' => 'token 4711'
+                    ],
                     'json' => [
                         'body' => "Thank you for your contribution to TYPO3. We are using Gerrit Code Review for our contributions and took the liberty to convert your pull request to a review in our review system.\nYou can find your patch at: https://review.typo3.org/12345\nFor further information on how to contribute have a look at https://docs.typo3.org/typo3cms/ContributionWorkflowGuide/"
                     ]
@@ -107,7 +113,12 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
 
         $generalClientProphecy
             ->put(
-                'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/lock?access_token=4711'
+                'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/lock',
+                [
+                    'headers' => [
+                        'Authorization' => 'token 4711'
+                    ]
+                ]
             )
             ->shouldBeCalled();
 

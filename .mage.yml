@@ -49,11 +49,12 @@ magephp:
         - fs/link: { from: "../../../../shared/var/data.db", to: "var/data.db" }
         - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
         - fs/link: { from: "../../../../shared/var/git-core-split", to: "var/git-core-split" }
+        - fs/link: { from: "../../../../shared/var/git-core-pr", to: "var/git-core-pr" }
         - fs/link: { from: "../../../../shared/var/git-core-split-v8", to: "var/git-core-split-v8" }
       on-release:
       post-release:
         - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}
-        - exec: { cmd: "[ -f ../../../cachetool/cachetool.phar ] || curl -o ../../../cachetool/cachetool.phar http://gordalina.github.io/cachetool/downloads/cachetool.phar && chmod +x ../../../cachetool/cachetool.phar"}
+        - exec: { cmd: "[ -f ../../../cachetool/cachetool.phar ] || curl -L -o ../../../cachetool/cachetool.phar https://gordalina.github.io/cachetool/downloads/cachetool.phar && chmod +x ../../../cachetool/cachetool.phar"}
         - exec: { cmd: "php ../../../cachetool/cachetool.phar opcache:reset --fcgi=/var/run/intercept.typo3.com_fpm.sock --tmp-dir=/srv/vhosts/intercept.typo3.com/site/cachetool"}
         - exec: { cmd: "rm -rf var/cache"}
         - exec: { cmd: "php7.4 ./bin/console cache:warmup"}
@@ -79,12 +80,13 @@ magephp:
         - fs/link: { from: "../../../../shared/var/patches", to: "var/patches" }
         - fs/link: { from: "../../../../shared/var/data.db", to: "var/data.db" }
         - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
+        - fs/link: { from: "../../../../shared/var/git-core-pr", to: "var/git-core-pr" }
         - fs/link: { from: "../../../../shared/var/git-core-split", to: "var/git-core-split" }
         - fs/link: { from: "../../../../shared/var/git-core-split-v8", to: "var/git-core-split-v8" }
       on-release:
       post-release:
         - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}
-        - exec: { cmd: "[ -f ../../../cachetool/cachetool.phar ] || curl -o ../../../cachetool/cachetool.phar http://gordalina.github.io/cachetool/downloads/cachetool.phar && chmod +x ../../../cachetool/cachetool.phar"}
+        - exec: { cmd: "[ -f ../../../cachetool/cachetool.phar ] || curl -L -o ../../../cachetool/cachetool.phar https://gordalina.github.io/cachetool/downloads/cachetool.phar && chmod +x ../../../cachetool/cachetool.phar"}
         - exec: { cmd: "php ../../../cachetool/cachetool.phar opcache:reset --fcgi=/var/run/stage.intercept.typo3.com_fpm.sock --tmp-dir=/srv/vhosts/stage.intercept.typo3.com/site/cachetool"}
         - exec: { cmd: "rm -rf var/cache"}
         - exec: { cmd: "php7.4 ./bin/console cache:warmup"}
