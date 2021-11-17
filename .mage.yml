@@ -22,7 +22,6 @@ magephp:
     - ./auth.json
     - ./tests
     - ./phpunit.xml.dist
-    - ./composer.json
     - ./composer.lock
     - ./package.json
     - ./README.md
