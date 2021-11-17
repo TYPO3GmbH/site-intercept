@@ -27,7 +27,6 @@ magephp:
     - ./composer.lock
     - ./package.json
     - ./README.md
-    - ./symfony.lock
     - ./webpack.config.js
     - ./yarn.lock
   environments:
