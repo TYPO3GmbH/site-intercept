@@ -17,7 +17,6 @@ magephp:
     - ./assets
     - ./build
     - ./node_modules
-    - ./var
     - ./.php_cs.cache
     - ./.php_cs.dist
     - ./auth.json
