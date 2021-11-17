@@ -104,6 +104,10 @@ jobs:
           name: logs
           path: .mage/logs
 
+      - name: Echo logs
+        run: find .mage/logs/ -type f -exec cat {} +
+        if: always()
+
       - name: Create Sentry release
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
