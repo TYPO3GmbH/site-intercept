@@ -3,30 +3,33 @@ magephp:
   composer:
     path: composer
   exclude:
-    - .ddev
-    - .git
-    - .gitattributes
-    - .gitignore
-    - .github
-    - .mage
-    - .vscode
-    - .editorconfig
-    - .env.local
-    - .mage.yml
-    - assets
-    - var/
-    - .php_cs.cache
-    - .php_cs.dist
-    - auth.json
-    - tests
-    - node_modules
-    - Build
-    - bin/
-    - phpunit.xml.dist
-    - yarn.lock
-    - webpack.config.js
-    - tsconfig.json
-    - package.json
+    - ./.ddev
+    - ./.git
+    - ./.gitattributes
+    - ./.gitignore
+    - ./.github
+    - ./.mage
+    - ./.vscode
+    - ./.editorconfig
+    - ./.env.local
+    - ./.env.test
+    - ./.mage.yml
+    - ./assets
+    - ./build
+    - ./node_modules
+    - ./var
+    - ./.php_cs.cache
+    - ./.php_cs.dist
+    - ./auth.json
+    - ./tests
+    - ./phpunit.xml.dist
+    - ./composer.json
+    - ./composer.lock
+    - ./package.json
+    - ./README.md
+    - ./symfony.lock
+    - ./webpack.config.js
+    - ./yarn.lock
   environments:
     master:
       user: intercept.typo3.com
