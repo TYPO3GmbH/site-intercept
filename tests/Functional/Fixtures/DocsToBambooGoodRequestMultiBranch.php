@@ -22,16 +22,16 @@ return Request::create(
       {
         "forced": false,
         "old": {
-          "name": "master",
+          "name": "main",
           "links": {
             "commits": {
-              "href": "https://api.bitbucket.org/2.0/repositories/pathfindermediagroup/eso-export-addon/commits/master"
+              "href": "https://api.bitbucket.org/2.0/repositories/pathfindermediagroup/eso-export-addon/commits/main"
             },
             "self": {
-              "href": "https://api.bitbucket.org/2.0/repositories/pathfindermediagroup/eso-export-addon/refs/branches/master"
+              "href": "https://api.bitbucket.org/2.0/repositories/pathfindermediagroup/eso-export-addon/refs/branches/main"
             },
             "html": {
-              "href": "https://bitbucket.org/pathfindermediagroup/eso-export-addon/branch/master"
+              "href": "https://bitbucket.org/pathfindermediagroup/eso-export-addon/branch/main"
             }
           },
           "default_merge_strategy": "merge_commit",
@@ -141,16 +141,16 @@ return Request::create(
         "truncated": false,
         "closed": false,
         "new": {
-          "name": "master",
+          "name": "main",
           "links": {
             "commits": {
-              "href": "https://api.bitbucket.org/2.0/repositories/pathfindermediagroup/eso-export-addon/commits/master"
+              "href": "https://api.bitbucket.org/2.0/repositories/pathfindermediagroup/eso-export-addon/commits/main"
             },
             "self": {
-              "href": "https://api.bitbucket.org/2.0/repositories/pathfindermediagroup/eso-export-addon/refs/branches/master"
+              "href": "https://api.bitbucket.org/2.0/repositories/pathfindermediagroup/eso-export-addon/refs/branches/main"
             },
             "html": {
-              "href": "https://bitbucket.org/pathfindermediagroup/eso-export-addon/branch/master"
+              "href": "https://bitbucket.org/pathfindermediagroup/eso-export-addon/branch/main"
             }
           },
           "default_merge_strategy": "merge_commit",

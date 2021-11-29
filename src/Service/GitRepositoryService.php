@@ -98,7 +98,7 @@ class GitRepositoryService
         $uniqueVersion = array_flip($uniqueVersion);
         asort($uniqueVersion);
 
-        // Keep master branch on top, then list tags
+        // Keep main branch on top, then list tags
         return array_merge($results, $uniqueVersion);
     }
 

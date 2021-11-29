@@ -129,9 +129,9 @@ return Request::create(
     "forks": 5,
     "open_issues": 0,
     "watchers": 12,
-    "default_branch": "master",
+    "default_branch": "main",
     "stargazers": 12,
-    "master_branch": "master",
+    "master_branch": "main",
     "organization": "mautic"
   },
   "pusher": {

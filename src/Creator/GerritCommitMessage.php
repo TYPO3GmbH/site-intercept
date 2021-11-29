@@ -51,7 +51,7 @@ class GerritCommitMessage
 
     /**
      * Try to extract a "Releases: xy" information from github issue body,
-     * else fall back to master.
+     * else fall back to main.
      *
      * @param string $body
      * @return string
@@ -60,7 +60,7 @@ class GerritCommitMessage
     {
         $release = '';
         if (preg_match('/^Releases\:\s\w+$/m', $body) < 1) {
-            $release = 'Releases: master';
+            $release = 'Releases: main';
         }
         return $release;
     }

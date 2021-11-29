@@ -20,7 +20,7 @@ class GithubCorePullRequestTest extends TestCase
         'action' => 'opened',
         'pull_request' => [
             'base' => [
-                'ref' => 'master',
+                'ref' => 'main',
             ],
             'diff_url' => 'https://github.com/psychomieze/TYPO3.CMS/pull/1.diff',
             'user' => [
@@ -38,7 +38,7 @@ class GithubCorePullRequestTest extends TestCase
     public function constructorExtractsValues()
     {
         $subject = new GithubCorePullRequest(json_encode($this->payload));
-        $this->assertSame('master', $subject->branch);
+        $this->assertSame('main', $subject->branch);
         $this->assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1.diff', $subject->diffUrl);
         $this->assertSame('https://api.github.com/users/psychomieze', $subject->userUrl);
         $this->assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1', $subject->issueUrl);

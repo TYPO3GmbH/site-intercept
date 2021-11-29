@@ -33,8 +33,8 @@ class SplitCoreControllerTestHistoryData extends Fixture implements OrderedFixtu
                         'job_uuid' => $groupId,
                         'type' => 'patch',
                         'status' => 'queued',
-                        'sourceBranch' => 'master',
-                        'targetBranch' => 'master',
+                        'sourceBranch' => 'main',
+                        'targetBranch' => 'main',
                         'triggeredBy' => 'api',
                     ]
                 )
@@ -52,8 +52,8 @@ class SplitCoreControllerTestHistoryData extends Fixture implements OrderedFixtu
                         'job_uuid' => $groupId,
                         'type' => 'patch',
                         'status' => 'work',
-                        'sourceBranch' => 'master',
-                        'targetBranch' => 'master',
+                        'sourceBranch' => 'main',
+                        'targetBranch' => 'main',
                         'timestamp' => '2019-03-11T10:34:22.803Z',
                     ]
                 )
@@ -70,8 +70,8 @@ class SplitCoreControllerTestHistoryData extends Fixture implements OrderedFixtu
                         'job_uuid' => $groupId,
                         'type' => HistoryEntryType::PATCH,
                         'status' => SplitterStatus::DONE,
-                        'sourceBranch' => 'master',
-                        'targetBranch' => 'master',
+                        'sourceBranch' => 'main',
+                        'targetBranch' => 'main',
                         'timestamp' => '2019-03-11T10:36:27.256Z',
                     ]
                 )

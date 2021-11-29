@@ -19,11 +19,11 @@ class GithubPushEventForCoreTest extends TestCase
     /**
      * @test
      */
-    public function constructorHandlesPatchMasterBranch()
+    public function constructorHandlesPatchMainBranch()
     {
-        $subject = new GithubPushEventForCore(['ref' => 'refs/heads/master']);
-        $this->assertSame('master', $subject->sourceBranch);
-        $this->assertSame('master', $subject->targetBranch);
+        $subject = new GithubPushEventForCore(['ref' => 'refs/heads/main']);
+        $this->assertSame('main', $subject->sourceBranch);
+        $this->assertSame('main', $subject->targetBranch);
         $this->assertSame('patch', $subject->type);
     }
 

@@ -41,8 +41,8 @@ class DeploymentInformationTest extends TestCase
             $composerJsonAsArray['type'],
             'bazfnord',
             'https://github.com/lolli42/enetcache/',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
-            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json',
+            'main',
             '9.5',
             '9.5',
             '/tmp/foo',
@@ -50,14 +50,14 @@ class DeploymentInformationTest extends TestCase
         );
 
         $this->assertSame('https://github.com/lolli42/enetcache/', $subject->repositoryUrl);
-        $this->assertSame('https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json', $subject->publicComposerJsonUrl);
+        $this->assertSame('https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json', $subject->publicComposerJsonUrl);
         $this->assertSame('foobar', $subject->vendor);
         $this->assertSame('bazfnord', $subject->name);
         $this->assertSame('foobar/bazfnord', $subject->packageName);
-        $this->assertSame('master', $subject->sourceBranch);
+        $this->assertSame('main', $subject->sourceBranch);
         $this->assertSame('p', $subject->typeShort);
         $this->assertSame('extension', $subject->typeLong);
-        $this->assertSame('master', $subject->targetBranchDirectory);
+        $this->assertSame('main', $subject->targetBranchDirectory);
         $this->assertStringContainsString('/tmp/foo/bar/', $subject->absoluteDumpFile);
         $this->assertStringContainsString('bar/', $subject->relativeDumpFile);
     }
@@ -75,14 +75,14 @@ class DeploymentInformationTest extends TestCase
 
         $expected = [
             'repository_url' => 'https://github.com/lolli42/enetcache/',
-            'public_composer_json_url' => 'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
+            'public_composer_json_url' => 'https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json',
             'vendor' => 'foobar',
             'name' => 'bazfnord',
             'package_name' => 'foobar/bazfnord',
             'package_type' => 'typo3-cms-extension',
             'extension_key' => 'bazfnord',
-            'source_branch' => 'master',
-            'target_branch_directory' => 'master',
+            'source_branch' => 'main',
+            'target_branch_directory' => 'main',
             'type_long' => 'extension',
             'type_short' => 'p',
         ];
@@ -91,8 +91,8 @@ class DeploymentInformationTest extends TestCase
             $composerJsonAsArray['type'],
             'bazfnord',
             'https://github.com/lolli42/enetcache/',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
-            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json',
+            'main',
             '9.5',
             '9.5',
             '/tmp/foo',
@@ -135,8 +135,8 @@ class DeploymentInformationTest extends TestCase
             $composerJsonAsArray['type'],
             $expectedName,
             'https://github.com/lolli42/enetcache/',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
-            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json',
+            'main',
             '9.5',
             '9.5',
             '/tmp/foo',
@@ -183,8 +183,8 @@ class DeploymentInformationTest extends TestCase
             $composerJsonAsArray['type'],
             'not_given',
             'https://github.com/lolli42/enetcache/',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
-            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json',
+            'main',
             '9.5',
             '9.5',
             '/tmp/foo',
@@ -227,8 +227,8 @@ class DeploymentInformationTest extends TestCase
             $composerJsonAsArray['type'],
             'bazfnord',
             'https://github.com/lolli42/enetcache/',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
-            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json',
+            'main',
             '9.5',
             '9.5',
             '/tmp/foo',
@@ -254,7 +254,7 @@ class DeploymentInformationTest extends TestCase
             'bazfnord',
             'https://github.com/TYPO3-Documentation/DocsTypo3Org-Homepage.git',
             'https://something',
-            'master',
+            'main',
             '9.5',
             '9.5',
             '/tmp/foo',
@@ -303,8 +303,8 @@ class DeploymentInformationTest extends TestCase
             $composerJsonAsArray['type'],
             'bazfnord',
             'https://github.com/lolli42/enetcache/',
-            'https://raw.githubusercontent.com/lolli42/enetcache/master/composer.json',
-            'master',
+            'https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json',
+            'main',
             '9.5',
             '9.5',
             '/tmp/foo',
@@ -320,13 +320,13 @@ class DeploymentInformationTest extends TestCase
         return [
             [
                 'typo3-cms-extension',
-                'master',
-                'master',
+                'main',
+                'main',
             ],
             [
                 'typo3-cms-extension',
                 'latest',
-                'master',
+                'main',
             ],
             [
                 'typo3-cms-extension',
@@ -345,13 +345,13 @@ class DeploymentInformationTest extends TestCase
             ],
             [
                 'typo3-cms-framework',
-                'master',
-                'master',
+                'main',
+                'main',
             ],
             [
                 'typo3-cms-framework',
                 'latest',
-                'master',
+                'main',
             ],
             [
                 'typo3-cms-framework',
@@ -400,13 +400,13 @@ class DeploymentInformationTest extends TestCase
             ],
             [
                 'typo3-cms-documentation',
-                'master',
-                'master',
+                'main',
+                'main',
             ],
             [
                 'typo3-cms-documentation',
                 'latest',
-                'master',
+                'main',
             ],
             [
                 'typo3-cms-documentation',

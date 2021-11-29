@@ -3,30 +3,30 @@ magephp:
   composer:
     path: composer
   exclude:
-    - .ddev
-    - .git
-    - .gitattributes
-    - .gitignore
-    - .github
-    - .mage
-    - .vscode
-    - .editorconfig
-    - .env.local
-    - .mage.yml
-    - assets
-    - var/
-    - .php_cs.cache
-    - .php_cs.dist
-    - auth.json
-    - tests
-    - node_modules
-    - Build
-    - bin/
-    - phpunit.xml.dist
-    - yarn.lock
-    - webpack.config.js
-    - tsconfig.json
-    - package.json
+    - ./.ddev
+    - ./.git
+    - ./.gitattributes
+    - ./.gitignore
+    - ./.github
+    - ./.mage
+    - ./.vscode
+    - ./.editorconfig
+    - ./.env.local
+    - ./.env.test
+    - ./.mage.yml
+    - ./assets
+    - ./build
+    - ./node_modules
+    - ./.php_cs.cache
+    - ./.php_cs.dist
+    - ./auth.json
+    - ./tests
+    - ./phpunit.xml.dist
+    - ./composer.lock
+    - ./package.json
+    - ./README.md
+    - ./webpack.config.js
+    - ./yarn.lock
   environments:
     master:
       user: intercept.typo3.com
@@ -49,8 +49,12 @@ magephp:
         - fs/link: { from: "../../../../shared/var/data.db", to: "var/data.db" }
         - fs/link: { from: "../../../shared/.env.local", to: ".env.local" }
         - fs/link: { from: "../../../../shared/var/git-core-split", to: "var/git-core-split" }
+        - fs/link: { from: "../../../../shared/var/git-core-split-extensions", to: "var/git-core-split-extensions" }
+        - fs/link: { from: "../../../../shared/var/git-core-split-extensions-v8", to: "var/git-core-split-extensions-v8" }
+        - fs/link: { from: "../../../../shared/var/git-core-split-extensions-v9", to: "var/git-core-split-extensions-v9" }
         - fs/link: { from: "../../../../shared/var/git-core-pr", to: "var/git-core-pr" }
         - fs/link: { from: "../../../../shared/var/git-core-split-v8", to: "var/git-core-split-v8" }
+        - fs/link: { from: "../../../../shared/var/git-core-split-v9", to: "var/git-core-split-v9" }
       on-release:
       post-release:
         - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}

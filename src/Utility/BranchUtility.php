@@ -27,7 +27,7 @@ class BranchUtility
     public static function resolveCoreMonoRepoBranch(string $identifier): string
     {
         $identifier = mb_strtolower(str_replace(['branch', 'nightly', 'TYPO3_', '_', '-'], ['', '', '', '.', '.'], $identifier));
-        if ($identifier !== 'master') {
+        if ($identifier !== 'main') {
             $sanityCheck = explode('.', $identifier);
             if (count($sanityCheck) !== 2 || (int)$sanityCheck[0] < 7 || (int)$sanityCheck[1] < 0) {
                 throw new DoNotCareException('I do not care');
@@ -48,14 +48,14 @@ class BranchUtility
     /**
      * Translate a given core mono repo branch to a target branch in split repositories.
      *
-     * @param string $monoRepoBranch A valid mono repo branch name, eg '9.5', 'master', 'TYPO3_8-7'
+     * @param string $monoRepoBranch A valid mono repo branch name, eg '9.5', 'main', 'TYPO3_8-7'
      * @return string
      * @throws DoNotCareException
      */
     public static function resolveCoreSplitBranch(string $monoRepoBranch): string
     {
         $splitBranch = str_replace(['TYPO3_', '-'], ['', '.'], $monoRepoBranch);
-        if ($splitBranch !== 'master') {
+        if ($splitBranch !== 'main') {
             $sanityCheck = explode('.', $splitBranch);
             if (count($sanityCheck) !== 2 || (int)$sanityCheck[0] < 8 || (int)$sanityCheck[1] < 0) {
                 throw new DoNotCareException('I do not care');

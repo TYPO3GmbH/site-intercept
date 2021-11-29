@@ -198,7 +198,7 @@ class CoreSplitService
         // Send a heartbeat after initial clone
         $rabbitIO->read(0);
 
-        // Verify given tag is in one of the branches we DO consider: TYPO3_8_7, 9.x, 10.x, ..., master)
+        // Verify given tag is in one of the branches we DO consider: TYPO3_8_7, 9.x, 10.x, ..., main)
         try {
             $branchesContainTag = $this->gitCommand($coreWorkingCopy, false, 'branch', '-r', '--contains', $event->tag);
         } catch (GitException $e) {
@@ -220,7 +220,7 @@ class CoreSplitService
         }
         if (!$responsibleForBranch) {
             $this->writeHistoryEntry(
-                'Job ignored: Skipped tagging sub tree repositories: The given tag "' . $event->tag . '" is not in one of the branches we do care of - "TYPO3_8-7", ">=9.x.y" or "master"',
+                'Job ignored: Skipped tagging sub tree repositories: The given tag "' . $event->tag . '" is not in one of the branches we do care of - "TYPO3_8-7", ">=9.x.y" or "main"',
                 'WARNING'
             );
             return;
