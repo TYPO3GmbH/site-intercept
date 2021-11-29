@@ -57,7 +57,7 @@ class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $content = json_decode($this->client->getResponse()->getContent(), true);
 
-        $this->assertArrayHasKey('master', $content['blog']['docs']);
+        $this->assertArrayHasKey('main', $content['blog']['docs']);
         $this->assertArrayHasKey('8.7.4', $content['blog']['docs']);
         $this->assertArrayHasKey('8.7', $content['blog']['docs']);
         $this->assertArrayNotHasKey('draft', $content['blog']['docs']);
@@ -87,6 +87,6 @@ class AssetsDocsControllerTest extends AbstractFunctionalWebTestCase
         $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $content = $this->client->getResponse()->getContent();
 
-        $this->assertStringContainsString('"key":"t3g\/blog","extensionKey":"blog","latest":"9.1","versions":{"master":"\/p\/t3g\/blog\/master\/en-us","9.1":"\/typo3cms\/extensions\/blog\/9.1.1","9.0":"\/typo3cms\/extensions\/blog\/9.0.0","8.7":"\/p\/t3g\/blog\/8.7\/en-us"', $content);
+        $this->assertStringContainsString('"key":"t3g\/blog","extensionKey":"blog","latest":"9.1","versions":{"main":"\/p\/t3g\/blog\/main\/en-us","9.1":"\/typo3cms\/extensions\/blog\/9.1.1","9.0":"\/typo3cms\/extensions\/blog\/9.0.0","8.7":"\/p\/t3g\/blog\/8.7\/en-us"', $content);
     }
 }

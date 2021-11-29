@@ -59,7 +59,7 @@ class DeploymentInformation
     public string $extensionKey;
 
     /**
-     * @var string The (not changed) source branch or tag of the repository supposed to be checked out, eg. '1.2.3', '1.2', 'master', 'latest'
+     * @var string The (not changed) source branch or tag of the repository supposed to be checked out, eg. '1.2.3', '1.2', 'main', 'latest'
      */
     public string $sourceBranch;
 
@@ -195,9 +195,9 @@ class DeploymentInformation
     {
         $result = $branch;
 
-        // 'master', 'latest' and 'main' become 'master'
+        // 'master', 'latest' and 'main' become 'main'
         if ($result === 'latest' || $result === 'master' || $result === 'main') {
-            return 'master';
+            return 'main';
         }
 
         // branch 'documentation-draft' becomes 'draft' (and is not indexed by spiders later)
@@ -232,7 +232,7 @@ class DeploymentInformation
             return $result;
         }
 
-        // docs-home has only master branch, this is returned above already, safe to not handle this here.
+        // docs-home has only main branch, this is returned above already, safe to not handle this here.
         throw new RuntimeException('Unknown package type ' . $type);
     }
 

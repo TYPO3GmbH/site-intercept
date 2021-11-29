@@ -27,8 +27,8 @@ class DeploymentsControllerTestData extends Fixture implements OrderedFixtureInt
             ->setPackageName('typo3/docs-homepage')
             ->setPackageType('typo3-cms-documentation')
             ->setExtensionKey('docs_that_is_no_extension')
-            ->setBranch('master')
-            ->setTargetBranchDirectory('master')
+            ->setBranch('main')
+            ->setTargetBranchDirectory('main')
             ->setTypeLong('docs-home')
             ->setTypeShort('h')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
@@ -38,7 +38,7 @@ class DeploymentsControllerTestData extends Fixture implements OrderedFixtureInt
             ->setReRenderNeeded(false)
             ->setNew(false)
             ->setApproved(true)
-            ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/TYPO3-Documentation/DocsTypo3Org-Homepage/master/composer.json');
+            ->setPublicComposerJsonUrl('https://raw.githubusercontent.com/TYPO3-Documentation/DocsTypo3Org-Homepage/main/composer.json');
         $manager->persist($documentationJar);
 
         // Core extension
@@ -49,8 +49,8 @@ class DeploymentsControllerTestData extends Fixture implements OrderedFixtureInt
             ->setPackageName('typo3/cms-felogin')
             ->setPackageType('typo3-cms-framework')
             ->setExtensionKey('felogin')
-            ->setBranch('master')
-            ->setTargetBranchDirectory('master')
+            ->setBranch('main')
+            ->setTargetBranchDirectory('main')
             ->setTypeLong('core-extension')
             ->setTypeShort('c')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
@@ -155,8 +155,8 @@ class DeploymentsControllerTestData extends Fixture implements OrderedFixtureInt
             ->setPackageName('t3g/blog')
             ->setPackageType('typo3-cms-extension')
             ->setExtensionKey('blog')
-            ->setBranch('master')
-            ->setTargetBranchDirectory('master')
+            ->setBranch('main')
+            ->setTargetBranchDirectory('main')
             ->setTypeLong('extension')
             ->setTypeShort('p')
             ->setStatus(DocumentationStatus::STATUS_RENDERED)
@@ -211,7 +211,7 @@ class DeploymentsControllerTestData extends Fixture implements OrderedFixtureInt
             ->setPublicComposerJsonUrl('');
         $manager->persist($documentationJar);
 
-        // Community extension (master only)
+        // Community extension (main only)
         $documentationJar = (new DocumentationJar())
             ->setRepositoryUrl('https://github.com/georgringer/news.git')
             ->setVendor('georgringer')
@@ -219,8 +219,8 @@ class DeploymentsControllerTestData extends Fixture implements OrderedFixtureInt
             ->setPackageName('georgringer/news')
             ->setPackageType('typo3-cms-extension')
             ->setExtensionKey('news')
-            ->setBranch('master')
-            ->setTargetBranchDirectory('master')
+            ->setBranch('main')
+            ->setTargetBranchDirectory('main')
             ->setTypeLong('extension')
             ->setTypeShort('p')
             ->setStatus(DocumentationStatus::STATUS_AWAITING_APPROVAL)

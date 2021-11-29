@@ -36,12 +36,12 @@ class GithubPushEventForCore
     public ?string $type = null;
 
     /**
-     * @var string|null The source branch to split FROM, eg. 'TYPO3_8-7', '9.2', 'master'
+     * @var string|null The source branch to split FROM, eg. 'TYPO3_8-7', '9.2', 'main'
      */
     public ?string $sourceBranch = null;
 
     /**
-     * @var string|null The target branch to split TO, eg. '8.7', '9.2', 'master'
+     * @var string|null The target branch to split TO, eg. '8.7', '9.2', 'main'
      */
     public ?string $targetBranch = null;
 
@@ -75,7 +75,7 @@ class GithubPushEventForCore
                 $this->targetBranch = BranchUtility::resolveCoreSplitBranch($this->sourceBranch);
             } elseif ($this->isPushedTag($fullPullRequestInformation)) {
                 $this->type = self::TYPE_TAG;
-                $this->sourceBranch = $fullPullRequestInformation['repository']['master_branch'] ?? 'master';
+                $this->sourceBranch = $fullPullRequestInformation['repository']['master_branch'] ?? 'main';
                 $this->tag = $this->getTag($fullPullRequestInformation['ref']);
             } else {
                 throw new DoNotCareException('no pushed patch, no pushed tag, it\'s not my job');
@@ -98,7 +98,7 @@ class GithubPushEventForCore
 
     /**
      * If 'ref' starts with 'refs/tags/, and created is set and base_ref is not
-     * empty, then this push event is an event for a new tag on git core master.
+     * empty, then this push event is an event for a new tag on git core main.
      *
      * @param array $requestInformation
      * @return bool
@@ -126,7 +126,7 @@ class GithubPushEventForCore
     }
 
     /**
-     * Determine source branch from 'ref', eg. 'refs/heads/master' becomes 'master'
+     * Determine source branch from 'ref', eg. 'refs/heads/main' becomes 'main'
      *
      * @param string $ref
      * @return string

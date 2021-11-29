@@ -57,7 +57,7 @@ class GitRepositoryServiceTest extends TestCase
                 'repoService' => GitRepositoryService::SERVICE_BITBUCKET_SERVER,
             ],
             'GitHub (cloud) push branch' => [
-                'expectedUrl' => 'https://raw.githubusercontent.com/Codertocat/Hello-World/master/composer.json',
+                'expectedUrl' => 'https://raw.githubusercontent.com/Codertocat/Hello-World/main/composer.json',
                 'payload' => $this->getPayloadFromFixture('Payload_GitHub_Event_Push_Branch.json'),
                 'repoService' => GitRepositoryService::SERVICE_GITHUB,
             ],
@@ -67,7 +67,7 @@ class GitRepositoryServiceTest extends TestCase
                 'repoService' => GitRepositoryService::SERVICE_GITHUB,
             ],
             'GitLab (cloud) push branch' => [
-                'expectedUrl' => 'http://example.com/mike/diaspora/raw/master/composer.json',
+                'expectedUrl' => 'http://example.com/mike/diaspora/raw/main/composer.json',
                 'payload' => $this->getPayloadFromFixture('Payload_Gitlab_Event_Push_Branch.json'),
                 'repoService' => GitRepositoryService::SERVICE_GITLAB,
             ],
@@ -82,25 +82,25 @@ class GitRepositoryServiceTest extends TestCase
     public function filterAllowedBranchesDataProvider(): array
     {
         return [
-            'one version, master only' => [
-                ['master'], // input
-                ['master' => 'master'] // expected
+            'one version, main only' => [
+                ['main'], // input
+                ['main' => 'main'] // expected
             ],
-            'two versions, master and a semver one' => [
-                ['master', '1.0.1'],
-                ['master' => 'master', '1.0.1' => '1.0']
+            'two versions, main and a semver one' => [
+                ['main', '1.0.1'],
+                ['main' => 'main', '1.0.1' => '1.0']
             ],
             'multiple versions, distinct targets' => [
-                ['master', '1.0.4', '2.8.7'],
-                ['master' => 'master', '1.0.4' => '1.0', '2.8.7' => '2.8']
+                ['main', '1.0.4', '2.8.7'],
+                ['main' => 'main', '1.0.4' => '1.0', '2.8.7' => '2.8']
             ],
             'one version, semver with leading v' => [
                 ['v1.0.1'],
                 ['v1.0.1' => '1.0']
             ],
-            'master not on top will put master on top' => [
-                ['v1.0.1', 'v2.5.8', 'master', '5.7.6'],
-                ['master' => 'master', 'v1.0.1' => '1.0', 'v2.5.8' => '2.5', '5.7.6' => '5.7']
+            'main not on top will put main on top' => [
+                ['v1.0.1', 'v2.5.8', 'main', '5.7.6'],
+                ['main' => 'main', 'v1.0.1' => '1.0', 'v2.5.8' => '2.5', '5.7.6' => '5.7']
             ],
             'multiple invalid versions lead to empty result' => [
                 ['v1.1', 'v1', '1'],

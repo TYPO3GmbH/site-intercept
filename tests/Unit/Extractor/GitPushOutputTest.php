@@ -34,7 +34,7 @@ remote:
 remote: New Changes:
 remote:   https://review.typo3.org/c/Packages/TYPO3.CMS/+/60480 [WIP][TASK] testing gerrit [WIP]
 To ssh://review.typo3.org:29418/Packages/TYPO3.CMS.git
- * [new branch]            HEAD -> refs/for/master%wip';
+ * [new branch]            HEAD -> refs/for/main%wip';
         $subject = new GitPushOutput($exampleOutput);
         $this->assertSame('https://review.typo3.org/c/Packages/TYPO3.CMS/+/60480', $subject->reviewUrl);
     }

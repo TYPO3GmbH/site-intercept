@@ -19,9 +19,9 @@ class BranchUtilityTest extends TestCase
     public function resolveCoreMonoRepoBranchDataProvider(): array
     {
         return [
-            'master' => [
-                'master',
-                'master'
+            'main' => [
+                'main',
+                'main'
             ],
             'straight 23.42' => [
                 '23.42',
@@ -55,9 +55,9 @@ class BranchUtilityTest extends TestCase
                 'branch7_6',
                 'TYPO3_7-6'
             ],
-            'web interface nightlyMaster' => [
-                'nightlyMaster',
-                'master'
+            'web interface nightlyMain' => [
+                'nightlyMain',
+                'main'
             ],
             'web interface nightly95' => [
                 'nightly9_5',
@@ -91,9 +91,9 @@ class BranchUtilityTest extends TestCase
     public function resolveCoreSplitBranchDataProvider(): array
     {
         return [
-            'master' => [
-                'master',
-                'master'
+            'main' => [
+                'main',
+                'main'
             ],
             '23.42' => [
                 '23.42',
