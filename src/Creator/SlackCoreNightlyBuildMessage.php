@@ -30,7 +30,7 @@ class SlackCoreNightlyBuildMessage implements \JsonSerializable
     private string $buildKey;
 
     /**
-     * @var string Project name, eg. 'Core nightly master'
+     * @var string Project name, eg. 'Core nightly main'
      */
     private string $projectName;
 

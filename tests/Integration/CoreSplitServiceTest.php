@@ -30,7 +30,7 @@ class CoreSplitServiceTest extends TestCase
      *
      * Prepare patches and tags:
      * * clone your core fork, then
-     *   * checkout new branch 'test-1' from master , 'git co -b test-1 origin/master'
+     *   * checkout new branch 'test-1' from main , 'git co -b test-1 origin/main'
      *      * commit a patch to 'about' extension, 'git commit -a -m "patch 1 to about test-1"'
      *      * push that branch, 'git push origin test-1'
      *      * tag as version 'v42.0.0', 'git tag v42.0.0'

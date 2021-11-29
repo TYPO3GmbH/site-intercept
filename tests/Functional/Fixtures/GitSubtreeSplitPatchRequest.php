@@ -17,7 +17,7 @@ return Request::create(
     [],
     [],
     '{
-      "ref": "refs/heads/master",
+      "ref": "refs/heads/main",
       "before": "253c42fe1e2e050539a21973b819216d7260b1a2",
       "after": "1b93464c68d398351410d871826e30066bfdbb2f",
       "created": false,
@@ -30,7 +30,7 @@ return Request::create(
           "id": "1b93464c68d398351410d871826e30066bfdbb2f",
           "tree_id": "614938af52c154d0f76f964d797b8da7c6f9d3a0",
           "distinct": true,
-          "message": "[BUGFIX] Load AdditionalFactoryConfiguration.php again\n\nThis file is placed in \"typo3conf\" just like the other configuration\nfiles and must be loaded accordingly.\n\nResolves: #87035\nRelates: #85560\nReleases: master\nChange-Id: I7db72a3c1b29f79fb242f1e5da21ec7d77614bfe\nReviewed-on: https://review.typo3.org/58977\nTested-by: TYPO3com <no-reply@typo3.com>\nReviewed-by: Andreas Wolf <andreas.wolf@typo3.org>\nReviewed-by: Benni Mack <benni@typo3.org>\nTested-by: Benni Mack <benni@typo3.org>\nReviewed-by: Anja Leichsenring <aleichsenring@ab-softlab.de>\nTested-by: Anja Leichsenring <aleichsenring@ab-softlab.de>",
+          "message": "[BUGFIX] Load AdditionalFactoryConfiguration.php again\n\nThis file is placed in \"typo3conf\" just like the other configuration\nfiles and must be loaded accordingly.\n\nResolves: #87035\nRelates: #85560\nReleases: main\nChange-Id: I7db72a3c1b29f79fb242f1e5da21ec7d77614bfe\nReviewed-on: https://review.typo3.org/58977\nTested-by: TYPO3com <no-reply@typo3.com>\nReviewed-by: Andreas Wolf <andreas.wolf@typo3.org>\nReviewed-by: Benni Mack <benni@typo3.org>\nTested-by: Benni Mack <benni@typo3.org>\nReviewed-by: Anja Leichsenring <aleichsenring@ab-softlab.de>\nTested-by: Anja Leichsenring <aleichsenring@ab-softlab.de>",
           "timestamp": "2018-11-29T22:59:07+01:00",
           "url": "https://github.com/TYPO3/TYPO3.CMS/commit/1b93464c68d398351410d871826e30066bfdbb2f",
           "author": {
@@ -44,10 +44,10 @@ return Request::create(
             "username": "maddy2101"
           },
           "added": [
-    
+
           ],
           "removed": [
-    
+
           ],
           "modified": [
             "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php",
@@ -59,7 +59,7 @@ return Request::create(
         "id": "1b93464c68d398351410d871826e30066bfdbb2f",
         "tree_id": "614938af52c154d0f76f964d797b8da7c6f9d3a0",
         "distinct": true,
-        "message": "[BUGFIX] Load AdditionalFactoryConfiguration.php again\n\nThis file is placed in \"typo3conf\" just like the other configuration\nfiles and must be loaded accordingly.\n\nResolves: #87035\nRelates: #85560\nReleases: master\nChange-Id: I7db72a3c1b29f79fb242f1e5da21ec7d77614bfe\nReviewed-on: https://review.typo3.org/58977\nTested-by: TYPO3com <no-reply@typo3.com>\nReviewed-by: Andreas Wolf <andreas.wolf@typo3.org>\nReviewed-by: Benni Mack <benni@typo3.org>\nTested-by: Benni Mack <benni@typo3.org>\nReviewed-by: Anja Leichsenring <aleichsenring@ab-softlab.de>\nTested-by: Anja Leichsenring <aleichsenring@ab-softlab.de>",
+        "message": "[BUGFIX] Load AdditionalFactoryConfiguration.php again\n\nThis file is placed in \"typo3conf\" just like the other configuration\nfiles and must be loaded accordingly.\n\nResolves: #87035\nRelates: #85560\nReleases: main\nChange-Id: I7db72a3c1b29f79fb242f1e5da21ec7d77614bfe\nReviewed-on: https://review.typo3.org/58977\nTested-by: TYPO3com <no-reply@typo3.com>\nReviewed-by: Andreas Wolf <andreas.wolf@typo3.org>\nReviewed-by: Benni Mack <benni@typo3.org>\nTested-by: Benni Mack <benni@typo3.org>\nReviewed-by: Anja Leichsenring <aleichsenring@ab-softlab.de>\nTested-by: Anja Leichsenring <aleichsenring@ab-softlab.de>",
         "timestamp": "2018-11-29T22:59:07+01:00",
         "url": "https://github.com/TYPO3/TYPO3.CMS/commit/1b93464c68d398351410d871826e30066bfdbb2f",
         "author": {
@@ -73,10 +73,10 @@ return Request::create(
           "username": "maddy2101"
         },
         "added": [
-    
+
         ],
         "removed": [
-    
+
         ],
         "modified": [
           "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php",
@@ -182,9 +182,9 @@ return Request::create(
         "forks": 347,
         "open_issues": 5,
         "watchers": 586,
-        "default_branch": "master",
+        "default_branch": "main",
         "stargazers": 586,
-        "master_branch": "master",
+        "master_branch": "main",
         "organization": "TYPO3"
       },
       "pusher": {

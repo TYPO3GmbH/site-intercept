@@ -21,7 +21,7 @@ use App\Exception\DoNotCareException;
 class GithubCorePullRequest
 {
     /**
-     * @var string Target PR branch, eg. 'master'
+     * @var string Target PR branch, eg. 'main'
      */
     public string $branch;
 

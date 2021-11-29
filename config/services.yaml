@@ -3,8 +3,8 @@ parameters:
     router.request_context.host: '%env(APP_URL)%'
 
     core_repositories:
-      master:
-        version: 'master'
+      main:
+        version: 'main'
         monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
       branch11_5:
         version: '11.5'
@@ -74,7 +74,7 @@ services:
         arguments:
             $logger: '@monolog.logger.request'
             $splitCorePath: '%kernel.project_dir%/var/git-core-split/'
-            $splitMonoRepo: '@=parameter("core_repositories")["master"]["monoRepository"]'
+            $splitMonoRepo: '@=parameter("core_repositories")["main"]["monoRepository"]'
             $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE)%'
             $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions/'
             $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'

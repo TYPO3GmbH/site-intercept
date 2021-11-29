@@ -64,8 +64,8 @@ return Request::create(
         "comments_url": "https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments",
         "statuses_url": "https://api.github.com/repos/psychomieze/TYPO3.CMS/statuses/bbb17ae78d7dda67eed18a603ee257adc49fffe2",
         "head": {
-          "label": "neustawebdeploy:master",
-          "ref": "master",
+          "label": "neustawebdeploy:main",
+          "ref": "main",
           "sha": "bbb17ae78d7dda67eed18a603ee257adc49fffe2",
           "user": {
             "login": "neustawebdeploy",
@@ -172,12 +172,12 @@ return Request::create(
             "forks": 0,
             "open_issues": 0,
             "watchers": 0,
-            "default_branch": "master"
+            "default_branch": "main"
           }
         },
         "base": {
-          "label": "psychomieze:master",
-          "ref": "master",
+          "label": "psychomieze:main",
+          "ref": "main",
           "sha": "314c9a65d30d41ec7a0b6beda0a8f70ff60d4ee8",
           "user": {
             "login": "psychomieze",
@@ -284,7 +284,7 @@ return Request::create(
             "forks": 1,
             "open_issues": 1,
             "watchers": 1,
-            "default_branch": "master"
+            "default_branch": "main"
           }
         },
         "_links": {
@@ -410,7 +410,7 @@ return Request::create(
         "forks": 1,
         "open_issues": 1,
         "watchers": 1,
-        "default_branch": "master"
+        "default_branch": "main"
       },
       "sender": {
         "login": "psychomieze",

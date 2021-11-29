@@ -144,7 +144,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->addRabbitManagementClientProphecy();
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
         $generalClientProphecy
-            ->request('GET', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/master/composer.json')
+            ->request('GET', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json')
             ->shouldBeCalled()
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);

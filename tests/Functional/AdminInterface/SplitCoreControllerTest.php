@@ -124,13 +124,13 @@ class SplitCoreControllerTest extends AbstractFunctionalWebTestCase
         $crawler = $client->request('GET', '/admin/split/core');
 
         // Get the rendered form, feed it with some data and submit it
-        $form = $crawler->selectButton('Trigger master')->form();
+        $form = $crawler->selectButton('Trigger main')->form();
         $client->submit($form, [], []);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         // The branch is shown
         $this->assertMatchesRegularExpression(
-            '/Triggered split job for core branch &quot;master&quot;/',
+            '/Triggered split job for core branch &quot;main&quot;/',
             $client->getResponse()->getContent()
         );
     }

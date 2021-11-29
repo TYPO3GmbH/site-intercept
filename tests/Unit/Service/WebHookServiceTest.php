@@ -44,7 +44,7 @@ class WebHookServiceTest extends TestCase
             ],
             'Payload_GitHub_Event_Push_Branch' => [
                 new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Branch.json')),
-                new PushEvent('https://github.com/Codertocat/Hello-World.git', 'master', 'https://raw.githubusercontent.com/Codertocat/Hello-World/master/composer.json')
+                new PushEvent('https://github.com/Codertocat/Hello-World.git', 'main', 'https://raw.githubusercontent.com/Codertocat/Hello-World/main/composer.json')
             ],
             'Payload_GitHub_Event_Push_Tag' => [
                 new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Tag.json')),
@@ -52,7 +52,7 @@ class WebHookServiceTest extends TestCase
             ],
             'Payload_Gitlab_Event_Push_Branch' => [
                 new Request([], [], [], [], [], ['HTTP_X-Gitlab-Event' => 'Push Hook'], file_get_contents(__DIR__ . '/Fixtures/Payload_Gitlab_Event_Push_Branch.json')),
-                new PushEvent('http://example.com/mike/diaspora.git', 'master', 'http://example.com/mike/diaspora/raw/master/composer.json')
+                new PushEvent('http://example.com/mike/diaspora.git', 'main', 'http://example.com/mike/diaspora/raw/main/composer.json')
             ],
             'Payload_Gitlab_Event_Push_Tag' => [
                 new Request([], [], [], [], [], ['HTTP_X-Gitlab-Event' => 'Tag Push Hook'], file_get_contents(__DIR__ . '/Fixtures/Payload_Gitlab_Event_Push_Tag.json')),
@@ -81,7 +81,7 @@ class WebHookServiceTest extends TestCase
             'Payload_Bitbucket_Cloud_Event_Push_Multiple' => [
                 new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:push'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Cloud_Event_Push_Multiple.json')),
                 [
-                    new PushEvent('https://bitbucket.org/pathfindermediagroup/eso-export-addon', 'master', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/master/composer.json'),
+                    new PushEvent('https://bitbucket.org/pathfindermediagroup/eso-export-addon', 'main', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json'),
                     new PushEvent('https://bitbucket.org/pathfindermediagroup/eso-export-addon', 'test', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/test/composer.json'),
                 ]
             ],

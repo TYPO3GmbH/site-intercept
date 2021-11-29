@@ -141,7 +141,7 @@ return Request::create(
         "forks": 148,
         "open_issues": 59,
         "watchers": 200,
-        "default_branch": "master"
+        "default_branch": "main"
       },
       "sender": {
         "login": "benjaminkott",
