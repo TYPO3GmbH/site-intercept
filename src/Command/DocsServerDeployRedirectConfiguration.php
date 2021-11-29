@@ -30,7 +30,7 @@ class DocsServerDeployRedirectConfiguration extends Command
 
     public function __construct(DocsServerNginxService $nginxService, GithubService $githubService)
     {
-        parent::__construct($name);
+        parent::__construct();
         $this->nginxService = $nginxService;
         $this->githubService = $githubService;
     }
