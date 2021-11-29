@@ -28,7 +28,7 @@ class DocsServerDeployRedirectConfiguration extends Command
 
     protected GithubService $githubService;
 
-    public function __construct(string $name = 'app:docs-redirect-deploy', DocsServerNginxService $nginxService, GithubService $githubService)
+    public function __construct(DocsServerNginxService $nginxService, GithubService $githubService)
     {
         parent::__construct($name);
         $this->nginxService = $nginxService;
