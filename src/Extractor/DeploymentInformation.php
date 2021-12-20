@@ -22,6 +22,8 @@ class DeploymentInformation
         'typo3-cms-documentation' => ['m' => 'manual'],
         'typo3-cms-framework' => ['c' => 'core-extension'],
         'typo3-cms-extension' => ['p' => 'extension'],
+        'other' => ['other', 'other'],
+        '' => ['other', 'other']
         // There is a third one 'h' => 'docs-home', handled below.
         // There is a fourth one 'other' => 'other', handled below.
     ];
@@ -246,10 +248,6 @@ class DeploymentInformation
     {
         if (array_key_exists($packageName, self::$packageTypeExceptionMap)) {
             return self::$packageTypeExceptionMap[$packageName];
-        }
-
-        if ($packageType === '') {
-            throw new ComposerJsonInvalidException('composer.json \'type\' must be given', 1558019479);
         }
 
         if (!array_key_exists($packageType, self::$typeMap)) {
