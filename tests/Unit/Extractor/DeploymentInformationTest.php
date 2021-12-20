@@ -268,53 +268,6 @@ class DeploymentInformationTest extends TestCase
     /**
      * @return array
      */
-    public function invalidPackageTypeDataProvider(): array
-    {
-        return [
-            'empty string' => [
-                '',
-                1558019479
-            ],
-            'something else' => [
-                'something',
-                1557490474
-            ]
-        ];
-    }
-
-    /**
-     * @param string $type
-     * @param int $exceptionCode
-     * @dataProvider invalidPackageTypeDataProvider
-     * @test
-     */
-    public function invalidPackageTypesThrowException(?string $type, int $exceptionCode): void
-    {
-        $this->expectException(ComposerJsonInvalidException::class);
-        $this->expectExceptionCode($exceptionCode);
-
-        $composerJsonAsArray = [
-            'name' => 'foobar/bazfnord',
-            'type' => $type,
-        ];
-
-        new DeploymentInformation(
-            $composerJsonAsArray['name'],
-            $composerJsonAsArray['type'],
-            'bazfnord',
-            'https://github.com/lolli42/enetcache/',
-            'https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json',
-            'main',
-            '9.5',
-            '9.5',
-            '/tmp/foo',
-            'bar'
-        );
-    }
-
-    /**
-     * @return array
-     */
     public function validBranchNameDataProvider(): array
     {
         return [
