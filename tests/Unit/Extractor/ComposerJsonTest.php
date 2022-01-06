@@ -69,8 +69,8 @@ class ComposerJsonTest extends TestCase
      */
     public function typeIsReturnedAsExpected(): void
     {
-        $composerJson = new ComposerJson(['name' => '123', 'type' => 'package']);
-        $this->assertSame('package', $composerJson->getType());
+        $composerJson = new ComposerJson(['name' => '123', 'type' => 'typo3-cms-extension']);
+        $this->assertSame('typo3-cms-extension', $composerJson->getType());
     }
 
     /**
@@ -91,33 +91,10 @@ class ComposerJsonTest extends TestCase
         return [
             ['typo3/surf'],
             ['typo3/tailor'],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function emptyTypeDataProvider(): array
-    {
-        return [
             [''],
-            ['     '],
             [null],
+            ['     '],
         ];
-    }
-
-    /**
-     * @test
-     * @dataProvider emptyNameDataProvider
-     * @param mixed $value
-     */
-    public function emptyTypeThrowsException($value): void
-    {
-        $this->expectException(DocsComposerMissingValueException::class);
-        $this->expectExceptionCode(1557309364);
-
-        $composerJson = new ComposerJson(['type', $value]);
-        $composerJson->getType();
     }
 
     /**

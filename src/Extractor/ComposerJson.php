@@ -39,19 +39,14 @@ class ComposerJson
 
     /**
      * @return string
-     * @throws DocsComposerMissingValueException
      */
     public function getType(): string
     {
-        $specialTypeOther = [
-            'typo3/surf',
-            'typo3/tailor',
-        ];
-        if (in_array($this->getName(), $specialTypeOther)) {
-            return 'other';
+        $type = (string)($this->composerJson['type']);
+        if (!str_contains($type, 'typo3-cms')) {
+            $type = 'other';
         }
-        $this->assertPropertyContainsValue('type');
-        return (string)$this->composerJson['type'];
+        return $type;
     }
 
     /**
@@ -88,11 +83,7 @@ class ComposerJson
     public function getMinimumTypoVersion(): string
     {
         // Leave version constraint empty for typo3/cms-core itself or other products like typo3/surf or typo3/tailor
-        if (
-            $this->getName() === 'typo3/cms-core' ||
-            $this->getName() === 'typo3/surf' ||
-            $this->getName() === 'typo3/tailor'
-        ) {
+        if ($this->getType() === 'other' || $this->getName() === 'typo3/cms-core') {
             return '';
         }
         if ($this->getCoreRequirement() === null) {
@@ -109,11 +100,7 @@ class ComposerJson
     public function getMaximumTypoVersion(): string
     {
         // Leave version constraint empty for typo3/cms-core itself or other products like typo3/surf or typo3/tailor
-        if (
-            $this->getName() === 'typo3/cms-core' ||
-            $this->getName() === 'typo3/surf' ||
-            $this->getName() === 'typo3/tailor'
-        ) {
+        if ($this->getType() === 'other' || $this->getName() === 'typo3/cms-core') {
             return '';
         }
         if ($this->getCoreRequirement() === null) {
@@ -149,7 +136,7 @@ class ComposerJson
      */
     public function getExtensionKey(): ?string
     {
-        if (strpos($this->getType(), 'typo3-cms-') === false) {
+        if (!str_contains($this->getType(), 'typo3-cms-')) {
             return null;
         }
 
@@ -158,7 +145,7 @@ class ComposerJson
         }
 
         foreach (array_keys($this->composerJson['replace'] ?? []) as $packageName) {
-            if (strpos($packageName, '/') === false) {
+            if (!str_contains($packageName, '/')) {
                 return trim($packageName);
             }
         }
