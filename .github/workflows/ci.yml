@@ -35,11 +35,11 @@ jobs:
       - name: PHP Stan
         run: composer t3g:phpstan
 
-      - name: Yarn install
-        run: yarn install --silent
+      - name: NPM install
+        run: npm ci
 
-      - name: Yarn build
-        run: yarn build
+      - name: NPM build
+        run: npm run build
 
       - name: (TEST) Run all tests with coverage
         run: composer t3g:test:php:cover

@@ -113,8 +113,8 @@ file and write proper values to a `.env.local` file!
 ddev start
 ddev composer install
 ddev exec bin/console doctrine:migrations:migrate -n
-ddev exec yarn install
-ddev exec yarn encore dev
+ddev exec npm ci
+ddev exec npm run build
 ```
 
 ### URL's
@@ -130,8 +130,8 @@ ddev start
 ddev composer install
 ddev exec bin/console cache:clear
 ddev exec bin/console doctrine:migrations:migrate -n
-ddev exec yarn install
-ddev exec yarn encore dev
+ddev exec npm ci
+ddev exec npm run build
 ddev exec -s rabbitmq rabbitmqadmin -u admin -p foo declare queue name=intercept-core-split-testing
 ```
 
