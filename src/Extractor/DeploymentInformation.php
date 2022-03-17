@@ -129,7 +129,7 @@ class DeploymentInformation
     public function __construct(
         string $composerPackageName,
         string $composerPackageType,
-        string $extensionKey,
+        ?string $extensionKey,
         string $repositoryUrl,
         string $publicComposerJsonUrl,
         string $version,
@@ -143,7 +143,7 @@ class DeploymentInformation
         $this->packageType = $composerPackageType;
         $packageName = $this->determinePackageName($composerPackageName);
         $packageType = $this->determinePackageType($composerPackageType, $composerPackageName);
-        $this->extensionKey = $extensionKey;
+        $this->extensionKey = $extensionKey ?? '';
         $this->vendor = key($packageName);
         $this->name = current($packageName);
         $this->packageName = $this->vendor . '/' . $this->name;

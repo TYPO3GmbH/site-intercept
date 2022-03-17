@@ -42,7 +42,7 @@ class ComposerJson
      */
     public function getType(): string
     {
-        $type = (string)($this->composerJson['type']);
+        $type = (string)($this->composerJson['type'] ?? '');
         if (!str_contains($type, 'typo3-cms')) {
             $type = 'other';
         }
