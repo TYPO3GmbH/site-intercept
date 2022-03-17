@@ -19,11 +19,13 @@
 /commands/web/xdebug
 /commands/web/live
 /config.*.y*ml
+/db-build/postgres_healthcheck.sh
 /db_snapshots
 /import-db
 /import.yaml
 /mutagen
 /nginx_full/nginx-site.conf
+/postgres/postgresql.conf
 /sequelpro.spf
 /xhprof
 /**/README.*
