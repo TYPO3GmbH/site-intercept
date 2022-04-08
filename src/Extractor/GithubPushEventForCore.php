@@ -55,6 +55,9 @@ class GithubPushEventForCore
      */
     public ?string $repositoryFullName = null;
 
+    public string $headCommitTitle = '';
+    public array $commit = [];
+
     /**
      * Extract information.
      *
@@ -70,9 +73,11 @@ class GithubPushEventForCore
             }
             $this->repositoryFullName = $fullPullRequestInformation['repository']['full_name'] ?? '';
             if ($this->isPushedPatch($fullPullRequestInformation)) {
+                $this->commit = $fullPullRequestInformation['head_commit'] ?? [];
                 $this->type = self::TYPE_PATCH;
                 $this->sourceBranch = $this->getSourceBranch($fullPullRequestInformation['ref']);
                 $this->targetBranch = BranchUtility::resolveCoreSplitBranch($this->sourceBranch);
+                $this->headCommitTitle = explode("\n", $fullPullRequestInformation['head_commit']['message'] ?? '', 2)[0] ?? '';
             } elseif ($this->isPushedTag($fullPullRequestInformation)) {
                 $this->type = self::TYPE_TAG;
                 $this->sourceBranch = $fullPullRequestInformation['repository']['master_branch'] ?? 'main';

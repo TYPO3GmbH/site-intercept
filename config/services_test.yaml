@@ -1,7 +1,4 @@
 services:
-  App\Client\BambooClient:
-    tags:
-      - testDouble
   App\Client\GerritClient:
     tags:
       - testDouble
