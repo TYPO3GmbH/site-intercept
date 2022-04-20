@@ -63,7 +63,7 @@ class ComposerJson
      */
     public function getCoreRequirement(): ?string
     {
-        return $this->composerJson['require']['typo3/cms-core'] ?? $this->composerJson['require']['typo3/cms'] ?? null;
+        return $this->composerJson['require']['typo3/cms-core'] ?? $this->composerJson['require-dev']['typo3/cms-core'] ?? $this->composerJson['require']['typo3/cms'] ?? null;
     }
 
     /**
