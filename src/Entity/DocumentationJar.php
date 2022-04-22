@@ -200,7 +200,7 @@ class DocumentationJar
         return $this->publicComposerJsonUrl;
     }
 
-    public function setPublicComposerJsonUrl(string $publicComposerJsonUrl): self
+    public function setPublicComposerJsonUrl(?string $publicComposerJsonUrl): self
     {
         $this->publicComposerJsonUrl = $publicComposerJsonUrl;
 
