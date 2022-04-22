@@ -26,7 +26,7 @@ class GithubRstIssueController extends AbstractController
 {
     /**
      * Called by github post merge, this checks the incoming merge for rst file changes and posts them on a Github repository as issues
-     * @Route("/create-rst-issue", name="docs_github_rst_issue_create")
+     * @Route("/create-rst-issue", name="docs_github_rst_issue_create", methods={"POST"})
      *
      * @param Request $request
      * @param GithubService $githubService
@@ -40,6 +40,8 @@ class GithubRstIssueController extends AbstractController
             $githubService->handleGithubIssuesForRstFiles($pushEventInformation, $githubChangelogToLogRepository);
         } catch (DoNotCareException $e) {
             // Hook payload could not be identified as hook that should trigger git split
+        } catch (\JsonException $e) {
+            return new Response('Invalid JSON', 400);
         }
 
         return new Response();
