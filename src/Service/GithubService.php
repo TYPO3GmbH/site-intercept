@@ -18,8 +18,10 @@ use App\Extractor\BambooBuildTriggered;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\GithubCorePullRequest;
 use App\Extractor\GithubPullRequestIssue;
+use App\Extractor\GithubPushEventForCore;
 use App\Extractor\GithubUserData;
 use App\Extractor\GitPatchFile;
+use GuzzleHttp\Exception\BadResponseException;
 use RuntimeException;
 
 /**
@@ -144,6 +146,79 @@ class GithubService
         ]);
     }
 
+    public function handleGithubIssuesForRstFiles(GithubPushEventForCore $pushEvent, string $githubChangelogToLogRepository): void
+    {
+        $added = $this->filterRstChanges($pushEvent->commit['added'] ?? []);
+        $modified = $this->filterRstChanges($pushEvent->commit['modified'] ?? []);
+        $removed = $this->filterRstChanges($pushEvent->commit['removed'] ?? []);
+        if (count($added) + count($modified) + count($removed) === 0) {
+            // no rst files changed, nothing to do
+            return;
+        }
+        $githubRawBaseUrl = sprintf('https://raw.githubusercontent.com/%s/%s', $pushEvent->repositoryFullName, $pushEvent->commit['id']);
+
+        $changedDocuments = [
+            'added' => $added,
+            'modified' => $modified,
+            'removed' => $removed,
+        ];
+        $typeLabels = [
+            'added' => ':heavy_plus_sign: Added files',
+            'modified' => ':heavy_division_sign: Modified files',
+            'removed' => ':heavy_minus_sign: Removed files',
+        ];
+
+        $body = [];
+        $body[] = sprintf(':information_source: View this commit [on Github](%s)', $pushEvent->commit['url']);
+        $body[] = sprintf(':busts_in_silhouette: Authored by %s %s', $pushEvent->commit['author']['name'], $pushEvent->commit['author']['email']);
+        $body[] = sprintf(":heavy_check_mark: Merged by %s %s\n", $pushEvent->commit['committer']['name'], $pushEvent->commit['committer']['email']);
+        $body[] = "## Commit message\n";
+        $body[] = sprintf("%s\n", $pushEvent->commit['message']);
+
+        $labels = [];
+
+        foreach ($changedDocuments as $type => $files) {
+            if (count($files) === 0) {
+                continue;
+            }
+
+            $typeLabel = $typeLabels[$type];
+            $body[] = sprintf("## %s\n", $typeLabel);
+
+            foreach ($files as $file) {
+                $fullRawUrl = sprintf('%s/%s', $githubRawBaseUrl, $file);
+                try {
+                    $response = $this->client->request('GET', $fullRawUrl);
+                } catch (BadResponseException $e) {
+                    continue;
+                }
+                $changelogContent = (string)$response->getBody();
+
+                $version = basename(dirname($file));
+                $labels[] = $version;
+
+                $body[] = '<details>';
+                $body[] = sprintf("<summary>%s/%s</summary>\n\n", $version, basename($file));
+                $body[] = sprintf("```rst\n%s\n```\n", $changelogContent);
+                $body[] = '</details>' . "\n";
+            }
+        }
+
+        $requestUrl = sprintf('https://api.github.com/repos/%s/issues', $githubChangelogToLogRepository);
+        $payload = [
+            'title' => $pushEvent->headCommitTitle,
+            'body' => implode("\n", $body),
+            'labels' => array_values(array_unique($labels)),
+        ];
+
+        $this->client->request('POST', $requestUrl, [
+            'headers' => [
+                'Authorization' => 'token ' . $this->accessKey
+            ],
+            'json' => $payload,
+        ]);
+    }
+
     /**
      * Triggers new build in project TYPO3-Documentation/t3docs-ci-deploy
      *
@@ -224,5 +299,16 @@ class GithubService
             ]
         );
         return new BambooBuildTriggered(json_encode(['buildResultKey' => $id]));
+    }
+
+    /**
+     * @param string[] $files
+     * @return string[]
+     */
+    private function filterRstChanges(array $files): array
+    {
+        return array_filter($files, static function (string $file) {
+            return str_ends_with($file, '.rst');
+        });
     }
 }
