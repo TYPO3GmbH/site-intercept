@@ -35,6 +35,7 @@ use Symplify\GitWrapper\GitWrapper;
  */
 class CoreSplitService
 {
+    private string $projectDir;
     private LoggerInterface $logger;
 
     /**
@@ -73,14 +74,8 @@ class CoreSplitService
     private GithubPushEventForCore $event;
     private EntityManagerInterface $entityManager;
 
-    /**
-     * @param LoggerInterface $logger
-     * @param string $splitCorePath
-     * @param string $splitMonoRepo
-     * @param string $splitSingleRepoBase
-     * @param string $splitSingleRepoPath
-     */
     public function __construct(
+        string $projectDir,
         LoggerInterface $logger,
         string $splitCorePath,
         string $splitMonoRepo,
@@ -89,6 +84,7 @@ class CoreSplitService
         GitOutputListener $gitOutputListener,
         EntityManagerInterface $entityManager
     ) {
+        $this->projectDir = $projectDir;
         $this->logger = $logger;
         $this->splitCorePath = $splitCorePath;
         $this->splitMonoRepo = $splitMonoRepo;
@@ -151,7 +147,7 @@ class CoreSplitService
             $execOutput = [];
             $execExitCode = 0;
             $command = 'cd ' . escapeshellarg($this->splitCorePath) . ' && '
-                       . escapeshellcmd('../../bin/' . $splitBinary)
+                       . escapeshellcmd($this->projectDir . '/bin/' . $splitBinary)
                        . ' --prefix=' . escapeshellarg('typo3/sysext/' . $extension)
                        . ' --origin=' . escapeshellarg('origin/' . $event->sourceBranch)
                        . ' 2>&1';

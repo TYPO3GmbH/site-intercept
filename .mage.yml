@@ -38,8 +38,8 @@ magephp:
       pre-deploy:
         - exec: { cmd: "echo \"APP_ENV=prod\" >> .env.local"}
         - composer/install: { flags: "--no-dev --optimize-autoloader"}
-        - exec: { cmd: "yarn install --silent"}
-        - exec: { cmd: "yarn build"}
+        - exec: { cmd: "npm ci"}
+        - exec: { cmd: "npm run build"}
       on-deploy:
         - exec: { cmd: "rm -Rf var/log"}
         - fs/link: { from: "../../../../shared/var/log", to: "var/log" }
@@ -74,8 +74,8 @@ magephp:
       pre-deploy:
         - exec: { cmd: "echo \"APP_ENV=prod\" >> .env.local"}
         - composer/install: { flags: "--no-dev --optimize-autoloader"}
-        - exec: { cmd: "yarn install --silent"}
-        - exec: { cmd: "yarn build"}
+        - exec: { cmd: "npm ci"}
+        - exec: { cmd: "npm run build"}
       on-deploy:
         - exec: { cmd: "rm -Rf var/log"}
         - fs/link: { from: "../../../../shared/var/log", to: "var/log" }

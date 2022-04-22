@@ -42,7 +42,7 @@ class ComposerJson
      */
     public function getType(): string
     {
-        $type = (string)($this->composerJson['type']);
+        $type = (string)($this->composerJson['type'] ?? '');
         if (!str_contains($type, 'typo3-cms')) {
             $type = 'other';
         }
@@ -63,7 +63,7 @@ class ComposerJson
      */
     public function getCoreRequirement(): ?string
     {
-        return $this->composerJson['require']['typo3/cms-core'] ?? $this->composerJson['require']['typo3/cms'] ?? null;
+        return $this->composerJson['require']['typo3/cms-core'] ?? $this->composerJson['require-dev']['typo3/cms-core'] ?? $this->composerJson['require']['typo3/cms'] ?? null;
     }
 
     /**
