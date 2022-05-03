@@ -23,6 +23,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
 class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
@@ -59,11 +60,20 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->addRabbitManagementClientProphecy();
         $slackClient = $this->addSlackClientProphecy();
         $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
+        $generalClientProphecy = $this->getGeneralClientProphecy([
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json', __DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/README.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Readme.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Settings.cfg', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Settings.cfg'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Index.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Index.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Includes.rst.txt', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Includes.rst.txt'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Sitemap.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Sitemap.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/genindex.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Genindex.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/_make/Makefile', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Sitemap/Index.rst', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Includes.txt', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Settings.yml', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Targets.rst', ''],
+        ]);
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
         $githubClientProphecy = $this->prophesize(GithubClient::class);
@@ -86,11 +96,21 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     {
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
+        $generalClientProphecy = $this->getGeneralClientProphecy([
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json', __DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/README.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Readme.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Settings.cfg', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Settings.cfg'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Index.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Index.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Includes.rst.txt', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Includes.rst.txt'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Sitemap.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Sitemap.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/genindex.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Genindex.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/_make/Makefile', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Sitemap/Index.rst', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Includes.txt', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Settings.yml', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Targets.rst', ''],
+        ]);
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
         $slackClientProphecy = $this->prophesize(SlackClient::class);
         $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
@@ -112,12 +132,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->entityManager->persist($jar);
         $this->entityManager->flush();
 
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
         $githubClientProphecy = $this->prophesize(GithubClient::class);
         $githubClientProphecy
             ->post(
@@ -142,16 +156,33 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     {
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json')));
+        $generalClientProphecy = $this->getGeneralClientProphecy([
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json', __DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/README.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Readme.rst'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/Settings.cfg', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Settings.cfg'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/Index.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Index.rst'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/Includes.rst.txt', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Includes.rst.txt'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/Sitemap.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Sitemap.rst'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/genindex.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Genindex.rst'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/_make/Makefile', ''],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/Sitemap/Index.rst', ''],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/Includes.txt', ''],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/Settings.yml', ''],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/Documentation/Targets.rst', ''],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/composer.json', __DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/README.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Readme.rst'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/Settings.cfg', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Settings.cfg'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/Index.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Index.rst'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/Includes.rst.txt', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Includes.rst.txt'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/Sitemap.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Sitemap.rst'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/genindex.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Genindex.rst'],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/_make/Makefile', ''],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/Sitemap/Index.rst', ''],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/Includes.txt', ''],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/Settings.yml', ''],
+            ['https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/Documentation/Targets.rst', ''],
+        ]);
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
-        $generalClientProphecy
-            ->request('GET', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json')));
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
         $slackClientProphecy = $this->prophesize(SlackClient::class);
         $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
@@ -227,11 +258,9 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->addRabbitManagementClientProphecy();
         $slackClient = $this->addSlackClientProphecy();
         $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooBadRequestComposerWithoutDependency.json')));
+        $generalClientProphecy = $this->getGeneralClientProphecy([
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json', __DIR__ . '/Fixtures/DocsToBambooBadRequestComposerWithoutDependency.json'],
+        ]);
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
         $kernel = new Kernel('test', true);
@@ -254,11 +283,21 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     {
         $this->addRabbitManagementClientProphecy();
         $this->addRabbitManagementClientProphecy();
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
+        $generalClientProphecy = $this->getGeneralClientProphecy([
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json', __DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/README.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Readme.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Settings.cfg', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Settings.cfg'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Index.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Index.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Includes.rst.txt', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Includes.rst.txt'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Sitemap.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Sitemap.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/genindex.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Genindex.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/_make/Makefile', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Sitemap/Index.rst', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Includes.txt', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Settings.yml', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Targets.rst', ''],
+        ]);
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
         TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
         $slackClientProphecy = $this->prophesize(SlackClient::class);
         $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
@@ -279,13 +318,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $jar->setApproved(true);
         $this->entityManager->persist($jar);
         $this->entityManager->flush();
-
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
         $githubClientProphecy = $this->prophesize(GithubClient::class);
         $githubClientProphecy
@@ -328,6 +360,41 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
+    public function githubBuildIsNotTriggeredDueToInvalidDocs(): void
+    {
+        $this->addRabbitManagementClientProphecy();
+        $slackClient = $this->addSlackClientProphecy();
+        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
+        $generalClientProphecy = $this->getGeneralClientProphecy([
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json', __DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/README.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Readme_Invalid.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Settings.cfg', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Settings_Invalid.cfg'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Index.rst', __DIR__ . '/../Unit/Service/Fixtures/File_Documentation_Index_Invalid.rst'],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Includes.rst.txt', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Sitemap.rst', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/genindex.rst', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/_make/Makefile', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Sitemap/Index.rst', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Includes.txt', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Settings.yml', ''],
+            ['https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/Documentation/Targets.rst', ''],
+        ]);
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+
+        $kernel = new Kernel('test', true);
+        $kernel->boot();
+        DatabasePrimer::prime($kernel);
+
+        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
+        $response = $kernel->handle($request);
+        $this->assertSame('Documentation format is invalid. See https://intercept.typo3.com for more information.', $response->getContent());
+        $this->assertSame(412, $response->getStatusCode());
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * @test
+     */
     public function githubPingIsHandled(): void
     {
         $this->addRabbitManagementClientProphecy();
@@ -343,5 +410,20 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertStringContainsString('github ping', $response->getContent());
         $kernel->terminate($request, $response);
+    }
+
+    private function getGeneralClientProphecy(array $requests): ObjectProphecy
+    {
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        foreach ($requests as $request) {
+            $generalClientProphecy
+                ->request('GET', $request[0])
+                ->shouldBeCalled()
+                ->willReturn(new Response(
+                        !empty($request[1]) ? 200 : 404, [],
+                        !empty($request[1]) ? file_get_contents($request[1]) : null)
+                );
+        }
+        return $generalClientProphecy;
     }
 }

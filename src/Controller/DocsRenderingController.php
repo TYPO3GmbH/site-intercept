@@ -20,6 +20,7 @@ use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DocsNoRstChangesException;
+use App\Exception\DocsNotValidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\GitBranchDeletedException;
@@ -27,6 +28,7 @@ use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Repository\RepositoryBlacklistEntryRepository;
 use App\Service\DocumentationBuildInformationService;
+use App\Service\DocumentationValidationService;
 use App\Service\GithubService;
 use App\Service\MailService;
 use App\Service\WebHookService;
@@ -50,6 +52,7 @@ class DocsRenderingController extends AbstractController
      * @param GithubService $githubService
      * @param WebHookService $webhookService
      * @param DocumentationBuildInformationService $documentationBuildInformationService
+     * @param DocumentationValidationService $documentationValidationService
      * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
      * @param LoggerInterface $logger
      * @param MailService $mailService
@@ -60,6 +63,7 @@ class DocsRenderingController extends AbstractController
         GithubService $githubService,
         WebHookService $webhookService,
         DocumentationBuildInformationService $documentationBuildInformationService,
+        DocumentationValidationService $documentationValidationService,
         RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
         LoggerInterface $logger,
         MailService $mailService
@@ -101,6 +105,7 @@ class DocsRenderingController extends AbstractController
                     $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
                     $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
                     $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
+                    $documentationValidationService->validate($pushEvent, $composerAsObject);
                     $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
                     // Trigger build only if status is not already "I'm rendering". Else, only set a flag that re-rendering is needed.
                     // The re-render flag is used and reset by the post build controller if it is set, to trigger a new
@@ -288,13 +293,43 @@ class DocsRenderingController extends AbstractController
                     try {
                         $author = $composerAsObject->getFirstAuthor();
                         if (filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
-                            $mailService->sendMailToAuthorDueToMissingDependency($pushEvent, $composerAsObject, $e->getMessage());
+                            $mailService->sendMailToAuthorDueToFailedRendering($pushEvent, $composerAsObject, $e->getMessage());
                         }
                     } catch (DocsComposerMissingValueException $e) {
                         // Do not send mail if 'authors' is not set in composer.json
                     }
                     $erroredPushes++;
                     $errorMessage = 'Dependencies are not fulfilled. See https://intercept.typo3.com for more information.';
+                    continue;
+                } catch (DocsNotValidException $e) {
+                    $manager->persist(
+                        (new HistoryEntry())
+                            ->setType(HistoryEntryType::DOCS_RENDERING)
+                            ->setStatus(DocsRenderingHistoryStatus::INVALID_DOCS)
+                            ->setData(
+                                [
+                                    'type' => HistoryEntryType::DOCS_RENDERING,
+                                    'status' => DocsRenderingHistoryStatus::INVALID_DOCS,
+                                    'triggeredBy' => HistoryEntryTrigger::API,
+                                    'exceptionCode' => $e->getCode(),
+                                    'exceptionMessage' => $e->getMessage(),
+                                    'repository' => $pushEvent->getRepositoryUrl(),
+                                    'sourceBranch' => $pushEvent->getVersionString(),
+                                    'user' => $userIdentifier
+                                ]
+                            )
+                    );
+                    $manager->flush();
+                    try {
+                        $author = $composerAsObject->getFirstAuthor();
+                        if (filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
+                            $mailService->sendMailToAuthorDueToFailedRendering($pushEvent, $composerAsObject, $e->getMessage());
+                        }
+                    } catch (DocsComposerMissingValueException $e) {
+                        // Do not send mail if 'authors' is not set in composer.json
+                    }
+                    $erroredPushes++;
+                    $errorMessage = 'Documentation format is invalid. See https://intercept.typo3.com for more information.';
                     continue;
                 }
             }

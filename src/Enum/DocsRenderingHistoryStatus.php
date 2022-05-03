@@ -21,6 +21,7 @@ final class DocsRenderingHistoryStatus
     const NO_RELEVANT_BRANCH_OR_TAG = 'noRelevantBranchOrTag';
     const MISSING_VALUE_IN_COMPOSER_JSON = 'missingValueInComposerJson';
     const CORE_DEPENDENCY_NOT_SET = 'coreDependencyNotSet';
+    const INVALID_DOCS = 'invalidDocs';
     const UNSUPPORTED_HOOK = 'unsupportedHook';
     const BRANCH_DELETED = 'branchDeleted';
     const BRANCH_NO_RST_CHANGES = 'branchNoRstChanges';
@@ -37,6 +38,7 @@ final class DocsRenderingHistoryStatus
         self::NO_RELEVANT_BRANCH_OR_TAG,
         self::MISSING_VALUE_IN_COMPOSER_JSON,
         self::CORE_DEPENDENCY_NOT_SET,
+        self::INVALID_DOCS,
         self::UNSUPPORTED_HOOK,
         self::BRANCH_DELETED,
         self::BRANCH_NO_RST_CHANGES,
@@ -57,6 +59,7 @@ final class DocsRenderingHistoryStatus
         self::NO_RELEVANT_BRANCH_OR_TAG => 'No relevant branch or tag found.',
         self::MISSING_VALUE_IN_COMPOSER_JSON => 'Missing value in composer.json.',
         self::CORE_DEPENDENCY_NOT_SET => 'Dependency to typo3/core not set.',
+        self::INVALID_DOCS => 'Invalid documentation.',
         self::UNSUPPORTED_HOOK => 'Unsupported hook format.',
         self::BRANCH_DELETED => 'Branch has been deleted.',
         self::BRANCH_NO_RST_CHANGES => 'Branch has no rst file changes.',

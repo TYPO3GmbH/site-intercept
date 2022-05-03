@@ -104,10 +104,10 @@ class WebHookService
         $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
         $repositoryUrl = (string)$payload->repository->git_http_url;
         $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
-        $urlToComposerFile = (new GitRepositoryService())
-            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITLAB);
+        $fileUrlFormat = (new GitRepositoryService())
+            ->resolvePublicFileUrlByPayload('{file}', $payload, GitRepositoryService::SERVICE_GITLAB);
 
-        return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile)];
+        return [new PushEvent($repositoryUrl, $versionString, $fileUrlFormat)];
     }
 
     /**
@@ -164,10 +164,10 @@ class WebHookService
 
         $repositoryUrl = (string)$payload->repository->clone_url;
         $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
-        $urlToComposerFile = (new GitRepositoryService())
-            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITHUB);
+        $fileUrlFormat = (new GitRepositoryService())
+            ->resolvePublicFileUrlByPayload('{file}', $payload, GitRepositoryService::SERVICE_GITHUB);
 
-        return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile)];
+        return [new PushEvent($repositoryUrl, $versionString, $fileUrlFormat)];
     }
 
     protected function pushEventFromBitbucketCloudChange(stdClass $payload, stdClass $change): PushEvent
@@ -183,10 +183,10 @@ class WebHookService
         if (is_int(strpos($repositoryUrl, '/commits/'))) {
             $repositoryUrl = substr($repositoryUrl, 0, strpos($repositoryUrl, '/commits/'));
         }
-        $urlToComposerFile = (new GitRepositoryService())
-            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET_CLOUD);
+        $fileUrlFormat = (new GitRepositoryService())
+            ->resolvePublicFileUrlByPayload('{file}', $payload, GitRepositoryService::SERVICE_BITBUCKET_CLOUD);
 
-        return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
+        return new PushEvent($repositoryUrl, $versionString, $fileUrlFormat);
     }
 
     protected function pushEventFromBitbucketServerChange(stdClass $payload, stdClass $change): PushEvent
@@ -209,9 +209,9 @@ class WebHookService
             throw new UnsupportedWebHookRequestException('Private repositories are not supported.', 1594283381);
         }
 
-        $urlToComposerFile = (new GitRepositoryService())
-            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET_SERVER);
+        $fileUrlFormat = (new GitRepositoryService())
+            ->resolvePublicFileUrlByPayload('{file}', $payload, GitRepositoryService::SERVICE_BITBUCKET_SERVER);
 
-        return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
+        return new PushEvent($repositoryUrl, $versionString, $fileUrlFormat);
     }
 }

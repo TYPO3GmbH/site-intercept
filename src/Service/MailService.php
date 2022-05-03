@@ -35,13 +35,13 @@ class MailService
      * @param string $exceptionMessage
      * @return int
      */
-    public function sendMailToAuthorDueToMissingDependency(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
+    public function sendMailToAuthorDueToFailedRendering(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
     {
         try {
             $author = $composerJson->getFirstAuthor();
             $message = $this->createMessageWithTemplate(
                 'Documentation rendering failed',
-                'email/docs/renderingFailedDueToMissingDependency.html.twig',
+                'email/docs/renderingFailed.html.twig',
                 [
                     'author' => $author,
                     'package' => $composerJson->getName(),

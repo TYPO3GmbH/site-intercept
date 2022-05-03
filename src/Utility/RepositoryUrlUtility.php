@@ -42,7 +42,7 @@ class RepositoryUrlUtility
             '{repoName}' => $packageParts[0] . '/' . str_replace('.git', '', $packageParts[1]),
             '{version}' => $branch,
         ];
-        return (new GitRepositoryService())->resolvePublicComposerJsonUrl($repoService, $parameters);
+        return (new GitRepositoryService())->resolvePublicFileUrl('composer.json', $parameters, $repoService);
     }
 
     private static function extractFromGithub(string $repositoryUrl, string $branch): string
@@ -53,7 +53,7 @@ class RepositoryUrlUtility
             '{repoName}' => $packageParts[0] . '/' . $packageParts[1],
             '{version}' => $branch,
         ];
-        return (new GitRepositoryService())->resolvePublicComposerJsonUrl($repoService, $parameters);
+        return (new GitRepositoryService())->resolvePublicFileUrl('composer.json', $parameters, $repoService);
     }
 
     private static function extractFromGitlab(string $repositoryUrl, string $branch): string
@@ -63,7 +63,7 @@ class RepositoryUrlUtility
             '{baseUrl}' => str_replace('.git', '', $repositoryUrl),
             '{version}' => $branch,
         ];
-        return (new GitRepositoryService())->resolvePublicComposerJsonUrl($repoService, $parameters);
+        return (new GitRepositoryService())->resolvePublicFileUrl('composer.json', $parameters, $repoService);
     }
 
     private static function extractFromSelfHostedBitBucket(string $repositoryUrl, string $branch): string
@@ -84,7 +84,7 @@ class RepositoryUrlUtility
             '{version}' => $branch,
             '{type}' => $tag ? 'tags' : 'heads',
         ];
-        return (new GitRepositoryService())->resolvePublicComposerJsonUrl($repoService, $parameters);
+        return (new GitRepositoryService())->resolvePublicFileUrl('composer.json', $parameters, $repoService);
     }
 
     public static function resolveComposerJsonUrl(string $repositoryUrl, string $branch, string $repositoryType = null): string

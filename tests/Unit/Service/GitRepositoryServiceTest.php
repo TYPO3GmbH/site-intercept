@@ -31,7 +31,7 @@ class GitRepositoryServiceTest extends TestCase
      */
     public function composerJsonUrlIsResolvedByPayload(string $expectedUrl, \stdClass $payload, string $repoService)
     {
-        $composerJsonUrl = $this->subject->resolvePublicComposerJsonUrlByPayload($payload, $repoService);
+        $composerJsonUrl = $this->subject->resolvePublicFileUrlByPayload('composer.json', $payload, $repoService);
 
         $this->assertSame($expectedUrl, $composerJsonUrl, 'Resolved composer json url did not match.');
     }

@@ -28,33 +28,33 @@ class GitRepositoryService
         self::SERVICE_BITBUCKET_SERVER => 'Bitbucket Server'
     ];
 
-    protected array $composerJsonUrlFormat = [
-        self::SERVICE_BITBUCKET_CLOUD => '{baseUrl}/{repoName}/raw/{version}/composer.json',
-        self::SERVICE_BITBUCKET_SERVER => '{baseUrl}/projects/{project}/repos/{package}/raw/composer.json?at=refs%2F{type}%2F{version}',
-        self::SERVICE_GITLAB => '{baseUrl}/raw/{version}/composer.json',
-        self::SERVICE_GITHUB => 'https://raw.githubusercontent.com/{repoName}/{version}/composer.json',
+    protected array $fileUrlFormat = [
+        self::SERVICE_BITBUCKET_CLOUD => '{baseUrl}/{repoName}/raw/{version}/{file}',
+        self::SERVICE_BITBUCKET_SERVER => '{baseUrl}/projects/{project}/repos/{package}/raw/{file}?at=refs%2F{type}%2F{version}',
+        self::SERVICE_GITLAB => '{baseUrl}/raw/{version}/{file}',
+        self::SERVICE_GITHUB => 'https://raw.githubusercontent.com/{repoName}/{version}/{file}',
     ];
 
     protected array $allowedBranches = ['master', 'main', 'documentation-draft'];
 
-    public function resolvePublicComposerJsonUrlByPayload(stdClass $payload, string $repoService): string
+    public function resolvePublicFileUrlByPayload(string $file, stdClass $payload, string $repoService): string
     {
         switch ($repoService) {
             case self::SERVICE_BITBUCKET_SERVER:
             case self::SERVICE_BITBUCKET_CLOUD:
-                return $this->getPublicComposerUrlForBitbucket($payload);
+                return $this->getPublicFileUrlForBitbucket($file, $payload);
             case self::SERVICE_GITHUB:
-                return $this->getPublicComposerUrlForGithub($payload);
+                return $this->getPublicFileUrlForGithub($file, $payload);
             case self::SERVICE_GITLAB:
-                return $this->getPublicComposerUrlForGitlab($payload);
+                return $this->getPublicFileUrlForGitlab($file, $payload);
             default:
                 return '';
         }
     }
 
-    public function resolvePublicComposerJsonUrl(string $repoService, array $parameters): string
+    public function resolvePublicFileUrl(string $file, array $parameters, string $repoService): string
     {
-        return $this->getParsedUrl($this->composerJsonUrlFormat[$repoService], $parameters);
+        return $this->getParsedUrl($this->fileUrlFormat[$repoService], array_merge($parameters, ['{file}' => $file]));
     }
 
     public function getBranchesFromRepositoryUrl(string $repositoryUrl): array
@@ -114,13 +114,14 @@ class GitRepositoryService
         return $process->getOutput();
     }
 
-    protected function getPublicComposerUrlForBitbucket(stdClass $payload): string
+    protected function getPublicFileUrlForBitbucket(string $file, stdClass $payload): string
     {
         if (isset($payload->repository->links->html->href, $payload->repository->full_name, $payload->push->changes[0]->new->name)) {
-            return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_BITBUCKET_CLOUD], [
+            return $this->getParsedUrl($this->fileUrlFormat[self::SERVICE_BITBUCKET_CLOUD], [
                 '{baseUrl}' => 'https://bitbucket.org',
                 '{repoName}' => (string)$payload->repository->full_name,
                 '{version}' => (string)$payload->push->changes[0]->new->name,
+                '{file}' => $file,
             ]);
         }
 
@@ -129,30 +130,33 @@ class GitRepositoryService
             $tag = true;
         }
 
-        return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_BITBUCKET_SERVER], [
+        return $this->getParsedUrl($this->fileUrlFormat[self::SERVICE_BITBUCKET_SERVER], [
             '{baseUrl}' => 'https://' . explode('/', str_replace('https://', '', (string)$payload->repository->links->self[0]->href))[0],
             '{package}' => (string)$payload->repository->name,
             '{project}' => (string)$payload->repository->project->key,
+            '{file}' => $file,
             '{version}' => (string)$payload->changes[0]->ref->displayId,
             '{type}' => $tag ? 'tags' : 'heads',
         ]);
     }
 
-    protected function getPublicComposerUrlForGitlab(stdClass $payload): string
+    protected function getPublicFileUrlForGitlab(string $file, stdClass $payload): string
     {
-        return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_GITLAB], [
+        return $this->getParsedUrl($this->fileUrlFormat[self::SERVICE_GITLAB], [
             '{baseUrl}' => (string)$payload->project->web_url,
             '{version}' => str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref),
+            '{file}' => $file,
         ]);
     }
 
-    protected function getPublicComposerUrlForGithub(stdClass $payload): string
+    protected function getPublicFileUrlForGithub(string $file, stdClass $payload): string
     {
         $version = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
 
-        return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_GITHUB], [
+        return $this->getParsedUrl($this->fileUrlFormat[self::SERVICE_GITHUB], [
             '{repoName}' => (string)$payload->repository->full_name,
             '{version}' => $version,
+            '{file}' => $file,
         ]);
     }
 

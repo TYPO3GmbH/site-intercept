@@ -94,7 +94,7 @@ service.
 
 Changes to intercept should go to the develop branch. This branch is deployed to stage
 https://stage.intercept.typo3.com/ - the master branch is updated by creating a new release
-via gitflow workflow and is deployed to live by github actionts.
+via gitflow workflow and is deployed to live by github actions.
 
 
 ## Installation & upgrading

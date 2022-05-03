@@ -25,19 +25,19 @@ class PushEvent
      */
     protected string $repositoryUrl;
 
-    protected string $urlToComposerFile;
+    protected string $fileUrlFormat;
 
     /**
      * PushEvent constructor.
      * @param string $repositoryUrl
      * @param string $versionString
-     * @param string $urlToComposerFile
+     * @param string $fileUrlFormat
      */
-    public function __construct(string $repositoryUrl, string $versionString, string $urlToComposerFile)
+    public function __construct(string $repositoryUrl, string $versionString, string $fileUrlFormat)
     {
         $this->repositoryUrl = $repositoryUrl;
         $this->versionString = $versionString;
-        $this->urlToComposerFile = $urlToComposerFile;
+        $this->fileUrlFormat = $fileUrlFormat;
     }
 
     /**
@@ -61,6 +61,14 @@ class PushEvent
      */
     public function getUrlToComposerFile(): string
     {
-        return $this->urlToComposerFile;
+        return $this->getUrlToFile('composer.json');
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlToFile(string $file): string
+    {
+        return str_replace('{file}', $file, $this->fileUrlFormat);
     }
 }
