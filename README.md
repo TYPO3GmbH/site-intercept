@@ -230,3 +230,40 @@ time find ../var/docs-build-information/ ! -type d | parallel "./move.sh {}"
 # rsync rendered docs to live
 ./upload.sh
 ```
+
+### Debugging locally
+
+1. Add server to project configuration for frontend and command line testing:
+
+    - host "intercept.ddev.site"
+    - port "80"
+    - path mapping: map project root to "/var/www/html" on server
+
+2. Add server to project configuration for API request testing:
+
+    - host "web"
+    - port "4717"
+    - path mapping: map project root to "/var/www/html" on server
+
+3. Enable DDEV debugging with
+
+    ```
+    ddev xdebug on
+    ```
+
+4. Listen for incoming PHP debug connections in your IDE.
+
+5. Set breakpoint in arbitrary controller and navigate to related route in intercept frontend.
+   Confirm that code execution is stopping at the specific line in the IDE.
+
+6. Set breakpoint in arbitrary controller and execute a related command on command line.
+   Confirm that code execution is stopping at the specific line in the IDE.
+
+7. Set breakpoint in arbitrary controller and send HTTP request to related route in intercept API.
+   Confirm that code execution is stopping at the specific line in the IDE.
+
+8. Disable DDEV debugging with
+
+    ```
+    ddev xdebug off
+    ```
