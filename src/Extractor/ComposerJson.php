@@ -70,10 +70,12 @@ class ComposerJson
      * @return array
      * @throws DocsComposerMissingValueException
      */
-    public function getFirstAuthor(): array
+    public function getAuthorsWithEmailAddress(): array
     {
         $this->assertPropertyContainsValue('authors');
-        return current($this->composerJson['authors']);
+        return array_filter($this->composerJson['authors'], function ($author) {
+            return filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL);
+        });
     }
 
     /**

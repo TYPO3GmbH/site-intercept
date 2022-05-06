@@ -1,6 +1,6 @@
 {% set active = 'renderingFailed' %}
 
-Hi {{ author.name }},
+Hi {{ author.name|default('documentation author') }} and team,
 
 Rendering the documentation for {{ package }} failed for the indicated reasons below.
 

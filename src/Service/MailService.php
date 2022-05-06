@@ -35,30 +35,32 @@ class MailService
      * @param string $exceptionMessage
      * @return int
      */
-    public function sendMailToAuthorDueToFailedRendering(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
+    public function sendMailToAuthorsDueToFailedRendering(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
     {
         try {
-            $author = $composerJson->getFirstAuthor();
-            $message = $this->createMessageWithTemplate(
-                'Documentation rendering failed',
-                'email/docs/renderingFailed.html.twig',
-                'email/docs/renderingFailed.txt.twig',
-                [
-                    'author' => $author,
-                    'package' => $composerJson->getName(),
-                    'pushEvent' => $pushEvent,
-                    'reasonPhrase' => $exceptionMessage,
-                ]
-            );
-            if (!empty($author['email'])) {
+            $authors = $composerJson->getAuthorsWithEmailAddress();
+            if (count($authors)) {
+                $firstAuthor = array_shift($authors);
+                $message = $this->createMessageWithTemplate(
+                    'Documentation rendering failed',
+                    'email/docs/renderingFailed.html.twig',
+                    'email/docs/renderingFailed.txt.twig',
+                    [
+                        'author' => $firstAuthor,
+                        'package' => $composerJson->getName(),
+                        'pushEvent' => $pushEvent,
+                        'reasonPhrase' => $exceptionMessage,
+                    ]
+                );
                 $message
                     ->setFrom('intercept@typo3.com')
-                    ->setTo($composerJson->getFirstAuthor()['email']);
+                    ->setTo($firstAuthor['email'])
+                    ->setCc(array_map(function ($author) { return $author['email']; }, $authors));
             } else {
                 return 0;
             }
         } catch (DocsComposerMissingValueException $e) {
-            // Thrown if author is not set, we can't send a mail, then.
+            // Thrown if authors are not set, we can't send a mail, then.
             return 0;
         }
 

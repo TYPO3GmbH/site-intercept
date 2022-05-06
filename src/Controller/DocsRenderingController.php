@@ -290,14 +290,7 @@ class DocsRenderingController extends AbstractController
                             )
                     );
                     $manager->flush();
-                    try {
-                        $author = $composerAsObject->getFirstAuthor();
-                        if (filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
-                            $mailService->sendMailToAuthorDueToFailedRendering($pushEvent, $composerAsObject, $e->getMessage());
-                        }
-                    } catch (DocsComposerMissingValueException $e) {
-                        // Do not send mail if 'authors' is not set in composer.json
-                    }
+                    $mailService->sendMailToAuthorsDueToFailedRendering($pushEvent, $composerAsObject, $e->getMessage());
                     $erroredPushes++;
                     $errorMessage = 'Dependencies are not fulfilled. See https://intercept.typo3.com for more information.';
                     continue;
@@ -320,14 +313,7 @@ class DocsRenderingController extends AbstractController
                             )
                     );
                     $manager->flush();
-                    try {
-                        $author = $composerAsObject->getFirstAuthor();
-                        if (filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
-                            $mailService->sendMailToAuthorDueToFailedRendering($pushEvent, $composerAsObject, $e->getMessage());
-                        }
-                    } catch (DocsComposerMissingValueException $e) {
-                        // Do not send mail if 'authors' is not set in composer.json
-                    }
+                    $mailService->sendMailToAuthorsDueToFailedRendering($pushEvent, $composerAsObject, $e->getMessage());
                     $erroredPushes++;
                     $errorMessage = 'Documentation format is invalid. See https://intercept.typo3.com for more information.';
                     continue;
