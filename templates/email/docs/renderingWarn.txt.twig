@@ -1,0 +1,15 @@
+Hi {{ author.name|default('documentation author') }} and team,
+
+Rendering the documentation for {{ package }} was successful, but generated the warnings shown below.
+
+{{ reasonPhrase }}
+
+--
+Repository: {{ pushEvent.repositoryUrl }}
+Tag or branch: {{ pushEvent.versionString }}
+--
+Reply to this email directly or join our Slack channel #documentation-team:
+https://typo3.slack.com/archives/C028JEPJL
+and view it on Intercept:
+https://intercept.typo3.com/admin/docs/deployments .
+You are receiving this because you are mentioned in the project's composer.json.

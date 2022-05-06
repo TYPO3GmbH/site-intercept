@@ -40,8 +40,14 @@ class DocumentationValidationService
         $errors = $this->validateFiles($files, $composerJson);
 
         if (count($errors)) {
+            // Handle documentation validation errors gently for a grace period. Adapt this message when the grace
+            // period has expired.
             $message = "The documentation format is outdated:\n\n";
             $message.= "- " . implode("\n- ", $errors);
+            $message.= "\n\n";
+            $message.= "Use the current grace period to fix the documentation warnings and adapt them to the TYPO3 documentation standards [1][2].\n\n";
+            $message.= "[1] https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/GeneralConventions/FileStructure.html\n";
+            $message.= "[2] https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/UserRoundTrip.html";
             throw new DocsNotValidException($message, 1651671307);
         }
     }

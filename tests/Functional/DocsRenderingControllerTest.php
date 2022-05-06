@@ -358,9 +358,12 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
     }
 
     /**
+     * Handle documentation validation errors gently for a grace period. Adapt this test when the grace period has
+     * expired.
+     *
      * @test
      */
-    public function githubBuildIsNotTriggeredDueToInvalidDocs(): void
+    public function githubBuildIsTriggeredAlthoughInvalidDocs(): void
     {
         $this->addRabbitManagementClientProphecy();
         $slackClient = $this->addSlackClientProphecy();
@@ -387,8 +390,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
 
         $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
         $response = $kernel->handle($request);
-        $this->assertSame('Documentation format is invalid. See https://intercept.typo3.com for more information.', $response->getContent());
-        $this->assertSame(412, $response->getStatusCode());
+        $this->assertEquals(204, $response->getStatusCode());
         $kernel->terminate($request, $response);
     }
 

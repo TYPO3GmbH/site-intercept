@@ -1,0 +1,21 @@
+<p>Hi {{ author.name|default('documentation author') }} and team,</p>
+<p>Rendering the documentation for {{ package }} was successful, but generated the warnings shown below.</p>
+<pre>{{ reasonPhrase }}</pre>
+
+<p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">
+    &mdash;
+    <br>
+    Repository:
+    <a href="{{ pushEvent.repositoryUrl }}" style="color:#ff8700;">{{ pushEvent.repositoryUrl }}</a>
+    <br>
+    Tag or branch:
+    {{ pushEvent.versionString }}
+    <br>
+    &mdash;
+    <br>
+    Reply to this email directly or join our Slack channel
+    <a href="https://typo3.slack.com/archives/C028JEPJL" style="color:#ff8700;">#documentation-team</a>, and
+    view it on <a href="https://intercept.typo3.com/admin/docs/deployments" style="color:#ff8700;">Intercept</a>.
+    <br>
+    You are receiving this because you are mentioned in the project's composer.json.
+</p>

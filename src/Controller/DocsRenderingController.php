@@ -101,11 +101,20 @@ class DocsRenderingController extends AbstractController
                         $manager->flush();
                         continue;
                     }
+                    $historyEntryAdditionalData = [];
                     $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
                     $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
                     $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
                     $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
-                    $documentationValidationService->validate($pushEvent, $composerAsObject);
+                    // Handle documentation validation errors gently for a grace period. Remove this try-catch wrap
+                    // when the grace period has expired.
+                    try {
+                        $documentationValidationService->validate($pushEvent, $composerAsObject);
+                    } catch (DocsNotValidException $e) {
+                        $historyEntryAdditionalData['warningCode'] = $e->getCode();
+                        $historyEntryAdditionalData['warningMessage'] = $e->getMessage();
+                        $mailService->sendMailToAuthorsDueToRenderingWarn($pushEvent, $composerAsObject, $e->getMessage());
+                    }
                     $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
                     // Trigger build only if status is not already "I'm rendering". Else, only set a flag that re-rendering is needed.
                     // The re-render flag is used and reset by the post build controller if it is set, to trigger a new
@@ -143,7 +152,7 @@ class DocsRenderingController extends AbstractController
                                 ->setStatus(HistoryEntryTrigger::API)
                                 ->setGroupEntry($buildTriggered->buildResultKey)
                                 ->setData(
-                                    [
+                                    array_merge([
                                         'type' => HistoryEntryType::DOCS_RENDERING,
                                         'status' => DocsRenderingHistoryStatus::TRIGGERED,
                                         'triggeredBy' => HistoryEntryTrigger::API,
@@ -153,7 +162,7 @@ class DocsRenderingController extends AbstractController
                                         'targetBranch' => $buildInformation->targetBranchDirectory,
                                         'bambooKey' => $buildTriggered->buildResultKey,
                                         'user' => $userIdentifier
-                                    ]
+                                    ], $historyEntryAdditionalData)
                                 )
                         );
                         $manager->flush();
@@ -290,7 +299,7 @@ class DocsRenderingController extends AbstractController
                             )
                     );
                     $manager->flush();
-                    $mailService->sendMailToAuthorsDueToFailedRendering($pushEvent, $composerAsObject, $e->getMessage());
+                    $mailService->sendMailToAuthorsDueToRenderingFail($pushEvent, $composerAsObject, $e->getMessage());
                     $erroredPushes++;
                     $errorMessage = 'Dependencies are not fulfilled. See https://intercept.typo3.com for more information.';
                     continue;
@@ -313,7 +322,7 @@ class DocsRenderingController extends AbstractController
                             )
                     );
                     $manager->flush();
-                    $mailService->sendMailToAuthorsDueToFailedRendering($pushEvent, $composerAsObject, $e->getMessage());
+                    $mailService->sendMailToAuthorsDueToRenderingFail($pushEvent, $composerAsObject, $e->getMessage());
                     $erroredPushes++;
                     $errorMessage = 'Documentation format is invalid. See https://intercept.typo3.com for more information.';
                     continue;

@@ -32,10 +32,48 @@ class MailService
     /**
      * @param PushEvent $pushEvent
      * @param ComposerJson $composerJson
+     * @param string $warningMessage
+     * @return int
+     */
+    public function sendMailToAuthorsDueToRenderingWarn(PushEvent $pushEvent, ComposerJson $composerJson, string $warningMessage): int
+    {
+        try {
+            $authors = $composerJson->getAuthorsWithEmailAddress();
+            if (count($authors)) {
+                $firstAuthor = array_shift($authors);
+                $message = $this->createMessageWithTemplate(
+                    'Documentation rendering warning',
+                    'email/docs/renderingWarn.html.twig',
+                    'email/docs/renderingWarn.txt.twig',
+                    [
+                        'author' => $firstAuthor,
+                        'package' => $composerJson->getName(),
+                        'pushEvent' => $pushEvent,
+                        'reasonPhrase' => $warningMessage,
+                    ]
+                );
+                $message
+                    ->setFrom('intercept@typo3.com')
+                    ->setTo($firstAuthor['email'])
+                    ->setCc(array_map(function ($author) { return $author['email']; }, $authors));
+            } else {
+                return 0;
+            }
+        } catch (DocsComposerMissingValueException $e) {
+            // Thrown if authors are not set, we can't send a mail, then.
+            return 0;
+        }
+
+        return $this->send($message);
+    }
+
+    /**
+     * @param PushEvent $pushEvent
+     * @param ComposerJson $composerJson
      * @param string $exceptionMessage
      * @return int
      */
-    public function sendMailToAuthorsDueToFailedRendering(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
+    public function sendMailToAuthorsDueToRenderingFail(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
     {
         try {
             $authors = $composerJson->getAuthorsWithEmailAddress();
@@ -43,8 +81,8 @@ class MailService
                 $firstAuthor = array_shift($authors);
                 $message = $this->createMessageWithTemplate(
                     'Documentation rendering failed',
-                    'email/docs/renderingFailed.html.twig',
-                    'email/docs/renderingFailed.txt.twig',
+                    'email/docs/renderingFail.html.twig',
+                    'email/docs/renderingFail.txt.twig',
                     [
                         'author' => $firstAuthor,
                         'package' => $composerJson->getName(),
