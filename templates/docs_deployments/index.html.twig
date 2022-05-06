@@ -241,10 +241,22 @@
                                             <span class="message-detail-value">{{ log.data.exceptionCode }}</span>
                                         </div>
                                     {% endif %}
+                                    {% if log.data.exceptionMessage is defined %}
+                                        <div class="message-detail-item">
+                                            <span class="message-detail-key">Exception Message</span>
+                                            <span class="message-detail-value">{{ log.data.exceptionMessage }}</span>
+                                        </div>
+                                    {% endif %}
                                     {% if log.data.warningCode is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Warning Code</span>
                                             <span class="message-detail-value">{{ log.data.warningCode }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if log.data.warningMessage is defined %}
+                                        <div class="message-detail-item">
+                                            <span class="message-detail-key">Warning Message</span>
+                                            <span class="message-detail-value">{{ log.data.warningMessage }}</span>
                                         </div>
                                     {% endif %}
                                 </div>
