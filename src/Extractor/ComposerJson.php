@@ -70,7 +70,7 @@ class ComposerJson
      * @return array
      * @throws DocsComposerMissingValueException
      */
-    public function getAuthorsWithEmailAddress(): array
+    public function getAuthorsHavingEmailAddress(): array
     {
         $this->assertPropertyContainsValue('authors');
         return array_filter($this->composerJson['authors'], function ($author) {

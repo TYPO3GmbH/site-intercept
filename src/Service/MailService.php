@@ -38,7 +38,7 @@ class MailService
     public function sendMailToAuthorsDueToRenderingWarn(PushEvent $pushEvent, ComposerJson $composerJson, string $warningMessage): int
     {
         try {
-            $authors = $composerJson->getAuthorsWithEmailAddress();
+            $authors = $composerJson->getAuthorsHavingEmailAddress();
             if (count($authors)) {
                 $firstAuthor = array_shift($authors);
                 $message = $this->createMessageWithTemplate(
@@ -76,7 +76,7 @@ class MailService
     public function sendMailToAuthorsDueToRenderingFail(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
     {
         try {
-            $authors = $composerJson->getAuthorsWithEmailAddress();
+            $authors = $composerJson->getAuthorsHavingEmailAddress();
             if (count($authors)) {
                 $firstAuthor = array_shift($authors);
                 $message = $this->createMessageWithTemplate(
