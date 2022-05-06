@@ -55,7 +55,9 @@ class MailService
                 $message
                     ->setFrom('intercept@typo3.com')
                     ->setTo($firstAuthor['email'])
-                    ->setCc(array_map(function ($author) { return $author['email']; }, $authors));
+                    ->setCc(array_map(function ($author) {
+                        return $author['email'];
+                    }, $authors));
             } else {
                 return 0;
             }
@@ -93,7 +95,9 @@ class MailService
                 $message
                     ->setFrom('intercept@typo3.com')
                     ->setTo($firstAuthor['email'])
-                    ->setCc(array_map(function ($author) { return $author['email']; }, $authors));
+                    ->setCc(array_map(function ($author) {
+                        return $author['email'];
+                    }, $authors));
             } else {
                 return 0;
             }

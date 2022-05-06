@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the package t3g/intercept.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace App\Tests\Unit\Service;
 
 use App\Client\GeneralClient;
@@ -191,9 +198,12 @@ class DocumentationValidationServiceTest extends TestCase
             $generalClientProphecy
                 ->request('GET', $request[0])
                 ->shouldBeCalled()
-                ->willReturn(new Response(
-                    !empty($request[1]) ? 200 : 404, [],
-                    !empty($request[1]) ? file_get_contents($request[1]) : null)
+                ->willReturn(
+                    new Response(
+                        !empty($request[1]) ? 200 : 404,
+                        [],
+                        !empty($request[1]) ? file_get_contents($request[1]) : null
+                    )
                 );
         }
         return $generalClientProphecy;

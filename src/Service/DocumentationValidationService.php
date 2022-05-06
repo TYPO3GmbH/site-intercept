@@ -42,12 +42,11 @@ class DocumentationValidationService
         if (count($errors)) {
             // Handle documentation validation errors gently for a grace period. Adapt this message when the grace
             // period has expired.
-            $message = "The documentation format is outdated:\n\n";
-            $message.= "- " . implode("\n- ", $errors);
-            $message.= "\n\n";
-            $message.= "Use the current grace period to fix the documentation warnings and adapt them to the TYPO3 documentation standards [1][2].\n\n";
-            $message.= "[1] https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/GeneralConventions/FileStructure.html\n";
-            $message.= "[2] https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/UserRoundTrip.html";
+            $message = 'The documentation format is outdated:' . "\n\n";
+            $message.= '- ' . implode("\n- ", $errors) . "\n\n";
+            $message.= 'Use the current grace period to fix the documentation warnings and adapt them to the TYPO3 documentation standards [1][2].' . "\n\n";
+            $message.= '[1] https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/GeneralConventions/FileStructure.html' . "\n";
+            $message.= '[2] https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/UserRoundTrip.html';
             throw new DocsNotValidException($message, 1651671307);
         }
     }
@@ -149,12 +148,16 @@ class DocumentationValidationService
                 $errors[] = 'Documentation/Settings.cfg has syntax errors.';
             } else {
                 $outdated = ['t3author', 'description', 'github_commit_hash', 'github_revision_msg', 'github_sphinx_locale', 't3core'];
-                $outdated = array_filter($outdated, function ($property) use ($settingsCfg) { return isset($settingsCfg[$property]); });
+                $outdated = array_filter($outdated, function ($property) use ($settingsCfg) {
+                    return isset($settingsCfg[$property]);
+                });
                 if (count($outdated)) {
                     $errors[] = 'Documentation/Settings.cfg contains outdated properties: ' . implode(', ', $outdated) . '.';
                 }
                 $missing = ['project', 'version', 'release', 'copyright', 'project_home', 'project_contact', 'project_repository', 'project_issues'];
-                $missing = array_filter($missing, function ($property) use ($settingsCfg) { return empty($settingsCfg[$property]); });
+                $missing = array_filter($missing, function ($property) use ($settingsCfg) {
+                    return empty($settingsCfg[$property]);
+                });
                 if (count($missing)) {
                     $errors[] = 'Documentation/Settings.cfg misses proper values for properties: ' . implode(', ', $missing) . '.';
                 }
@@ -168,7 +171,9 @@ class DocumentationValidationService
             preg_match_all('/^\s*:([A-Za-z0-9 ]+):\s/m', $files['Documentation/Index.rst'], $matches);
             $fields = array_flip($matches[1] ?? []);
             $outdated = ['Description', 'Keywords', 'Copyright', 'Classification'];
-            $outdated = array_filter($outdated, function ($name) use ($fields) { return isset($fields[$name]); });
+            $outdated = array_filter($outdated, function ($name) use ($fields) {
+                return isset($fields[$name]);
+            });
             if (count($outdated)) {
                 $errors[] = 'Documentation/Index.rst contains outdated fields: ' . implode(', ', $outdated) . '.';
             }
@@ -179,7 +184,9 @@ class DocumentationValidationService
             } else {
                 $missing = ['Package name', 'Version', 'Language', 'Author', 'License', 'Rendered'];
             }
-            $missing = array_filter($missing, function ($name) use ($fields) { return !isset($fields[$name]); });
+            $missing = array_filter($missing, function ($name) use ($fields) {
+                return !isset($fields[$name]);
+            });
             if (count($missing)) {
                 $errors[] = 'Documentation/Index.rst misses the fields: ' . implode(', ', $missing) . '.';
             }
@@ -205,7 +212,9 @@ class DocumentationValidationService
             'Documentation/Settings.yml',
             'Documentation/Targets.rst',
         ];
-        $outdated = array_filter($outdated, function ($file) use ($files) { return isset($files[$file]); });
+        $outdated = array_filter($outdated, function ($file) use ($files) {
+            return isset($files[$file]);
+        });
         if (count($outdated)) {
             $errors[] = 'These files are outdated and should be removed: ' . implode(', ', $outdated) . '.';
         }
@@ -226,7 +235,9 @@ class DocumentationValidationService
 
         try {
             $search = ['?', '{', '}', '|', '&', '~', '!', '\\', '[', ']', '(', ')', '^'];
-            $replace = array_map(function ($character) { return sprintf('---%s---', ord($character)); }, $search);
+            $replace = array_map(function ($character) {
+                return sprintf('---%s---', ord($character));
+            }, $search);
             $content = preg_replace_callback('/^.*$/m', function ($matches) use ($search, $replace) {
                 return str_starts_with($matches[0], '#') ? '' : # remove comments
                     (str_starts_with($matches[0], ';') ? '' : # remove comments
@@ -234,7 +245,9 @@ class DocumentationValidationService
                             str_replace($search, $replace, $matches[0]))); # escape key-value pairs
             }, $content);
             $parsed = parse_ini_string($content, false, INI_SCANNER_RAW);
-            $parsed = array_map(function ($line) use ($search, $replace) { return str_replace($replace, $search, $line); }, $parsed);
+            $parsed = array_map(function ($line) use ($search, $replace) {
+                return str_replace($replace, $search, $line);
+            }, $parsed);
         } catch (\ErrorException $e) {
             // noop
         }
