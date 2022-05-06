@@ -42,6 +42,7 @@ class MailService
             $message = $this->createMessageWithTemplate(
                 'Documentation rendering failed',
                 'email/docs/renderingFailed.html.twig',
+                'email/docs/renderingFailed.txt.twig',
                 [
                     'author' => $author,
                     'package' => $composerJson->getName(),
@@ -66,14 +67,16 @@ class MailService
 
     /**
      * @param string $subject
-     * @param string $templateFile
+     * @param string $htmlTemplateFile
+     * @param string $plainTemplateFile
      * @param array $templateVariables
      * @return Swift_Message
      */
-    private function createMessageWithTemplate(string $subject, string $templateFile, array $templateVariables): Swift_Message
+    private function createMessageWithTemplate(string $subject, string $htmlTemplateFile, string $plainTemplateFile, array $templateVariables): Swift_Message
     {
         $message = new Swift_Message($subject);
-        $message->setBody($this->templating->render($templateFile, $templateVariables), 'text/html');
+        $message->setBody($this->templating->render($htmlTemplateFile, $templateVariables), 'text/html');
+        $message->addPart($this->templating->render($plainTemplateFile, $templateVariables), 'text/plain');
 
         return $message;
     }

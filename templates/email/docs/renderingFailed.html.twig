@@ -1,21 +1,23 @@
 {% set active = 'renderingFailed' %}
 
 <p>Hi {{ author.name }},</p>
-<p>Rendering the documentation for {{ package }} failed because of the following reason:</p>
+<p>Rendering the documentation for {{ package }} failed for the indicated reasons below.</p>
 <pre>{{ reasonPhrase }}</pre>
-
-<hr>
-
-<h4>Repository</h4>
-<p><a href="{{ pushEvent.repositoryUrl }}" style="color:#ff8700;">{{ pushEvent.repositoryUrl }}</a></p>
-<h4>Tag or branch</h4>
-<p>{{ pushEvent.versionString }}</p>
 
 <p style="font-size:small;-webkit-text-size-adjust:none;color:#666;">
     &mdash;
     <br>
-    Reply to this email directly or
-    <a href="https://intercept.typo3.com/admin/docs/deployments" style="color:#ff8700;">view it on Intercept</a>.
+    Repository:
+    <a href="{{ pushEvent.repositoryUrl }}" style="color:#ff8700;">{{ pushEvent.repositoryUrl }}</a>
+    <br>
+    Tag or branch:
+    {{ pushEvent.versionString }}
+    <br>
+    &mdash;
+    <br>
+    Reply to this email directly or join our Slack channel
+    <a href="https://typo3.slack.com/archives/C028JEPJL" style="color:#ff8700;">#documentation-team</a>, and
+    view it on <a href="https://intercept.typo3.com/admin/docs/deployments" style="color:#ff8700;">Intercept</a>.
     <br>
     You are receiving this because you are mentioned in the project's composer.json.
 </p>
