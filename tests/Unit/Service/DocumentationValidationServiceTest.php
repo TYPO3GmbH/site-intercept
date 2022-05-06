@@ -90,10 +90,17 @@ class DocumentationValidationServiceTest extends TestCase
     {
         $this->expectException(DocsNotValidException::class);
         $this->expectExceptionCode(1651671307);
-        $this->expectExceptionMessage('Settings.cfg is missing in Documentation/.');
+        $this->expectExceptionMessage('
+- README file is missing in the project root.
+- Settings.cfg is missing in Documentation/.');
 
         $generalClientProphecy = $this->getGeneralClientProphecy([
-            ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/README.rst', __DIR__ . '/Fixtures/File_Readme.rst'],
+            ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/README.rst', ''],
+            ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/README.md', ''],
+            ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/Readme.rst', ''],
+            ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/Readme.md', ''],
+            ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/readme.rst', ''],
+            ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/readme.md', ''],
             ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/Documentation/Settings.cfg', ''],
             ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/Documentation/Index.rst', ''],
             ['https://raw.githubusercontent.com/FriendsOfTYPO3/extension_builder/master/Documentation/Includes.rst.txt', ''],
@@ -155,6 +162,7 @@ class DocumentationValidationServiceTest extends TestCase
         $this->expectException(DocsNotValidException::class);
         $this->expectExceptionCode(1651671307);
         $this->expectExceptionMessage('
+- README file misses link to rendered documentation on docs.typo3.org.
 - README file misses badges with store statistics.
 - README file misses badges with TYPO3 compatibility.
 - README file misses link to project page on extensions.typo3.org (TER).

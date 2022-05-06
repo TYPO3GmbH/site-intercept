@@ -9,7 +9,7 @@ TYPO3 Extension ``extension_builder``
 =====================================
 
 The Extension Builder helps you to develop a TYPO3 extension based on the
-domain-driven MVC framework `Extbase`_ and the templating engine `Fluid`_.
+domain-driven MVC framework Extbase and the templating engine Fluid.
 
 It provides a graphical modeler to define domain objects and their relations
 as well as associated controllers with basic actions. It also provides a
@@ -23,6 +23,3 @@ even after you have started making manual changes to the files.
 In this mode, the Extension Builder retains the manual changes,
 such as new methods, changed method bodies, comments and annotations,
 even if you change the extension in the graphical editor.
-
-.. _Extbase: https://docs.typo3.org/m/typo3/book-extbasefluid/11.5/en-us/0-Introduction/Index.html
-.. _Fluid: https://docs.typo3.org/m/typo3/book-extbasefluid/11.5/en-us/8-Fluid/Index.html
