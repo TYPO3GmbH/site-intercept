@@ -34,6 +34,15 @@ class DocumentationValidationService
         $this->client = $client;
     }
 
+    /**
+     * Validate the documentation based on the TYPO3 documentation standards and raise an exception containing all
+     * validation errors.
+     *
+     * @param PushEvent $pushEvent
+     * @param ComposerJson $composerJson
+     * @return void
+     * @throws DocsNotValidException
+     */
     public function validate(PushEvent $pushEvent, ComposerJson $composerJson): void
     {
         $files = $this->fetchFiles($pushEvent);

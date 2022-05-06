@@ -26,6 +26,7 @@ use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
+use App\Extractor\ComposerJson;
 use App\Repository\RepositoryBlacklistEntryRepository;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\DocumentationValidationService;
@@ -304,6 +305,11 @@ class DocsRenderingController extends AbstractController
                     $errorMessage = 'Dependencies are not fulfilled. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (DocsNotValidException $e) {
+                    // This exception is never thrown because there is a grace period for documentation validation
+                    // errors (see above) and PHPStan cannot confirm the existence of $composerAsObject so long. This is
+                    // bypassed by setting $composerAsObject explicitly. Remove it again once the grace period has
+                    // expired.
+                    $composerAsObject = $composerAsObject ?? new ComposerJson([]);
                     $manager->persist(
                         (new HistoryEntry())
                             ->setType(HistoryEntryType::DOCS_RENDERING)
