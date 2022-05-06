@@ -66,8 +66,7 @@ class DocumentationValidationService
         ];
         foreach ($paths as $path) {
             try {
-                $content = $this->fetchRemoteDocumentationFile($pushEvent->getUrlToFile($path));
-                $files['README.rst'] = ['path' => $path, 'content' => $content];
+                $files['README.rst'] = $this->fetchRemoteDocumentationFile($pushEvent->getUrlToFile($path));
                 break;
             } catch (FileNotFoundException $e) {
             }
@@ -81,8 +80,7 @@ class DocumentationValidationService
         ];
         foreach ($paths as $path) {
             try {
-                $content = $this->fetchRemoteDocumentationFile($pushEvent->getUrlToFile($path));
-                $files[$path] = ['path' => $path, 'content' => $content];
+                $files[$path] = $this->fetchRemoteDocumentationFile($pushEvent->getUrlToFile($path));
             } catch (FileNotFoundException $e) {
             }
         }
@@ -96,7 +94,7 @@ class DocumentationValidationService
         foreach ($paths as $path) {
             try {
                 $this->fetchRemoteDocumentationFile($pushEvent->getUrlToFile($path));
-                $files[$path] = ['path' => $path, 'content' => ''];
+                $files[$path] = '';
             } catch (FileNotFoundException $e) {
             }
         }
@@ -125,17 +123,17 @@ class DocumentationValidationService
         if (!isset($files['README.rst'])) {
             $errors[] = 'README file is missing in the project root.';
         } else {
-            if (!str_contains($files['README.rst']['content'], 'docs.typo3.org')) {
+            if (!str_contains($files['README.rst'], 'docs.typo3.org')) {
                 $errors[] = 'README file misses link to rendered documentation on docs.typo3.org.';
             }
             if ($composerJson->getType() === 'typo3-cms-extension') {
-                if (!str_contains($files['README.rst']['content'], 'poser.pugx.org')) {
+                if (!str_contains($files['README.rst'], 'poser.pugx.org')) {
                     $errors[] = 'README file misses badges with store statistics.';
                 }
-                if (!str_contains($files['README.rst']['content'], 'img.shields.io/badge/TYPO3')) {
+                if (!str_contains($files['README.rst'], 'img.shields.io/badge/TYPO3')) {
                     $errors[] = 'README file misses badges with TYPO3 compatibility.';
                 }
-                if (!str_contains($files['README.rst']['content'], 'extensions.typo3.org')) {
+                if (!str_contains($files['README.rst'], 'extensions.typo3.org')) {
                     $errors[] = 'README file misses link to project page on extensions.typo3.org (TER).';
                 }
             }
@@ -146,7 +144,7 @@ class DocumentationValidationService
                 $errors[] = 'Settings.cfg is missing in Documentation/.';
             }
         } else {
-            $settingsCfg = $this->parseIniString($files['Documentation/Settings.cfg']['content']);
+            $settingsCfg = $this->parseIniString($files['Documentation/Settings.cfg']);
             if (empty($settingsCfg)) {
                 $errors[] = 'Documentation/Settings.cfg has syntax errors.';
             } else {
@@ -164,10 +162,10 @@ class DocumentationValidationService
         }
 
         if (isset($files['Documentation/Index.rst'])) {
-            if (!str_contains($files['Documentation/Index.rst']['content'], 'Includes.rst.txt')) {
+            if (!str_contains($files['Documentation/Index.rst'], 'Includes.rst.txt')) {
                 $errors[] = 'Documentation/Index.rst misses including the /Includes.rst.txt.';
             }
-            preg_match_all('/^\s*:([A-Za-z0-9 ]+):\s/m', $files['Documentation/Index.rst']['content'], $matches);
+            preg_match_all('/^\s*:([A-Za-z0-9 ]+):\s/m', $files['Documentation/Index.rst'], $matches);
             $fields = array_flip($matches[1] ?? []);
             $outdated = ['Description', 'Keywords', 'Copyright', 'Classification'];
             $outdated = array_filter($outdated, function ($name) use ($fields) { return isset($fields[$name]); });
@@ -185,7 +183,7 @@ class DocumentationValidationService
             if (count($missing)) {
                 $errors[] = 'Documentation/Index.rst misses the fields: ' . implode(', ', $missing) . '.';
             }
-            if (!str_contains($files['Documentation/Index.rst']['content'], '.. toctree::')) {
+            if (!str_contains($files['Documentation/Index.rst'], '.. toctree::')) {
                 $errors[] = 'Documentation/Index.rst misses the table of contents.';
             }
 
