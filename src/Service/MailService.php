@@ -42,7 +42,7 @@ class MailService
             if (count($authors)) {
                 $firstAuthor = array_shift($authors);
                 $message = $this->createMessageWithTemplate(
-                    'Documentation rendering warning',
+                    sprintf('[%s] Documentation rendering warning', $composerJson->getName()),
                     'email/docs/renderingWarn.html.twig',
                     'email/docs/renderingWarn.txt.twig',
                     [
@@ -82,7 +82,7 @@ class MailService
             if (count($authors)) {
                 $firstAuthor = array_shift($authors);
                 $message = $this->createMessageWithTemplate(
-                    'Documentation rendering failed',
+                    sprintf('[%s] Documentation rendering failed', $composerJson->getName()),
                     'email/docs/renderingFail.html.twig',
                     'email/docs/renderingFail.txt.twig',
                     [

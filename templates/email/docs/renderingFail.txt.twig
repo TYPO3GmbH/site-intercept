@@ -1,15 +1,16 @@
-Hi {{ author.name|default('documentation author') }} and team,
+Hi {{ author.name|default('documentation author') }} and contributors,
 
-Rendering the documentation for {{ package }} failed for the indicated reasons below.
+Rendering the documentation failed for the indicated reasons below.
 
 {{ reasonPhrase }}
 
 --
 Repository: {{ pushEvent.repositoryUrl }}
 Tag or branch: {{ pushEvent.versionString }}
+Package: {{ package }}
 --
-Reply to this email directly or join our Slack channel #documentation-team:
-https://typo3.slack.com/archives/C028JEPJL
-and view it on Intercept:
-https://intercept.typo3.com/admin/docs/deployments .
+Reply to this email directly, view it on Intercept:
+https://intercept.typo3.com/admin/docs/deployments
+or join our Slack channel #documentation-team:
+https://typo3.slack.com/archives/C028JEPJL .
 You are receiving this because you are mentioned in the project's composer.json.
