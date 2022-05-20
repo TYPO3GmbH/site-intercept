@@ -17,7 +17,7 @@ return Request::create(
     [],
     [],
     '{
-      "ref": "refs/heads/main",
+      "ref": "refs/heads/11.5",
       "before": "253c42fe1e2e050539a21973b819216d7260b1a2",
       "after": "1b93464c68d398351410d871826e30066bfdbb2f",
       "created": false,
@@ -51,8 +51,6 @@ return Request::create(
           ],
           "modified": [
             "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php",
-            "typo3/sysext/core/Documentation/Index.rst",
-            "typo3/sysext/rte_ckeditor/Documentation/Configuration/ConfigureTypo3.rst",
             "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
           ]
         }
@@ -82,8 +80,6 @@ return Request::create(
         ],
         "modified": [
           "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php",
-          "typo3/sysext/core/Documentation/Index.rst",
-          "typo3/sysext/rte_ckeditor/Documentation/Configuration/ConfigureTypo3.rst",
           "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
         ]
       },

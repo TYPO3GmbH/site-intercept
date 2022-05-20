@@ -44,16 +44,11 @@ return Request::create(
             "username": "maddy2101"
           },
           "added": [
-            "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
           ],
           "removed": [
-            "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
           ],
           "modified": [
-            "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php",
-            "typo3/sysext/core/Documentation/Index.rst",
-            "typo3/sysext/rte_ckeditor/Documentation/Configuration/ConfigureTypo3.rst",
-            "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
+            "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php"
           ]
         }
       ],
@@ -75,16 +70,11 @@ return Request::create(
           "username": "maddy2101"
         },
         "added": [
-          "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
         ],
         "removed": [
-          "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
         ],
         "modified": [
-          "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php",
-          "typo3/sysext/core/Documentation/Index.rst",
-          "typo3/sysext/rte_ckeditor/Documentation/Configuration/ConfigureTypo3.rst",
-          "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
+          "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php"
         ]
       },
       "repository": {
