@@ -37,6 +37,10 @@ class GithubRstIssueController extends AbstractController
     {
         try {
             $pushEventInformation = new GithubPushEventForCore(json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR));
+            if ($pushEventInformation->targetBranch !== 'main') {
+                // We do not care about backported changes
+                throw new DoNotCareException();
+            }
             $githubService->handleGithubIssuesForRstFiles($pushEventInformation, $githubChangelogToLogRepository);
         } catch (DoNotCareException $e) {
             // Hook payload could not be identified as hook that should trigger git split

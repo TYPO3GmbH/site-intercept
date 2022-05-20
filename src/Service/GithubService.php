@@ -308,7 +308,7 @@ class GithubService
     private function filterRstChanges(array $files): array
     {
         return array_filter($files, static function (string $file) {
-            return str_ends_with($file, '.rst');
+            return str_ends_with($file, '.rst') && str_contains($file, 'typo3/sysext/core/Documentation/Changelog/');
         });
     }
 }
