@@ -14,6 +14,7 @@ use App\Bundle\TestDoubleBundle;
 use App\Client\GeneralClient;
 use App\Kernel;
 use GuzzleHttp\Psr7\Response;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 class GithubRstIssueControllerTest extends AbstractFunctionalWebTestCase
@@ -28,7 +29,7 @@ class GithubRstIssueControllerTest extends AbstractFunctionalWebTestCase
     /**
      * @test
      */
-    public function githubIssueIsCreatedForRstChanges()
+    public function githubIssueIsCreatedForRstChanges(): void
     {
         /** @var Response $rstFetchRawResponse */
         $rstFetchRawResponse = require __DIR__ . '/Fixtures/GithubRstIssuePatchFetchRawFileResponse.php';
@@ -37,6 +38,14 @@ class GithubRstIssueControllerTest extends AbstractFunctionalWebTestCase
             'GET',
             'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst'
         )->shouldBeCalled()->willReturn($rstFetchRawResponse);
+        $generalClientProphecy->request(
+            'GET',
+            'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/rte_ckeditor/Documentation/Configuration/ConfigureTypo3.rst'
+        )->shouldNotBeCalled();
+        $generalClientProphecy->request(
+            'GET',
+            'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/core/Documentation/Index.rst'
+        )->shouldNotBeCalled();
         $generalClientProphecy->request(
             'POST',
             'https://api.github.com/repos/foobar-documentation/Changelog-To-Doc/issues',
@@ -117,6 +126,40 @@ class GithubRstIssueControllerTest extends AbstractFunctionalWebTestCase
         $kernel->boot();
 
         $request = require __DIR__ . '/Fixtures/GithubRstIssuePatchRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * @test
+     */
+    public function githubIssueIsNotCreatedForChangesInNonMainBranch(): void
+    {
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        $generalClientProphecy->request(Argument::cetera())->shouldNotBeCalled();
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+
+        $kernel = new Kernel('test', true);
+        $kernel->boot();
+
+        $request = require __DIR__ . '/Fixtures/GithubRstIssuePatchBackportRequest.php';
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * @test
+     */
+    public function githubIssueIsNotCreatedForChangesWithoutDocsChanges(): void
+    {
+        $generalClientProphecy = $this->prophesize(GeneralClient::class);
+        $generalClientProphecy->request(Argument::cetera())->shouldNotBeCalled();
+        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+
+        $kernel = new Kernel('test', true);
+        $kernel->boot();
+
+        $request = require __DIR__ . '/Fixtures/GithubRstIssuePatchNoDocsChangesRequest.php';
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
     }
