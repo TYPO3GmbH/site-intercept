@@ -26,7 +26,7 @@
         "doctrine/persistence": "^2.1",
         "dragonmantank/cron-expression": "^2.3",
         "eightpoints/guzzle-bundle": "^v8.2.0",
-        "guzzlehttp/guzzle": "^6.3",
+        "guzzlehttp/guzzle": "^6.5.8",
         "kbsali/redmine-api": "~1.0",
         "knplabs/knp-menu": "^3.0",
         "knplabs/knp-paginator-bundle": "^5.0",
