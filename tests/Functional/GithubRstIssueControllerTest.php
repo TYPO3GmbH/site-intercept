@@ -33,11 +33,17 @@ class GithubRstIssueControllerTest extends AbstractFunctionalWebTestCase
     {
         /** @var Response $rstFetchRawResponse */
         $rstFetchRawResponse = require __DIR__ . '/Fixtures/GithubRstIssuePatchFetchRawFileResponse.php';
+        /** @var Response $rstFetchRawResponse */
+        $rstFetchCompareResponse = require __DIR__ . '/Fixtures/GithubRstIssuePatchFetchCompareResponse.php';
         $generalClientProphecy = $this->prophesize(GeneralClient::class);
         $generalClientProphecy->request(
             'GET',
             'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst'
         )->shouldBeCalled()->willReturn($rstFetchRawResponse);
+        $generalClientProphecy->request(
+            'GET',
+            'https://api.github.com/repos/TYPO3/TYPO3.CMS/compare/cc9ce47f0c030772ca6b59bbc65d728fb32c96dd...47520511f4947a6ebd139a84e831a062a5b61c31'
+        )->shouldBeCalled()->willReturn($rstFetchCompareResponse);
         $generalClientProphecy->request(
             'GET',
             'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/rte_ckeditor/Documentation/Configuration/ConfigureTypo3.rst'
@@ -55,67 +61,7 @@ class GithubRstIssueControllerTest extends AbstractFunctionalWebTestCase
                 ],
                 'json' => [
                     'title' => '[BUGFIX] Load AdditionalFactoryConfiguration.php again',
-                    'body' => ":information_source: View this commit [on Github](https://github.com/TYPO3/TYPO3.CMS/commit/1b93464c68d398351410d871826e30066bfdbb2f)\n"
-                        . ":busts_in_silhouette: Authored by Mathias Brodala mbrodala@pagemachine.de\n"
-                        . ":heavy_check_mark: Merged by Anja Leichsenring aleichsenring@ab-softlab.de\n"
-                        . "\n"
-                        . "## Commit message\n"
-                        . "\n"
-                        . "[BUGFIX] Load AdditionalFactoryConfiguration.php again\n"
-                        . "\n"
-                        . "This file is placed in \"typo3conf\" just like the other configuration\n"
-                        . "files and must be loaded accordingly.\n"
-                        . "\n"
-                        . "Resolves: #87035\n"
-                        . "Relates: #85560\n"
-                        . "Releases: main\n"
-                        . "Change-Id: I7db72a3c1b29f79fb242f1e5da21ec7d77614bfe\n"
-                        . "Reviewed-on: https://review.typo3.org/58977\n"
-                        . "Tested-by: TYPO3com <no-reply@typo3.com>\n"
-                        . "Reviewed-by: Andreas Wolf <andreas.wolf@typo3.org>\n"
-                        . "Reviewed-by: Benni Mack <benni@typo3.org>\n"
-                        . "Tested-by: Benni Mack <benni@typo3.org>\n"
-                        . "Reviewed-by: Anja Leichsenring <aleichsenring@ab-softlab.de>\n"
-                        . "Tested-by: Anja Leichsenring <aleichsenring@ab-softlab.de>\n"
-                        . "\n"
-                        . "## :heavy_plus_sign: Added files\n"
-                        . "\n"
-                        . "<details>\n"
-                        . "<summary>12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst</summary>\n"
-                        . "\n"
-                        . "\n"
-                        . "```rst\n"
-                        . (string)$rstFetchRawResponse->getBody()
-                        . "\n"
-                        . "```\n"
-                        . "\n"
-                        . "</details>\n"
-                        . "\n"
-                        . "## :heavy_division_sign: Modified files\n"
-                        . "\n"
-                        . "<details>\n"
-                        . "<summary>12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst</summary>\n"
-                        . "\n"
-                        . "\n"
-                        . "```rst\n"
-                        . (string)$rstFetchRawResponse->getBody()
-                        . "\n"
-                        . "```\n"
-                        . "\n"
-                        . "</details>\n"
-                        . "\n"
-                        . "## :heavy_minus_sign: Removed files\n"
-                        . "\n"
-                        . "<details>\n"
-                        . "<summary>12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst</summary>\n"
-                        . "\n"
-                        . "\n"
-                        . "```rst\n"
-                        . (string)$rstFetchRawResponse->getBody()
-                        . "\n"
-                        . "```\n"
-                        . "\n"
-                        . "</details>\n",
+                    'body' => file_get_contents(__DIR__ . '/Fixtures/GithubRstPushBody.txt'),
                     'labels' => ['12.0'],
                 ]
             ]

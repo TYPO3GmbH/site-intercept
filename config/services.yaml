@@ -34,6 +34,11 @@ services:
           $projectDir: '%kernel.project_dir%'
           $githubChangelogToLogRepository: '%githubChangelogToLogRepository%'
 
+    _instanceof:
+      App\Strategy\GithubRst\StrategyInterface:
+        tags: [ 'github_rst_strategy' ]
+        lazy: true
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -174,6 +179,10 @@ services:
         class: App\Service\RabbitStatusService
         arguments:
             $client: '@App\Client\RabbitManagementClient'
+
+    App\Strategy\GithubRst\StrategyResolver:
+        arguments:
+            $strategies: !tagged 'github_rst_strategy'
 
     PhpAmqpLib\Connection\AMQPStreamConnection:
         class: PhpAmqpLib\Connection\AMQPLazyConnection
