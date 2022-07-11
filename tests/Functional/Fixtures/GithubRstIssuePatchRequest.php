@@ -18,8 +18,8 @@ return Request::create(
     [],
     '{
       "ref": "refs/heads/main",
-      "before": "253c42fe1e2e050539a21973b819216d7260b1a2",
-      "after": "1b93464c68d398351410d871826e30066bfdbb2f",
+      "before": "cc9ce47f0c030772ca6b59bbc65d728fb32c96dd",
+      "after": "47520511f4947a6ebd139a84e831a062a5b61c31",
       "created": false,
       "deleted": false,
       "forced": false,
@@ -53,7 +53,7 @@ return Request::create(
             "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php",
             "typo3/sysext/core/Documentation/Index.rst",
             "typo3/sysext/rte_ckeditor/Documentation/Configuration/ConfigureTypo3.rst",
-            "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
+            "typo3/sysext/core/Documentation/Changelog/12.0/Breaking-97454-RemoveLinkBrowserHooks.rst"
           ]
         }
       ],
@@ -84,7 +84,7 @@ return Request::create(
           "typo3/sysext/core/Classes/Configuration/ConfigurationManager.php",
           "typo3/sysext/core/Documentation/Index.rst",
           "typo3/sysext/rte_ckeditor/Documentation/Configuration/ConfigureTypo3.rst",
-          "typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst"
+          "typo3/sysext/core/Documentation/Changelog/12.0/Breaking-97454-RemoveLinkBrowserHooks.rst"
         ]
       },
       "repository": {

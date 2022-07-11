@@ -57,6 +57,8 @@ class GithubPushEventForCore
 
     public string $headCommitTitle = '';
     public array $commit = [];
+    public string $beforeCommitId = '';
+    public string $afterCommitId = '';
 
     /**
      * Extract information.
@@ -73,6 +75,8 @@ class GithubPushEventForCore
             }
             $this->repositoryFullName = $fullPullRequestInformation['repository']['full_name'] ?? '';
             if ($this->isPushedPatch($fullPullRequestInformation)) {
+                $this->beforeCommitId = $fullPullRequestInformation['before'] ?? '';
+                $this->afterCommitId = $fullPullRequestInformation['after'] ?? '';
                 $this->commit = $fullPullRequestInformation['head_commit'] ?? [];
                 $this->type = self::TYPE_PATCH;
                 $this->sourceBranch = $this->getSourceBranch($fullPullRequestInformation['ref']);

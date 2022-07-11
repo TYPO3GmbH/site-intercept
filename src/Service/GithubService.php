@@ -21,6 +21,7 @@ use App\Extractor\GithubPullRequestIssue;
 use App\Extractor\GithubPushEventForCore;
 use App\Extractor\GithubUserData;
 use App\Extractor\GitPatchFile;
+use App\Strategy\GithubRst\StrategyResolver;
 use GuzzleHttp\Exception\BadResponseException;
 use RuntimeException;
 
@@ -41,6 +42,7 @@ class GithubService
      */
     private $accessKey;
     private GithubClient $githubClient;
+    private StrategyResolver $strategyResolver;
 
     /**
      * GithubService constructor.
@@ -48,12 +50,13 @@ class GithubService
      * @param string $pullRequestPatchPath Absolute path pull request files are put to
      * @param GeneralClient $client General http client that does not need authentication
      */
-    public function __construct(string $pullRequestPatchPath, GeneralClient $client, GithubClient $githubClient)
+    public function __construct(string $pullRequestPatchPath, GeneralClient $client, GithubClient $githubClient, StrategyResolver $strategyResolver)
     {
         $this->pullRequestPatchPath = $pullRequestPatchPath;
         $this->client = $client;
         $this->accessKey = $_ENV['GITHUB_ACCESS_TOKEN'] ?? '';
         $this->githubClient = $githubClient;
+        $this->strategyResolver = $strategyResolver;
     }
 
     /**
@@ -155,7 +158,6 @@ class GithubService
             // no rst files changed, nothing to do
             return;
         }
-        $githubRawBaseUrl = sprintf('https://raw.githubusercontent.com/%s/%s', $pushEvent->repositoryFullName, $pushEvent->commit['id']);
 
         $changedDocuments = [
             'added' => $added,
@@ -185,22 +187,25 @@ class GithubService
             $typeLabel = $typeLabels[$type];
             $body[] = sprintf("## %s\n", $typeLabel);
 
+            $strategy = $this->strategyResolver->resolve($type);
+
             foreach ($files as $file) {
-                $fullRawUrl = sprintf('%s/%s', $githubRawBaseUrl, $file);
                 try {
-                    $response = $this->client->request('GET', $fullRawUrl);
+                    $response = $strategy->getFromGithub($pushEvent, $file);
                 } catch (BadResponseException $e) {
                     continue;
                 }
-                $changelogContent = (string)$response->getBody();
 
-                $version = basename(dirname($file));
-                $labels[] = $version;
+                $formattedContent = $strategy->formatResponse($response);
+                if ($formattedContent !== '') {
+                    $version = basename(dirname($file));
+                    $labels[] = $version;
 
-                $body[] = '<details>';
-                $body[] = sprintf("<summary>%s/%s</summary>\n\n", $version, basename($file));
-                $body[] = sprintf("```rst\n%s\n```\n", $changelogContent);
-                $body[] = '</details>' . "\n";
+                    $body[] = '<details>';
+                    $body[] = sprintf("<summary>%s/%s</summary>\n\n", $version, basename($file));
+                    $body[] = $formattedContent;
+                    $body[] = '</details>' . "\n";
+                }
             }
         }
 
