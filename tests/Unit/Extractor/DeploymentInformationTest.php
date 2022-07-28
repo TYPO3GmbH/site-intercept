@@ -205,6 +205,7 @@ class DeploymentInformationTest extends TestCase
             'viewhelper reference' => ['', 'typo3/view-helper-reference', 'other', 'other'],
             'typo3 surf' => ['', 'typo3/surf', 'other', 'other'],
             'typo3 tailor' => ['', 'typo3/tailor', 'other', 'other'],
+            'typo3 fluid' => ['', 'typo3fluid/fluid', 'other', 'other'],
         ];
     }
 
