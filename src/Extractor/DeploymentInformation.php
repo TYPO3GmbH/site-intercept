@@ -22,8 +22,8 @@ class DeploymentInformation
         'typo3-cms-documentation' => ['m' => 'manual'],
         'typo3-cms-framework' => ['c' => 'core-extension'],
         'typo3-cms-extension' => ['p' => 'extension'],
-        'other' => ['other', 'other'],
-        '' => ['other', 'other']
+        'other' => ['other' => 'other'],
+        '' => ['other' => 'other'],
         // There is a third one 'h' => 'docs-home', handled below.
         // There is a fourth one 'other' => 'other', handled below.
     ];
