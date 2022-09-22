@@ -119,7 +119,7 @@ class WebHookService
     protected function getPushEventFromGithub(Request $request): array
     {
         $content = $request->getContent();
-        try{
+        try {
             $payload = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
             if ($payload === null) {
                 // If can't be decoded to json, this might be a x-www-form-encoded body
@@ -128,7 +128,7 @@ class WebHookService
                 $payload = substr($payload, 8); // cut off 'payload=', rest should be json, then
                 $payload = json_decode($payload, false, 512, JSON_THROW_ON_ERROR);
             }
-        }catch (\JsonException $e) {
+        } catch (\JsonException $e) {
             throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
         }
         if ($payload === null) {
