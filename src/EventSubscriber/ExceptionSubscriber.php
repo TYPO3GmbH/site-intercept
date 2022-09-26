@@ -14,7 +14,9 @@ namespace App\EventSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ExceptionSubscriber implements EventSubscriberInterface
@@ -39,9 +41,12 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         $throwable = $event->getThrowable();
 
-        if ($throwable instanceof SuspiciousOperationException) {
+        if (
+            $throwable instanceof SuspiciousOperationException ||
+            $throwable instanceof BadRequestHttpException
+        ) {
             $event->setResponse(new JsonResponse([
-                'errors' => $throwable->getMessage()
+                'error' => 'Bad Request'
             ], JsonResponse::HTTP_BAD_REQUEST));
         }
     }
