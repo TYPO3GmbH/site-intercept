@@ -149,6 +149,8 @@ class WebHookServiceTest extends TestCase
     public function testGetPushEventFromGithubThrowsException()
     {
         //Creates a request with json containing syntax error
+        //The syntax error was generated in the json by using '' instead of ""
+        //for following key value pair "test": 'Hello',
         $request = new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Added_Exception_Rst.json'));
         $this->expectException(UnsupportedWebHookRequestException::class);
         $createdPushEvent = $this->subject->createPushEvent($request);
