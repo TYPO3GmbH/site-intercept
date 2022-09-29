@@ -119,16 +119,18 @@ class WebHookService
     protected function getPushEventFromGithub(Request $request): array
     {
         $content = $request->getContent();
-        $payload = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-        if ($payload === null) {
+        try {
+            $payload = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
             // If can't be decoded to json, this might be a x-www-form-encoded body
             // probably by using the old legacy hook, that used this
             $payload = urldecode($content);
             $payload = substr($payload, 8); // cut off 'payload=', rest should be json, then
-            $payload = json_decode($payload, false, 512, JSON_THROW_ON_ERROR);
-        }
-        if ($payload === null) {
-            throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
+            try {
+                $payload = json_decode($payload, false, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
+            }
         }
         if (!empty($payload->deleted) && $payload->deleted === true) {
             $cloneUrl = '';
