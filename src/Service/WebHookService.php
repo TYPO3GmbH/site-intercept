@@ -132,9 +132,6 @@ class WebHookService
                 throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
             }
         }
-        if ($payload === null) {
-            throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
-        }
         if (!empty($payload->deleted) && $payload->deleted === true) {
             $cloneUrl = '';
             if (is_object($payload) && isset($payload->repository)) {
