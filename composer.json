@@ -70,7 +70,7 @@
         "t3g/symfony-keycloak-bundle": "@dev",
         "t3g/symfony-template-bundle": "^2.16",
         "t3g/symfony-usercentrics-bundle": "^1.0.0",
-        "twig/twig": "^v3.3.0",
+        "twig/twig": "^3.4.3",
         "woeler/phpdiscord": "^1.1"
     },
     "require-dev": {
