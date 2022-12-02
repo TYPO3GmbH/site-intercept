@@ -1,6 +1,15 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -13,21 +22,34 @@ jobs:
           - '7.4'
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
-      - uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+      - name: Setup PHP ${{ matrix.php-versions }}
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
           coverage: pcov
 
-      - name: php --version
+      - name: Show PHP version
         run: php --version
 
-      - name: composer --version
+      - name: Show composer version
         run: composer --version
 
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: (COMPOSER) Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
+        run: composer install --prefer-dist --no-progress --no-interaction --ansi
 
       - name: (CGL) PHP
         run: composer t3g:cgl
@@ -70,17 +92,22 @@ jobs:
           ssh-keygen -p -P "${{ secrets.SSH_PASSPHRASE }}" -N "" -f ~/.ssh/deploy_rsa
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add ~/.ssh/deploy_rsa
-      - uses: actions/checkout@v2
+
+      - uses: actions/checkout@v3
+
       - uses: shivammathur/setup-php@v2
+
       - name: Install Magallanes
         run: |
           composer global require "andres-montanez/magallanes" --no-progress
           /home/runner/.composer/vendor/bin/mage version
           mkdir -p ./.mage/logs
+
       - name: Get Environment
         id: environment
         run: |
-          echo ::set-output name=target::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//-/g')
+          echo "target=$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//-/g')" >> $GITHUB_OUTPUT
+
       - name: Deployment
         env:
           SSH_AUTH_SOCK: /tmp/ssh-auth.sock
@@ -97,6 +124,7 @@ jobs:
             }'
         run: |
           /home/runner/.composer/vendor/bin/mage deploy ${{ steps.environment.outputs.target }} -vvv
+
       - name: Archive Logs
         uses: actions/upload-artifact@v1
         if: always()
