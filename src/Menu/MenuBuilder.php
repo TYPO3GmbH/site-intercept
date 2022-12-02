@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace App\Menu;
 
 use Knp\Menu\ItemInterface;
-use Knp\Menu\MenuItem;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 use T3G\Bundle\TemplateBundle\Menu\MenuBuilder as TemplateMenuBuider;
 use T3G\Bundle\TemplateBundle\Utility\AvatarUtility;
@@ -21,11 +20,7 @@ use T3G\Bundle\TemplateBundle\Utility\AvatarUtility;
  */
 class MenuBuilder extends TemplateMenuBuider
 {
-    /**
-     * @param array $options
-     * @return ItemInterface|MenuItem
-     */
-    public function mainDefault(array $options)
+    public function mainDefault(array $options): ItemInterface
     {
         $menu = $this->factory->createItem('root');
 
@@ -110,11 +105,7 @@ class MenuBuilder extends TemplateMenuBuider
         return $menu;
     }
 
-    /**
-     * @param array $options
-     * @return ItemInterface|MenuItem
-     */
-    public function mainProfile(array $options)
+    public function mainProfile(array $options): ItemInterface
     {
         $menu = $this->factory->createItem('root');
         $menu->addChild(
