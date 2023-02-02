@@ -64,7 +64,7 @@
             {% for log in logs %}
                 <div class="card">
                     <div class="card-header" id="headingOne">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#uuid{{ log.queueLog.groupEntry }}" aria-expanded="false" aria-controls="uuid{{ log.queueLog.groupEntry }}">
+                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#uuid{{ log.queueLog.groupEntry }}" aria-expanded="false" aria-controls="uuid{{ log.queueLog.groupEntry }}">
                             <span>{{ localdatetime(log.queueLog.createdAt) }} - </span>
                             {% if log.queueLog.type == 'patch' %}
                                 <span>Split sub tree</span>
