@@ -19,7 +19,6 @@ hooks:
 omit_containers: [db, dba]
 webimage_extra_packages: [php7.4-gmp, ssh]
 use_dns_when_possible: true
-composer_version: 2.0.0
 web_environment: []
 nodejs_version: "16"
 

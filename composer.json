@@ -99,6 +99,9 @@
         "preferred-install": {
             "*": "dist",
             "t3g/symfony-template-bundle": "source"
+        },
+        "allow-plugins": {
+            "symfony/flex": true
         }
     },
     "scripts": {
