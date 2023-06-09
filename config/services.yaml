@@ -1,207 +1,140 @@
 parameters:
-    locale: 'en'
-    router.request_context.host: '%env(APP_URL)%'
-
-    core_repositories:
-      main:
-        version: 'main'
-        monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
-      branch11_5:
-        version: '11.5'
-        monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
-      branch10_4:
-        version: '10.4'
-        monoRepository: '%env(CORE_SPLIT_MAIN_REPO)%'
-      branch9_5:
-        version: '9.5'
-        monoRepository: '%env(CORE_SPLIT_MAIN_REPO_V9)%'
-      branch8_7:
-        version: '8.7'
-        monoRepository: '%env(CORE_SPLIT_MAIN_REPO_V8)%'
-
-    githubChangelogToLogRepository: '%env(GITHUB_CHANGELOG_TO_LOG_REPOSITORY)%'
+  locale: 'en'
+  router.request_context.host: '%env(APP_URL)%'
 
 services:
-    # default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-        public: false       # Allows optimizing the container by removing unused services; this also means
-                            # fetching services directly from the container via $container->get() won't work.
-                            # The best practice is to be explicit about your dependencies anyway.
-        bind:
-          $coreRepositories: '%core_repositories%'
-          $projectDir: '%kernel.project_dir%'
-          $githubChangelogToLogRepository: '%githubChangelogToLogRepository%'
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false       # Allows optimizing the container by removing unused services; this also means
+      # fetching services directly from the container via $container->get() won't work.
+    # The best practice is to be explicit about your dependencies anyway.
+    bind:
+      $projectDir: '%kernel.project_dir%'
+      $githubChangelogToLogRepository: '%env(GITHUB_CHANGELOG_TO_LOG_REPOSITORY)%'
 
-    _instanceof:
-      App\Strategy\GithubRst\StrategyInterface:
-        tags: [ 'github_rst_strategy' ]
-        lazy: true
+  _instanceof:
+    App\Strategy\GithubRst\StrategyInterface:
+      tags: [ 'github_rst_strategy' ]
+      lazy: true
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+  # makes classes in src/ available to be used as services
+  # this creates a service per class whose id is the fully-qualified class name
+  App\:
+    resource: '../src/*'
+    exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
-    # controllers are imported separately to make sure services can be injected
-    # as action arguments even if you don't extend any base controller class
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
+  # controllers are imported separately to make sure services can be injected
+  # as action arguments even if you don't extend any base controller class
+  App\Controller\:
+    resource: '../src/Controller'
+    tags: [ 'controller.service_arguments' ]
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    App\Client\GerritClient: '@eight_points_guzzle.client.gerrit'
-    App\Client\GeneralClient: '@eight_points_guzzle.client.general'
-    App\Client\RabbitManagementClient: '@eight_points_guzzle.client.rabbitManagement'
-    App\Client\SlackClient: '@eight_points_guzzle.client.slack'
-    App\Client\GithubClient: '@eight_points_guzzle.client.github'
+  redmine.client.forge:
+    class: Redmine\Client\NativeCurlClient
+    public: true
+    arguments:
+      $url: '%env(FORGE_ENDPOINT)%'
+      $apikeyOrUsername: '%env(FORGE_ACCESS_TOKEN)%'
+    tags:
+      - testDouble
 
-    App\Client\ForgeClient:
-        class: App\Client\ForgeClient
-        public: true
-        arguments:
-            $url: '%env(FORGE_ENDPOINT)%'
-            $apikeyOrUsername: '%env(FORGE_ACCESS_TOKEN)%'
-        tags:
-            - testDouble
+  guzzle.client.general:
+    class: GuzzleHttp\Client
+    tags:
+      - testDouble
 
-    App\Service\LocalCoreGitService:
-        class: App\Service\LocalCoreGitService
-        public: true
-        arguments:
-            $logger: '@monolog.logger.request'
-            $pullRequestCorePath: '%kernel.project_dir%/var/git-core-pr/'
-        tags:
-            - testDouble
+  guzzle.client.github:
+    class: GuzzleHttp\Client
+    arguments:
+      $config:
+        headers:
+          User-Agent: 'TYPO3 Intercept'
+          Authorization: 'token %env(GITHUB_API_PASSWORD_TOKEN)%'
+        base_uri: 'https://api.github.com/'
+    tags:
+      - testDouble
 
-    core_splitter:
-        class: App\Service\CoreSplitService
-        public: true
-        arguments:
-            $logger: '@monolog.logger.request'
-            $splitCorePath: '%kernel.project_dir%/var/git-core-split/'
-            $splitMonoRepo: '@=parameter("core_repositories")["main"]["monoRepository"]'
-            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE)%'
-            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions/'
-            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
-        tags:
-            - core_splitter
-            - testDouble
+  guzzle.client.slack:
+    class: GuzzleHttp\Client
+    tags:
+      - testDouble
 
-    core_splitter_v8:
-        class: App\Service\CoreSplitService
-        public: true
-        arguments:
-            $logger: '@monolog.logger.request'
-            $splitCorePath: '%kernel.project_dir%/var/git-core-split-v8/'
-            $splitMonoRepo: '@=parameter("core_repositories")["branch8_7"]["monoRepository"]'
-            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V8)%'
-            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v8/'
-            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
-        tags:
-            - core_splitter
-            - testDouble
+  App\Service\LocalCoreGitService:
+    class: App\Service\LocalCoreGitService
+    public: true
+    arguments:
+      $pullRequestCorePath: '%kernel.project_dir%/var/git-core-pr/'
+    tags:
+      - testDouble
 
-    core_splitter_v9:
-        class: App\Service\CoreSplitService
-        public: true
-        arguments:
-            $logger: '@monolog.logger.request'
-            $splitCorePath: '%kernel.project_dir%/var/git-core-split-v9/'
-            $splitMonoRepo: '@=parameter("core_repositories")["branch9_5"]["monoRepository"]'
-            $splitSingleRepoBase: '%env(CORE_SPLIT_SINGLE_REPOS_BASE_V9)%'
-            $splitSingleRepoPath: '%kernel.project_dir%/var/git-core-split-extensions-v9/'
-            $gitOutputListener: '@App\GitWrapper\Event\GitOutputListener'
-        tags:
-            - core_splitter
-            - testDouble
+  App\Service\GitService:
+    class: App\Service\GitService
+    arguments:
+      $logger: '@monolog.logger.request'
 
-    App\Service\DiscordServerService:
-        class: App\Service\DiscordServerService
-        public: true
-        arguments:
-            $serverId: '%env(DISCORD_SERVER_ID)%'
-            $botToken: '%env(DISCORD_BOT_TOKEN)%'
+  App\Service\ForgeService:
+    class: App\Service\ForgeService
+    arguments:
+      $client: '@redmine.client.forge'
 
-    App\Service\SlackService:
-        class: App\Service\SlackService
-        public: true
-        arguments:
-            $hook: '%env(SLACK_HOOK)%'
+  App\Service\SlackService:
+    class: App\Service\SlackService
+    public: true
+    arguments:
+      $client: '@guzzle.client.slack'
+      $hook: '%env(SLACK_HOOK)%'
 
-    App\Service\DiscordWebhookService:
-        class: App\Service\DiscordWebhookService
-        public: true
+  App\Service\GithubService:
+    class: App\Service\GithubService
+    arguments:
+      # Absolute path to local directory where GitHub core pull request files are put
+      $pullRequestPatchPath: '%kernel.project_dir%/var/patches/'
+      $generalClient: '@guzzle.client.general'
+      $githubClient: '@guzzle.client.github'
+      $accessKey: '%env(GITHUB_ACCESS_TOKEN)%'
 
-    App\Service\GithubService:
-        class: App\Service\GithubService
-        arguments:
-            # Absolute path to local directory where github core pull request files are put
-            $pullRequestPatchPath: '%kernel.project_dir%/var/patches/'
-            $client: '@App\Client\GeneralClient'
-            $githubClient: '@App\Client\GithubClient'
+  App\Service\DocumentationBuildInformationService:
+    class: App\Service\DocumentationBuildInformationService
+    public: true
+    arguments:
+      $privateDir: '%kernel.project_dir%/var'
+      $subDir: 'docs-build-information'
+      $generalClient: '@guzzle.client.general'
+    tags:
+      - testDouble
 
-    App\Service\DocumentationBuildInformationService:
-        class: App\Service\DocumentationBuildInformationService
-        public: true
-        arguments:
-            $privateDir: '%kernel.project_dir%/var'
-            $subDir: 'docs-build-information'
-        tags:
-            - testDouble
+  App\Service\DocsServerNginxService:
+    class: App\Service\DocsServerNginxService
+    public: true
+    arguments:
+      $staticDir: '%kernel.project_dir%/config/nginx'
+    tags:
+      - testDouble
 
-    App\Service\DocsServerNginxService:
-        class: App\Service\DocsServerNginxService
-        public: true
-        arguments:
-            $privateDir: '%kernel.project_dir%/var'
-            $staticDir: '%kernel.project_dir%/config/nginx'
-        tags:
-            - testDouble
+  App\Strategy\GithubRst\StrategyResolver:
+    arguments:
+      $strategies: !tagged 'github_rst_strategy'
 
-    App\Service\RabbitPublisherService:
-        class: App\Service\RabbitPublisherService
-        arguments:
-            $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
-            $rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
+  App\Strategy\GithubRst\AddedFilesStrategy:
+    arguments:
+      $generalClient: '@guzzle.client.general'
 
-    App\Service\RabbitConsumerService:
-        class: App\Service\RabbitConsumerService
-        arguments:
-            $rabbitConnection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
-            $coreSplitters: !tagged 'core_splitter'
-            $rabbitSplitQueue: '%env(RABBITMQ_SPLIT_QUEUE)%'
+  App\Strategy\GithubRst\DeletedFilesStrategy:
+    arguments:
+      $generalClient: '@guzzle.client.general'
 
-    App\Service\RabbitStatusService:
-        class: App\Service\RabbitStatusService
-        arguments:
-            $client: '@App\Client\RabbitManagementClient'
+  App\Strategy\GithubRst\ModifiedFilesStrategy:
+    arguments:
+      $generalClient: '@guzzle.client.general'
 
-    App\Strategy\GithubRst\StrategyResolver:
-        arguments:
-            $strategies: !tagged 'github_rst_strategy'
+  App\Security\LogoutSuccessHandler:
+    class: App\Security\LogoutSuccessHandler
+    arguments:
+      $urlService: '@datahub.typo3.com.urlService'
+      $appUrl: '%env(APP_URL)%'
 
-    PhpAmqpLib\Connection\AMQPStreamConnection:
-        class: PhpAmqpLib\Connection\AMQPLazyConnection
-        public: true
-        arguments:
-            $host: '%env(RABBITMQ_HOST)%'
-            $port: '%env(RABBITMQ_PORT)%'
-            $user: '%env(RABBITMQ_USER)%'
-            $password: '%env(RABBITMQ_PASSWORD)%'
-        tags:
-            - testDouble
-
-    App\Security\LogoutSuccessHandler:
-      class: App\Security\LogoutSuccessHandler
-      arguments:
-        $urlService: '@datahub.typo3.com.urlService'
-        $appUrl: '%env(APP_URL)%'
-
-
-    App\EventListener\KernelTerminateListener:
-      tags:
-        - { name: kernel.event_listener, event: kernel.terminate }
+  App\EventListener\KernelTerminateListener:
+    tags:
+      - { name: kernel.event_listener, event: kernel.terminate }

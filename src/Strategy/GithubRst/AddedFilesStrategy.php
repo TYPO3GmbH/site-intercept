@@ -11,29 +11,26 @@ declare(strict_types=1);
 
 namespace App\Strategy\GithubRst;
 
-use App\Client\GeneralClient;
 use App\Extractor\GithubPushEventForCore;
+use GuzzleHttp\ClientInterface;
 
-class AddedFilesStrategy implements StrategyInterface
+readonly class AddedFilesStrategy implements StrategyInterface
 {
-    private GeneralClient $client;
-
-    public function __construct(GeneralClient $client)
+    public function __construct(private ClientInterface $generalClient)
     {
-        $this->client = $client;
     }
 
     public function match(string $type): bool
     {
-        return $type === 'added';
+        return 'added' === $type;
     }
 
     public function getFromGithub(GithubPushEventForCore $pushEvent, string $filename): string
     {
         $url = sprintf('https://raw.githubusercontent.com/%s/%s/%s', $pushEvent->repositoryFullName, $pushEvent->commit['id'], $filename);
-        $response = $this->client->request('GET', $url);
+        $response = $this->generalClient->request('GET', $url);
 
-        return (string)$response->getBody();
+        return (string) $response->getBody();
     }
 
     public function formatResponse(string $response): string

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -11,10 +13,9 @@ namespace App\Extractor;
 
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
-use RuntimeException;
 
 /**
- * Holds the environment information required for rendering and deployment of documentation jobs
+ * Holds the environment information required for rendering and deployment of documentation jobs.
  */
 class DeploymentInformation
 {
@@ -27,7 +28,6 @@ class DeploymentInformation
         // There is a third one 'h' => 'docs-home', handled below.
         // There is a fourth one 'other' => 'other', handled below.
     ];
-
     private static array $packageTypeExceptionMap = [
         'typo3/docs-homepage' => ['h' => 'docs-home'],
         'typo3/view-helper-reference' => ['other' => 'other'],
@@ -36,7 +36,7 @@ class DeploymentInformation
     ];
 
     /**
-     * @var string Package vendor, eg. "georgringer"
+     * @var string Package vendor, e.g. "georgringer"
      */
     public $vendor;
 
@@ -46,14 +46,9 @@ class DeploymentInformation
     public string $name;
 
     /**
-     * @var string Full package name, eg. 'georgringer/news'
+     * @var string Full package name, e.g. 'georgringer/news'
      */
     public string $packageName;
-
-    /**
-     * @var string Full package type, eg. 'typo3-cms-extension'
-     */
-    public string $packageType;
 
     /**
      * @var string Extension key, e.g. 'news'
@@ -61,12 +56,7 @@ class DeploymentInformation
     public string $extensionKey;
 
     /**
-     * @var string The (not changed) source branch or tag of the repository supposed to be checked out, eg. '1.2.3', '1.2', 'main', 'latest'
-     */
-    public string $sourceBranch;
-
-    /**
-     * @var string The target directory on the documentation server, typically identical to $branch, except for $branch='latest', this is deployed to 'master'
+     * @var string The target directory on the documentation server, typically identical to, except for='latest', this is deployed to 'master'
      */
     public string $targetBranchDirectory;
 
@@ -81,78 +71,46 @@ class DeploymentInformation
     public $typeShort;
 
     /**
-     * @var string Repository URL, eg. 'https://github.com/lolli42/enetcache/'
-     */
-    public string $repositoryUrl;
-
-    /**
-     * @var string public URL to the composer.json file in the repository
-     */
-    public string $publicComposerJsonUrl;
-
-    /**
-     * @var string Absolute path to the dump file, eg. '/.../var/docs-build-information/1893678543347'
+     * @var string Absolute path to the dump file, e.g. '/.../var/docs-build-information/1893678543347'
      */
     public string $absoluteDumpFile;
 
     /**
-     * @var string Path to dump file relative to document root, eg. 'docs-build-information/1893678543347'
+     * @var string Path to dump file relative to document root, e.g. 'docs-build-information/1893678543347'
      */
     public string $relativeDumpFile;
 
     /**
-     * @var string TYPO3 version the package is compatible with (minimum)
-     */
-    public string $minimumTypoVersion;
-
-    /**
-     * @var string TYPO3 version the package is compatible with (maximum)
-     */
-    public string $maximumTypoVersion;
-
-    /**
-     * Constructor
+     * Constructor.
      *
-     * @param string $composerPackageName
-     * @param string $composerPackageType
      * @param string $extensionKey
-     * @param string $repositoryUrl
-     * @param string $publicComposerJsonUrl
-     * @param string $version
      * @param string $minimumTypoVersion,
      * @param string $maximumTypoVersion,
-     * @param string $privateDir
-     * @param string $subDir
+     *
      * @throws DocsPackageDoNotCareBranch
      * @throws ComposerJsonInvalidException
      */
     public function __construct(
         string $composerPackageName,
-        string $composerPackageType,
+        public string $packageType,
         ?string $extensionKey,
-        string $repositoryUrl,
-        string $publicComposerJsonUrl,
-        string $version,
-        string $minimumTypoVersion,
-        string $maximumTypoVersion,
+        public string $repositoryUrl,
+        public string $publicComposerJsonUrl,
+        public string $sourceBranch,
+        public string $minimumTypoVersion,
+        public string $maximumTypoVersion,
         string $privateDir,
         string $subDir
     ) {
-        $this->repositoryUrl = $repositoryUrl;
-        $this->publicComposerJsonUrl = $publicComposerJsonUrl;
-        $this->packageType = $composerPackageType;
         $packageName = $this->determinePackageName($composerPackageName);
-        $packageType = $this->determinePackageType($composerPackageType, $composerPackageName);
+        $packageType = $this->determinePackageType($packageType, $composerPackageName);
         $this->extensionKey = $extensionKey ?? '';
         $this->vendor = key($packageName);
         $this->name = current($packageName);
         $this->packageName = $this->vendor . '/' . $this->name;
         $this->typeLong = current($packageType);
         $this->typeShort = key($packageType);
-        $this->sourceBranch = $version;
         $this->targetBranchDirectory = $this->getTargetBranchDirectory($this->sourceBranch, $this->typeLong);
-        $this->minimumTypoVersion = $minimumTypoVersion;
-        $this->maximumTypoVersion = $maximumTypoVersion;
 
         $buildTime = ceil(microtime(true) * 10000);
         $this->absoluteDumpFile = implode('/', [
@@ -160,12 +118,9 @@ class DeploymentInformation
             $subDir,
             $buildTime,
         ]);
-        $this->relativeDumpFile = implode('/', [ $subDir, $buildTime ]);
+        $this->relativeDumpFile = implode('/', [$subDir, $buildTime]);
     }
 
-    /**
-     * @return array
-     */
     public function toArray(): array
     {
         return [
@@ -187,62 +142,51 @@ class DeploymentInformation
     /**
      * Determine the target directory this package with given branch/tag will be deployed to.
      *
-     * @param string $branch
-     * @param string $type
-     * @return string
      * @throws DocsPackageDoNotCareBranch
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     private function getTargetBranchDirectory(string $branch, string $type): string
     {
         $result = $branch;
 
         // 'master', 'latest' and 'main' become 'main'
-        if ($result === 'latest' || $result === 'master' || $result === 'main') {
+        if ('latest' === $result || 'master' === $result || 'main' === $result) {
             return 'main';
         }
 
         // branch 'documentation-draft' becomes 'draft' (and is not indexed by spiders later)
-        if ($result === 'documentation-draft') {
+        if ('documentation-draft' === $result) {
             return 'draft';
         }
 
         // Cut off a leading 'v', a tag like v8.7.2 will become 8.7.2
         $result = ltrim($result, 'v');
 
-        if ($type === 'extension') {
+        if ('extension' === $type) {
             // Rules for extensions - verify structure '8.7.2' or 'v8.7.2'
             if (!preg_match('/^(\d+.\d+.\d+)$/', $result)) {
-                throw new DocsPackageDoNotCareBranch(
-                    'Branch / tag named \'' . $branch . '\' is ignored, only tags named \'major.minor.patch\' (eg. \'5.7.2\') are considered.',
-                    1557498335
-                );
+                throw new DocsPackageDoNotCareBranch('Branch / tag named \'' . $branch . '\' is ignored, only tags named \'major.minor.patch\' (e.g. \'5.7.2\') are considered.', 1557498335);
             }
             // Remove patch level, '8.7.2' becomes '8.7'
             return implode('.', array_slice(explode('.', $result), 0, 2));
         }
 
-        if ($type === 'core-extension' || $type === 'manual' || $type === 'other') {
+        if ('core-extension' === $type || 'manual' === $type || 'other' === $type) {
             // Rules for manuals and core extensions - render branches like '8.5' as '8.5' and '8' as '8'
             $result = str_replace(['_', '-'], '.', $result);
             if (!preg_match('/^(\d+.\d+)$/', $result) && !preg_match('/^(\d+)$/', $result)) {
-                throw new DocsPackageDoNotCareBranch(
-                    'Branch / tag named \'' . $branch . '\' is ignored, only branches named \'major.minor\' or \'major\' (eg. \'5.7\') are considered.',
-                    1557503542
-                );
+                throw new DocsPackageDoNotCareBranch('Branch / tag named \'' . $branch . '\' is ignored, only branches named \'major.minor\' or \'major\' (e.g. \'5.7\') are considered.', 1557503542);
             }
+
             return $result;
         }
 
         // docs-home has only main branch, this is returned above already, safe to not handle this here.
-        throw new RuntimeException('Unknown package type ' . $type);
+        throw new \RuntimeException('Unknown package type ' . $type);
     }
 
     /**
-     * @param string $packageType
-     * @param string $packageName
      * @throws ComposerJsonInvalidException
-     * @return array
      */
     private function determinePackageType(string $packageType, string $packageName): array
     {
@@ -258,14 +202,12 @@ class DeploymentInformation
     }
 
     /**
-     * @param string $packageName
-     * @return array
      * @throws ComposerJsonInvalidException
      */
     private function determinePackageName(string $packageName): array
     {
         $packageName = trim($packageName);
-        if ($packageName === '') {
+        if ('' === $packageName) {
             throw new ComposerJsonInvalidException('composer.json \'name\' must be given', 1558019290);
         }
 
@@ -274,6 +216,7 @@ class DeploymentInformation
         }
 
         [$vendor, $name] = explode('/', $packageName);
+
         return [$vendor => $name];
     }
 }

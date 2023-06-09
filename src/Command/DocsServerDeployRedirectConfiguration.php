@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -9,7 +11,6 @@
 
 namespace App\Command;
 
-use App\Service\DocsServerNginxService;
 use App\Service\GithubService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,31 +19,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Use this command to create the nginx redirects configuration file and trigger a deployment.
+ *
  * @codeCoverageIgnore
  */
 class DocsServerDeployRedirectConfiguration extends Command
 {
     protected static $defaultName = 'app:docs-redirect-deploy';
+    protected static $defaultDescription = 'Deploy current docs redirects to live server';
 
-    protected DocsServerNginxService $nginxService;
-
-    protected GithubService $githubService;
-
-    public function __construct(DocsServerNginxService $nginxService, GithubService $githubService)
-    {
+    public function __construct(
+        private readonly GithubService $githubService
+    ) {
         parent::__construct();
-        $this->nginxService = $nginxService;
-        $this->githubService = $githubService;
-    }
-
-    /**
-     * @return void
-     */
-    protected function configure()
-    {
-        $this
-            ->setDescription('Deploy current docs redirects to live server')
-        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -52,6 +40,6 @@ class DocsServerDeployRedirectConfiguration extends Command
         $this->githubService->triggerDocumentationRedirectsPlan();
         $io->success('done');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

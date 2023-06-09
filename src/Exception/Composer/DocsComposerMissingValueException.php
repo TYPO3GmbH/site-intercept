@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -11,7 +12,7 @@ declare(strict_types = 1);
 namespace App\Exception\Composer;
 
 /**
- * Exception concerning missing values in composer.json
+ * Exception concerning missing values in composer.json.
  */
 class DocsComposerMissingValueException extends \Exception
 {

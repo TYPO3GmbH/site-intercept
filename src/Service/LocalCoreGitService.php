@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -15,61 +16,25 @@ use App\Extractor\GithubCorePullRequest;
 use App\Extractor\GithubUserData;
 use App\Extractor\GitPatchFile;
 use App\Extractor\GitPushOutput;
-use App\GitWrapper\Event\GitOutputListener;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symplify\GitWrapper\EventSubscriber\GitLoggerEventSubscriber;
-use Symplify\GitWrapper\GitWorkingCopy;
-use Symplify\GitWrapper\GitWrapper;
+use Gitonomy\Git\Repository;
 
 /**
- * Apply patches to local core checkout and push to gerrit
+ * Apply patches to local core checkout and push to gerrit.
  *
  * @codeCoverageIgnore GitWrapper and friends are unmockable due to final keyword :(
  */
 class LocalCoreGitService
 {
-    private GitWorkingCopy $workingCopy;
+    private ?Repository $repository = null;
 
-    private GitOutputListener $listener;
-
-    /**
-     * Prepare core checkout.
-     *
-     * @param LoggerInterface $logger
-     * @param GitOutputListener $listener
-     * @param string $pullRequestCorePath Absolute path of local core git checkout
-     */
-    public function __construct(LoggerInterface $logger, GitOutputListener $listener, string $pullRequestCorePath)
-    {
-        $this->listener = $listener;
-        $gitWrapper = new GitWrapper();
-        $gitWrapper->setEnvVar('HOME', $_ENV['GIT_HOME'] ?? '');
-        $gitWrapper->setPrivateKey($_ENV['GIT_SSH_PRIVATE_KEY'] ?? '');
-        $gitWrapper->addLoggerEventSubscriber(new GitLoggerEventSubscriber($logger));
-        // Increase timeout to have a chance initial clone runs through
-        $gitWrapper->setTimeout(300);
-        $this->workingCopy = $gitWrapper->workingCopy($pullRequestCorePath);
-        if (!$this->workingCopy->isCloned()) {
-            // Initial clone
-            $this->workingCopy->cloneRepository('git@github.com:typo3/typo3.git');
-            $this->workingCopy->setCloned(true);
-            // Enable commit hook
-            $filesystem = new Filesystem();
-            $filesystem->copy(
-                $pullRequestCorePath . 'Build/git-hooks/commit-msg',
-                $pullRequestCorePath . '.git/hooks/commit-msg'
-            );
-        }
+    public function __construct(
+        private readonly GitService $gitService,
+        private readonly string $pullRequestCorePath
+    ) {
     }
 
     /**
      * Commit a patch to the local git repository.
-     *
-     * @param GitPatchFile $patchFile
-     * @param GithubCorePullRequest $pullRequest
-     * @param GithubUserData $userData
-     * @param GerritCommitMessage $commitMessage
      */
     public function commitPatchAsUser(
         GitPatchFile $patchFile,
@@ -77,18 +42,17 @@ class LocalCoreGitService
         GithubUserData $userData,
         GerritCommitMessage $commitMessage
     ): void {
-        $workingCopy = $this->workingCopy;
-        $workingCopy->clean('-d', '-f');
-        $workingCopy->reset('--hard');
-        $workingCopy->checkout($pullRequest->branch);
-        $workingCopy->reset('--hard', 'origin/' . $pullRequest->branch);
-        $workingCopy->fetch();
-        if (!$workingCopy->isUpToDate()) {
-            $workingCopy->pull();
-        }
-        $workingCopy->apply($patchFile->file);
-        $workingCopy->add('.');
-        $workingCopy->commit([
+        $repository = $this->gitService->cloneAndCheckout($this->getRepository(), 'git@github.com:typo3/typo3.git', 'main');
+        $this->enableCommitHook($repository);
+
+        $repository->run('clean', ['-d', '-f']);
+        $repository->run('reset', ['--hard']);
+        $repository->run('checkout', [$pullRequest->branch]);
+        $repository->run('reset', ['--hard', 'origin/' . $pullRequest->branch]);
+        $repository->run('pull');
+        $repository->run('apply', [$patchFile->file]);
+        $repository->run('add', [$patchFile->file]);
+        $repository->run('commit', [
             'author' => '"' . $userData->user . '<' . $userData->email . '>"',
             'm' => $commitMessage->message,
             'verbose' => true,
@@ -97,16 +61,28 @@ class LocalCoreGitService
 
     /**
      * Push the prepared patch on local git repository to gerrit remote.
-     *
-     * @param GithubCorePullRequest $pullRequest
-     * @return GitPushOutput
      */
     public function pushToGerrit(GithubCorePullRequest $pullRequest): GitPushOutput
     {
-        $wrapper = $this->workingCopy->getWrapper();
-        $wrapper->addOutputEventSubscriber($this->listener);
-        $this->workingCopy->push('origin', 'HEAD:refs/for/' . $pullRequest->branch);
-        $wrapper->removeOutputEventSubscriber($this->listener);
-        return new GitPushOutput($this->listener->output);
+        $output = $this->getRepository()->run('push', ['origin', 'HEAD:refs/for/' . $pullRequest->branch]);
+
+        return new GitPushOutput($output);
+    }
+
+    private function getRepository(): Repository
+    {
+        if (null === $this->repository) {
+            $this->repository = $this->gitService->getRepository($this->pullRequestCorePath);
+        }
+
+        return $this->repository;
+    }
+
+    private function enableCommitHook(Repository $repository): void
+    {
+        $hooks = $repository->getHooks();
+        if (!$hooks->has('commit-msg')) {
+            $hooks->setSymlink('commit-msg', $this->pullRequestCorePath . 'Build/git-hooks/commit-msg');
+        }
     }
 }

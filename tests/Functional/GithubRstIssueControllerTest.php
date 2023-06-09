@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -10,52 +11,50 @@ declare(strict_types = 1);
 
 namespace App\Tests\Functional;
 
-use App\Bundle\TestDoubleBundle;
-use App\Client\GeneralClient;
-use App\Kernel;
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
+use T3G\LibTestHelper\Request\AssertRequestTrait;
+use T3G\LibTestHelper\Request\MockRequest;
+use T3G\LibTestHelper\Request\RequestExpectation;
+use T3G\LibTestHelper\Request\RequestPool;
 
 class GithubRstIssueControllerTest extends AbstractFunctionalWebTestCase
 {
-    use ProphecyTrait;
+    use AssertRequestTrait;
 
     protected function setUp(): void
     {
-        self::bootKernel();
+        parent::setUp();
+
+        $this->client = static::createClient();
     }
 
-    /**
-     * @test
-     */
-    public function githubIssueIsCreatedForRstChanges(): void
+    public function testGithubIssueIsCreatedForRstChanges(): void
     {
-        /** @var Response $rstFetchRawResponse */
         $rstFetchRawResponse = require __DIR__ . '/Fixtures/GithubRstIssuePatchFetchRawFileResponse.php';
-        /** @var Response $rstFetchRawResponse */
         $rstFetchCompareResponse = require __DIR__ . '/Fixtures/GithubRstIssuePatchFetchCompareResponse.php';
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy->request(
-            'GET',
-            'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst'
-        )->shouldBeCalled()->willReturn($rstFetchRawResponse);
-        $generalClientProphecy->request(
-            'GET',
-            'https://api.github.com/repos/TYPO3/TYPO3.CMS/compare/cc9ce47f0c030772ca6b59bbc65d728fb32c96dd...47520511f4947a6ebd139a84e831a062a5b61c31'
-        )->shouldBeCalled()->willReturn($rstFetchCompareResponse);
-        $generalClientProphecy->request(
-            'GET',
-            'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/rte_ckeditor/Documentation/Configuration/ConfigureTypo3.rst'
-        )->shouldNotBeCalled();
-        $generalClientProphecy->request(
-            'GET',
-            'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/core/Documentation/Index.rst'
-        )->shouldNotBeCalled();
-        $generalClientProphecy->request(
-            'POST',
-            'https://api.github.com/repos/foobar-documentation/Changelog-To-Doc/issues',
-            [
+
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst',
+                $rstFetchRawResponse
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/repos/TYPO3/TYPO3.CMS/compare/cc9ce47f0c030772ca6b59bbc65d728fb32c96dd...47520511f4947a6ebd139a84e831a062a5b61c31',
+                $rstFetchCompareResponse
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3/TYPO3.CMS/1b5272038f09dd6f9d09736c8f57172c37d33648/typo3/sysext/core/Documentation/Changelog/12.0/Feature-97326-OpenBackendPageFromAdminPanel.rst',
+                $rstFetchRawResponse
+            ),
+            (new RequestExpectation(
+                'POST',
+                'https://api.github.com/repos/foobar-documentation/Changelog-To-Doc/issues',
+                new Response(200)
+            ))->withPayload([
                 'headers' => [
                     'Authorization' => 'token 4711',
                 ],
@@ -63,50 +62,37 @@ class GithubRstIssueControllerTest extends AbstractFunctionalWebTestCase
                     'title' => '[BUGFIX] Load AdditionalFactoryConfiguration.php again',
                     'body' => file_get_contents(__DIR__ . '/Fixtures/GithubRstPushBody.txt'),
                     'labels' => ['12.0'],
-                ]
-            ]
-        )->shouldBeCalled();
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+                ],
+            ]),
+        );
+        $generalClient = $this->createMock(Client::class);
+        static::assertRequests($generalClient, $requestPool);
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-
-        $request = require __DIR__ . '/Fixtures/GithubRstIssuePatchRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/GithubRstIssuePatchRequest.php');
+        self::assertEquals(200, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function githubIssueIsNotCreatedForChangesInNonMainBranch(): void
+    public function testGithubIssueIsNotCreatedForChangesInNonMainBranch(): void
     {
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy->request(Argument::cetera())->shouldNotBeCalled();
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+        $generalClient = $this->createMock(Client::class);
+        $generalClient->expects(self::never())->method('request');
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-
-        $request = require __DIR__ . '/Fixtures/GithubRstIssuePatchBackportRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/GithubRstIssuePatchBackportRequest.php');
+        self::assertEquals(200, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function githubIssueIsNotCreatedForChangesWithoutDocsChanges(): void
+    public function testGithubIssueIsNotCreatedForChangesWithoutDocsChanges(): void
     {
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy->request(Argument::cetera())->shouldNotBeCalled();
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
+        $generalClient = $this->createMock(Client::class);
+        $generalClient->expects(self::never())->method('request');
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-
-        $request = require __DIR__ . '/Fixtures/GithubRstIssuePatchNoDocsChangesRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/GithubRstIssuePatchNoDocsChangesRequest.php');
+        self::assertEquals(200, $response->getStatusCode());
     }
 }

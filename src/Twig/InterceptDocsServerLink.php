@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -14,21 +15,22 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
- * Twig filter that generates a link for a given documentation record
+ * Twig filter that generates a link for a given documentation record.
  */
 class InterceptDocsServerLink extends AbstractExtension
 {
     public function getFilters(): array
     {
         return [
-            new TwigFilter('intercept_docs_server_link', [$this, 'render'], ['is_safe' => ['html']]),
+            new TwigFilter('intercept_docs_server_link', $this->render(...), ['is_safe' => ['html']]),
         ];
     }
 
     public function render(string $value): string
     {
         $server = $_ENV['DOCS_LIVE_SERVER'] ?? '';
-        $path = strpos($value, '/') === 0 ? substr($value, 1) : $value;
+        $path = str_starts_with($value, '/') ? substr($value, 1) : $value;
+
         return $server . $path;
     }
 

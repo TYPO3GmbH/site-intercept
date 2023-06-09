@@ -1,7 +1,6 @@
 <?php
 declare(strict_types = 1);
 
-
 namespace App\Tests\Unit;
 
 /*
@@ -20,20 +19,10 @@ use org\bovigo\vfs\vfsStream;
 
 class NotFoundApplicationTest extends TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $requestMock;
+    private ServerRequestInterface&MockObject $requestMock;
+    private UriInterface&MockObject $uriMock;
 
-    /**
-     * @var MockObject
-     */
-    private $uriMock;
-
-    /**
-     * @var NotFoundApplication
-     */
-    private $subject;
+    private NotFoundApplication $subject;
 
     public function setUp(): void
     {
@@ -73,20 +62,14 @@ class NotFoundApplicationTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @test
-     */
-    public function statusCodeIs404()
+    public function testStatusCodeIs404(): void
     {
         $this->configureRequestUriPath('');
         $response = $this->subject->handle();
         $this->assertSame(404, $response->getStatusCode(), 'Not found did not return 404 as status code.');
     }
 
-    /**
-     * @test
-     */
-    public function default404FileIsReturned()
+    public function testDefault404FileIsReturned(): void
     {
         $this->configureRequestUriPath('');
         $response = $this->subject->handle();
@@ -97,10 +80,7 @@ class NotFoundApplicationTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function specific404FileIsReturnedForDeeperLevelCall()
+    public function testSpecific404FileIsReturnedForDeeperLevelCall(): void
     {
         $this->configureRequestUriPath('/m/typo3/team-t3docteam/master/en-us/OverviewOfManuals/DoesNotExist/AnotherLevel/Index.html');
 
@@ -112,10 +92,7 @@ class NotFoundApplicationTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function default404FileIsReturnedForDeeperLevelCall()
+    public function testDefault404FileIsReturnedForDeeperLevelCall(): void
     {
         $this->configureRequestUriPath('/m/typo3/team-t3docteam/master/en-us/');
 
@@ -127,10 +104,7 @@ class NotFoundApplicationTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function baseTagIsInserted()
+    public function testBaseTagIsInserted(): void
     {
         $this->configureRequestUriPath('');
         vfsStream::setup('root', null, [
@@ -147,7 +121,7 @@ class NotFoundApplicationTest extends TestCase
         );
     }
 
-    private function configureRequestUriPath(string $path = '')
+    private function configureRequestUriPath(string $path = ''): void
     {
         $this->uriMock->expects($this->any())
             ->method('getPath')

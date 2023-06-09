@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,19 +14,17 @@ namespace App\Utility;
 use App\Entity\DocumentationJar;
 
 /**
- * Helper class for documentation related tasks
+ * Helper class for documentation related tasks.
  */
 class DocsUtility
 {
     /**
      * Render a publicly available link to the rendered documentation.
-     *
-     * @param DocumentationJar $documentationJar
-     * @return string
      */
     public static function generateLinkToDocs(DocumentationJar $documentationJar): string
     {
         $server = $_ENV['DOCS_LIVE_SERVER'] ?? '';
+
         return sprintf('%s%s/%s/%s/en-us', $server, $documentationJar->getTypeShort(), $documentationJar->getPackageName(), $documentationJar->getTargetBranchDirectory());
     }
 }

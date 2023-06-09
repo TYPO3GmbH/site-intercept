@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -21,45 +23,30 @@ use App\Repository\HistoryEntryRepository;
 use App\Service\DocsServerNginxService;
 use App\Service\GithubService;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
-/**
- * @Route("/redirect")
- */
+#[Route(path: '/redirect')]
 class RedirectController extends AbstractController
 {
-    protected DocsServerNginxService $nginxService;
-
-    protected GithubService $githubService;
-
-    private Security $security;
-
     public function __construct(
-        DocsServerNginxService $nginxService,
-        GithubService $githubService,
-        Security $security
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DocsServerNginxService $nginxService,
+        private readonly GithubService $githubService,
+        private readonly Security $security,
     ) {
-        $this->nginxService = $nginxService;
-        $this->githubService = $githubService;
-        $this->security = $security;
     }
 
-    /**
-     * @Route("/", name="admin_redirect_index", methods={"GET"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param DocsServerRedirectRepository $redirectRepository
-     * @param HistoryEntryRepository $historyEntryRepository
-     * @param Request $request
-     * @param PaginatorInterface $paginator
-     * @return Response
-     */
+    #[Route(path: '/', name: 'admin_redirect_index', methods: ['GET'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function index(
         DocsServerRedirectRepository $redirectRepository,
         HistoryEntryRepository $historyEntryRepository,
@@ -74,7 +61,7 @@ class RedirectController extends AbstractController
 
         $requestSortDirection = $request->query->get('direction');
         $requestSortField = $request->query->get('sort');
-        $sortDirection = $requestSortDirection === 'asc' ? Criteria::ASC : Criteria::DESC;
+        $sortDirection = 'asc' === $requestSortDirection ? Criteria::ASC : Criteria::DESC;
         $sortField = in_array($requestSortField, ['source', 'target']) ? $requestSortField : 'target';
         $criteria->orderBy([$sortField => $sortDirection]);
 
@@ -108,12 +95,8 @@ class RedirectController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/new", name="admin_redirect_new", methods={"GET","POST"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param Request $request
-     * @return Response
-     */
+    #[Route(path: '/new', name: 'admin_redirect_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function new(
         Request $request
     ): Response {
@@ -122,11 +105,11 @@ class RedirectController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($redirect);
-            $entityManager->flush();
+            $this->entityManager->persist($redirect);
+            $this->entityManager->flush();
 
             $this->createRedirectsAndDeploy('new', $redirect);
+
             return $this->redirectToRoute('admin_redirect_index');
         }
 
@@ -139,30 +122,21 @@ class RedirectController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/{id<\d+>}", name="admin_redirect_show", methods={"GET"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param DocsServerRedirect $redirect
-     * @return Response
-     */
+    #[Route(path: '/{id<\d+>}', name: 'admin_redirect_show', methods: ['GET'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function show(
         DocsServerRedirect $redirect
     ): Response {
         return $this->render(
             'docs_redirect/show.html.twig',
             [
-                'redirect' => $redirect
+                'redirect' => $redirect,
             ]
         );
     }
 
-    /**
-     * @Route("/{id<\d+>}/edit", name="admin_redirect_edit", methods={"GET","POST"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param Request $request
-     * @param DocsServerRedirect $redirect
-     * @return Response
-     */
+    #[Route(path: '/{id<\d+>}/edit', name: 'admin_redirect_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function edit(
         Request $request,
         DocsServerRedirect $redirect
@@ -171,9 +145,10 @@ class RedirectController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->entityManager->flush();
 
             $this->createRedirectsAndDeploy('edit', $redirect);
+
             return $this->redirectToRoute('admin_redirect_index', ['id' => $redirect->getId()]);
         }
 
@@ -186,49 +161,35 @@ class RedirectController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/{id<\d+>}", name="admin_redirect_delete", methods={"DELETE"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param Request $request
-     * @param DocsServerRedirect $redirect
-     * @return Response
-     */
+    #[Route(path: '/{id<\d+>}', name: 'admin_redirect_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function delete(
         Request $request,
-        DocsServerRedirect $redirect
+        DocsServerRedirect $redirect,
+        ParameterBagInterface $parameterBag
     ): Response {
-        if ($this->isCsrfTokenValid('delete' . $redirect->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($redirect);
-            $entityManager->flush();
+        $csrfIsEnabled = (bool) $parameterBag->get('form.type_extension.csrf.enabled');
+        if (!$csrfIsEnabled || $this->isCsrfTokenValid('delete' . $redirect->getId(), $request->request->get('_token'))) {
+            $this->entityManager->remove($redirect);
+            $this->entityManager->flush();
             $this->createRedirectsAndDeploy('delete', $redirect);
         }
 
         return $this->redirectToRoute('admin_redirect_index');
     }
 
-    /**
-     * @Route("/dynamic", name="admin_redirect_dynamic", methods={"GET"})
-     * @return Response
-     */
+    #[Route(path: '/dynamic', name: 'admin_redirect_dynamic', methods: ['GET'])]
     public function getDynamicRedirects(): Response
     {
         return new Response(implode(chr(10), $this->nginxService->getDynamicConfiguration()));
     }
 
-    /**
-     * @Route("/static", name="admin_redirect_static", methods={"GET"})
-     * @return Response
-     */
+    #[Route(path: '/static', name: 'admin_redirect_static', methods: ['GET'])]
     public function getStaticRedirects(): Response
     {
         return new Response($this->nginxService->getStaticConfiguration()->getContents());
     }
 
-    /**
-     * @param string $triggeredBySubType
-     * @param DocsServerRedirect $redirect
-     */
     protected function createRedirectsAndDeploy(
         string $triggeredBySubType,
         DocsServerRedirect $redirect
@@ -239,24 +200,21 @@ class RedirectController extends AbstractController
         if ($user instanceof KeyCloakUser) {
             $userIdentifier = $user->getDisplayName();
         }
-        $manager = $this->getDoctrine()->getManager();
-        $manager->persist(
+        $this->entityManager->persist(
             (new HistoryEntry())
                 ->setType(HistoryEntryType::DOCS_REDIRECT)
                 ->setStatus(DocsRenderingHistoryStatus::TRIGGERED)
                 ->setGroupEntry($bambooBuildTriggered->buildResultKey)
-                ->setData(
-                    [
-                        'type' => HistoryEntryType::DOCS_REDIRECT,
-                        'status' => DocsRenderingHistoryStatus::TRIGGERED,
-                        'triggeredBy' => HistoryEntryTrigger::WEB,
-                        'subType' => $triggeredBySubType,
-                        'redirect' => $redirect->toArray(),
-                        'bambooKey' => $bambooBuildTriggered->buildResultKey,
-                        'user' => $userIdentifier
-                    ]
-                )
+                ->setData([
+                    'type' => HistoryEntryType::DOCS_REDIRECT,
+                    'status' => DocsRenderingHistoryStatus::TRIGGERED,
+                    'triggeredBy' => HistoryEntryTrigger::WEB,
+                    'subType' => $triggeredBySubType,
+                    'redirect' => $redirect->toArray(),
+                    'bambooKey' => $bambooBuildTriggered->buildResultKey,
+                    'user' => $userIdentifier,
+                ])
         );
-        $manager->flush();
+        $this->entityManager->flush();
     }
 }

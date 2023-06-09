@@ -11,28 +11,25 @@ declare(strict_types=1);
 
 namespace App\Strategy\GithubRst;
 
-use App\Client\GeneralClient;
 use App\Extractor\GithubPushEventForCore;
+use GuzzleHttp\ClientInterface;
 
-class ModifiedFilesStrategy implements StrategyInterface
+readonly class ModifiedFilesStrategy implements StrategyInterface
 {
-    private GeneralClient $client;
-
-    public function __construct(GeneralClient $client)
+    public function __construct(private ClientInterface $generalClient)
     {
-        $this->client = $client;
     }
 
     public function match(string $type): bool
     {
-        return $type === 'modified';
+        return 'modified' === $type;
     }
 
     public function getFromGithub(GithubPushEventForCore $pushEvent, string $filename): string
     {
         $url = sprintf('https://api.github.com/repos/%s/compare/%s...%s', $pushEvent->repositoryFullName, $pushEvent->beforeCommitId, $pushEvent->afterCommitId);
-        $response = $this->client->request('GET', $url);
-        $compare = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $response = $this->generalClient->request('GET', $url);
+        $compare = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $files = $compare['files'] ?? [];
 
         foreach ($files as $file) {

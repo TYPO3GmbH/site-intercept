@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -25,43 +26,19 @@ use App\Utility\RepositoryUrlUtility;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
-class DocumentationService
+readonly class DocumentationService
 {
-    protected RenderDocumentationService $renderDocumentationService;
-
-    protected DocumentationJarRepository $docsRepository;
-
-    protected EntityManagerInterface $entityManager;
-
-    protected DocumentationBuildInformationService $documentationBuildInformationService;
-
-    protected GithubService $githubService;
-
-    protected LoggerInterface $logger;
-
-    protected SlackService $slackService;
-
     public function __construct(
-        RenderDocumentationService $renderDocumentationService,
-        DocumentationJarRepository $documentationJarRepository,
-        EntityManagerInterface $entityManager,
-        DocumentationBuildInformationService $documentationBuildInformationService,
-        GithubService $githubService,
-        LoggerInterface $logger,
-        SlackService $slackService
+        private DocumentationJarRepository $docsRepository,
+        private EntityManagerInterface $entityManager,
+        private DocumentationBuildInformationService $documentationBuildInformationService,
+        private GithubService $githubService,
+        private LoggerInterface $logger,
+        private SlackService $slackService
     ) {
-        $this->renderDocumentationService = $renderDocumentationService;
-        $this->docsRepository = $documentationJarRepository;
-        $this->entityManager = $entityManager;
-        $this->documentationBuildInformationService = $documentationBuildInformationService;
-        $this->githubService = $githubService;
-        $this->logger = $logger;
-        $this->slackService = $slackService;
     }
 
     /**
-     * @param string $repositoryUrl
-     * @param string $packageName
      * @throws DocsPackageRegisteredWithDifferentRepositoryException
      */
     public function assertUrlIsUnique(string $repositoryUrl, string $packageName): void
@@ -80,8 +57,6 @@ class DocumentationService
     }
 
     /**
-     * @param DocumentationJar $doc
-     * @param string $branchName
      * @throws ComposerJsonInvalidException
      * @throws ComposerJsonNotFoundException
      * @throws DocsComposerDependencyException
@@ -104,10 +79,6 @@ class DocumentationService
             ->setMaximumTypoVersion($composerJsonObject->getMaximumTypoVersion());
     }
 
-    /**
-     * @param DocumentationJar $doc
-     * @param DeploymentInformation $deploymentInformation
-     */
     public function enrichWithDeploymentInformation(DocumentationJar $doc, DeploymentInformation $deploymentInformation): void
     {
         $doc
@@ -126,14 +97,12 @@ class DocumentationService
     }
 
     /**
-     * @param array $branches
-     * @param DocumentationJar $documentationJar
      * @throws DocsPackageDoNotCareBranch
      */
     protected function handleBranches(array $branches, DocumentationJar $documentationJar): void
     {
         foreach ($branches as $branchName => $short) {
-            // Check if in the mean time someone already rendered this branch
+            // Check if in the meantime someone already rendered this branch
             $alreadyExists = $this->docsRepository->findBy([
                 'repositoryUrl' => $documentationJar->getRepositoryUrl(),
                 'targetBranchDirectory' => $short,
@@ -151,12 +120,12 @@ class DocumentationService
                 $deploymentInformation = $this->documentationBuildInformationService
                     ->generateBuildInformationFromDocumentationJar($doc);
             } catch (
-                ComposerJsonNotFoundException |
-                ComposerJsonInvalidException |
-                DocsComposerDependencyException |
-                DocsPackageDoNotCareBranch |
-                DocsComposerMissingValueException |
-                \UnexpectedValueException |
+                ComposerJsonNotFoundException|
+                ComposerJsonInvalidException|
+                DocsComposerDependencyException|
+                DocsPackageDoNotCareBranch|
+                DocsComposerMissingValueException|
+                \UnexpectedValueException|
                 DocsPackageRegisteredWithDifferentRepositoryException $e
             ) {
                 $this->logger->warning('Cannot render documentation: ' . $e->getMessage(), [
@@ -171,30 +140,26 @@ class DocumentationService
                 continue;
             }
 
-            if ($deploymentInformation !== null) {
-                $this->enrichWithDeploymentInformation($doc, $deploymentInformation);
+            $this->enrichWithDeploymentInformation($doc, $deploymentInformation);
 
-                $doc
-                    ->setReRenderNeeded(false)
-                    ->setNew(false)
-                    ->setApproved(true);
+            $doc
+                ->setReRenderNeeded(false)
+                ->setNew(false)
+                ->setApproved(true);
 
-                $bambooBuildTriggered = $this->triggerBuild($doc);
-                $doc->setBuildKey($bambooBuildTriggered->buildResultKey);
-                $this->entityManager->persist($doc);
+            $bambooBuildTriggered = $this->triggerBuild($doc);
+            $doc->setBuildKey($bambooBuildTriggered->buildResultKey);
+            $this->entityManager->persist($doc);
 
-                // Flushing in ForEach is needed in case Bamboo finishes the build before this command
-                // has finished running through all the branches
-                $this->entityManager->flush();
-            }
+            // Flushing in ForEach is needed in case Bamboo finishes the build before this command
+            // has finished running through all the branches
+            $this->entityManager->flush();
         }
     }
 
     /**
-     * Adds documentationJar to database and triggers build
+     * Adds documentationJar to database and triggers build.
      *
-     * @param DocumentationJar $doc
-     * @param DeploymentInformation $deploymentInformation
      * @throws DocsPackageDoNotCareBranch
      */
     public function addNewDocumentationBuild(DocumentationJar $doc, DeploymentInformation $deploymentInformation): void
@@ -209,7 +174,7 @@ class DocumentationService
             'packageName' => $deploymentInformation->packageName,
         ]);
 
-        if (count($existingDocs) === 0) {
+        if (0 === count($existingDocs)) {
             $doc->setNew(true);
             $this->slackService->sendRepositoryDiscoveryMessage($doc);
         } else {
@@ -237,7 +202,6 @@ class DocumentationService
     }
 
     /**
-     * @param DocumentationJar $documentationJar
      * @throws DocsPackageDoNotCareBranch
      */
     public function handleNewRepository(DocumentationJar $documentationJar): void
@@ -253,13 +217,12 @@ class DocumentationService
     }
 
     /**
-     * @param DocumentationJar $doc
-     * @return BambooBuildTriggered
      * @throws DocsPackageDoNotCareBranch
      */
     public function triggerBuild(DocumentationJar $doc): BambooBuildTriggered
     {
         $deploymentInformation = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($doc);
+
         return $this->githubService->triggerDocumentationPlan($deploymentInformation);
     }
 }

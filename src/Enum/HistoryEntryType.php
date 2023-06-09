@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,8 +13,8 @@ namespace App\Enum;
 
 class HistoryEntryType
 {
-    public const DOCS_RENDERING = 'docsRendering';
-    public const DOCS_REDIRECT = 'docsRedirect';
-    public const PATCH = 'patch';
-    public const TAG = 'tag';
+    final public const DOCS_RENDERING = 'docsRendering';
+    final public const DOCS_REDIRECT = 'docsRedirect';
+    final public const PATCH = 'patch';
+    final public const TAG = 'tag';
 }

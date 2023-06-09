@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -10,19 +11,13 @@ declare(strict_types = 1);
 
 namespace App\Strategy\GithubRst;
 
-class StrategyResolver
+readonly class StrategyResolver
 {
-    /**
-     * @var StrategyInterface[]
-     */
-    private iterable $strategies;
-
     /**
      * @param StrategyInterface[] $strategies
      */
-    public function __construct(iterable $strategies)
+    public function __construct(private iterable $strategies)
     {
-        $this->strategies = $strategies;
     }
 
     public function resolve(string $type): StrategyInterface

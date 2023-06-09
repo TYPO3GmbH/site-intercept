@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,12 +14,12 @@ namespace App\Creator;
 use App\Extractor\GitPushOutput;
 
 /**
- * Comment posted on github for transferred pull requests.
+ * Comment posted on GitHub for transferred pull requests.
  */
 class GithubPullRequestCloseComment
 {
     /**
-     * Link to contribution guide
+     * Link to contribution guide.
      */
     private const CONTRIB_GUIDE = 'https://docs.typo3.org/typo3cms/ContributionWorkflowGuide/';
 
@@ -28,9 +29,7 @@ class GithubPullRequestCloseComment
     public string $comment;
 
     /**
-     * Create message including link to patch on gerrit
-     *
-     * @param GitPushOutput $gitPushOutput
+     * Create message including link to patch on gerrit.
      */
     public function __construct(GitPushOutput $gitPushOutput)
     {

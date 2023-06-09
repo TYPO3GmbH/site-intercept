@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -10,11 +11,9 @@ declare(strict_types = 1);
 
 namespace App\Exception;
 
-use RuntimeException;
-
 /**
- * Thrown if given HTTP status code is invalid for a redirect
+ * Thrown if given HTTP status code is invalid for a redirect.
  */
-class InvalidStatusException extends RuntimeException
+class InvalidStatusException extends \RuntimeException
 {
 }

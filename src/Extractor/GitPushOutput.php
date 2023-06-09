@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -14,17 +15,15 @@ namespace App\Extractor;
  * Extract gerrit review url from a local git push
  * needed by pull request transformer.
  */
-class GitPushOutput
+readonly class GitPushOutput
 {
     /**
-     * @var string Review extracted from a git push output, eg. 'https://review.typo3.org/c/Packages/TYPO3.CMS/+/60480'
+     * @var string Review extracted from a git push output, e.g. 'https://review.typo3.org/c/Packages/TYPO3.CMS/+/60480'
      */
     public string $reviewUrl;
 
     /**
-     * Extract review URL
-     *
-     * @param string $output
+     * Extract review URL.
      */
     public function __construct(string $output)
     {

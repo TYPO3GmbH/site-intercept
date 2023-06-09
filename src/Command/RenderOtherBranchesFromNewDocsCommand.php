@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -18,19 +20,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class RenderOtherBranchesFromNewDocsCommand extends Command
 {
     protected static $defaultName = 'app:docs-render-new';
-    private DocumentationJarRepository $documentationJarRepository;
-    private DocumentationService $documentationService;
+    protected static $defaultDescription = 'Command to render missing branches from newly added repositories';
 
-    public function __construct(DocumentationJarRepository $documentationJarRepository, DocumentationService $documentationService)
-    {
+    public function __construct(
+        private readonly DocumentationJarRepository $documentationJarRepository,
+        private readonly DocumentationService $documentationService
+    ) {
         parent::__construct();
-        $this->documentationJarRepository = $documentationJarRepository;
-        $this->documentationService = $documentationService;
-    }
-
-    protected function configure(): void
-    {
-        $this->setDescription('Command to render missing branches from newly added repositories');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -40,13 +36,13 @@ class RenderOtherBranchesFromNewDocsCommand extends Command
             'approved' => true,
         ]);
 
-        if (count($newRepositories) === 0) {
-            return 0;
+        if (0 === count($newRepositories)) {
+            return Command::SUCCESS;
         }
         foreach ($newRepositories as $documentationJar) {
             $this->documentationService->handleNewRepository($documentationJar);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

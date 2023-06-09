@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -30,13 +31,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ConfigurationController extends AbstractController
 {
-    /**
-     * @Route("/admin/docs/deployments/add", name="admin_docs_deployments_add")
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param Request $request
-     * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
-     * @return Response
-     */
+    #[Route(path: '/admin/docs/deployments/add', name: 'admin_docs_deployments_add')]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function addConfiguration(Request $request, RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository): Response
     {
         $documentationJar = new DocumentationJar();
@@ -47,7 +43,7 @@ class ConfigurationController extends AbstractController
         $form->get('repositoryType')->setData($request->get('documentation_deployment')['repositoryType'] ?? '');
         $form->handleRequest($request);
         if (!empty($repositoryUrl)) {
-            if (preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, $repositoryUrl) !== 1) {
+            if (1 !== preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, (string) $repositoryUrl)) {
                 $error = new FormError('A repository url must be a valid https git url. Staring with \'https://\' and ending with \'.git\'.');
                 $form->addError($error);
             } elseif ($repositoryBlacklistEntryRepository->isBlacklisted($repositoryUrl)) {
@@ -68,12 +64,8 @@ class ConfigurationController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/admin/docs/deployments/add/step2", name="admin_docs_deployments_add_step2")
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param Request $request
-     * @return Response
-     */
+    #[Route(path: '/admin/docs/deployments/add/step2', name: 'admin_docs_deployments_add_step2')]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function addConfigurationStep2(Request $request): Response
     {
         $documentationJar = new DocumentationJar();
@@ -83,10 +75,10 @@ class ConfigurationController extends AbstractController
         $branch = $request->get('documentation_deployment')['branch'] ?? '';
         $documentationJar->setBranch($branch);
 
-        $form = $this->createForm(DocumentationDeployment::class, $documentationJar, ['step2' => true, 'entity_manager' => $this->getDoctrine()->getManager()]);
+        $form = $this->createForm(DocumentationDeployment::class, $documentationJar, ['step2' => true]);
         $form->setData($documentationJar);
         $form->get('repositoryType')->setData($request->get('documentation_deployment')['repositoryType']);
-        if ($branch !== '') {
+        if ('' !== $branch) {
             return $this->forward(self::class . '::addConfigurationStep3');
         }
 
@@ -101,15 +93,11 @@ class ConfigurationController extends AbstractController
     }
 
     /**
-     * @Route("/admin/docs/deployments/add/step3", name="admin_docs_deployments_add_step3")
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param Request $request
-     * @param DocumentationBuildInformationService $docBuildInfoService
-     * @param DocumentationService $docService
-     * @return Response
      * @throws DocsPackageDoNotCareBranch
      * @throws DocsComposerMissingValueException
      */
+    #[Route(path: '/admin/docs/deployments/add/step3', name: 'admin_docs_deployments_add_step3')]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function addConfigurationStep3(
         Request $request,
         DocumentationBuildInformationService $docBuildInfoService,
@@ -133,15 +121,16 @@ class ConfigurationController extends AbstractController
             $request->request->set('documentation_deployment', $deploymentParams);
             $docService->assertUrlIsUnique($repositoryUrl, $doc->getPackageName());
             $deploymentInformation = $docBuildInfoService->generateBuildInformationFromDocumentationJar($doc);
-        } catch (ComposerJsonNotFoundException | ComposerJsonInvalidException | DocsComposerDependencyException | DocsPackageDoNotCareBranch | DocsPackageRegisteredWithDifferentRepositoryException $e) {
+        } catch (ComposerJsonNotFoundException|ComposerJsonInvalidException|DocsComposerDependencyException|DocsPackageDoNotCareBranch|DocsPackageRegisteredWithDifferentRepositoryException $e) {
             $this->addFlash('danger', $e->getMessage());
         }
 
         $form = $this->createForm(DocumentationDeployment::class, $doc, ['step3' => true]);
         $form->handleRequest($request);
-        if ($deploymentInformation !== null && $form->isValid()) {
+        if (null !== $deploymentInformation && $form->isValid()) {
             $docService->addNewDocumentationBuild($doc, $deploymentInformation);
             $this->addFlash('success', 'Configuration added');
+
             return $this->redirectToRoute('admin_docs_deployments');
         }
 

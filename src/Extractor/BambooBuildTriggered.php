@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -17,18 +18,16 @@ namespace App\Extractor;
 class BambooBuildTriggered
 {
     /**
-     * @var string Build result key, eg. 'CORE-GTC87-3282'
+     * @var string Build result key, e.g. 'CORE-GTC87-3282'
      */
     public string $buildResultKey;
 
     /**
-     * Extract information from a bamboo build status
-     *
-     * @param string $payload
+     * Extract information from a bamboo build status.
      */
     public function __construct(string $payload)
     {
-        if ($payload === '') {
+        if ('' === $payload) {
             $this->buildResultKey = '';
         } else {
             $response = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);

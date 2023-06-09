@@ -1,13 +1,35 @@
-{% set active = 'renderingFailed' %}
+{% extends '@Template/email.html.twig' %}
 
-<h2>Rendering documentation failed</h2>
+{% block email_subject %}Documentation rendering failed{% endblock %}
 
-<p>Hi {{ author.name }}!</p>
-<p>Rendering the documentation for {{ package }} failed because of the following reason:</p>
-<pre>{{ reasonPhrase }}</pre>
+{% block email_html_preview %}
+    The rendering of the documentation for {{ package }} failed
+{% endblock %}
 
-<h3>Additional data</h3>
-<ul>
-    <li>Repository: {{ pushEvent.repositoryUrl }}</li>
-    <li>Tag or branch: {{ pushEvent.versionString }}</li>
-</ul>
+{% block email_html_body %}
+    <p>Hi {{ author.name }}!</p>
+    <p>Rendering the documentation for {{ package }} failed because of the following reason:</p>
+    <pre>{{ reasonPhrase }}</pre>
+
+    <h3>Additional data</h3>
+    <ul>
+        <li>Repository: {{ pushEvent.repositoryUrl }}</li>
+        <li>Tag or branch: {{ pushEvent.versionString }}</li>
+    </ul>
+
+    <p><small>This is an automated email. Please do not reply to this message.</small></p>
+{% endblock %}
+
+{% block email_plaintext %}
+    Hi {{ author.name }}!
+
+    Rendering the documentation for {{ package }} failed because of the following reason:
+
+    {{ reasonPhrase }}
+
+    Additional data:
+    * Repository: {{ pushEvent.repositoryUrl }}
+    * Tag or branch: {{ pushEvent.versionString }}
+
+    This is an automated email. Please do not reply to this message.
+{% endblock %}

@@ -53,12 +53,9 @@ Interface to link other services to Discord webhooks.
 - github.com - repository hooks trigger: git subtree split, git subtree tagging, pull request
     handling, documentation rendering. intercept pushes patches and tags to core subtree split
     repositories.
-- rabbitmq.typo3.com - intercept web controls push new subtree split & tag jobs to a rabbitmq queue,
-    a intercept cli job connects to rabbit to handle these jobs.
 - typo3.slack.com - intercept pushs messages to slack for failed nightly builds
 - sqlite - a local sqlite, stores users, documentation details, information if a single core
     nightly build has been rebuild already
-- Discord - Creating and sending webhooks in Discord
 
 ## Architecture
 

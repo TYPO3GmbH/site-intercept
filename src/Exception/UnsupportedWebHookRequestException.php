@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -10,11 +11,9 @@ declare(strict_types = 1);
 
 namespace App\Exception;
 
-use RuntimeException;
-
 /**
- * Thrown if a request is not a valid or supported webhook request
+ * Thrown if a request is not a valid or supported webhook request.
  */
-class UnsupportedWebHookRequestException extends RuntimeException
+class UnsupportedWebHookRequestException extends \RuntimeException
 {
 }

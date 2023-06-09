@@ -18,13 +18,10 @@ use Symfony\Component\Finder\Finder;
 /**
  * Return a list of other versions of given documentation
  */
-class DocumentationVersions
+readonly class DocumentationVersions
 {
-    protected $request;
-
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(private ServerRequestInterface $request)
     {
-        $this->request = $request;
     }
 
     /**

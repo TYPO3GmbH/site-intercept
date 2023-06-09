@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -11,7 +12,7 @@ declare(strict_types = 1);
 namespace App\Exception;
 
 /**
- * Exception thrown if duplicate docs repo entries are found
+ * Exception thrown if duplicate docs repo entries are found.
  */
 class DuplicateDocumentationRepositoryException extends \Exception
 {

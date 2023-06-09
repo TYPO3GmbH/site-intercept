@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,55 +14,54 @@ namespace App\Extractor;
 use App\Exception\DoNotCareException;
 
 /**
- * Extract information from a github push event hook
- * that was triggered by a new github pull request on
+ * Extract information from a GitHub push event hook
+ * that was triggered by a new GitHub pull request on
  * https://github.com/TYPO3/TYPO3.CMS.
  * Throws exceptions if data is incomplete or not responsible.
  */
-class GithubCorePullRequest
+readonly class GithubCorePullRequest
 {
     /**
-     * @var string Target PR branch, eg. 'main'
+     * @var string Target PR branch, e.g. 'main'
      */
     public string $branch;
 
     /**
-     * @var string Diff URL, eg. 'https://github.com/psychomieze/TYPO3.CMS/pull/1.diff'
+     * @var string Diff URL, e.g. 'https://github.com/psychomieze/TYPO3.CMS/pull/1.diff'
      */
     public string $diffUrl;
 
     /**
-     * @var string URL to github user, eg. 'https://api.github.com/users/psychomieze'
+     * @var string URL to github user, e.g. 'https://api.github.com/users/psychomieze'
      */
     public string $userUrl;
 
     /**
-     * @var string URL to pr "issue", eg. 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1'
+     * @var string URL to pr "issue", e.g. 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1'
      */
     public string $issueUrl;
 
     /**
-     * @var string URL to pull request, eg. 'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1'
+     * @var string URL to pull request, e.g. 'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1'
      */
     public string $pullRequestUrl;
 
     /**
-     * @var string URL to pull request comments, eg. 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments'
+     * @var string URL to pull request comments, e.g. 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments'
      */
     public string $commentsUrl;
 
     /**
-     * Extract information needed by pull request controller from a github
+     * Extract information needed by pull request controller from a GitHub
      * PR or throw an exception if not responsible.
      *
-     * @param string $payload Incoming, not yet json_decoded payload
      * @throws DoNotCareException
      */
     public function __construct(string $payload)
     {
         $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
         $action = $payload['action'] ?? '';
-        if ($action !== 'opened') {
+        if ('opened' !== $action) {
             throw new DoNotCareException('action is not opened, it\'s not my job');
         }
 

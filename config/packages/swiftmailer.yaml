@@ -1,3 +1,0 @@
-swiftmailer:
-    #spool:
-    #    path: '%kernel.project_dir%/var/spool'

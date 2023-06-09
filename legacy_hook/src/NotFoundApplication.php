@@ -16,28 +16,19 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Handles 404 state for docs.typo3.org
  */
-class NotFoundApplication
+readonly class NotFoundApplication
 {
-    /**
-     * @var ServerRequestInterface
-     */
-    protected $request;
+    private const DEFAULT_NO_FOUND_PAGE = '/404.html';
 
-    /**
-     * @var string
-     */
-    protected $defaultNotFoundPage = '/404.html';
-
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(private ServerRequestInterface $request)
     {
-        $this->request = $request;
     }
 
     public function handle(): Response
     {
         $notFoundPage = $this->findNextNotFoundPage();
         if (empty($notFoundPage)) {
-            $notFoundPage = $this->getDocumentRoot() . $this->defaultNotFoundPage;
+            $notFoundPage = $this->getDocumentRoot() . self::DEFAULT_NO_FOUND_PAGE;
         }
         return new Response(404, [], $this->getNotFoundContent($notFoundPage));
     }
@@ -67,13 +58,11 @@ class NotFoundApplication
         $tagBeforeBaseTag = '<meta charset="utf-8"/>';
         $baseTag = '<base href="https://docs.typo3.org/">';
 
-        $content = str_replace(
+        return str_replace(
             $tagBeforeBaseTag,
             $tagBeforeBaseTag. PHP_EOL . $baseTag,
             $content
         );
-
-        return $content;
     }
 
     protected function getDocumentRoot(): string

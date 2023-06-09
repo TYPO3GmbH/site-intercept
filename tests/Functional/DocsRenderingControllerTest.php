@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -11,337 +11,292 @@ declare(strict_types = 1);
 
 namespace App\Tests\Functional;
 
-use App\Bundle\TestDoubleBundle;
-use App\Client\GeneralClient;
-use App\Client\GithubClient;
-use App\Client\SlackClient;
 use App\Entity\DocumentationJar;
 use App\Extractor\DeploymentInformation;
-use App\Kernel;
+use App\Repository\DocumentationJarRepository;
 use App\Service\GithubService;
-use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use T3G\LibTestHelper\Database\DatabasePrimer;
+use T3G\LibTestHelper\Request\AssertRequestTrait;
+use T3G\LibTestHelper\Request\MockRequest;
+use T3G\LibTestHelper\Request\RequestExpectation;
+use T3G\LibTestHelper\Request\RequestPool;
 
 class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
 {
-    use ProphecyTrait;
+    use DatabasePrimer;
+    use AssertRequestTrait;
+    private DocumentationJarRepository $documentationJarRepository;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
-        $kernel = self::bootKernel();
+        parent::setUp();
 
-        $this->entityManager = $kernel->getContainer()
-            ->get('doctrine')
-            ->getManager();
+        $this->client = static::createClient();
+        $this->prime();
+        $this->documentationJarRepository = $this->getEntityManager()->getRepository(DocumentationJar::class);
 
         ClockMock::register(DeploymentInformation::class);
         ClockMock::register(GithubService::class);
         ClockMock::withClockMock(155309515.6937);
     }
 
-    /**
-     * @test
-     */
-    public function githubBuildIsNotTriggeredWithNewRepo(): void
+    public function testGithubBuildIsNotTriggeredWithNewRepo(): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $slackClient = $this->addSlackClientProphecy();
-        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
+        $generalClient = $this->createMock(Client::class);
+        $generalClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
-        $githubClientProphecy = $this->prophesize(GithubClient::class);
-        $githubClientProphecy->post(Argument::cetera())->shouldNotBeCalled();
-        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects(self::once())->method('request')->with('POST', self::anything())->willReturn(new Response(200));
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        DatabasePrimer::prime($kernel);
+        $githubClient = $this->createMock(Client::class);
+        $githubClient->expects(self::never())->method('request');
 
-        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
+        self::assertEquals(204, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function githubBuildIsTriggered(): void
+    public function testGithubBuildIsTriggered(): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
+        $generalClient = $this->createMock(Client::class);
+        $generalClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
-        $slackClientProphecy = $this->prophesize(SlackClient::class);
-        $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
-        TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
-        $this->addSlackClientProphecy();
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        DatabasePrimer::prime($kernel);
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects(self::once())->method('request')->with('POST', self::anything())->willReturn(new Response(200));
 
-        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
+        self::assertEquals(204, $response->getStatusCode());
 
-        $jar = $this->entityManager
-            ->getRepository(DocumentationJar::class)
-            ->findOneBy(['packageName' => 'johndoe/make-good']);
+        $this->rebootState();
+
+        $jar = $this->documentationJarRepository->findOneBy(['packageName' => 'johndoe/make-good']);
         $jar->setApproved(true);
-        $this->entityManager->persist($jar);
-        $this->entityManager->flush();
+        $this->getEntityManager()->persist($jar);
+        $this->getEntityManager()->flush();
 
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
+        $generalClient = $this->createMock(Client::class);
+        $generalClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
-        $githubClientProphecy = $this->prophesize(GithubClient::class);
-        $githubClientProphecy
-            ->post(
-                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
-                Argument::any()
-            )->shouldBeCalled()
+
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything())
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-
-        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
+        self::assertEquals(204, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function githubBuildForMultipleBranchesIsTriggered(): void
+    public function testGithubBuildForMultipleBranchesIsTriggered(): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
-        $generalClientProphecy
-            ->request('GET', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/composer.json')
-            ->shouldBeCalled()
-            ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
-        $slackClientProphecy = $this->prophesize(SlackClient::class);
-        $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
-        TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
-        $this->addSlackClientProphecy();
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json',
+                new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/composer.json',
+                new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json'))
+            )
+        );
+        $generalClient = $this->createMock(Client::class);
+        static::assertRequests($generalClient, $requestPool);
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        DatabasePrimer::prime($kernel);
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects(self::once())->method('request')->with('POST', self::anything())->willReturn(new Response(200));
 
-        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php');
+        self::assertEquals(204, $response->getStatusCode());
 
-        $jars = $this->entityManager
-            ->getRepository(DocumentationJar::class)
-            ->findBy(['packageName' => 'bla/yay']);
+        $this->rebootState();
+
+        $jars = $this->documentationJarRepository->findBy(['packageName' => 'bla/yay']);
         foreach ($jars as $jar) {
             $jar->setApproved(true);
             $this->entityManager->persist($jar);
         }
         $this->entityManager->flush();
 
-        $githubClientProphecy = $this->prophesize(GithubClient::class);
-        $githubClientProphecy
-            ->post(
-                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
-                Argument::any()
-            )->shouldBeCalled()
-            ->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
-        $githubClientProphecy
-            ->post(
-                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
-                Argument::any()
-            )->shouldBeCalled()
-            ->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json',
+                new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/v1.1/composer.json',
+                new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json'))
+            )
+        );
+        $generalClient = $this->createMock(Client::class);
+        static::assertRequests($generalClient, $requestPool);
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'POST',
+                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
+                new Response(200)
+            ),
+            new RequestExpectation(
+                'POST',
+                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
+                new Response(200)
+            )
+        );
+        $githubClient = $this->createMock(Client::class);
+        static::assertRequests($githubClient, $requestPool);
 
-        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php');
+        self::assertEquals(204, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function githubBuildIsNotTriggered(): void
+    public function testGithubBuildIsNotTriggered(): void
     {
-        $this->addGeneralClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $slackClient = $this->addSlackClientProphecy();
-        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
-        $githubClientProphecy = $this->prophesize(GithubClient::class);
-        $githubClientProphecy->post(Argument::cetera())->shouldNotBeCalled();
-        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects(self::never())->method('request')->with('POST', self::anything());
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        $request = require __DIR__ . '/Fixtures/DocsToBambooBadRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $githubClient = $this->createMock(Client::class);
+        $githubClient->expects(self::never())->method('request');
+
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooBadRequest.php');
+        self::assertEquals(412, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function githubBuildIsNotTriggeredDueToMissingDependency(): void
+    public function testGithubBuildIsNotTriggeredDueToMissingDependency(): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $slackClient = $this->addSlackClientProphecy();
-        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects(self::never())->method('request')->with('POST', self::anything());
+
+        $generalClient = $this->createMock(Client::class);
+        $generalClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooBadRequestComposerWithoutDependency.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        DatabasePrimer::prime($kernel);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
 
-        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
-        $response = $kernel->handle($request);
-        $this->assertSame('Dependencies are not fulfilled. See https://intercept.typo3.com for more information.', $response->getContent());
-        $this->assertSame(412, $response->getStatusCode());
-        $kernel->terminate($request, $response);
+        self::assertSame('Dependencies are not fulfilled. See https://intercept.typo3.com for more information.', $response->getContent());
+        self::assertSame(412, $response->getStatusCode());
     }
 
     /**
-     * cms-core can not require cms-core in its composer.json
-     *
-     * @test
+     * cms-core can not require cms-core in its composer.json.
      */
-    public function githubBuildIsTriggeredForPackageThatCanNotRequireItself(): void
+    public function testGithubBuildIsTriggeredForPackageThatCanNotRequireItself(): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects(self::once())->method('request')->with('POST', self::anything())->willReturn(new Response(200, [], ''));
+
+        $generalClient = $this->createMock(Client::class);
+        $generalClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
-        $slackClientProphecy = $this->prophesize(SlackClient::class);
-        $slackClientProphecy->post(Argument::cetera())->shouldBeCalled()->willReturn(new Response(200, [], ''));
-        TestDoubleBundle::addProphecy(SlackClient::class, $slackClientProphecy);
-        $this->addSlackClientProphecy();
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        DatabasePrimer::prime($kernel);
 
-        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
-        $response = $kernel->handle($request);
-        $this->assertSame(204, $response->getStatusCode());
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
 
-        $jar = $this->entityManager
-            ->getRepository(DocumentationJar::class)
-            ->findOneBy(['packageName' => 'typo3/cms-core']);
+        self::assertSame(204, $response->getStatusCode());
+
+        $this->rebootState();
+
+        $jar = $this->documentationJarRepository->findOneBy(['packageName' => 'typo3/cms-core']);
         $jar->setApproved(true);
-        $this->entityManager->persist($jar);
-        $this->entityManager->flush();
+        $this->getEntityManager()->persist($jar);
+        $this->getEntityManager()->flush();
 
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        $generalClientProphecy
-            ->request('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->shouldBeCalled()
+        $generalClient = $this->createMock(Client::class);
+        $generalClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(200, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
 
-        $githubClientProphecy = $this->prophesize(GithubClient::class);
-        $githubClientProphecy
-            ->post(
-                '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
-                Argument::any()
-            )->shouldBeCalled()
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything())
             ->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $githubClientProphecy);
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
 
-        $request = require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php';
-        $response = $kernel->handle($request);
-        $this->assertSame(204, $response->getStatusCode());
-        $kernel->terminate($request, $response);
+        self::assertSame(204, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function githubBuildIsNotTriggeredDueToDeletedBranch(): void
+    public function testGithubBuildIsNotTriggeredDueToDeletedBranch(): void
     {
-        $this->addGeneralClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $slackClient = $this->addSlackClientProphecy();
-        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        DatabasePrimer::prime($kernel);
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects(self::never())->method('request')->with('POST', self::anything());
 
-        $request = require __DIR__ . '/Fixtures/DocsToBamboGithubDeletedBranchRequest.php';
-        $response = $kernel->handle($request);
-        $this->assertSame('The branch in this push event has been deleted.', $response->getContent());
-        $this->assertSame(412, $response->getStatusCode());
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGithubDeletedBranchRequest.php');
+
+        self::assertSame('The branch in this push event has been deleted.', $response->getContent());
+        self::assertSame(412, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function githubPingIsHandled(): void
+    public function testGithubPingIsHandled(): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $slackClient = $this->addSlackClientProphecy();
-        $slackClient->post(Argument::cetera())->willReturn(new Response(200, [], ''));
-        $this->addGeneralClientProphecy();
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        DatabasePrimer::prime($kernel);
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects(self::never())->method('request')->with('POST', self::anything());
 
-        $request = require __DIR__ . '/Fixtures/DocsToBambooGithubPingRequest.php';
-        $response = $kernel->handle($request);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertStringContainsString('github ping', $response->getContent());
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGithubPingRequest.php');
+
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertStringContainsString('github ping', $response->getContent());
     }
 }

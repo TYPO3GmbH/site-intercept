@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,21 +13,20 @@ namespace App\Enum;
 
 final class DocsRenderingHistoryStatus
 {
-    const BLACKLISTED = 'blacklisted';
-    const RE_RENDER_NEEDED = 're-render-needed';
-    const NO_COMPOSER_JSON = 'noComposerJson';
-    const INVALID_COMPOSER_JSON = 'invalidComposerJson';
-    const PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY = 'packageRegisteredWithDifferentRepository';
-    const NO_RELEVANT_BRANCH_OR_TAG = 'noRelevantBranchOrTag';
-    const MISSING_VALUE_IN_COMPOSER_JSON = 'missingValueInComposerJson';
-    const CORE_DEPENDENCY_NOT_SET = 'coreDependencyNotSet';
-    const UNSUPPORTED_HOOK = 'unsupportedHook';
-    const BRANCH_DELETED = 'branchDeleted';
-    const BRANCH_NO_RST_CHANGES = 'branchNoRstChanges';
-    const PACKAGE_DELETED = 'packageDeleted';
-    const TRIGGERED = 'triggered';
-    const GITHUB_PING = 'githubPing';
-
+    public const BLACKLISTED = 'blacklisted';
+    public const RE_RENDER_NEEDED = 're-render-needed';
+    public const NO_COMPOSER_JSON = 'noComposerJson';
+    public const INVALID_COMPOSER_JSON = 'invalidComposerJson';
+    public const PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY = 'packageRegisteredWithDifferentRepository';
+    public const NO_RELEVANT_BRANCH_OR_TAG = 'noRelevantBranchOrTag';
+    public const MISSING_VALUE_IN_COMPOSER_JSON = 'missingValueInComposerJson';
+    public const CORE_DEPENDENCY_NOT_SET = 'coreDependencyNotSet';
+    public const UNSUPPORTED_HOOK = 'unsupportedHook';
+    public const BRANCH_DELETED = 'branchDeleted';
+    public const BRANCH_NO_RST_CHANGES = 'branchNoRstChanges';
+    public const PACKAGE_DELETED = 'packageDeleted';
+    public const TRIGGERED = 'triggered';
+    public const GITHUB_PING = 'githubPing';
     public static array $warnings = [
         self::BLACKLISTED,
         self::RE_RENDER_NEEDED,
@@ -42,12 +41,10 @@ final class DocsRenderingHistoryStatus
         self::BRANCH_NO_RST_CHANGES,
         self::PACKAGE_DELETED,
     ];
-
     public static array $success = [
         self::TRIGGERED,
         self::GITHUB_PING,
     ];
-
     public static array $messages = [
         self::BLACKLISTED => 'Repository has been blacklisted.',
         self::RE_RENDER_NEEDED => 'Re-rendering needed.',

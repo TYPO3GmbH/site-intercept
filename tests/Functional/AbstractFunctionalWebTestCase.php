@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -11,28 +11,23 @@ declare(strict_types = 1);
 
 namespace App\Tests\Functional;
 
-use App\Bundle\TestDoubleBundle;
-use App\Client\GeneralClient;
-use App\Client\GerritClient;
-use App\Client\RabbitManagementClient;
-use App\Client\SlackClient;
-use GuzzleHttp\Psr7\Response;
-use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
+use T3G\LibTestHelper\Database\DatabasePrimer;
 
 abstract class AbstractFunctionalWebTestCase extends WebTestCase
 {
+    use DatabasePrimer;
+    protected KernelBrowser $client;
+
     /**
-     * Log in a client as documentation maintainer
-     *
-     * @param AbstractBrowser $client
+     * Log in a client as documentation maintainer.
      */
-    protected function logInAsDocumentationMaintainer(AbstractBrowser $client)
+    protected function logInAsDocumentationMaintainer(AbstractBrowser $client): void
     {
         $session = $client->getContainer()->get('session');
         $firewall = 'main';
@@ -51,11 +46,9 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
     }
 
     /**
-     * Log in a client as admin
-     *
-     * @param AbstractBrowser $client
+     * Log in a client as admin.
      */
-    protected function logInAsAdmin(AbstractBrowser $client)
+    protected function logInAsAdmin(AbstractBrowser $client): void
     {
         $session = $client->getContainer()->get('session');
         $firewall = 'main';
@@ -73,38 +66,11 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
         $client->getCookieJar()->set($cookie);
     }
 
-    protected function addGerritClientProphecy(): ObjectProphecy
+    protected function rebootState(): void
     {
-        $gerritClient = $this->prophesize(GerritClient::class);
-        TestDoubleBundle::addProphecy(GerritClient::class, $gerritClient);
-        return $gerritClient;
-    }
+        static::ensureKernelShutdown();
 
-    protected function addRabbitManagementClientProphecy(): ObjectProphecy
-    {
-        $prophecy = $this->prophesize(RabbitManagementClient::class);
-        $prophecy->get(Argument::containingString('api/queues/%2f/'), Argument::cetera())->willReturn(new Response(200, [], '{}'));
-        TestDoubleBundle::addProphecy(RabbitManagementClient::class, $prophecy);
-        return $prophecy;
-    }
-
-    protected function addSlackClientProphecy(): ObjectProphecy
-    {
-        $prophecy = $this->prophesize(SlackClient::class);
-        TestDoubleBundle::addProphecy(SlackClient::class, $prophecy);
-        return $prophecy;
-    }
-
-    protected function addGeneralClientProphecy(): ObjectProphecy
-    {
-        $prophecy = $this->prophesize(GeneralClient::class);
-        TestDoubleBundle::addProphecy(GeneralClient::class, $prophecy);
-        return $prophecy;
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        TestDoubleBundle::reset();
+        $this->client = static::createClient();
+        static::$kernel->boot();
     }
 }
