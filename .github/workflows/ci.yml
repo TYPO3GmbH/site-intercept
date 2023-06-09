@@ -59,6 +59,18 @@ jobs:
 
       - name: Install dependencies (Composer)
         run: composer install --prefer-dist --no-progress --no-interaction --ansi
+        env:
+          COMPOSER_AUTH: '{
+            "http-basic": {
+              "repo.packagist.com": {
+                "username": "token",
+                "password": "${{ secrets.PACKAGIST_AUTH_TOKEN }}"
+              }
+            },
+            "github-oauth": {
+              "github.com": "${{ secrets.ACTIONS_TOKEN }}"
+            }
+          }'
 
       - name: PHP CGL
         run: composer t3g:cgl

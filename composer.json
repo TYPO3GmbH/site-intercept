@@ -26,7 +26,7 @@
         "doctrine/persistence": "^2.1",
         "dragonmantank/cron-expression": "^2.3",
         "eightpoints/guzzle-bundle": "^v8.2.0",
-        "guzzlehttp/guzzle": "^6.5.8",
+        "guzzlehttp/guzzle": "^7.7.0",
         "kbsali/redmine-api": "~1.0",
         "knplabs/knp-menu": "^3.0",
         "knplabs/knp-paginator-bundle": "^5.0",
@@ -67,7 +67,8 @@
         "symfony/webpack-encore-bundle": "^1.0",
         "symfony/yaml": "^5.0",
         "symplify/git-wrapper": "^9.2",
-        "t3g/symfony-keycloak-bundle": "@dev",
+        "t3g/symfony-datahub-bundle": "^2.0.4",
+        "t3g/symfony-keycloak-bundle": "^2.0",
         "t3g/symfony-template-bundle": "^3.5.0",
         "t3g/symfony-usercentrics-bundle": "^1.0.0",
         "twig/twig": "^3.4.3",
@@ -101,7 +102,8 @@
             "t3g/symfony-template-bundle": "source"
         },
         "allow-plugins": {
-            "symfony/flex": true
+            "symfony/flex": true,
+            "php-http/discovery": true
         }
     },
     "scripts": {

@@ -14,29 +14,21 @@ namespace App\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
+use T3G\Bundle\Datahub\Service\UrlService;
 
 class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
 {
+    private UrlService $urlService;
     private string $appUrl;
 
-    public function __construct(string $appUrl)
+    public function __construct(UrlService $urlService, string $appUrl)
     {
+        $this->urlService = $urlService;
         $this->appUrl = $appUrl;
     }
 
-    /**
-     * Creates a Response object to send upon a successful logout.
-     *
-     * @param Request $request
-     *
-     * @return RedirectResponse never null
-     */
     public function onLogoutSuccess(Request $request): RedirectResponse
     {
-        /*
-         * This is a gatekeeper route
-         * @see https://github.com/keycloak/keycloak-documentation/blob/master/securing_apps/topics/oidc/keycloak-gatekeeper.adoc#logout-endpoint
-         */
-        return new RedirectResponse('/oauth/logout?redirect=' . urlencode('https://login.typo3.com/auth/realms/TYPO3/protocol/openid-connect/logout?redirect_uri=' . urlencode('https://' . $this->appUrl)));
+        return new RedirectResponse('/oauth/logout?redirect=' . urlencode($this->urlService->getLogoutUrlWithRedirectToApp($this->appUrl)));
     }
 }
