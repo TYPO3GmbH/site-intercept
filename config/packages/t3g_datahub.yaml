@@ -1,0 +1,8 @@
+t3g_datahub:
+  datahub:
+    base_uri: '%env(DATAHUB_BASE_URI)%'
+  keycloak:
+    base_uri: '%env(KEYCLOAK_BASE_URI)%'
+    token_uri: '%env(KEYCLOAK_TOKEN_URI)%'
+    client_id: '%env(KEYCLOAK_CLIENT_ID)%'
+    client_secret: '%env(KEYCLOAK_CLIENT_SECRET)%'
