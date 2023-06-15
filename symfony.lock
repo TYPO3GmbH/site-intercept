@@ -149,6 +149,9 @@
     "jean85/pretty-package-versions": {
         "version": "2.0.3"
     },
+    "kamermans/guzzle-oauth2-subscriber": {
+        "version": "v1.0.12"
+    },
     "kbsali/redmine-api": {
         "version": "v1.5.16"
     },
@@ -409,6 +412,9 @@
     },
     "spomky-labs/base64url": {
         "version": "v2.0.2"
+    },
+    "sunrise/stream": {
+        "version": "v1.3.4"
     },
     "swiftmailer/swiftmailer": {
         "version": "v6.2.1"
@@ -708,6 +714,12 @@
     },
     "symplify/git-wrapper": {
         "version": "v9.2.12"
+    },
+    "t3g/datahub-api-library": {
+        "version": "2.0.16"
+    },
+    "t3g/symfony-datahub-bundle": {
+        "version": "2.0.4"
     },
     "t3g/symfony-keycloak-bundle": {
         "version": "1.0.3"

@@ -198,6 +198,7 @@ services:
     App\Security\LogoutSuccessHandler:
       class: App\Security\LogoutSuccessHandler
       arguments:
+        $urlService: '@datahub.typo3.com.urlService'
         $appUrl: '%env(APP_URL)%'
 
 
