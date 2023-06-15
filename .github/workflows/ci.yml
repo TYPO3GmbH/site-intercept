@@ -30,40 +30,66 @@ jobs:
           php-version: ${{ matrix.php-versions }}
           coverage: pcov
 
-      - name: Show PHP version
-        run: php --version
-
-      - name: Show composer version
-        run: composer --version
-
-      - name: Get Composer Cache Directory
+      - name: Setup Composer cache
         id: composer-cache
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - name: Setup npm cache
+        id: npm-cache-dir
+        shell: bash
+        run: |
+          echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+
+      - name: Recover Composer caches
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock', '**/composer.json') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: (COMPOSER) Install dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction --ansi
+      - name: Recover npm caches
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-      - name: (CGL) PHP
+      - name: Install dependencies (Composer)
+        run: composer install --prefer-dist --no-progress --no-interaction --ansi
+        env:
+          COMPOSER_AUTH: '{
+            "http-basic": {
+              "repo.packagist.com": {
+                "username": "token",
+                "password": "${{ secrets.PACKAGIST_AUTH_TOKEN }}"
+              }
+            },
+            "github-oauth": {
+              "github.com": "${{ secrets.ACTIONS_TOKEN }}"
+            }
+          }'
+
+      - name: PHP CGL
         run: composer t3g:cgl
 
-      - name: PHP Stan
+      - name: phpstan
         run: composer t3g:phpstan
 
-      - name: NPM install
+      - name: Install dependencies (npm)
         run: npm ci
 
-      - name: NPM build
+      - name: Build frontend artifacts
         run: npm run build
 
-      - name: (TEST) Run all tests with coverage
+      - name: Build is clean
+        run: |
+          git status
+          git status | grep -q "nothing to commit, working tree clean"
+
+      - name: Tests
         run: composer t3g:test:php:cover
         env:
           COMPOSER_PROCESS_TIMEOUT: 2400
@@ -97,6 +123,33 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
 
+      - name: Setup Composer cache
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Setup npm cache
+        id: npm-cache-dir
+        shell: bash
+        run: |
+          echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+
+      - name: Recover Composer caches
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock', '**/composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Recover npm caches
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install Magallanes
         run: |
           composer global require "andres-montanez/magallanes" --no-progress
@@ -126,7 +179,7 @@ jobs:
           /home/runner/.composer/vendor/bin/mage deploy ${{ steps.environment.outputs.target }} -vvv
 
       - name: Archive Logs
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: logs
