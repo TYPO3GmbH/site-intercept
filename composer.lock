@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91f150de0436ca9d5428fe232250b210",
+    "content-hash": "3a466d02ef884fb097fa26da468bad99",
     "packages": [
         {
             "name": "brick/math",
@@ -1922,39 +1922,29 @@
         },
         {
             "name": "gitonomy/gitlib",
-            "version": "v1.3.8",
+            "version": "dev-bugfix/205",
             "source": {
                 "type": "git",
-                "url": "https://github.com/gitonomy/gitlib.git",
-                "reference": "9fea656e75ad6e3452feb2cac46a6c1239cd7f74"
+                "url": "https://github.com/andreasfernandez/gitlib.git",
+                "reference": "c728377bc619cae52cd6b85c78d02c0d6347a829"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gitonomy/gitlib/zipball/9fea656e75ad6e3452feb2cac46a6c1239cd7f74",
-                "reference": "9fea656e75ad6e3452feb2cac46a6c1239cd7f74",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://repo.packagist.com/typo3gmbh/dists/%package%/%version%/r%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
+                "url": "https://api.github.com/repos/andreasfernandez/gitlib/zipball/c728377bc619cae52cd6b85c78d02c0d6347a829",
+                "reference": "c728377bc619cae52cd6b85c78d02c0d6347a829",
+                "shasum": ""
             },
             "require": {
                 "ext-pcre": "*",
-                "php": "^5.6 || ^7.0 || ^8.0",
+                "php": "^8.0",
                 "symfony/polyfill-mbstring": "^1.7",
-                "symfony/process": "^3.4 || ^4.4 || ^5.0 || ^6.0"
+                "symfony/process": "^5.4 || ^6.0"
             },
             "require-dev": {
                 "ext-fileinfo": "*",
-                "phpspec/prophecy": "^1.10.2",
-                "phpunit/phpunit": "^5.7.27 || ^6.5.14 || ^7.5.20 || ^8.5.20 || ^9.5.9",
+                "phpspec/prophecy-phpunit": "^2.0",
+                "phpunit/phpunit": "^7.5.20 || ^8.5.20 || ^9.5.9",
                 "psr/log": "^1.0"
-            },
-            "suggest": {
-                "ext-fileinfo": "Required to determine the mimetype of a blob",
-                "psr/log": "Required to use loggers for reporting of execution"
             },
             "type": "library",
             "autoload": {
@@ -1962,7 +1952,11 @@
                     "Gitonomy\\Git\\": "src/Gitonomy/Git/"
                 }
             },
-            "notification-url": "https://repo.packagist.com/typo3gmbh/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Gitonomy\\Git\\Tests\\": "tests/Gitonomy/Git/Tests/"
+                }
+            },
             "license": [
                 "MIT"
             ],
@@ -1990,16 +1984,15 @@
             ],
             "description": "Library for accessing git",
             "support": {
-                "issues": "https://github.com/gitonomy/gitlib/issues",
-                "source": "https://github.com/gitonomy/gitlib/tree/v1.3.8"
+                "source": "https://github.com/andreasfernandez/gitlib/tree/bugfix/205"
             },
             "funding": [
                 {
-                    "url": "https://tidelift.com/funding/github/packagist/gitonomy/gitlib",
-                    "type": "tidelift"
+                    "type": "tidelift",
+                    "url": "https://tidelift.com/funding/github/packagist/gitonomy/gitlib"
                 }
             ],
-            "time": "2023-05-11T08:29:06+00:00"
+            "time": "2023-07-11T15:34:57+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -14905,6 +14898,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "gitonomy/gitlib": 20,
         "t3g/symfony-keycloak-bundle": 20,
         "t3g/lib-test-helper": 20
     },
