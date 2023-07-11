@@ -35,7 +35,7 @@ magephp:
         - shared-small.typo3.com
       pre-deploy:
         - exec: { cmd: "echo \"APP_ENV=prod\" >> .env.local"}
-        - composer/install: { flags: "--no-dev --optimize-autoloader"}
+        - composer/install: { flags: "--no-dev --no-progress --optimize-autoloader --ansi"}
         - exec: { cmd: "npm ci"}
         - exec: { cmd: "npm run build"}
       on-deploy:
