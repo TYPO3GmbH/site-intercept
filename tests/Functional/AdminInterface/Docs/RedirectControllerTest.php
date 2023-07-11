@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -10,209 +11,202 @@ declare(strict_types = 1);
 
 namespace App\Tests\Functional\AdminInterface\Docs;
 
-use App\Bundle\TestDoubleBundle;
-use App\Client\GithubClient;
+use App\Extractor\DeploymentInformation;
+use App\Service\GithubService;
 use App\Tests\Functional\AbstractFunctionalWebTestCase;
-use App\Tests\Functional\DatabasePrimer;
 use App\Tests\Functional\Fixtures\AdminInterface\Docs\RedirectControllerTestData;
-use GuzzleHttp\Psr7\Response;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\BrowserKit\AbstractBrowser;
+use GuzzleHttp\Client;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\DomCrawler\Crawler;
+use T3G\LibTestHelper\Database\DatabasePrimer;
+use T3G\LibTestHelper\Request\MockRequest;
 
 class RedirectControllerTest extends AbstractFunctionalWebTestCase
 {
-    use ProphecyTrait;
-    /**
-     * @var AbstractBrowser
-     */
-    private $client;
+    use DatabasePrimer;
 
     protected function setUp(): void
     {
         parent::setUp();
-        TestDoubleBundle::reset();
-        $this->addRabbitManagementClientProphecy();
+
+        $this->client = static::createClient();
+        $this->prime();
+        (new RedirectControllerTestData())->load(
+            self::$kernel->getContainer()->get('doctrine')->getManager()
+        );
+
+        ClockMock::register(DeploymentInformation::class);
+        ClockMock::register(GithubService::class);
+        ClockMock::withClockMock(155309515.6937);
     }
 
-    /**
-     * @test
-     */
-    public function indexRenderTableWithRedirectEntries()
+    public function testIndexRenderTableWithRedirectEntries(): void
     {
-        $this->client = static::createClient();
-        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('<table class="datatable-table">', $content);
-        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        self::assertStringContainsString('<table class="datatable-table">', $content);
+        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
 
-    /**
-     * @test
-     */
-    public function showRenderTableWithRedirectEntries()
+    public function testShowRenderTableWithRedirectEntries(): void
     {
-        $this->client = static::createClient();
-        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1');
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('<table class="datatable-table">', $content);
-        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        self::assertStringContainsString('<table class="datatable-table">', $content);
+        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
 
-    /**
-     * @test
-     */
-    public function editRenderTableWithRedirectEntries()
+    public function testEditRenderTableWithRedirectEntries(): void
     {
-        $this->client = static::createClient();
-        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
 
-    /**
-     * @test
-     */
-    public function updateRenderTableWithRedirectEntries()
+    public function testUpdateRenderTableWithRedirectEntries(): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $this->createPlainGithubProphecy();
-        $this->client = static::createClient();
-        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
 
-        $crawler = $this->client->request('GET', '/redirect/1/edit');
-        $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
-        $this->assertStringContainsString('302', $content);
+        $response = (new MockRequest($this->client))
+            ->setMethod('GET')
+            ->setEndPoint('/redirect/1/edit')
+            ->execute();
+        $content = $response->getContent();
+        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        self::assertStringContainsString('302', $content);
 
-        $githubClient = $this->prophesize(GithubClient::class);
-        $githubClient->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $githubClient);
+        $this->rebootState();
 
-        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
-            'docs_server_redirect' => [
-                'source' => '/p/vendor/packageOld/1.0/Bar.html',
-                'target' => '/p/vendor/packageNew/1.0/Bar.html',
-                'statusCode' => 302
-            ],
-        ]);
-        $this->client->submit($form, [], []);
-        $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
+        $this->logInAsDocumentationMaintainer($this->client);
 
-        $this->createPlainGithubProphecy();
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
+                'json' => [
+                    'event_type' => 'redirect',
+                    'client_payload' => [
+                        'id' => 'fc9a9c60fe8aff9e85190aebe1c42361c373b8c6',
+                    ],
+                ],
+            ]);
+
+        $response = (new MockRequest($this->client))
+            ->setMethod('POST')
+            ->setEndPoint('/redirect/1/edit')
+            ->setBody([
+                'docs_server_redirect' => [
+                    'source' => '/p/vendor/packageOld/1.0/Bar.html',
+                    'target' => '/p/vendor/packageNew/1.0/Bar.html',
+                    'statusCode' => 302,
+                ],
+            ])
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute();
+        self::assertEquals(302, $response->getStatusCode());
+
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Bar.html', $content);
-        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Bar.html', $content);
-        $this->assertStringContainsString('302', $content);
+        self::assertStringContainsString('/p/vendor/packageOld/1.0/Bar.html', $content);
+        self::assertStringContainsString('/p/vendor/packageNew/1.0/Bar.html', $content);
+        self::assertStringContainsString('302', $content);
     }
 
-    /**
-     * @test
-     */
-    public function newRenderTableWithRedirectEntries()
+    public function testNewRenderTableWithRedirectEntries(): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-
-        $this->createPlainGithubProphecy();
-        $this->client = static::createClient();
-        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
 
-        $crawler = $this->client->request('GET', '/redirect/new');
-        $bambooClientProphecy = $this->prophesize(GithubClient::class);
-        $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $bambooClientProphecy);
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
+                'json' => [
+                    'event_type' => 'redirect',
+                    'client_payload' => [
+                        'id' => 'fc9a9c60fe8aff9e85190aebe1c42361c373b8c6',
+                    ],
+                ],
+            ]);
 
-        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
-            'docs_server_redirect' => [
-                'source' => '/p/vendor/packageOld/4.0/Bar.html',
-                'target' => '/p/vendor/packageNew/4.0/Bar.html',
-                'statusCode' => 303
-            ],
-        ]);
-        $this->client->submit($form, [], []);
-        $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
+        $response = (new MockRequest($this->client))
+            ->setMethod('POST')
+            ->setEndPoint('/redirect/new')
+            ->setBody([
+                'docs_server_redirect' => [
+                    'source' => '/p/vendor/packageOld/4.0/Bar.html',
+                    'target' => '/p/vendor/packageNew/4.0/Bar.html',
+                    'statusCode' => 303,
+                ],
+            ])
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute();
+        self::assertEquals(302, $response->getStatusCode());
 
-        $this->createPlainGithubProphecy();
-        $this->logInAsDocumentationMaintainer($this->client);
-
-        $this->client->request('GET', '/redirect/');
-        $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('/p/vendor/packageOld/4.0/Bar.html', $content);
-        $this->assertStringContainsString('/p/vendor/packageNew/4.0/Bar.html', $content);
-    }
-
-    /**
-     * @test
-     */
-    public function deleteRenderTableWithRedirectEntries()
-    {
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-
-        $this->createPlainGithubProphecy();
-        $this->client = static::createClient();
-        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        self::assertStringContainsString('/p/vendor/packageOld/4.0/Bar.html', $content);
+        self::assertStringContainsString('/p/vendor/packageNew/4.0/Bar.html', $content);
+    }
 
-        $crawler = $this->client->request('GET', '/redirect/1/edit');
-        $bambooClientProphecy = $this->prophesize(GithubClient::class);
-        $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $bambooClientProphecy);
+    public function testDeleteRenderTableWithRedirectEntries(): void
+    {
+        $this->logInAsDocumentationMaintainer($this->client);
 
-        $form = $crawler->selectButton('redirectformdelete')->form();
-        $this->client->submit($form, [], []);
-        $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
+        $this->client->request('GET', '/redirect/');
+        $content = $this->client->getResponse()->getContent();
+        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
 
-        $this->createPlainGithubProphecy();
+        $this->rebootState();
+
+        $this->logInAsDocumentationMaintainer($this->client);
+
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
+                'json' => [
+                    'event_type' => 'redirect',
+                    'client_payload' => [
+                        'id' => 'fc9a9c60fe8aff9e85190aebe1c42361c373b8c6',
+                    ],
+                ],
+            ]);
+
+        $response = (new MockRequest($this->client))
+            ->setMethod('DELETE')
+            ->setEndPoint('/redirect/1')
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute();
+        self::assertEquals(302, $response->getStatusCode());
+
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('no records found', $content);
-    }
-
-    private function createPlainGithubProphecy(): void
-    {
-        $github = $this->prophesize(GithubClient::class);
-        TestDoubleBundle::addProphecy(GithubClient::class, $github);
-        $github->get(Argument::any(), Argument::cetera())->willReturn(
-            new Response(200, [], json_encode([]))
-        );
+        self::assertStringContainsString('no records found', $content);
     }
 
     /**
-     * @test
-     * @dataProvider invalidRedirectStrings
+     * @dataProvider invalidRedirectStringsDataProvider
      */
-    public function invalidSourceInputTriggersValidationError(string $input)
+    public function testInvalidSourceInputTriggersValidationError(string $input): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
@@ -220,29 +214,25 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
             'docs_server_redirect' => [
                 'source' => $input,
                 'target' => '/p/vendor/packageNew/4.0/Bar.html',
-                'statusCode' => 303
+                'statusCode' => 303,
             ],
         ]);
-        $this->client->submit($form, [], []);
+        $this->client->submit($form);
         $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertEquals(200, $response->getStatusCode());
         $content = $response->getContent();
 
         $responseCrawler = new Crawler('');
         $responseCrawler->addHtmlContent($content);
         $sourceLabel = $responseCrawler->filter('#docs_server_redirect div label')->text();
-        $this->assertStringContainsString('Source', $sourceLabel);
+        self::assertStringContainsString('Source', $sourceLabel);
     }
 
     /**
-     * @test
-     * @dataProvider invalidRedirectStrings
-     * @param string $input
+     * @dataProvider invalidRedirectStringsDataProvider
      */
-    public function invalidTargetInputTriggersValidationError(string $input)
+    public function testInvalidTargetInputTriggersValidationError(string $input): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $this->client = static::createClient();
         $this->logInAsDocumentationMaintainer($this->client);
 
         $crawler = $this->client->request('GET', '/redirect/new');
@@ -250,54 +240,58 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
             'docs_server_redirect' => [
                 'source' => '/p/vendor/packageOld/1.0/Foo.html',
                 'target' => $input,
-                'statusCode' => 303
+                'statusCode' => 303,
             ],
         ]);
 
-        $this->client->submit($form, [], []);
+        $this->client->submit($form);
         $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
+        self::assertEquals(200, $response->getStatusCode());
         $content = $response->getContent();
 
         $responseCrawler = new Crawler('');
         $responseCrawler->addHtmlContent($content);
         $targetLabel = $responseCrawler->filter('#docs_server_redirect')->children()->getNode(1)->textContent;
-        $this->assertStringContainsString('Target', $targetLabel);
+        self::assertStringContainsString('Target', $targetLabel);
     }
 
     /**
-     * @test
-     * @dataProvider validRedirectStrings
-     * @param string $input
+     * @dataProvider validRedirectStringsDataProvider
      */
-    public function validTargetInputTriggersFormSubmit(string $input)
+    public function testValidTargetInputTriggersFormSubmit(string $input): void
     {
-        $this->addRabbitManagementClientProphecy();
-        $this->createPlainGithubProphecy();
-        $this->client = static::createClient();
-        $this->manualSetup();
         $this->logInAsDocumentationMaintainer($this->client);
 
-        $crawler = $this->client->request('GET', '/redirect/new');
-        $form = $crawler->selectButton('docs_server_redirect_submit')->form([
-            'docs_server_redirect' => [
-                'source' => $input,
-                'target' => $input,
-                'statusCode' => 303
-            ],
-        ]);
-        $bambooClientProphecy = $this->prophesize(GithubClient::class);
-        $bambooClientProphecy->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $bambooClientProphecy);
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
+                'json' => [
+                    'event_type' => 'redirect',
+                    'client_payload' => [
+                        'id' => 'fc9a9c60fe8aff9e85190aebe1c42361c373b8c6',
+                    ],
+                ],
+            ]);
 
-        $this->client->submit($form, [], []);
-        $response = $this->client->getResponse();
-        $this->assertEquals(302, $response->getStatusCode());
-        $content = $response->getContent();
-        $this->assertStringContainsString('Redirecting to <a href="/redirect/">/redirect/</a>.', $content);
+        $response = (new MockRequest($this->client))
+            ->setMethod('POST')
+            ->setEndPoint('/redirect/new')
+            ->setBody([
+                'docs_server_redirect' => [
+                    'source' => $input,
+                    'target' => $input,
+                    'statusCode' => 303,
+                ],
+            ])
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute();
+        self::assertEquals(302, $response->getStatusCode());
+        self::assertStringContainsString('Redirecting to <a href="/redirect/">/redirect/</a>.', $response->getContent());
     }
 
-    public function validRedirectStrings(): array
+    public static function validRedirectStringsDataProvider(): array
     {
         return [
             'package' => [
@@ -318,7 +312,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         ];
     }
 
-    public function invalidRedirectStrings(): array
+    public static function invalidRedirectStringsDataProvider(): array
     {
         return [
             'something random' => [
@@ -328,13 +322,5 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
                 '/p/packageOld/2.0/Foo.html',
             ],
         ];
-    }
-
-    private function manualSetup(): void
-    {
-        DatabasePrimer::prime(self::$kernel);
-        (new RedirectControllerTestData())->load(
-            self::$kernel->getContainer()->get('doctrine')->getManager()
-        );
     }
 }

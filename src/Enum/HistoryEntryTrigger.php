@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,7 +13,7 @@ namespace App\Enum;
 
 class HistoryEntryTrigger
 {
-    public const API = 'api';
-    public const CLI = 'cli';
-    public const WEB = 'interface';
+    final public const API = 'api';
+    final public const CLI = 'cli';
+    final public const WEB = 'interface';
 }

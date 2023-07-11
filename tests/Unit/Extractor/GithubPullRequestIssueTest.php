@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -12,42 +13,34 @@ namespace App\Tests\Unit\Extractor;
 
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubPullRequestIssue;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Psr\Http\Message\ResponseInterface;
 
 class GithubPullRequestIssueTest extends TestCase
 {
-    use ProphecyTrait;
-    private $body = [
+    private static array $body = [
         'title' => 'Pull request title',
         'body' => 'Pull request body',
         'html_url' => 'https://github.com/psychomieze/TYPO3.CMS/pull/1',
     ];
 
-    /**
-     * @test
-     */
-    public function constructorExtractsValues()
+    public function testConstructorExtractsValues(): void
     {
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
-        $responseProphecy->getBody()->willReturn(json_encode($this->body));
-        $subject = new GithubPullRequestIssue($responseProphecy->reveal());
-        $this->assertSame('Pull request title', $subject->title);
-        $this->assertSame('Pull request body', $subject->body);
-        $this->assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1', $subject->url);
+        $response = new Response(200, ['Content-Type' => 'application/json'], json_encode(self::$body, JSON_THROW_ON_ERROR));
+        $subject = new GithubPullRequestIssue($response);
+
+        self::assertSame('Pull request title', $subject->title);
+        self::assertSame('Pull request body', $subject->body);
+        self::assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1', $subject->url);
     }
 
-    /**
-     * @test
-     */
-    public function constructorThrowsIfDetailDataIsEmpty()
+    public function testConstructorThrowsIfDetailDataIsEmpty(): void
     {
         $this->expectException(DoNotCareException::class);
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
-        $body = $this->body;
+
+        $body = self::$body;
         $body['title'] = '';
-        $responseProphecy->getBody()->willReturn(json_encode($body));
-        new GithubPullRequestIssue($responseProphecy->reveal());
+        $response = new Response(200, ['Content-Type' => 'application/json'], json_encode($body, JSON_THROW_ON_ERROR));
+        new GithubPullRequestIssue($response);
     }
 }

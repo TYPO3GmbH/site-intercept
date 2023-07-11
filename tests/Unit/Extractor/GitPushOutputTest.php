@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -15,10 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class GitPushOutputTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function constructorExtractsReviewUrl()
+    public function testConstructorExtractsReviewUrl(): void
     {
         $exampleOutput = 'Enumerating objects: 5, done.
 Counting objects: 100% (5/5), done.
@@ -36,13 +34,10 @@ remote:   https://review.typo3.org/c/Packages/TYPO3.CMS/+/60480 [WIP][TASK] test
 To ssh://review.typo3.org:29418/Packages/TYPO3.CMS.git
  * [new branch]            HEAD -> refs/for/main%wip';
         $subject = new GitPushOutput($exampleOutput);
-        $this->assertSame('https://review.typo3.org/c/Packages/TYPO3.CMS/+/60480', $subject->reviewUrl);
+        self::assertSame('https://review.typo3.org/c/Packages/TYPO3.CMS/+/60480', $subject->reviewUrl);
     }
 
-    /**
-     * @test
-     */
-    public function constructorThrowsIfUrlNotFound()
+    public function testConstructorThrowsIfUrlNotFound(): void
     {
         $this->expectException(\RuntimeException::class);
         new GitPushOutput('');

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -14,7 +15,7 @@ use App\Exception\DoNotCareException;
 
 /**
  * Extract information from a github push event hook
- * needed to trigger a bamboo docs render build
+ * needed to trigger a bamboo docs render build.
  */
 class GithubPushEventForDocs
 {
@@ -24,20 +25,19 @@ class GithubPushEventForDocs
     public string $tagOrBranchName = '';
 
     /**
-     * @var string Repository url to clone, eg. 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git'
+     * @var string Repository url to clone, e.g. 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git'
      */
     public string $repositoryUrl = '';
 
     /**
-     * Path to composer.json in repository
+     * Path to composer.json in repository.
      */
     public string $composerFile = '';
 
     /**
      * Extract information needed by docs trigger from a github
-     * push event or throw an exception if not responsible
+     * push event or throw an exception if not responsible.
      *
-     * @param string $payload
      * @throws DoNotCareException
      */
     public function __construct(string $payload)
@@ -53,10 +53,8 @@ class GithubPushEventForDocs
     }
 
     /**
-     * Find branch or tag name
+     * Find branch or tag name.
      *
-     * @param string $ref
-     * @return string
      * @throws DoNotCareException
      */
     private function getTagOrBranchFromRef(string $ref): string
@@ -70,10 +68,6 @@ class GithubPushEventForDocs
         throw new DoNotCareException('no tags, no heads in ref');
     }
 
-    /**
-     * @param string $repositoryUrl
-     * @return string
-     */
     private function extractRepositoryNameFromUrl(string $repositoryUrl): string
     {
         // Extract repository name from URL

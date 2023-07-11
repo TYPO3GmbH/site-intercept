@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -14,10 +15,10 @@ namespace App\Extractor;
  * Forge issue response object with validation. Created by a
  * forge response object.
  */
-class ForgeNewIssue
+readonly class ForgeNewIssue
 {
     /**
-     * @var int New forge issue is, eg. '12345'
+     * @var int New forge issue is, e.g. '12345'
      */
     public int $id;
 
@@ -25,11 +26,12 @@ class ForgeNewIssue
      * Extract information from a new forge issue response.
      *
      * @param \SimpleXMLElement $forgeIssue A new forge new issue client response
+     *
      * @throws \RuntimeException If id is not set in forge issue
      */
     public function __construct(\SimpleXMLElement $forgeIssue)
     {
-        $this->id = (int)$forgeIssue->id;
+        $this->id = (int) $forgeIssue->id;
 
         // Throw if id is not set in forge
         if (empty($this->id)) {

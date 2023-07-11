@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,11 +13,11 @@ namespace App\Extractor;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class GithubBuildInfo
+readonly class GithubBuildInfo
 {
-    public string $buildKey = '';
-    public string $link = '';
-    public bool $success = false;
+    public string $buildKey;
+    public string $link;
+    public bool $success;
 
     public function __construct(Request $request)
     {

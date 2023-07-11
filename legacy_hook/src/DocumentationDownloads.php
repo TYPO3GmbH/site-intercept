@@ -16,13 +16,10 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Return a list of download links of given documentation
  */
-class DocumentationDownloads
+readonly class DocumentationDownloads
 {
-    protected $request;
-
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(private ServerRequestInterface $request)
     {
-        $this->request = $request;
     }
 
     /**

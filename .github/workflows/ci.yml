@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         php-versions:
-          - '7.4'
+          - '8.2'
 
     steps:
       - uses: actions/checkout@v3
@@ -98,8 +98,9 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          composer global require twinh/php-coveralls --no-progress --no-suggest --no-interaction
+          composer global require php-coveralls/php-coveralls --no-progress --no-interaction --ansi
           /home/runner/.composer/vendor/bin/php-coveralls --coverage_clover=var/phpunit/coverage.xml -vvv --json_path=var/log/coveralls-upload.json
+        continue-on-error: true
 
 
   deployment:
@@ -121,7 +122,10 @@ jobs:
 
       - uses: actions/checkout@v3
 
-      - uses: shivammathur/setup-php@v2
+      - name: Setup PHP ${{ matrix.php-versions }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
 
       - name: Setup Composer cache
         id: composer-cache

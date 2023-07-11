@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -18,22 +19,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Provides actions to generate "static" assets used by docs and TER
+ * Provides actions to generate "static" assets used by docs and TER.
  */
 class AssetsDocsController extends AbstractController
 {
-    private DocumentationJarRepository $documentationJarRepository;
-
-    public function __construct(DocumentationJarRepository $documentationJarRepository)
-    {
-        $this->documentationJarRepository = $documentationJarRepository;
+    public function __construct(
+        private readonly DocumentationJarRepository $documentationJarRepository
+    ) {
     }
 
-    /**
-     * @Route("/assets/docs/manuals.json", name="docs_assets_manuals")
-     *
-     * @return Response
-     */
+    #[Route(path: '/assets/docs/manuals.json', name: 'docs_assets_manuals')]
     public function manuals(): Response
     {
         $aggregatedExtensions = [];
@@ -43,7 +38,7 @@ class AssetsDocsController extends AbstractController
             $extensionKey = $extension['key'];
             $aggregatedExtensions[$extensionKey]['docs'] = [];
             foreach ($extension['paths'] as $majorMinorVersion => $path) {
-                $majorMinorPatchVersion = explode('/', $path);
+                $majorMinorPatchVersion = explode('/', (string) $path);
                 if (empty($majorMinorPatchVersion[4])) {
                     continue;
                 }
@@ -80,14 +75,11 @@ class AssetsDocsController extends AbstractController
                 'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
             ];
         }
+
         return new JsonResponse($aggregatedExtensions);
     }
 
-    /**
-     * @Route("/assets/docs/extensions.js", name="docs_assets_extensions")
-     *
-     * @return Response
-     */
+    #[Route(path: '/assets/docs/extensions.js', name: 'docs_assets_extensions')]
     public function extensions(): Response
     {
         $extensions = $this->documentationJarRepository->findAllAvailableExtensions();
@@ -111,7 +103,7 @@ class AssetsDocsController extends AbstractController
                     'extensionKey' => $extension->getExtensionKey(),
                     'latest' => null, // this will be set later
                     'versions' => [
-                        $extension->getTargetBranchDirectory() => $extension->getTargetBranchDirectory()
+                        $extension->getTargetBranchDirectory() => $extension->getTargetBranchDirectory(),
                     ],
                     'paths' => [
                         $extension->getTargetBranchDirectory() => $path,
@@ -128,13 +120,10 @@ class AssetsDocsController extends AbstractController
 
         // Sort versions
         foreach ($flatList as &$item) {
-            natsort($item['versions']);
-
-            // natsort() keeps the array keys, this is unwanted
-            $item['versions'] = array_values(array_reverse($item['versions']));
+            rsort($item['versions'], SORT_NATURAL);
 
             // As the items are sorted as expected now, we can safely set the latest stable version
-            $stableVersions = array_values(array_filter($item['versions'], static fn (string $version): bool => preg_match('/\d+.\d+(.\d+)?/', $version) === 1));
+            $stableVersions = array_values(array_filter($item['versions'], static fn (string $version): bool => 1 === preg_match('/\d+.\d+(.\d+)?/', $version)));
             $item['latest'] = $stableVersions[0] ?? $item['versions'][0];
 
             // Create ['versions'] = ['version' => 'path']
@@ -152,6 +141,6 @@ class AssetsDocsController extends AbstractController
 
         $javaScript = sprintf($template, $now->format(\DateTimeInterface::ATOM), $encoded);
 
-        return new Response($javaScript, 200, ['Content-Type' => 'text/javascript']);
+        return new Response($javaScript, Response::HTTP_OK, ['Content-Type' => 'text/javascript']);
     }
 }

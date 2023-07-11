@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -236,11 +238,9 @@ class AssetsDocsControllerTestData extends Fixture implements OrderedFixtureInte
     }
 
     /**
-     * Get the order of this fixture
-     *
-     * @return int
+     * Get the order of this fixture.
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }

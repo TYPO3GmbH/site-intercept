@@ -2,11 +2,6 @@
 
 bin/
 !bin/console
-!bin/splitsh-lite-darwin
-!bin/splitsh-lite-linux
-
-# JIRA plugin
-atlassian-ide-plugin.xml
 
 ###> symfony/framework-bundle ###
 .env.local
@@ -18,8 +13,7 @@ atlassian-ide-plugin.xml
 ###< symfony/framework-bundle ###
 
 ###> friendsofphp/php-cs-fixer ###
-/.php_cs
-/.php_cs.cache
+.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 
 ###> phpunit/phpunit ###
@@ -31,18 +25,12 @@ atlassian-ide-plugin.xml
 /public/build/
 /public/docs-build-information/
 npm-debug.log
-yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 /.ddev/keycloak-gatekeeper.conf
 /auth.json
-/build/.phpunit.result.cache
-.phpunit.result.cache
 
 ###> symfony/phpunit-bridge ###
+build/.phpunit.cache
 .phpunit
 .phpunit.result.cache
-.php-cs-fixer.cache
-/phpunit.xml
 ###< symfony/phpunit-bridge ###
-/build/docker-compose.yml
-/build/jobfile.json

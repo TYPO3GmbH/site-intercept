@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -10,143 +12,101 @@
 namespace App\Entity;
 
 use App\Enum\DocumentationStatus;
+use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\DocumentationJarRepository")
- * @ORM\HasLifecycleCallbacks
  * @codeCoverageIgnore
  */
+#[ORM\Entity(repositoryClass: DocumentationJarRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class DocumentationJar
 {
-    public const VALID_REPOSITORY_URL_REGEX = '/^https:\/\/[-a-zA-Z0-9_.-\/]{2,300}\.git$/';
+    final public const VALID_REPOSITORY_URL_REGEX = '/^https:\/\/[-a-zA-Z0-9_.-\/]{2,300}\.git$/';
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
-     * @Assert\Url
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Url]
     private string $repositoryUrl;
 
-    /**
-     * @ORM\Column(type="string", length=255, options={"default": ""})
-     * @Assert\NotBlank
-     * @Assert\Url
-     */
+    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
+    #[Assert\NotBlank]
+    #[Assert\Url]
     private ?string $publicComposerJsonUrl = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, options={"default": ""})
-     */
+    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
     private string $vendor;
 
-    /**
-     * @ORM\Column(type="string", length=255, options={"default": ""})
-     */
+    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
     private string $name;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private string $packageName;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     private string $packageType;
 
-    /**
-     * @ORM\Column(type="string", length=255, options={"default": ""}, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true, options: ['default' => ''])]
     private ?string $extensionKey = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private string $branch;
 
-    /**
-     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
-     */
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
-     */
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $lastRenderedAt = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private string $targetBranchDirectory;
 
-    /**
-     * @ORM\Column(type="string", length=255, options={"default": ""})
-     */
+    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
     private string $typeLong;
 
-    /**
-     * @ORM\Column(type="string", length=255, options={"default": ""})
-     */
+    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
     private string $typeShort;
 
-    /**
-     * @ORM\Column(type="string", length=20, options={"default": ""})
-     */
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => ''])]
     private string $minimumTypoVersion;
 
-    /**
-     * @ORM\Column(type="string", length=20, options={"default": ""})
-     */
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => ''])]
     private string $maximumTypoVersion;
 
-    /**
-     * @ORM\Column(type="integer", options={"default": "0"})
-     */
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
     private int $status;
 
-    /**
-     * @ORM\Column(type="string", length=255, options={"default": ""})
-     */
+    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
     private string $buildKey;
 
-    /**
-     * @ORM\Column(type="boolean", options={"default": "0"})
-     */
+    #[ORM\Column(type: 'boolean', options: ['default' => 0])]
     private bool $reRenderNeeded;
 
-    /**
-     * @ORM\Column(type="boolean", options={"default": "0"})
-     */
+    #[ORM\Column(type: 'boolean', options: ['default' => 0])]
     private bool $new;
 
-    /**
-     * @ORM\Column(type="boolean", options={"default": "1"})
-     */
+    #[ORM\Column(type: 'boolean', options: ['default' => 1])]
     private bool $approved;
 
-    /**
-     * @ORM\Column(type="string", length=255, options={"default": ""})
-     */
+    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
     private string $lastRenderedLink = '';
 
     public function isReRenderNeeded(): bool
     {
-        return (bool)$this->reRenderNeeded;
+        return $this->reRenderNeeded;
     }
 
     public function setReRenderNeeded(bool $needed): self
     {
         $this->reRenderNeeded = $needed;
+
         return $this;
     }
 
@@ -158,6 +118,7 @@ class DocumentationJar
     public function setTypeShort(string $typeShort): self
     {
         $this->typeShort = $typeShort;
+
         return $this;
     }
 
@@ -169,6 +130,7 @@ class DocumentationJar
     public function setTypeLong(string $typeLong): self
     {
         $this->typeLong = $typeLong;
+
         return $this;
     }
 
@@ -192,6 +154,7 @@ class DocumentationJar
     public function setLastRenderedLink(string $lastRenderedLink): self
     {
         $this->lastRenderedLink = $lastRenderedLink;
+
         return $this;
     }
 
@@ -251,6 +214,7 @@ class DocumentationJar
     public function setPackageType(string $packageType): self
     {
         $this->packageType = $packageType;
+
         return $this;
     }
 
@@ -262,6 +226,7 @@ class DocumentationJar
     public function setExtensionKey(?string $extensionKey): self
     {
         $this->extensionKey = $extensionKey;
+
         return $this;
     }
 
@@ -363,7 +328,7 @@ class DocumentationJar
 
     public function isNew(): bool
     {
-        return (bool)$this->new;
+        return $this->new;
     }
 
     public function setApproved(bool $approved): self
@@ -375,13 +340,9 @@ class DocumentationJar
 
     public function isApproved(): bool
     {
-        return (bool)$this->approved;
+        return $this->approved;
     }
 
-    /**
-     * @param string $buildKey
-     * @return self
-     */
     public function setBuildKey(string $buildKey): self
     {
         $this->buildKey = $buildKey;
@@ -409,21 +370,19 @@ class DocumentationJar
 
     public function isDeletable(): bool
     {
-        return $this->status === DocumentationStatus::STATUS_RENDERED || $this->status === DocumentationStatus::STATUS_RENDERING_FAILED;
+        return DocumentationStatus::STATUS_RENDERED === $this->status || DocumentationStatus::STATUS_RENDERING_FAILED === $this->status;
     }
 
-    /**
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
-     */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
     public function updatedTimestamps(): void
     {
         // Set created at if record is first persisted
-        if ($this->getCreatedAt() === null) {
+        if (null === $this->getCreatedAt()) {
             $this->setCreatedAt(new \DateTime('now'));
         }
         // Update last rendered if record is first persisted
-        if ($this->getLastRenderedAt() === null) {
+        if (null === $this->getLastRenderedAt()) {
             $this->setLastRenderedAt(new \DateTime('now'));
         }
     }

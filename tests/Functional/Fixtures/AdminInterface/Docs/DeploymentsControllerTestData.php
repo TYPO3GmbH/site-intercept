@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -17,7 +19,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class DeploymentsControllerTestData extends Fixture implements OrderedFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         // Home page
         $documentationJar = (new DocumentationJar())
@@ -236,11 +238,9 @@ class DeploymentsControllerTestData extends Fixture implements OrderedFixtureInt
     }
 
     /**
-     * Get the order of this fixture
-     *
-     * @return int
+     * Get the order of this fixture.
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }

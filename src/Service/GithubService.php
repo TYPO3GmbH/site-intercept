@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -10,8 +11,6 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use App\Client\GeneralClient;
-use App\Client\GithubClient;
 use App\Creator\GithubPullRequestCloseComment;
 use App\Exception\DoNotCareException;
 use App\Extractor\BambooBuildTriggered;
@@ -22,118 +21,91 @@ use App\Extractor\GithubPushEventForCore;
 use App\Extractor\GithubUserData;
 use App\Extractor\GitPatchFile;
 use App\Strategy\GithubRst\StrategyResolver;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
-use RuntimeException;
 
 /**
- * Fetch various detail information from github
+ * Fetch various detail information from GitHub.
  */
-class GithubService
+readonly class GithubService
 {
-    private GeneralClient $client;
-
-    /**
-     * @var string Absolute path pull request files are put to
-     */
-    private string $pullRequestPatchPath;
-
-    /**
-     * @var string Github access token
-     */
-    private $accessKey;
-    private GithubClient $githubClient;
-    private StrategyResolver $strategyResolver;
-
-    /**
-     * GithubService constructor.
-     *
-     * @param string $pullRequestPatchPath Absolute path pull request files are put to
-     * @param GeneralClient $client General http client that does not need authentication
-     */
-    public function __construct(string $pullRequestPatchPath, GeneralClient $client, GithubClient $githubClient, StrategyResolver $strategyResolver)
-    {
-        $this->pullRequestPatchPath = $pullRequestPatchPath;
-        $this->client = $client;
-        $this->accessKey = $_ENV['GITHUB_ACCESS_TOKEN'] ?? '';
-        $this->githubClient = $githubClient;
-        $this->strategyResolver = $strategyResolver;
+    public function __construct(
+        private string $pullRequestPatchPath,
+        private ClientInterface $generalClient,
+        private ClientInterface $githubClient,
+        private StrategyResolver $strategyResolver,
+        private string $accessKey
+    ) {
     }
 
     /**
-     * Get details of a new pull request issue on github.
+     * Get details of a new pull request issue on GitHub.
      *
-     * @param GithubCorePullRequest $pullRequest
-     * @return GithubPullRequestIssue
      * @throws DoNotCareException
      */
     public function getIssueDetails(GithubCorePullRequest $pullRequest): GithubPullRequestIssue
     {
-        return new GithubPullRequestIssue($this->client->get($pullRequest->issueUrl));
+        return new GithubPullRequestIssue($this->generalClient->request('GET', $pullRequest->issueUrl));
     }
 
     /**
-     * Get details of a github user.
+     * Get details of a GitHub user.
      *
-     * @param GithubCorePullRequest $pullRequest
-     * @return GithubUserData
      * @throws DoNotCareException
      */
     public function getUserDetails(GithubCorePullRequest $pullRequest): GithubUserData
     {
-        return new GithubUserData($this->client->get($pullRequest->userUrl));
+        return new GithubUserData($this->generalClient->request('GET', $pullRequest->userUrl));
     }
 
     /**
-     * Fetch the diff file from a github PR and store to disk
-     *
-     * @param GithubCorePullRequest $pullRequest
-     * @return GitPatchFile
+     * Fetch the diff file from a GitHub PR and store to disk.
      */
     public function getLocalDiff(GithubCorePullRequest $pullRequest): GitPatchFile
     {
-        $response = $this->client->get($pullRequest->diffUrl);
-        $diff = (string)$response->getBody();
+        $response = $this->generalClient->request('GET', $pullRequest->diffUrl);
+        $diff = (string) $response->getBody();
         if (!@mkdir($concurrentDirectory = $this->pullRequestPatchPath) && !is_dir($concurrentDirectory)) {
-            throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
         $filePath = $this->pullRequestPatchPath . sha1($pullRequest->diffUrl);
-        $patch = fopen($filePath, 'w+');
+        $patch = fopen($filePath, 'wb+');
         fwrite($patch, $diff);
         fclose($patch);
+
         return new GitPatchFile($filePath);
     }
 
     /**
-     * Close pull request, add a comment, lock pull request
-     *
-     * @param GithubCorePullRequest $pullRequest
-     * @param GithubPullRequestCloseComment $closeComment
+     * Close pull request, add a comment, lock pull request.
      */
     public function closePullRequest(
         GithubCorePullRequest $pullRequest,
         GithubPullRequestCloseComment $closeComment
     ): void {
-        $client = $this->client;
+        $client = $this->generalClient;
 
         $url = $pullRequest->pullRequestUrl;
-        $client->patch(
+        $client->request(
+            'PATCH',
             $url,
             [
                 'headers' => [
-                    'Authorization' => 'token ' . $this->accessKey
+                    'Authorization' => 'token ' . $this->accessKey,
                 ],
                 'json' => [
                     'state' => 'closed',
-                ]
+                ],
             ]
         );
 
         $url = $pullRequest->commentsUrl;
-        $client->post(
+        $client->request(
+            'POST',
             $url,
             [
                 'headers' => [
-                    'Authorization' => 'token ' . $this->accessKey
+                    'Authorization' => 'token ' . $this->accessKey,
                 ],
                 'json' => [
                     'body' => $closeComment->comment,
@@ -142,9 +114,9 @@ class GithubService
         );
 
         $url = $pullRequest->issueUrl . '/lock';
-        $client->put($url, [
+        $client->request('PUT', $url, [
             'headers' => [
-                'Authorization' => 'token ' . $this->accessKey
+                'Authorization' => 'token ' . $this->accessKey,
             ],
         ]);
     }
@@ -154,7 +126,7 @@ class GithubService
         $added = $this->filterRstChanges($pushEvent->commit['added'] ?? []);
         $modified = $this->filterRstChanges($pushEvent->commit['modified'] ?? []);
         $removed = $this->filterRstChanges($pushEvent->commit['removed'] ?? []);
-        if (count($added) + count($modified) + count($removed) === 0) {
+        if (0 === count($added) + count($modified) + count($removed)) {
             // no rst files changed, nothing to do
             return;
         }
@@ -180,7 +152,7 @@ class GithubService
         $labels = [];
 
         foreach ($changedDocuments as $type => $files) {
-            if (count($files) === 0) {
+            if (0 === count($files)) {
                 continue;
             }
 
@@ -192,12 +164,12 @@ class GithubService
             foreach ($files as $file) {
                 try {
                     $response = $strategy->getFromGithub($pushEvent, $file);
-                } catch (BadResponseException $e) {
+                } catch (BadResponseException) {
                     continue;
                 }
 
                 $formattedContent = $strategy->formatResponse($response);
-                if ($formattedContent !== '') {
+                if ('' !== $formattedContent) {
                     $version = basename(dirname($file));
                     $labels[] = $version;
 
@@ -216,23 +188,20 @@ class GithubService
             'labels' => array_values(array_unique($labels)),
         ];
 
-        $this->client->request('POST', $requestUrl, [
+        $this->generalClient->request('POST', $requestUrl, [
             'headers' => [
-                'Authorization' => 'token ' . $this->accessKey
+                'Authorization' => 'token ' . $this->accessKey,
             ],
             'json' => $payload,
         ]);
     }
 
     /**
-     * Triggers new build in project TYPO3-Documentation/t3docs-ci-deploy
-     *
-     * @param DeploymentInformation $deploymentInformation
-     * @return BambooBuildTriggered
+     * Triggers new build in project TYPO3-Documentation/t3docs-ci-deploy.
      */
     public function triggerDocumentationPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
     {
-        $id = sha1((string)(time()) . $deploymentInformation->packageName);
+        $id = sha1(time() . $deploymentInformation->packageName);
         $postBody = [
             'event_type' => 'render',
             'client_payload' => [
@@ -242,27 +211,26 @@ class GithubService
                 'name' => $deploymentInformation->name,
                 'vendor' => $deploymentInformation->vendor,
                 'type_short' => $deploymentInformation->typeShort,
-                'id' => $id
-            ]
+                'id' => $id,
+            ],
         ];
-        $this->githubClient->post(
+        $this->githubClient->request(
+            'POST',
             '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
             [
-                'json' => $postBody
+                'json' => $postBody,
             ]
         );
-        return new BambooBuildTriggered(json_encode(['buildResultKey' => $id]));
+
+        return new BambooBuildTriggered(json_encode(['buildResultKey' => $id], JSON_THROW_ON_ERROR));
     }
 
     /**
-     * Triggers new build in project TYPO3-Documentation/t3docs-ci-deploy for deletion
-     *
-     * @param DeploymentInformation $deploymentInformation
-     * @return BambooBuildTriggered
+     * Triggers new build in project TYPO3-Documentation/t3docs-ci-deploy for deletion.
      */
     public function triggerDocumentationDeletionPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
     {
-        $id = sha1((string)time() . $deploymentInformation->packageName);
+        $id = sha1((string) time() . $deploymentInformation->packageName);
         $postBody = [
             'event_type' => 'delete',
             'client_payload' => [
@@ -270,50 +238,51 @@ class GithubService
                 'name' => $deploymentInformation->name,
                 'vendor' => $deploymentInformation->vendor,
                 'type_short' => $deploymentInformation->typeShort,
-                'id' => $id
-            ]
+                'id' => $id,
+            ],
         ];
 
-        $this->githubClient->post(
+        $this->githubClient->request(
+            'POST',
             '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
             [
-                'json' => $postBody
+                'json' => $postBody,
             ]
         );
-        return new BambooBuildTriggered(json_encode(['buildResultKey' => $id]));
+
+        return new BambooBuildTriggered(json_encode(['buildResultKey' => $id], JSON_THROW_ON_ERROR));
     }
 
     /**
-     * Trigger new build of project CORE-DRD
-     *
-     * @return BambooBuildTriggered
+     * Trigger new build of project CORE-DRD.
      */
     public function triggerDocumentationRedirectsPlan(): BambooBuildTriggered
     {
-        $id = sha1((string)time());
+        $id = sha1((string) time());
         $postBody = [
             'event_type' => 'redirect',
             'client_payload' => [
-                'id' => $id
-            ]
+                'id' => $id,
+            ],
         ];
-        $this->githubClient->post(
+        $this->githubClient->request(
+            'POST',
             '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches',
             [
-                'json' => $postBody
+                'json' => $postBody,
             ]
         );
-        return new BambooBuildTriggered(json_encode(['buildResultKey' => $id]));
+
+        return new BambooBuildTriggered(json_encode(['buildResultKey' => $id], JSON_THROW_ON_ERROR));
     }
 
     /**
      * @param string[] $files
+     *
      * @return string[]
      */
     private function filterRstChanges(array $files): array
     {
-        return array_filter($files, static function (string $file) {
-            return str_ends_with($file, '.rst') && str_contains($file, 'typo3/sysext/core/Documentation/Changelog/');
-        });
+        return array_filter($files, static fn (string $file) => str_ends_with($file, '.rst') && str_contains($file, 'typo3/sysext/core/Documentation/Changelog/'));
     }
 }

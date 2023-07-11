@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -23,15 +24,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BlacklistController extends AbstractController
 {
-
-    /**
-     * @Route("/admin/docs/deployments/blacklist/{documentationJarId}", name="admin_docs_deployments_blacklist_action", requirements={"documentationJarId"="\d+"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param int $documentationJarId
-     * @param DocumentationJarRepository $documentationJarRepository
-     * @param EntityManagerInterface $entityManager
-     * @return Response
-     */
+    #[Route(path: '/admin/docs/deployments/blacklist/{documentationJarId}', name: 'admin_docs_deployments_blacklist_action', requirements: ['documentationJarId' => '\d+'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function blacklist(
         int $documentationJarId,
         DocumentationJarRepository $documentationJarRepository,
@@ -53,14 +47,8 @@ class BlacklistController extends AbstractController
         return $this->redirectToRoute('admin_docs_deployments');
     }
 
-    /**
-     * @Route("/admin/docs/deployments/blacklist", name="admin_docs_deployments_blacklist_index")
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param Request $request
-     * @param PaginatorInterface $paginator
-     * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
-     * @return Response
-     */
+    #[Route(path: '/admin/docs/deployments/blacklist', name: 'admin_docs_deployments_blacklist_index')]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function blacklistIndex(
         Request $request,
         PaginatorInterface $paginator,
@@ -76,19 +64,13 @@ class BlacklistController extends AbstractController
         return $this->render(
             'docs_blacklist/index.html.twig',
             [
-                'pagination' => $pagination
+                'pagination' => $pagination,
             ]
         );
     }
 
-    /**
-     * @Route("/admin/docs/deployments/blacklist/delete/{entryId}", name="admin_docs_deployments_blacklist_delete_action", requirements={"entryId"="\d+"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param int $entryId
-     * @param RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
-     * @param EntityManagerInterface $entityManager
-     * @return Response
-     */
+    #[Route(path: '/admin/docs/deployments/blacklist/delete/{entryId}', name: 'admin_docs_deployments_blacklist_delete_action', requirements: ['entryId' => '\d+'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function blacklistDelete(
         int $entryId,
         RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,

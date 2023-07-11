@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,17 +13,15 @@ namespace App\EventListener;
 
 use App\Repository\HistoryEntryRepository;
 
-class KernelTerminateListener
+readonly class KernelTerminateListener
 {
-    private HistoryEntryRepository $repository;
-
-    public function __construct(HistoryEntryRepository $repository)
-    {
-        $this->repository = $repository;
+    public function __construct(
+        private HistoryEntryRepository $historyEntryRepository
+    ) {
     }
 
     public function __invoke(): void
     {
-        $this->repository->deleteOldEntries();
+        $this->historyEntryRepository->deleteOldEntries();
     }
 }

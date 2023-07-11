@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -27,7 +28,6 @@ use App\Service\GithubService;
 use App\Service\RenderDocumentationService;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,18 +37,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 /**
- * Show and manipulate all docs deployments managed by intercept
+ * Show and manipulate all docs deployments managed by intercept.
  */
 class DeploymentsController extends AbstractController
 {
-    /**
-     * @Route("/admin/docs/deployments", name="admin_docs_deployments")
-     * @param Request $request
-     * @param PaginatorInterface $paginator
-     * @param HistoryEntryRepository $historyEntryRepository
-     * @param DocumentationJarRepository $documentationJarRepository
-     * @return Response
-     */
+    #[Route(path: '/admin/docs/deployments', name: 'admin_docs_deployments')]
     public function index(
         Request $request,
         PaginatorInterface $paginator,
@@ -60,7 +53,7 @@ class DeploymentsController extends AbstractController
 
         $requestSortDirection = $request->query->get('direction');
         $requestSortField = $request->query->get('sort');
-        $sortDirection = $requestSortDirection === 'asc' ? Criteria::ASC : Criteria::DESC;
+        $sortDirection = 'asc' === $requestSortDirection ? Criteria::ASC : Criteria::DESC;
         $sortField = in_array($requestSortField, ['packageName', 'typeLong', 'lastRenderedAt']) ? $requestSortField : 'lastRenderedAt';
         $criteria->orderBy([$sortField => $sortDirection]);
 
@@ -72,7 +65,7 @@ class DeploymentsController extends AbstractController
             if ($data['type']) {
                 $criteria->andWhere($expressionBuilder->eq('typeLong', $data['type']));
             }
-            if ($data['status'] || $data['status'] === 0) {
+            if ($data['status'] || 0 === $data['status']) {
                 $criteria->andWhere($expressionBuilder->eq('status', $data['status']));
             }
             if ($data['search']) {
@@ -94,18 +87,13 @@ class DeploymentsController extends AbstractController
                 'logMessages' => $recentLogsMessages,
                 'warnings' => DocsRenderingHistoryStatus::$warnings,
                 'translations' => DocsRenderingHistoryStatus::$messages,
-                'docsLiveServer' => $_ENV['DOCS_LIVE_SERVER'] ?? ''
+                'docsLiveServer' => $_ENV['DOCS_LIVE_SERVER'] ?? '',
             ]
         );
     }
 
-    /**
-     * @Route("/admin/docs/deployments/delete/{documentationJarId}/confirm", name="admin_docs_deployments_delete_view", requirements={"documentationJarId"="\d+"}, methods={"GET"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param int $documentationJarId
-     * @param DocumentationJarRepository $documentationJarRepository
-     * @return Response
-     */
+    #[Route(path: '/admin/docs/deployments/delete/{documentationJarId}/confirm', name: 'admin_docs_deployments_delete_view', requirements: ['documentationJarId' => '\d+'], methods: ['GET'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function deleteConfirm(
         int $documentationJarId,
         DocumentationJarRepository $documentationJarRepository
@@ -125,17 +113,11 @@ class DeploymentsController extends AbstractController
     }
 
     /**
-     * @Route("/admin/docs/deployments/delete/{documentationJarId}", name="admin_docs_deployments_delete_action", requirements={"documentationJarId"="\d+"}, methods={"DELETE"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param int $documentationJarId
-     * @param DocumentationJarRepository $documentationJarRepository
-     * @param EntityManagerInterface $entityManager
-     * @param DocumentationBuildInformationService $documentationBuildInformationService
-     * @param GithubService $githubService
      * @throws DocsPackageDoNotCareBranch
      * @throws ComposerJsonInvalidException
-     * @return Response
      */
+    #[Route(path: '/admin/docs/deployments/delete/{documentationJarId}', name: 'admin_docs_deployments_delete_action', requirements: ['documentationJarId' => '\d+'], methods: ['DELETE'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function delete(
         int $documentationJarId,
         DocumentationJarRepository $documentationJarRepository,
@@ -164,17 +146,15 @@ class DeploymentsController extends AbstractController
                     ->setType('docsRendering')
                     ->setStatus(DocsRenderingHistoryStatus::PACKAGE_DELETED)
                     ->setGroupEntry($buildTriggered->buildResultKey)
-                    ->setData(
-                        [
-                            'type' => HistoryEntryType::DOCS_RENDERING,
-                            'status' => DocsRenderingHistoryStatus::PACKAGE_DELETED,
-                            'triggeredBy' => HistoryEntryTrigger::WEB,
-                            'repository' => $jar->getRepositoryUrl(),
-                            'package' => $jar->getPackageName(),
-                            'bambooKey' => $buildTriggered->buildResultKey,
-                            'user' => $userIdentifier
-                        ]
-                    )
+                    ->setData([
+                        'type' => HistoryEntryType::DOCS_RENDERING,
+                        'status' => DocsRenderingHistoryStatus::PACKAGE_DELETED,
+                        'triggeredBy' => HistoryEntryTrigger::WEB,
+                        'repository' => $jar->getRepositoryUrl(),
+                        'package' => $jar->getPackageName(),
+                        'bambooKey' => $buildTriggered->buildResultKey,
+                        'user' => $userIdentifier,
+                    ])
             );
             $entityManager->flush();
         }
@@ -183,23 +163,18 @@ class DeploymentsController extends AbstractController
     }
 
     /**
-     * @Route("/admin/docs/deployments/approve/{documentationJarId}", name="admin_docs_deployments_approve_action", requirements={"documentationJarId"="\d+"})
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param int $documentationJarId
-     * @param DocumentationJarRepository $documentationJarRepository
-     * @param EntityManagerInterface $entityManager
-     * @param RenderDocumentationService $renderDocumentationService
-     * @return Response
      * @throws DocsPackageDoNotCareBranch
      * @throws DuplicateDocumentationRepositoryException
      */
+    #[Route(path: '/admin/docs/deployments/approve/{documentationJarId}', name: 'admin_docs_deployments_approve_action', requirements: ['documentationJarId' => '\d+'])]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function approve(
         int $documentationJarId,
         DocumentationJarRepository $documentationJarRepository,
         EntityManagerInterface $entityManager,
         RenderDocumentationService $renderDocumentationService
     ): Response {
-        $originalJar = $documentationJarRepository->find($documentationJarId);
+        $originalJar = $documentationJarRepository->find($documentationJarId) ?? throw $this->createNotFoundException('Cannot find documentation with id ' . $documentationJarId);
         $jars = $documentationJarRepository->findBy(['repositoryUrl' => $originalJar->getRepositoryUrl()]);
 
         foreach ($jars as $jar) {
@@ -215,15 +190,10 @@ class DeploymentsController extends AbstractController
     }
 
     /**
-     * @Route("/admin/docs/render", name="admin_docs_render")
-     * @IsGranted("ROLE_DOCUMENTATION_MAINTAINER")
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @param DocumentationJarRepository $documentationJarRepository
-     * @param RenderDocumentationService $renderDocumentationService
      * @throws DuplicateDocumentationRepositoryException
-     * @return Response
      */
+    #[Route(path: '/admin/docs/render', name: 'admin_docs_render')]
+    #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function renderDocs(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -235,15 +205,14 @@ class DeploymentsController extends AbstractController
         if ($user instanceof KeyCloakUser) {
             $userIdentifier = $user->getDisplayName();
         }
-        try {
-            $documentationJarId = (int)$request->get('documentation');
-            $documentationJar = $documentationJarRepository->find($documentationJarId);
-            if ($documentationJar === null) {
-                throw new InvalidArgumentException('no documentationJar given', 1557930900);
-            }
 
+        $documentationJarId = (int) $request->get('documentation');
+        $documentationJar = $documentationJarRepository->find($documentationJarId) ?? throw $this->createNotFoundException('Cannot find documentation with id ' . $documentationJarId);
+
+        try {
             $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'interface');
             $this->addFlash('success', 'A re-rendering was triggered.');
+
             return $this->redirectToRoute('admin_docs_deployments');
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
@@ -251,51 +220,43 @@ class DeploymentsController extends AbstractController
                 (new HistoryEntry())
                     ->setType('docsRendering')
                     ->setStatus(DocsRenderingHistoryStatus::UNSUPPORTED_HOOK)
-                    ->setData(
-                        [
-                            'type' => 'docsRendering',
-                            'status' => DocsRenderingHistoryStatus::UNSUPPORTED_HOOK,
-                            'headers' => $request->headers,
-                            'payload' => $request->getContent(),
-                            'triggeredBy' => HistoryEntryTrigger::API,
-                            'exceptionCode' => $e->getCode(),
-                            'user' => $userIdentifier
-                        ]
-                    )
+                    ->setData([
+                        'type' => 'docsRendering',
+                        'status' => DocsRenderingHistoryStatus::UNSUPPORTED_HOOK,
+                        'headers' => $request->headers,
+                        'payload' => $request->getContent(),
+                        'triggeredBy' => HistoryEntryTrigger::API,
+                        'exceptionCode' => $e->getCode(),
+                        'user' => $userIdentifier,
+                    ])
             );
             $entityManager->flush();
+
             return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         } catch (DocsPackageDoNotCareBranch $e) {
             $entityManager->persist(
                 (new HistoryEntry())
                     ->setType(HistoryEntryType::DOCS_RENDERING)
                     ->setStatus(DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG)
-                    ->setData(
-                        [
-                            'type' => HistoryEntryType::DOCS_RENDERING,
-                            'status' => DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG,
-                            'triggeredBy' => HistoryEntryTrigger::API,
-                            'exceptionCode' => $e->getCode(),
-                            'exceptionMessage' => $e->getMessage(),
-                            'repository' => $documentationJar->getRepositoryUrl(),
-                            'sourceBranch' => $documentationJar->getBranch(),
-                            'user' => $userIdentifier
-                        ]
-                    )
+                    ->setData([
+                        'type' => HistoryEntryType::DOCS_RENDERING,
+                        'status' => DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG,
+                        'triggeredBy' => HistoryEntryTrigger::API,
+                        'exceptionCode' => $e->getCode(),
+                        'exceptionMessage' => $e->getMessage(),
+                        'repository' => $documentationJar->getRepositoryUrl(),
+                        'sourceBranch' => $documentationJar->getBranch(),
+                        'user' => $userIdentifier,
+                    ])
             );
             $entityManager->flush();
+
             return new Response('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         }
     }
 
-    /**
-     * @Route("/admin/docs/deployments/reset/{documentationJarId}", name="admin_docs_deployments_reset_action", requirements={"documentationJarId"="\d+"}, methods={"GET"})
-     * @IsGranted("ROLE_ADMIN")
-     * @param int $documentationJarId
-     * @param DocumentationJarRepository $documentationJarRepository
-     * @param EntityManagerInterface $entityManager
-     * @return Response
-     */
+    #[Route(path: '/admin/docs/deployments/reset/{documentationJarId}', name: 'admin_docs_deployments_reset_action', requirements: ['documentationJarId' => '\d+'], methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function resetStatus(
         int $documentationJarId,
         DocumentationJarRepository $documentationJarRepository,

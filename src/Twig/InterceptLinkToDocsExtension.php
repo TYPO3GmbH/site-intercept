@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -16,14 +17,14 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
- * Twig filter that generates a link for a given documentation record
+ * Twig filter that generates a link for a given documentation record.
  */
 class InterceptLinkToDocsExtension extends AbstractExtension
 {
     public function getFilters(): array
     {
         return [
-            new TwigFilter('intercept_link_to_docs', [$this, 'render'], ['is_safe' => ['html']]),
+            new TwigFilter('intercept_link_to_docs', $this->render(...), ['is_safe' => ['html']]),
         ];
     }
 

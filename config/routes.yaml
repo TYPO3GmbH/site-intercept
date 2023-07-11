@@ -1,6 +1,7 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+controllers:
+  resource: '../src/Controller/*'
+  type: annotation
+  trailing_slash_on_root: false
 
 # A static logout route
 logout:

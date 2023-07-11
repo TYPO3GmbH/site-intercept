@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -9,62 +11,47 @@
 
 namespace App\Entity;
 
+use App\Repository\RepositoryBlacklistEntryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\RepositoryBlacklistEntryRepository")
  * @codeCoverageIgnore
  */
+#[ORM\Entity(repositoryClass: RepositoryBlacklistEntryRepository::class)]
 class RepositoryBlacklistEntry
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
-     * @Assert\Url
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Url]
     private string $repositoryUrl = '';
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     * @return RepositoryBlacklistEntry
-     */
     public function setId(int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getRepositoryUrl(): string
     {
         return $this->repositoryUrl;
     }
 
-    /**
-     * @param string $repositoryUrl
-     * @return RepositoryBlacklistEntry
-     */
     public function setRepositoryUrl(string $repositoryUrl): self
     {
         $this->repositoryUrl = $repositoryUrl;
+
         return $this;
     }
 }

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -11,12 +12,10 @@ declare(strict_types = 1);
 namespace App\Extractor;
 
 use App\Exception\DoNotCareException;
-use App\Utility\BranchUtility;
 use Ramsey\Uuid\Uuid;
 
 /**
- * Extract information from a github push event hook
- * needed to trigger the core git split to single repos.
+ * Extract information from a github push event hook.
  *
  * Throws exceptions if not responsible.
  */
@@ -26,7 +25,7 @@ class GithubPushEventForCore
     private const TYPE_TAG = 'tag';
 
     /**
-     * @var string|null Used especially in logging as context.
+     * @var string|null used especially in logging as context
      */
     public ?string $jobUuid = null;
 
@@ -36,12 +35,12 @@ class GithubPushEventForCore
     public ?string $type = null;
 
     /**
-     * @var string|null The source branch to split FROM, eg. 'TYPO3_8-7', '9.2', 'main'
+     * @var string|null The source branch to split FROM, e.g. 'TYPO3_8-7', '9.2', 'main'
      */
     public ?string $sourceBranch = null;
 
     /**
-     * @var string|null The target branch to split TO, eg. '8.7', '9.2', 'main'
+     * @var string|null The target branch to split TO, e.g. '8.7', '9.2', 'main'
      */
     public ?string $targetBranch = null;
 
@@ -54,7 +53,6 @@ class GithubPushEventForCore
      * @var string|null the full name of the repository
      */
     public ?string $repositoryFullName = null;
-
     public string $headCommitTitle = '';
     public array $commit = [];
     public string $beforeCommitId = '';
@@ -63,7 +61,8 @@ class GithubPushEventForCore
     /**
      * Extract information.
      *
-     * @param array $fullPullRequestInformation Optional, this object is used in consumer, via json serializer, too.
+     * @param array $fullPullRequestInformation optional, this object is used in consumer, via json serializer, too
+     *
      * @throws DoNotCareException
      * @throws \Exception
      */
@@ -80,7 +79,7 @@ class GithubPushEventForCore
                 $this->commit = $fullPullRequestInformation['head_commit'] ?? [];
                 $this->type = self::TYPE_PATCH;
                 $this->sourceBranch = $this->getSourceBranch($fullPullRequestInformation['ref']);
-                $this->targetBranch = BranchUtility::resolveCoreSplitBranch($this->sourceBranch);
+                $this->targetBranch = $this->sourceBranch;
                 $this->headCommitTitle = explode("\n", $fullPullRequestInformation['head_commit']['message'] ?? '', 2)[0] ?? '';
             } elseif ($this->isPushedTag($fullPullRequestInformation)) {
                 $this->type = self::TYPE_TAG;
@@ -96,33 +95,25 @@ class GithubPushEventForCore
     /**
      * If the 'ref' part of a github pull request starts with 'refs/heads/',
      * then this has been a merged patch that should be split.
-     *
-     * @param array $requestInformation
-     * @return bool
      */
     private function isPushedPatch(array $requestInformation): bool
     {
-        return str_starts_with($requestInformation['ref'], 'refs/heads/');
+        return str_starts_with((string) $requestInformation['ref'], 'refs/heads/');
     }
 
     /**
      * If 'ref' starts with 'refs/tags/, and created is set and base_ref is not
      * empty, then this push event is an event for a new tag on git core main.
-     *
-     * @param array $requestInformation
-     * @return bool
      */
     private function isPushedTag(array $requestInformation): bool
     {
-        return str_starts_with($requestInformation['ref'], 'refs/tags/')
-               && $requestInformation['created'] === true;
+        return str_starts_with((string) $requestInformation['ref'], 'refs/tags/')
+               && true === $requestInformation['created'];
     }
 
     /**
-     * Extract tag from a 'refs/tags/v9.5.1' a-like string
+     * Extract tag from a 'refs/tags/v9.5.1' a-like string.
      *
-     * @param string $ref
-     * @return string
      * @throws DoNotCareException
      */
     private function getTag(string $ref): string
@@ -131,14 +122,13 @@ class GithubPushEventForCore
         if (empty($tagFromRef)) {
             throw new DoNotCareException('no tag found in ref');
         }
+
         return $tagFromRef;
     }
 
     /**
-     * Determine source branch from 'ref', eg. 'refs/heads/main' becomes 'main'
+     * Determine source branch from 'ref', e.g. 'refs/heads/main' becomes 'main'.
      *
-     * @param string $ref
-     * @return string
      * @throws DoNotCareException
      */
     private function getSourceBranch(string $ref): string
@@ -147,6 +137,7 @@ class GithubPushEventForCore
         if (empty($sourceBranchFromRef)) {
             throw new DoNotCareException('not source branch found');
         }
-        return BranchUtility::resolveCoreMonoRepoBranch($sourceBranchFromRef);
+
+        return $sourceBranchFromRef;
     }
 }

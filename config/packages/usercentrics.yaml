@@ -1,2 +1,2 @@
 usercentrics:
-    id: '%env(USERCENTRICS_ID)%'
+  id: '%env(USERCENTRICS_ID)%'

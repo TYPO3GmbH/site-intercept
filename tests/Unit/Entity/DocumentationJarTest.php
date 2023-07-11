@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -14,10 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class DocumentationJarTest extends TestCase
 {
-    /**
-     * @return array
-     */
-    public function repositoryUrlDataProvider(): array
+    public static function repositoryUrlDataProvider(): array
     {
         return [
             ['https://github.com/mautic/mautic-typo3.git', 1],
@@ -29,15 +28,12 @@ class DocumentationJarTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider repositoryUrlDataProvider
-     * @param string $url
-     * @param int $expected
      */
     public function testRepositoryUrlRegex(string $url, int $expected): void
     {
         $result = preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, $url);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 }

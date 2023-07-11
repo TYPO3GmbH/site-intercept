@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -10,7 +12,6 @@
 namespace App\Repository;
 
 use App\Entity\HistoryEntry;
-use App\Enum\HistoryEntryType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -32,44 +33,6 @@ class HistoryEntryRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('h')
             ->andWhere('h.type = :val')
             ->setParameter('val', $type)
-            ->orderBy('h.createdAt', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findSplitLogsByStatus(array $status, int $limit = 100): array
-    {
-        $qb = $this->createQueryBuilder('h');
-        return $qb
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->in('h.type', [HistoryEntryType::PATCH, HistoryEntryType::TAG]),
-                    $qb->expr()->in('h.status', ':status')
-                )
-            )
-            ->setParameter('status', $status)
-            ->orderBy('h.createdAt', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findSplitLogsByStatusAndGroup(array $status, string $group, int $limit = 100): array
-    {
-        $qb = $this->createQueryBuilder('h');
-        return $qb
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->in('h.type', [HistoryEntryType::PATCH, HistoryEntryType::TAG]),
-                    $qb->expr()->in('h.status', ':status'),
-                    $qb->expr()->eq('h.groupEntry', ':group'),
-                )
-            )
-            ->setParameters([
-                                'status' => $status,
-                                'group' => $group,
-                            ])
             ->orderBy('h.createdAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()

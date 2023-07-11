@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -16,7 +17,7 @@ use T3G\Bundle\TemplateBundle\Menu\MenuBuilder as TemplateMenuBuider;
 use T3G\Bundle\TemplateBundle\Utility\AvatarUtility;
 
 /**
- * MenuBuilder
+ * MenuBuilder.
  */
 class MenuBuilder extends TemplateMenuBuider
 {
@@ -24,16 +25,6 @@ class MenuBuilder extends TemplateMenuBuider
     {
         $menu = $this->factory->createItem('root');
 
-        $menu->addChild(
-            'core',
-            [
-                'route' => 'admin_split_core',
-                'label' => 'Split Core',
-                'extras' => [
-                    'icon' => 'actions-extension',
-                ],
-            ]
-        );
         $menu->addChild(
             'documentation',
             [
@@ -68,40 +59,7 @@ class MenuBuilder extends TemplateMenuBuider
                 ]
             );
         }
-        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            $menu->addChild(
-                'discord',
-                [
-                    'route' => 'admin_discord_webhooks',
-                    'label' => 'Discord',
-                    'extras' => [
-                        'icon' => 'discord',
-                        'fab' => true,
-                    ],
-                ]
-            );
-            $menu['discord']->addChild(
-                'discord_webhooks',
-                [
-                    'route' => 'admin_discord_webhooks',
-                    'label' => 'Webhooks',
-                ]
-            );
-            $menu['discord']->addChild(
-                'discord_scheduled_messages',
-                [
-                    'route' => 'admin_discord_scheduled_messages',
-                    'label' => 'Scheduled Messages',
-                ]
-            );
-            $menu['discord']->addChild(
-                'discord_howto',
-                [
-                    'route' => 'admin_discord_webhooks_howto',
-                    'label' => 'Configuring Services',
-                ]
-            );
-        }
+
         return $menu;
     }
 
@@ -153,6 +111,7 @@ class MenuBuilder extends TemplateMenuBuider
                 ]
             )->setLinkAttribute('class', 'btn btn-primary');
         }
+
         return $menu;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -21,7 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class DocsServerRedirectType
- * Form definition for the redirect entity
+ * Form definition for the redirect entity.
  */
 class DocsServerRedirectType extends AbstractType
 {
@@ -36,10 +38,10 @@ class DocsServerRedirectType extends AbstractType
             ])
             ->add('statusCode', ChoiceType::class, [
                 'choices' => DocsServerRedirect::$allowedStatusCodes,
-                'choice_label' => static fn ($value) => $value
+                'choice_label' => static fn ($value) => $value,
             ])
             ->add('isLegacy', HiddenType::class, [
-                'data' => '0'
+                'data' => '0',
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Save',
@@ -48,7 +50,7 @@ class DocsServerRedirectType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
             $data = $event->getData();
-            $data['isLegacy'] = (int)(strpos($data['source'], '/typo3cms/extensions/') === 0);
+            $data['isLegacy'] = (int) str_starts_with((string) $data['source'], '/typo3cms/extensions/');
             $event->setData($data);
         });
     }
@@ -57,7 +59,6 @@ class DocsServerRedirectType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => DocsServerRedirect::class,
-            'csrf_protection' => $_ENV['APP_ENV'] ?? '' !== 'test',
         ]);
     }
 }

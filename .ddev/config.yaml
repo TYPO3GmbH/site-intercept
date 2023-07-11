@@ -1,7 +1,7 @@
 name: intercept
 type: php
 docroot: public
-php_version: "7.4"
+php_version: "8.2"
 webserver_type: nginx-fpm
 router_http_port: "80"
 router_https_port: "443"
@@ -17,7 +17,7 @@ hooks:
     pre-start:
         - exec-host: php -r "file_exists('.ddev/keycloak-gatekeeper.conf') || copy('.ddev/keycloak-gatekeeper.conf.tmpl', '.ddev/keycloak-gatekeeper.conf');"
 omit_containers: [db, dba]
-webimage_extra_packages: [php7.4-gmp, ssh]
+webimage_extra_packages: [php8.2-gmp, ssh]
 use_dns_when_possible: true
 web_environment: []
 nodejs_version: "16"

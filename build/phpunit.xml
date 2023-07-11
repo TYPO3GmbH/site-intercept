@@ -1,35 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-         backupGlobals="false"
-         colors="true"
-         bootstrap="../tests/bootstrap.php"
->
-    <coverage processUncoveredFiles="true">
-        <include>
-            <directory suffix=".php">../src/*/</directory>
-        </include>
-        <exclude>
-            <directory>../src/Entity/</directory>
-            <directory>../src/Migrations/</directory>
-        </exclude>
-    </coverage>
-    <php>
-        <ini name="error_reporting" value="-1"/>
-        <env name="APP_ENV" value="test"/>
-        <env name="SHELL_VERBOSITY" value="-1"/>
-        <env name="GERRIT_TOKEN" value="SomeToken"/>
-        <env name="BAMBOO_AUTHORIZATION" value="Basic testing"/>
-        <env name="GERRIT_AUTHORIZATION" value="Basic testing"/>
-        <env name="FORGE_ACCESS_TOKEN" value="testing"/>
-        <env name="GITHUB_ACCESS_TOKEN" value="4711"/>
-    </php>
-    <testsuites>
-        <testsuite name="Unit Test Suite">
-            <directory>../tests/Unit/</directory>
-        </testsuite>
-        <testsuite name="Functional Test Suite">
-            <directory>../tests/Functional/</directory>
-        </testsuite>
-    </testsuites>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.1/phpunit.xsd" backupGlobals="false" colors="true" bootstrap="../tests/bootstrap.php" cacheDirectory=".phpunit.cache">
+  <coverage/>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+    <env name="APP_ENV" value="test" force="true"/>
+    <env name="SHELL_VERBOSITY" value="-1"/>
+    <env name="GERRIT_TOKEN" value="SomeToken"/>
+    <env name="GERRIT_AUTHORIZATION" value="Basic testing"/>
+    <env name="FORGE_ACCESS_TOKEN" value="testing"/>
+    <env name="GITHUB_ACCESS_TOKEN" value="4711"/>
+  </php>
+  <testsuites>
+    <testsuite name="Unit Test Suite">
+      <directory>../tests/Unit/</directory>
+    </testsuite>
+    <testsuite name="Functional Test Suite">
+      <directory>../tests/Functional/</directory>
+    </testsuite>
+  </testsuites>
+  <source>
+    <include>
+      <directory suffix=".php">../src/*/</directory>
+    </include>
+    <exclude>
+      <directory>../src/Entity/</directory>
+      <directory>../src/Migrations/</directory>
+    </exclude>
+  </source>
 </phpunit>

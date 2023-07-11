@@ -10,7 +10,9 @@ declare(strict_types = 1);
 
 require __DIR__ . '/vendor/autoload.php';
 
+use App\DocumentationDownloads;
+use App\ResponseEmitter;
 use GuzzleHttp\Psr7\ServerRequest;
 
-$response = (new \App\DocumentationDownloads(ServerRequest::fromGlobals()))->getDownloads();
-new \App\ResponseEmitter($response);
+$response = (new DocumentationDownloads(ServerRequest::fromGlobals()))->getDownloads();
+new ResponseEmitter($response);

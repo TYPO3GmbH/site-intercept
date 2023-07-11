@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -15,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class RepositoryUrlUtilityTest extends TestCase
 {
-    public function extractRepositoryNameFromCloneUrlDataProvider(): array
+    public static function extractRepositoryNameFromCloneUrlDataProvider(): array
     {
         return [
             ['git@github.com:typo3/typo3.git', 'typo3/typo3'],
@@ -26,17 +27,13 @@ class RepositoryUrlUtilityTest extends TestCase
 
     /**
      * @dataProvider extractRepositoryNameFromCloneUrlDataProvider
-     * @test
      */
-    public function extractRepositoryNameFromCloneUrlReturnsName(string $url, string $expectedName): void
+    public function testExtractRepositoryNameFromCloneUrlReturnsName(string $url, string $expectedName): void
     {
         self::assertSame($expectedName, RepositoryUrlUtility::extractRepositoryNameFromCloneUrl($url));
     }
 
-    /**
-     * @test
-     */
-    public function extractRepositoryNameFromCloneUrlThrowsException(): void
+    public function testExtractRepositoryNameFromCloneUrlThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot extract repository from clone URL typo3/typo3');

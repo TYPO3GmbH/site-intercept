@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -15,21 +16,16 @@ use PHPUnit\Framework\TestCase;
 
 class GitPatchFileTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function constructorExtractsFilename()
+    public function testConstructorExtractsFilename(): void
     {
         $subject = new GitPatchFile('/foo/bar.txt');
-        $this->assertSame('/foo/bar.txt', $subject->file);
+        self::assertSame('/foo/bar.txt', $subject->file);
     }
 
-    /**
-     * @test
-     */
-    public function constructorThrowsWithEmptyFile()
+    public function testConstructorThrowsWithEmptyFile(): void
     {
         $this->expectException(\RuntimeException::class);
+
         new GitPatchFile('');
     }
 }

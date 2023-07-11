@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -16,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 
 class GithubCorePullRequestTest extends TestCase
 {
-    private $payload = [
+    private array $payload = [
         'action' => 'opened',
         'pull_request' => [
             'base' => [
@@ -28,43 +29,34 @@ class GithubCorePullRequestTest extends TestCase
             ],
             'issue_url' => 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1',
             'url' => 'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1',
-            'comments_url' => 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments'
-        ]
+            'comments_url' => 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments',
+        ],
     ];
 
-    /**
-     * @test
-     */
-    public function constructorExtractsValues()
+    public function testConstructorExtractsValues(): void
     {
-        $subject = new GithubCorePullRequest(json_encode($this->payload));
-        $this->assertSame('main', $subject->branch);
-        $this->assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1.diff', $subject->diffUrl);
-        $this->assertSame('https://api.github.com/users/psychomieze', $subject->userUrl);
-        $this->assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1', $subject->issueUrl);
-        $this->assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1', $subject->pullRequestUrl);
-        $this->assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments', $subject->commentsUrl);
+        $subject = new GithubCorePullRequest(json_encode($this->payload, JSON_THROW_ON_ERROR));
+        self::assertSame('main', $subject->branch);
+        self::assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1.diff', $subject->diffUrl);
+        self::assertSame('https://api.github.com/users/psychomieze', $subject->userUrl);
+        self::assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1', $subject->issueUrl);
+        self::assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1', $subject->pullRequestUrl);
+        self::assertSame('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments', $subject->commentsUrl);
     }
 
-    /**
-     * @test
-     */
-    public function constructorThrowsIfActionIsNotOpened()
+    public function testConstructorThrowsIfActionIsNotOpened(): void
     {
         $this->expectException(DoNotCareException::class);
         $payload = $this->payload;
         $payload['action'] = 'closed';
-        new GithubCorePullRequest(json_encode($payload));
+        new GithubCorePullRequest(json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
-    /**
-     * @test
-     */
-    public function constructorThrowsIfDetailDataIsEmpty()
+    public function testConstructorThrowsIfDetailDataIsEmpty(): void
     {
         $this->expectException(DoNotCareException::class);
         $payload = $this->payload;
         $payload['pull_request']['diff_url'] = '';
-        new GithubCorePullRequest(json_encode($payload));
+        new GithubCorePullRequest(json_encode($payload, JSON_THROW_ON_ERROR));
     }
 }

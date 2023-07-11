@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,57 +14,62 @@ namespace App\Tests\Unit\Creator;
 use App\Creator\GerritCommitMessage;
 use App\Extractor\ForgeNewIssue;
 use App\Extractor\GithubPullRequestIssue;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 class GerritCommitMessageTest extends TestCase
 {
-    use ProphecyTrait;
-    /**
-     * @test
-     */
-    public function messageContainsRelevantInformation()
+    public function testMessageContainsRelevantInformation(): void
     {
-        $pullRequestProphecy = $this->prophesize(GithubPullRequestIssue::class);
-        $pullRequestProphecy->title = 'Patch title';
-        $pullRequestProphecy->body = 'Patch body';
-        $forgeIssue = $this->prophesize(ForgeNewIssue::class);
-        $forgeIssue->id = '4711';
-        $subject = new GerritCommitMessage($pullRequestProphecy->reveal(), $forgeIssue->reveal());
-        $this->assertMatchesRegularExpression('/^\[TASK\] Patch title/', $subject->message);
-        $this->assertMatchesRegularExpression('/Patch body/', $subject->message);
-        $this->assertMatchesRegularExpression('/4711/', $subject->message);
+        $response = new Response(200, ['Content-Type' => 'application/json'], json_encode([
+            'title' => 'Patch title',
+            'body' => 'Patch body',
+            'html_url' => 'https://github.com/TYPO3/typo3/pull/42',
+        ], JSON_THROW_ON_ERROR));
+        $pullRequest = new GithubPullRequestIssue($response);
+
+        $xml = new \SimpleXMLElement('<?xml version="1.0" standalone="yes"?><root><id>4711</id></root>');
+        $forgeIssue = new ForgeNewIssue($xml);
+
+        $subject = new GerritCommitMessage($pullRequest, $forgeIssue);
+        self::assertStringContainsString('[TASK] Patch title', $subject->message);
+        self::assertStringContainsString('Patch body', $subject->message);
+        self::assertStringContainsString('Resolves: #4711', $subject->message);
     }
 
-    /**
-     * @test
-     */
-    public function messageStripsLongTitle()
+    public function testMessageStripsLongTitle(): void
     {
-        $pullRequestProphecy = $this->prophesize(GithubPullRequestIssue::class);
-        $pullRequestProphecy->title = '0123456789012345678901234567890123456789012345678901234567890123456789';
-        $pullRequestProphecy->body = 'Patch body';
-        $forgeIssue = $this->prophesize(ForgeNewIssue::class);
-        $forgeIssue->id = '4711';
-        $subject = new GerritCommitMessage($pullRequestProphecy->reveal(), $forgeIssue->reveal());
-        $this->assertMatchesRegularExpression('/^\[TASK\] 0123456789012345678901234567890123456789012345678901234567890123456/', $subject->message);
-        $this->assertMatchesRegularExpression('/Patch body/', $subject->message);
-        $this->assertMatchesRegularExpression('/4711/', $subject->message);
+        $response = new Response(200, ['Content-Type' => 'application/json'], json_encode([
+            'title' => '0123456789012345678901234567890123456789012345678901234567890123456789',
+            'body' => 'Patch body',
+            'html_url' => 'https://github.com/TYPO3/typo3/pull/42',
+        ], JSON_THROW_ON_ERROR));
+        $pullRequest = new GithubPullRequestIssue($response);
+
+        $xml = new \SimpleXMLElement('<?xml version="1.0" standalone="yes"?><root><id>4711</id></root>');
+        $forgeIssue = new ForgeNewIssue($xml);
+
+        $subject = new GerritCommitMessage($pullRequest, $forgeIssue);
+        self::assertStringContainsString('[TASK] 0123456789012345678901234567890123456789012345678901234567890123456', $subject->message);
+        self::assertStringContainsString('Patch body', $subject->message);
+        self::assertStringContainsString('Resolves: #4711', $subject->message);
     }
 
-    /**
-     * @test
-     */
-    public function messageKeepsTitlePrefix()
+    public function testMessageKeepsTitlePrefix(): void
     {
-        $pullRequestProphecy = $this->prophesize(GithubPullRequestIssue::class);
-        $pullRequestProphecy->title = '[BUGFIX] Patch title';
-        $pullRequestProphecy->body = 'Patch body';
-        $forgeIssue = $this->prophesize(ForgeNewIssue::class);
-        $forgeIssue->id = '4711';
-        $subject = new GerritCommitMessage($pullRequestProphecy->reveal(), $forgeIssue->reveal());
-        $this->assertMatchesRegularExpression('/^\[BUGFIX\] Patch title/', $subject->message);
-        $this->assertMatchesRegularExpression('/Patch body/', $subject->message);
-        $this->assertMatchesRegularExpression('/4711/', $subject->message);
+        $response = new Response(200, ['Content-Type' => 'application/json'], json_encode([
+            'title' => '[BUGFIX] Patch title',
+            'body' => 'Patch body',
+            'html_url' => 'https://github.com/TYPO3/typo3/pull/42',
+        ], JSON_THROW_ON_ERROR));
+        $pullRequest = new GithubPullRequestIssue($response);
+
+        $xml = new \SimpleXMLElement('<?xml version="1.0" standalone="yes"?><root><id>4711</id></root>');
+        $forgeIssue = new ForgeNewIssue($xml);
+
+        $subject = new GerritCommitMessage($pullRequest, $forgeIssue);
+        self::assertStringContainsString('[BUGFIX] Patch title', $subject->message);
+        self::assertStringContainsString('Patch body', $subject->message);
+        self::assertStringContainsString('Resolves: #4711', $subject->message);
     }
 }

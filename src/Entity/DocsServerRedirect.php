@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -10,88 +12,66 @@
 namespace App\Entity;
 
 use App\Exception\InvalidStatusException;
+use App\Repository\DocsServerRedirectRepository;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * This is a stupid simple entity class and represent a redirect.
- *
- * @ORM\Entity(repositoryClass="App\Repository\DocsServerRedirectRepository")
- * @ORM\Table("redirect")
- * @ORM\HasLifecycleCallbacks()
- * @UniqueEntity("source")
  * @codeCoverageIgnore
  */
+#[ORM\Entity(repositoryClass: DocsServerRedirectRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[UniqueEntity('source')]
+#[ORM\Table('redirect')]
 class DocsServerRedirect
 {
-    public const STATUS_CODE_302 = 302; // Found
-    public const STATUS_CODE_303 = 303; // See Other
-    public const STATUS_CODE_307 = 307; // Temporary Redirect
-
+    final public const STATUS_CODE_302 = 302; // Found
+    final public const STATUS_CODE_303 = 303; // See Other
+    final public const STATUS_CODE_307 = 307; // Temporary Redirect
     public static array $allowedStatusCodes = [
         self::STATUS_CODE_302,
         self::STATUS_CODE_303,
         self::STATUS_CODE_307,
     ];
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private int $id;
 
-    /**
-     * @ORM\Column(name="created_at", type="datetime")
-     */
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @ORM\Column(name="updated_at", type="datetime")
-     */
+    #[ORM\Column(name: 'updated_at', type: 'datetime')]
     private ?\DateTimeInterface $updatedAt = null;
 
-    /**
-     * @ORM\Column(type="string", length=2000)
-     * @Assert\Regex(
-     *     pattern="@^/(([pcmh]{1}|other)/([^/]*)/([^/]*)/([^/]*)/(.*)|typo3cms/extensions/([^/]*)/([^/]*)/)$@m",
-     *     message="The path doesn't match the required format"
-     * )
-     * @AppAssert\InvalidCharacter
-     */
+    #[ORM\Column(type: 'string', length: 2000)]
+    #[AppAssert\InvalidCharacter]
+    #[Assert\Regex(pattern: '@^/(([pcmh]{1}|other)/([^/]*)/([^/]*)/([^/]*)/(.*)|typo3cms/extensions/([^/]*)/([^/]*)/)$@m', message: "The path doesn't match the required format")]
     private string $source = '';
 
-    /**
-     * @ORM\Column(type="string", length=2000)
-     * @Assert\Regex(
-     *     pattern="@^/([pcmh]{1}|other)/([^/]*)/([^/]*)/([^/]*)/(.*)$@m",
-     *     message="The path doesn't match the required format"
-     * )
-     * @AppAssert\InvalidCharacter
-     */
+    #[ORM\Column(type: 'string', length: 2000)]
+    #[AppAssert\InvalidCharacter]
+    #[Assert\Regex(pattern: '@^/([pcmh]{1}|other)/([^/]*)/([^/]*)/([^/]*)/(.*)$@m', message: "The path doesn't match the required format")]
     private string $target = '';
 
-    /**
-     * @ORM\Column(name="is_legacy", type="integer")
-     */
+    #[ORM\Column(name: 'is_legacy', type: 'integer')]
     private bool $isLegacy = false;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private int $statusCode = self::STATUS_CODE_303;
 
     /**
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
      * @throws \Exception
      */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
     public function updatedTimestamps(): void
     {
         $this->setUpdatedAt(new \DateTime(date('Y-m-d H:i:s')));
-        if ($this->getCreatedAt() === null) {
+        if (null === $this->getCreatedAt()) {
             $this->setCreatedAt(new \DateTime(date('Y-m-d H:i:s')));
         }
     }
@@ -104,6 +84,7 @@ class DocsServerRedirect
     public function setId(int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -115,6 +96,7 @@ class DocsServerRedirect
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -126,6 +108,7 @@ class DocsServerRedirect
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -137,6 +120,7 @@ class DocsServerRedirect
     public function setSource(string $source): self
     {
         $this->source = $source;
+
         return $this;
     }
 
@@ -148,6 +132,7 @@ class DocsServerRedirect
     public function setTarget(string $target): self
     {
         $this->target = $target;
+
         return $this;
     }
 
@@ -162,6 +147,7 @@ class DocsServerRedirect
             throw new InvalidStatusException('The HTTP status code is invalid for a redirect', 1553001673);
         }
         $this->statusCode = $statusCode;
+
         return $this;
     }
 
@@ -173,12 +159,10 @@ class DocsServerRedirect
     public function setIsLegacy(bool $isLegacy): self
     {
         $this->isLegacy = $isLegacy;
+
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function toArray(): array
     {
         return get_object_vars($this);

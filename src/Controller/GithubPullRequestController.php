@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -23,22 +24,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Transform github core pull requests from https://github.com/TYPO3/TYPO3.CMS
- * into a gerrit patch, create a forge issue, close github pr with some happy
+ * Transform GitHub core pull requests from https://github.com/TYPO3/TYPO3.CMS
+ * into a gerrit patch, create a forge issue, close GitHub pr with some happy
  * little message.
  */
 class GithubPullRequestController extends AbstractController
 {
     /**
-     * Called by github for new pull requests on
-     *
-     * @Route("/githubpr", name="core_git_pr")
-     * @param Request $request
-     * @param GithubService $githubService
-     * @param ForgeService $forgeService
-     * @param LocalCoreGitService $gitService
-     * @return Response
+     * Called by GitHub for new pull requests on.
      */
+    #[Route(path: '/githubpr', name: 'core_git_pr')]
     public function index(
         Request $request,
         GithubService $githubService,
@@ -56,7 +51,7 @@ class GithubPullRequestController extends AbstractController
             $gitPushOutput = $gitService->pushToGerrit($pullRequest);
             $closeComment = new GithubPullRequestCloseComment($gitPushOutput);
             $githubService->closePullRequest($pullRequest, $closeComment);
-        } catch (DoNotCareException $e) {
+        } catch (DoNotCareException) {
             // Hook payload could not be identified as hook that
             // should trigger a transfer of this PR
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -50,11 +52,13 @@ class DocumentationJarRepository extends ServiceEntityRepository
      * Used in 're-render docs' command controller
      *
      * @param string $packageIdentifier
+     *
      * @return DocumentationJar|null
      */
     public function findByPackageIdentifier(string $packageIdentifier): ?DocumentationJar
     {
         [$packageName, $version] = explode(':', $packageIdentifier);
+
         return $this->findOneBy(['targetBranchDirectory' => $version, 'packageName' => $packageName]);
     }
 

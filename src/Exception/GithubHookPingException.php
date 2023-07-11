@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -10,19 +11,17 @@ declare(strict_types = 1);
 
 namespace App\Exception;
 
-use Throwable;
-
 /**
- * Exception thrown if github sent a PING hook call when first adding the docs webhook.
+ * Exception thrown if GitHub sent a PING hook call when first adding the docs webhook.
  */
 class GithubHookPingException extends \Exception
 {
-    private string $repositoryUrl;
+    private readonly string $repositoryUrl;
 
-    public function __construct(string $message = '', int $code = 0, Throwable $previous = null, string $repositoryUrl = '')
+    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null, string $repositoryUrl = '')
     {
         parent::__construct($message, $code, $previous);
-        $this->repositoryUrl = $repositoryUrl ?? '';
+        $this->repositoryUrl = $repositoryUrl;
     }
 
     public function getRepositoryUrl(): string

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -13,30 +15,20 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\HttpFoundation\Request;
 
 class RedirectFilterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->setMethod('GET')
+            ->setMethod(Request::METHOD_GET)
             ->add('search', SearchType::class, [
                 'label' => false,
             ])
             ->add('trigger', SubmitType::class, [
-                'label' => 'Search'
+                'label' => 'Search',
             ]);
-    }
-
-    public function setDefaultOptions(OptionsResolver $resolver): void
-    {
-        $resolver
-            ->setDefaults([
-                'csrf_protection' => true,
-                'csrf_field_name' => '_token',
-            ])
-        ;
     }
 
     public function getName(): string

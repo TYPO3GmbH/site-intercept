@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -29,11 +30,8 @@ class GerritCommitMessage
     public string $message;
 
     /**
-     * Create a decent commit message from the github pull request information
+     * Create a decent commit message from the GitHub pull request information
      * and the forge issue.
-     *
-     * @param GithubPullRequestIssue $githubIssue
-     * @param ForgeNewIssue $forgeIssue
      */
     public function __construct(GithubPullRequestIssue $githubIssue, ForgeNewIssue $forgeIssue)
     {
@@ -50,26 +48,21 @@ class GerritCommitMessage
     }
 
     /**
-     * Try to extract a "Releases: xy" information from github issue body,
+     * Try to extract a "Releases: xy" information from GitHub issue body,
      * else fall back to main.
-     *
-     * @param string $body
-     * @return string
      */
     private function getReleasesLine(string $body): string
     {
         $release = '';
-        if (preg_match('/^Releases\:\s\w+$/m', $body) < 1) {
+        if (preg_match('/^Releases:\s\w+$/m', $body) < 1) {
             $release = 'Releases: main';
         }
+
         return $release;
     }
 
     /**
      * Wrap commit body lines a bit.
-     *
-     * @param string $body
-     * @return string
      */
     private function formatBody(string $body): string
     {
@@ -77,19 +70,17 @@ class GerritCommitMessage
     }
 
     /**
-     * Try to format the github 'title' to a decent commit subject.
-     *
-     * @param string $subject
-     * @return string
+     * Try to format the GitHub 'title' to a decent commit subject.
      */
     private function formatSubject(string $subject): string
     {
-        if (preg_match('/^\[.+?\]/', $subject) < 1) {
+        if (preg_match('/^\[.+?]/', $subject) < 1) {
             $subject = '[TASK] ' . $subject;
         }
         if (strlen($subject) > self::MAX_CHARS_PER_LINE) {
             $subject = substr($subject, 0, self::MAX_CHARS_PER_LINE);
         }
+
         return $subject;
     }
 }
