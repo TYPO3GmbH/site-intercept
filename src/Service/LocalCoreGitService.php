@@ -52,11 +52,7 @@ class LocalCoreGitService
         $repository->run('pull', ['--rebase']);
         $repository->run('apply', ['--directory', $repository->getWorkingDir(), '--unsafe-paths', $patchFile->file]);
         $repository->run('add', ['.']);
-        $repository->run('commit', [
-            'author' => '"' . $userData->user . '<' . $userData->email . '>"',
-            'm' => $commitMessage->message,
-            'verbose' => true,
-        ]);
+        $repository->run('commit', ['--author', $userData->user . '<' . $userData->email . '>', '-m', $commitMessage->message, '--verbose']);
     }
 
     /**
