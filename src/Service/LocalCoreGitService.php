@@ -50,8 +50,8 @@ class LocalCoreGitService
         $repository->run('checkout', [$pullRequest->branch]);
         $repository->run('reset', ['--hard', 'origin/' . $pullRequest->branch]);
         $repository->run('pull', ['--rebase']);
-        $repository->run('apply', [$patchFile->file]);
-        $repository->run('add', [$patchFile->file]);
+        $repository->run('apply', ['--directory', $repository->getWorkingDir(), '--unsafe-paths', $patchFile->file]);
+        $repository->run('add', ['.']);
         $repository->run('commit', [
             'author' => '"' . $userData->user . '<' . $userData->email . '>"',
             'm' => $commitMessage->message,
