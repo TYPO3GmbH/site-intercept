@@ -24,7 +24,7 @@
         "doctrine/migrations": "^3.6",
         "doctrine/orm": "^2.15",
         "doctrine/persistence": "^3.2",
-        "gitonomy/gitlib": "*",
+        "gitonomy/gitlib": "dev-bugfix/205",
         "guzzlehttp/guzzle": "^7.7.0",
         "kbsali/redmine-api": "^2.2",
         "knplabs/knp-menu": "^3.4",
@@ -164,7 +164,14 @@
             "allow-contrib": false
         }
     },
-    "repositories": [
-        {"type": "composer", "url": "https://repo.packagist.com/typo3gmbh/"}
-    ]
+    "repositories": {
+        "gitlib": {
+            "type": "vcs",
+            "url": "https://github.com/andreasfernandez/gitlib.git"
+        },
+        "0": {
+            "type": "composer",
+            "url": "https://repo.packagist.com/typo3gmbh/"
+        }
+    }
 }
