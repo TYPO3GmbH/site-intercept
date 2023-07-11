@@ -49,7 +49,7 @@ class LocalCoreGitService
         $repository->run('reset', ['--hard']);
         $repository->run('checkout', [$pullRequest->branch]);
         $repository->run('reset', ['--hard', 'origin/' . $pullRequest->branch]);
-        $repository->run('pull');
+        $repository->run('pull', ['--rebase']);
         $repository->run('apply', [$patchFile->file]);
         $repository->run('add', [$patchFile->file]);
         $repository->run('commit', [
