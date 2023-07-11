@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -14,7 +16,6 @@ use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Repository\DocumentationJarRepository;
 use App\Service\RenderDocumentationService;
-use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,23 +28,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DocsDumpRenderInformationCommand extends Command
 {
     protected static $defaultName = 'app:docs-dump-render-info';
+    protected static $defaultDescription = 'Command to re-render all docs or one specific';
 
-    protected RenderDocumentationService $renderDocumentationService;
-
-    protected DocumentationJarRepository $documentationJarRepository;
-
-    public function __construct(RenderDocumentationService $renderDocumentationService, DocumentationJarRepository $documentationJarRepository)
-    {
+    public function __construct(
+        private readonly RenderDocumentationService $renderDocumentationService,
+        private readonly DocumentationJarRepository $documentationJarRepository
+    ) {
         parent::__construct();
-        $this->renderDocumentationService = $renderDocumentationService;
-        $this->documentationJarRepository = $documentationJarRepository;
     }
 
     protected function configure(): void
     {
-        $this
-            ->setDescription('Command to re-render all docs or one specific')
-            ->addOption('all', 'a', InputOption::VALUE_NONE, 're-dump all existing configurations')
+        $this->addOption('all', 'a', InputOption::VALUE_NONE, 're-dump all existing configurations')
             ->addOption('configuration', 'c', InputOption::VALUE_OPTIONAL, 'dump configuration by given ID')
             ->addOption('package', 'p', InputOption::VALUE_OPTIONAL, 'dump configuration by given package and target directory, e.g. typo3/team-t3docteam:main')
         ;
@@ -58,9 +54,10 @@ class DocsDumpRenderInformationCommand extends Command
 
         $io->title('Render Documentation');
 
-        if ($all === false && $id === null && $package === null) {
+        if (false === $all && null === $id && null === $package) {
             $io->error('At least one option is required: --all, --configuration or --package');
-            return 1;
+
+            return Command::FAILURE;
         }
 
         try {
@@ -71,7 +68,7 @@ class DocsDumpRenderInformationCommand extends Command
                             $this->renderDocumentation($documentationJar);
                             $io->success('Dumped info for package "' . $documentationJar->getPackageName() . '" with target branch "' . $documentationJar->getTargetBranchDirectory() . '"');
                             // avoid stopping the whole queue because of a broken / irrelevant package
-                        } catch (DuplicateDocumentationRepositoryException | DocsPackageDoNotCareBranch $exception) {
+                        } catch (DuplicateDocumentationRepositoryException|DocsPackageDoNotCareBranch $exception) {
                             $io->error($exception->getMessage());
                         }
                     }
@@ -79,10 +76,10 @@ class DocsDumpRenderInformationCommand extends Command
                 } else {
                     $io->success('Dumping of ALL documentations aborted');
                 }
-            } elseif ($id !== null) {
-                $this->renderConfiguration((int)$id);
+            } elseif (null !== $id) {
+                $this->renderConfiguration((int) $id);
                 $io->success('Info dumped.');
-            } elseif ($package !== null) {
+            } elseif (null !== $package) {
                 $this->renderPackage($package);
                 $io->success('Info dumped');
             } else {
@@ -92,25 +89,23 @@ class DocsDumpRenderInformationCommand extends Command
             $io->writeln($exception->getMessage());
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
-     * @param int $id
      * @throws DocsPackageDoNotCareBranch
      * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderConfiguration(int $id): void
     {
         $documentationJar = $this->documentationJarRepository->find($id);
-        if ($documentationJar === null) {
-            throw new InvalidArgumentException('no valid id for a documentationJar given', 1558609697);
+        if (null === $documentationJar) {
+            throw new \InvalidArgumentException('no valid id for a documentationJar given', 1558609697);
         }
         $this->renderDocumentation($documentationJar);
     }
 
     /**
-     * @param string $package
      * @throws DocsPackageDoNotCareBranch
      * @throws DuplicateDocumentationRepositoryException
      */
@@ -118,23 +113,22 @@ class DocsDumpRenderInformationCommand extends Command
     {
         [$packageName, $version] = explode(':', $package);
         if (empty($packageName) || empty($version)) {
-            throw new InvalidArgumentException('no valid package identifier given: ' . $package, 1558609831);
+            throw new \InvalidArgumentException('no valid package identifier given: ' . $package, 1558609831);
         }
         $documentationJar = $this->documentationJarRepository->findByPackageIdentifier($package);
-        if ($documentationJar === null) {
-            throw new InvalidArgumentException('no valid documentationJar could be resolved for packageIdentifier:' . $package, 1558610587);
+        if (null === $documentationJar) {
+            throw new \InvalidArgumentException('no valid documentationJar could be resolved for packageIdentifier:' . $package, 1558610587);
         }
         $this->renderDocumentation($documentationJar);
     }
 
     /**
-     * @param DocumentationJar $documentationJar
      * @throws DocsPackageDoNotCareBranch
      * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderDocumentation(DocumentationJar $documentationJar): void
     {
-        /** @noinspection UnusedFunctionResultInspection */
+        /* @noinspection UnusedFunctionResultInspection */
         $this->renderDocumentationService->dumpRenderingInformationByDocumentationJar($documentationJar);
     }
 }

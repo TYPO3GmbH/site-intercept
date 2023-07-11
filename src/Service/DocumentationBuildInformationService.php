@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -10,7 +11,6 @@ declare(strict_types = 1);
 
 namespace App\Service;
 
-use App\Client\GeneralClient;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
@@ -23,96 +23,55 @@ use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
+use App\Repository\DocumentationJarRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use JsonException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * This service class generates a `source`-able file that contains some deployment-related
  * environment variables based on the push event it receives.
  */
-class DocumentationBuildInformationService
+readonly class DocumentationBuildInformationService
 {
-    /**
-     * @var string Absolute, private base directory where deployment infos are stored, configured via DI, typically '/.../var/'
-     */
-    private string $privateDir;
-
-    /**
-     * @var string Name of sub directory in $publicDir and $privateDir where the files are stored, typically 'docs-build-information'
-     */
-    private string $subDir;
-
-    private EntityManagerInterface $entityManager;
-
-    private Filesystem $fileSystem;
-
-    private ObjectRepository $documentationJarRepository;
-
-    private GeneralClient $client;
-
-    private SlackService $slackService;
-
-    /**
-     * Constructor
-     *
-     * @param string $privateDir
-     * @param string $subDir
-     * @param EntityManagerInterface $entityManager
-     * @param Filesystem $fileSystem
-     * @param GeneralClient $client
-     * @param SlackService $slackService
-     */
     public function __construct(
-        string $privateDir,
-        string $subDir,
-        EntityManagerInterface $entityManager,
-        Filesystem $fileSystem,
-        GeneralClient $client,
-        SlackService $slackService
+        private string $privateDir,
+        private string $subDir,
+        private DocumentationJarRepository $documentationJarRepository,
+        private EntityManagerInterface $entityManager,
+        private Filesystem $fileSystem,
+        private ClientInterface $generalClient,
+        private SlackService $slackService
     ) {
-        $this->privateDir = $privateDir;
-        $this->subDir = $subDir;
-        $this->entityManager = $entityManager;
-        $this->fileSystem = $fileSystem;
-        $this->documentationJarRepository = $this->entityManager->getRepository(DocumentationJar::class);
-        $this->client = $client;
-        $this->slackService = $slackService;
     }
 
     /**
      * Fetch composer.json from a remote repository to get more package information.
      *
-     * @param string $path
-     * @return array
      * @throws ComposerJsonNotFoundException
      * @throws ComposerJsonInvalidException
      */
     public function fetchRemoteComposerJson(string $path): array
     {
         try {
-            $response = $this->client->request('GET', $path);
+            $response = $this->generalClient->request('GET', $path);
         } catch (GuzzleException $e) {
             throw new ComposerJsonNotFoundException($e->getMessage(), $e->getCode());
         }
         $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
+        if (200 !== $statusCode) {
             throw new ComposerJsonNotFoundException('Fetching composer.json did not return HTTP 200', 1557489013);
         }
         try {
-            $json = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
+            $json = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
             throw new ComposerJsonInvalidException('Decoding ' . $path . ' did not return an object. Invalid json syntax?', 1558022442, $e);
         }
+
         return $json;
     }
 
-    /**
-     * @param array $composerJson
-     * @return ComposerJson
-     */
     public function getComposerJsonObject(array $composerJson): ComposerJson
     {
         return new ComposerJson($composerJson);
@@ -122,9 +81,6 @@ class DocumentationBuildInformationService
      * Create main deployment information from push event. This object will later be sanitized using
      * other methods of that service and dumped to disk for bamboo to fetch it again.
      *
-     * @param PushEvent $pushEvent
-     * @param ComposerJson $composerJson
-     * @return DeploymentInformation
      * @throws ComposerJsonInvalidException
      * @throws DocsPackageDoNotCareBranchAlias
      * @throws DocsComposerDependencyException
@@ -133,6 +89,7 @@ class DocumentationBuildInformationService
     public function generateBuildInformation(PushEvent $pushEvent, ComposerJson $composerJson): DeploymentInformation
     {
         $this->assertComposerJsonContainsNecessaryData($composerJson);
+
         return new DeploymentInformation(
             $composerJson->getName(),
             $composerJson->getType(),
@@ -151,8 +108,6 @@ class DocumentationBuildInformationService
      * Create main deployment information from DocumentationJar entity. This object will later be sanitized using
      * other methods of that service and dumped to disk for bamboo to fetch it again.
      *
-     * @param DocumentationJar $documentationJar
-     * @return DeploymentInformation
      * @throws DocsPackageDoNotCareBranchAlias
      * @throws ComposerJsonInvalidException
      */
@@ -173,33 +128,26 @@ class DocumentationBuildInformationService
     }
 
     /**
-    /**
+     * /**
      * Verify the build request for a given vendor/package name and a given repository url is not
      * already registered with a different repository url.
      *
-     * @param DeploymentInformation $deploymentInformation
      * @throws DocsPackageRegisteredWithDifferentRepositoryException
      */
     public function assertBuildWasTriggeredByRepositoryOwner(DeploymentInformation $deploymentInformation): void
     {
         $records = $this->documentationJarRepository->findBy([
-            'packageName' => $deploymentInformation->packageName
+            'packageName' => $deploymentInformation->packageName,
         ]);
         foreach ($records as $record) {
             if ($record instanceof DocumentationJar && $record->getRepositoryUrl() !== $deploymentInformation->repositoryUrl) {
-                throw new DocsPackageRegisteredWithDifferentRepositoryException(
-                    'Package ' . $deploymentInformation->packageName . ' from repository ' . $deploymentInformation->repositoryUrl
-                    . ' is already registered for repository ' . $record->getRepositoryUrl(),
-                    1553090750
-                );
+                throw new DocsPackageRegisteredWithDifferentRepositoryException('Package ' . $deploymentInformation->packageName . ' from repository ' . $deploymentInformation->repositoryUrl . ' is already registered for repository ' . $record->getRepositoryUrl(), 1553090750);
             }
         }
     }
 
     /**
-     * Dump the deployment information file to disk to be fetched from bamboo later
-     *
-     * @param DeploymentInformation $deploymentInformation
+     * Dump the deployment information file to disk to be fetched from bamboo later.
      */
     public function dumpDeploymentInformationFile(DeploymentInformation $deploymentInformation): void
     {
@@ -212,10 +160,8 @@ class DocumentationBuildInformationService
     }
 
     /**
-     * Add / update a db entry for this docs deployment
+     * Add / update a db entry for this docs deployment.
      *
-     * @param DeploymentInformation $deploymentInformation
-     * @return DocumentationJar
      * @throws DuplicateDocumentationRepositoryException
      */
     public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): DocumentationJar
@@ -226,19 +172,13 @@ class DocumentationBuildInformationService
             'targetBranchDirectory' => $deploymentInformation->targetBranchDirectory,
         ]);
         if (count($records) > 1) {
-            throw new DuplicateDocumentationRepositoryException(
-                'Inconsistent database, there should be only one entry for repository ' . $deploymentInformation->repositoryUrl
-                . ' package ' . $deploymentInformation->packageName
-                . ' with target directory ' . $deploymentInformation->targetBranchDirectory
-                . ' , but ' . count($records) . ' found.',
-                1557755476
-            );
+            throw new DuplicateDocumentationRepositoryException('Inconsistent database, there should be only one entry for repository ' . $deploymentInformation->repositoryUrl . ' package ' . $deploymentInformation->packageName . ' with target directory ' . $deploymentInformation->targetBranchDirectory . ' , but ' . count($records) . ' found.', 1557755476);
         }
         $record = array_pop($records);
         if ($record instanceof DocumentationJar) {
             // Update source branch if needed. This way, that db entry always hold the latest tag the
-            // documentation was rendered from, eg. if first target dir '5.7' was rendered from tag '5.7.1'
-            // and later overriden by tag '5.7.2'
+            // documentation was rendered from, e.g. if first target dir '5.7' was rendered from tag '5.7.1'
+            // and later overridden by tag '5.7.2'
             if ($record->getBranch() !== $deploymentInformation->sourceBranch) {
                 $record->setBranch($deploymentInformation->sourceBranch);
             }
@@ -317,30 +257,12 @@ class DocumentationBuildInformationService
         return $record;
     }
 
-    /**
-     * @param DocumentationJar $documentationJar
-     * @param string $buildKey
-     */
-    public function updateBuildKey(DocumentationJar $documentationJar, string $buildKey): void
+    public function update(DocumentationJar $documentationJar, callable $callback): void
     {
-        $documentationJar->setBuildKey($buildKey);
+        $callback($documentationJar);
         $this->entityManager->flush();
     }
 
-    /**
-     * @param DocumentationJar $documentationJar
-     * @param int $status
-     */
-    public function updateStatus(DocumentationJar $documentationJar, int $status): void
-    {
-        $documentationJar->setStatus($status);
-        $this->entityManager->flush();
-    }
-
-    /**
-     * @param DocumentationJar $documentationJar
-     * @param bool $reRenderNeeded
-     */
     public function updateReRenderNeeded(DocumentationJar $documentationJar, bool $reRenderNeeded): void
     {
         $documentationJar->setReRenderNeeded($reRenderNeeded);
@@ -348,12 +270,11 @@ class DocumentationBuildInformationService
     }
 
     /**
-     * @param ComposerJson $composerJson
      * @throws DocsComposerDependencyException
      */
     public function assertComposerJsonContainsNecessaryData(ComposerJson $composerJson): void
     {
-        if ($composerJson->getCoreRequirement() === null && (str_contains($composerJson->getType(), 'typo3-cms') && $composerJson->getName() !== 'typo3/cms-core')) {
+        if (null === $composerJson->getCoreRequirement() && (str_contains($composerJson->getType(), 'typo3-cms') && 'typo3/cms-core' !== $composerJson->getName())) {
             throw new DocsComposerDependencyException('Dependency typo3/cms-core is missing', 1557310527);
         }
     }

@@ -6,4 +6,4 @@ t3g_keycloak:
       typo3.com-gmbh: ROLE_ADMIN
       typo3.com-intercept-docs: ROLE_DOCUMENTATION_MAINTAINER
     # The default roles every user gets
-    default_roles: ['ROLE_USER', 'ROLE_OAUTH_USER']
+    default_roles: [ 'ROLE_USER', 'ROLE_OAUTH_USER' ]

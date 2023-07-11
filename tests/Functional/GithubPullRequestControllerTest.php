@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -10,143 +11,119 @@ declare(strict_types = 1);
 
 namespace App\Tests\Functional;
 
-use App\Bundle\TestDoubleBundle;
-use App\Client\ForgeClient;
-use App\Client\GeneralClient;
 use App\Extractor\GitPushOutput;
-use App\Kernel;
 use App\Service\LocalCoreGitService;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Redmine\Api\Issue;
-use SimpleXMLElement;
+use T3G\LibTestHelper\Request\AssertRequestTrait;
+use T3G\LibTestHelper\Request\MockRequest;
+use T3G\LibTestHelper\Request\RequestExpectation;
+use T3G\LibTestHelper\Request\RequestPool;
 
 class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
 {
-    use ProphecyTrait;
+    use AssertRequestTrait;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->addRabbitManagementClientProphecy();
+
+        $this->client = static::createClient();
     }
 
-    /**
-     * @test
-     */
-    public function pullRequestIsTransformed()
+    public function testPullRequestIsTransformed(): void
     {
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
-        $forgeClientProphecy = $this->prophesize(ForgeClient::class);
-        TestDoubleBundle::addProphecy(ForgeClient::class, $forgeClientProphecy);
-        $gitServiceProphecy = $this->prophesize(LocalCoreGitService::class);
-        TestDoubleBundle::addProphecy(LocalCoreGitService::class, $gitServiceProphecy);
-
-        $generalClientProphecy
-            ->get('https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1')
-            ->shouldBeCalled()
-            ->willReturn(require __DIR__ . '/Fixtures/GithubPullRequestIssueDetailsResponse.php');
-
-        $generalClientProphecy
-            ->get('https://api.github.com/users/psychomieze')
-            ->shouldBeCalled()
-            ->willReturn(require __DIR__ . '/Fixtures/GithubPullRequestUserDetailsResponse.php');
-
-        $forgeIssueProphecy = $this->prophesize(Issue::class);
-        $forgeClientProphecy->issue = $forgeIssueProphecy->reveal();
-        $forgeIssueProphecy
-            ->create([
-                'project_id' => 27,
-                'tracker_id' => 4,
-                'subject' => 'issue title',
-                'description' =>"updated body\n\nThis issue was automatically created from https://github.com/psychomieze/TYPO3.CMS/pull/1",
-                'custom_fields' => [
-                    [
-                        'id' => 4,
-                        'name' => 'TYPO3 Version',
-                        'value' => 10,
-                    ]
-                ]
-            ])
-            ->shouldBeCalled()
-            ->willReturn(new SimpleXMLElement('<?xml version="1.0"?><root><id>42</id></root>'));
-
-        $generalClientProphecy
-            ->get('https://github.com/psychomieze/TYPO3.CMS/pull/1.diff')
-            ->shouldBeCalled()
-            ->willReturn(require __DIR__ . '/Fixtures/GithubPullRequestPatchResponse.php');
-
-        // Unmockable git foo
-        $gitServiceProphecy->commitPatchAsUser(Argument::cetera())->shouldBeCalled();
-        $pushOutput = $this->prophesize(GitPushOutput::class);
-        $pushOutput->reviewUrl = 'https://review.typo3.org/12345';
-        $gitServiceProphecy->pushToGerrit(Argument::cetera())->shouldBeCalled()->willReturn($pushOutput->reveal());
-
-        $generalClientProphecy
-            ->patch(
+        $generalClientRequestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1',
+                require __DIR__ . '/Fixtures/GithubPullRequestIssueDetailsResponse.php'
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/users/psychomieze',
+                require __DIR__ . '/Fixtures/GithubPullRequestUserDetailsResponse.php'
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://github.com/psychomieze/TYPO3.CMS/pull/1.diff',
+                require __DIR__ . '/Fixtures/GithubPullRequestPatchResponse.php'
+            ),
+            (new RequestExpectation(
+                'PATCH',
                 'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1',
-                [
-                    'headers' => [
-                        'Authorization' => 'token 4711'
-                    ],
-                    'json' => [
-                        'state' => 'closed'
-                    ]
-                ]
-            )
-            ->shouldBeCalled();
-
-        $generalClientProphecy
-            ->post(
+                new Response(200)
+            ))->withPayload([
+                'headers' => [
+                    'Authorization' => 'token 4711',
+                ],
+                'json' => [
+                    'state' => 'closed',
+                ],
+            ]),
+            (new RequestExpectation(
+                'POST',
                 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments',
-                [
-                    'headers' => [
-                        'Authorization' => 'token 4711'
-                    ],
-                    'json' => [
-                        'body' => "Thank you for your contribution to TYPO3. We are using Gerrit Code Review for our contributions and took the liberty to convert your pull request to a review in our review system.\nYou can find your patch at: https://review.typo3.org/12345\nFor further information on how to contribute have a look at https://docs.typo3.org/typo3cms/ContributionWorkflowGuide/"
-                    ]
-                ]
-            )
-            ->shouldBeCalled();
-
-        $generalClientProphecy
-            ->put(
+                new Response(200)
+            ))->withPayload([
+                'headers' => [
+                    'Authorization' => 'token 4711',
+                ],
+                'json' => [
+                    'body' => "Thank you for your contribution to TYPO3. We are using Gerrit Code Review for our contributions and took the liberty to convert your pull request to a review in our review system.\nYou can find your patch at: https://review.typo3.org/c/Packages/TYPO3.CMS/+/12345\nFor further information on how to contribute have a look at https://docs.typo3.org/typo3cms/ContributionWorkflowGuide/",
+                ],
+            ]),
+            (new RequestExpectation(
+                'PUT',
                 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/lock',
-                [
-                    'headers' => [
-                        'Authorization' => 'token 4711'
-                    ]
-                ]
-            )
-            ->shouldBeCalled();
+                new Response(200)
+            ))->withPayload([
+                'headers' => [
+                    'Authorization' => 'token 4711',
+                ],
+            ]),
+        );
+        $generalClient = $this->createMock(Client::class);
+        static::assertRequests($generalClient, $generalClientRequestPool);
 
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        $request = require __DIR__ . '/Fixtures/GithubPullRequestGoodRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $forgeClient = $this->createMock(\Redmine\Client\Client::class);
+        $forgeIssueApi = $this->createMock(Issue::class);
+        $forgeIssueApi->expects(self::once())->method('create')->with([
+            'project_id' => 27,
+            'tracker_id' => 4,
+            'subject' => 'issue title',
+            'description' => "updated body\n\nThis issue was automatically created from https://github.com/psychomieze/TYPO3.CMS/pull/1",
+            'custom_fields' => [
+                [
+                    'id' => 4,
+                    'name' => 'TYPO3 Version',
+                    'value' => 12,
+                ],
+            ],
+        ])->willReturn(new \SimpleXMLElement('<?xml version="1.0"?><root><id>42</id></root>'));
+        $forgeClient->expects(self::once())->method('getApi')->with('issue')->willReturn($forgeIssueApi);
+
+        $gitService = $this->createMock(LocalCoreGitService::class);
+        $gitService->expects(self::once())->method('commitPatchAsUser');
+        $gitService->expects(self::once())->method('pushToGerrit')->willReturn(new GitPushOutput('https://review.typo3.org/c/Packages/TYPO3.CMS/+/12345'));
+
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.general', $generalClient)
+            ->withMock('redmine.client.forge', $forgeClient)
+            ->withMock(LocalCoreGitService::class, $gitService)
+            ->execute(require __DIR__ . '/Fixtures/GithubPullRequestGoodRequest.php');
+        self::assertEquals(200, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function pullRequestIsNotTransformed()
+    public function testPullRequestIsNotTransformed(): void
     {
-        $generalClientProphecy = $this->prophesize(GeneralClient::class);
-        TestDoubleBundle::addProphecy(GeneralClient::class, $generalClientProphecy);
-        $forgeClientProphecy = $this->prophesize(ForgeClient::class);
-        TestDoubleBundle::addProphecy(ForgeClient::class, $forgeClientProphecy);
-        $gitServiceProphecy = $this->prophesize(LocalCoreGitService::class);
-        TestDoubleBundle::addProphecy(LocalCoreGitService::class, $gitServiceProphecy);
+        $generalClient = $this->createMock(Client::class);
+        $generalClient->expects(self::never())->method('request');
 
-        $generalClientProphecy->get(Argument::cetera())->shouldNotBeCalled();
-
-        $kernel = new Kernel('test', true);
-        $kernel->boot();
-        $request = require __DIR__ . '/Fixtures/GithubPullRequestBadRequest.php';
-        $response = $kernel->handle($request);
-        $kernel->terminate($request, $response);
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/GithubPullRequestBadRequest.php');
+        self::assertEquals(200, $response->getStatusCode());
     }
 }

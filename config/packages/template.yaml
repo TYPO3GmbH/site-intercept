@@ -1,9 +1,9 @@
 template:
-    application:
-        name: 'Intercept'
-        routes:
-            home: admin_index
-        menu:
-            class: App\Menu\MenuBuilder
-        assets:
-            encore_entrypoint: 'app'
+  application:
+    name: 'Intercept'
+    routes:
+      home: admin_index
+    menu:
+      class: App\Menu\MenuBuilder
+    assets:
+      encore_entrypoint: 'app'

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -15,14 +16,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Handle web admin interface login
+ * Handle web admin interface login.
  */
 class LoginController extends AbstractController
 {
-    /**
-     * @Route("/admin/login", name="admin_login")
-     * @return Response
-     */
+    #[Route(path: '/admin/login', name: 'admin_login')]
     public function index(): Response
     {
         return $this->redirectToRoute('admin_index');

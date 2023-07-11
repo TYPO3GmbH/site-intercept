@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -10,55 +12,29 @@
 namespace App\Extractor;
 
 /**
- * Class represents a push event (web hook)
+ * Class represents a push event (web hook).
+ *
  * @codeCoverageIgnore
  */
 class PushEvent
 {
     /**
-     * @var string A tag or a branch name
-     */
-    protected string $versionString;
-
-    /**
-     * @var string Repository url to clone
-     */
-    protected string $repositoryUrl;
-
-    protected string $urlToComposerFile;
-
-    /**
      * PushEvent constructor.
-     * @param string $repositoryUrl
-     * @param string $versionString
-     * @param string $urlToComposerFile
      */
-    public function __construct(string $repositoryUrl, string $versionString, string $urlToComposerFile)
+    public function __construct(protected string $repositoryUrl, protected string $versionString, protected string $urlToComposerFile)
     {
-        $this->repositoryUrl = $repositoryUrl;
-        $this->versionString = $versionString;
-        $this->urlToComposerFile = $urlToComposerFile;
     }
 
-    /**
-     * @return string
-     */
     public function getVersionString(): string
     {
         return $this->versionString;
     }
 
-    /**
-     * @return string
-     */
     public function getRepositoryUrl(): string
     {
         return $this->repositoryUrl;
     }
 
-    /**
-     * @return string
-     */
     public function getUrlToComposerFile(): string
     {
         return $this->urlToComposerFile;

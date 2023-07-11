@@ -11,24 +11,29 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 use T3G\Bundle\Datahub\Service\UrlService;
 
-class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
+readonly class LogoutSuccessHandler implements EventSubscriberInterface
 {
-    private UrlService $urlService;
-    private string $appUrl;
-
-    public function __construct(UrlService $urlService, string $appUrl)
-    {
-        $this->urlService = $urlService;
-        $this->appUrl = $appUrl;
+    public function __construct(
+        private UrlService $urlService,
+        private string $appUrl
+    ) {
     }
 
-    public function onLogoutSuccess(Request $request): RedirectResponse
+    public function onLogout(LogoutEvent $logoutEvent): void
     {
-        return new RedirectResponse('/oauth/logout?redirect=' . urlencode($this->urlService->getLogoutUrlWithRedirectToApp($this->appUrl)));
+        $logoutEvent->setResponse(new RedirectResponse('/oauth/logout?redirect=' . urlencode($this->urlService->getLogoutUrlWithRedirectToApp($this->appUrl))));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [LogoutEvent::class => ['onLogout', 64]];
     }
 }

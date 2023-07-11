@@ -1,1 +1,0 @@
-latest/queue/CORE-GTC?stage=&os_authType=basic&executeAllStages=&bamboo.variable.changeUrl=58920&bamboo.variable.patchset=1

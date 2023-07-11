@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -16,54 +17,42 @@ use PHPUnit\Framework\TestCase;
 
 class GithubPushEventForDocsTest extends TestCase
 {
-    private $payload = [
+    private static array $payload = [
         'ref' => 'refs/tags/1.2.3',
         'repository' => [
             'clone_url' => 'https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git',
         ],
     ];
 
-    /**
-     * @test
-     */
-    public function constructorExtractsValues()
+    public function testConstructorExtractsValues(): void
     {
-        $subject = new GithubPushEventForDocs(json_encode($this->payload));
-        $this->assertSame('1.2.3', $subject->tagOrBranchName);
-        $this->assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
+        $subject = new GithubPushEventForDocs(json_encode(self::$payload, JSON_THROW_ON_ERROR));
+        self::assertSame('1.2.3', $subject->tagOrBranchName);
+        self::assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
     }
 
-    /**
-     * @test
-     */
-    public function constructorExtractsFromBranch()
+    public function testConstructorExtractsFromBranch(): void
     {
-        $payload = $this->payload;
+        $payload = self::$payload;
         $payload['ref'] = 'refs/heads/latest';
-        $subject = new GithubPushEventForDocs(json_encode($payload));
-        $this->assertSame('latest', $subject->tagOrBranchName);
-        $this->assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
+        $subject = new GithubPushEventForDocs(json_encode($payload, JSON_THROW_ON_ERROR));
+        self::assertSame('latest', $subject->tagOrBranchName);
+        self::assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
     }
 
-    /**
-     * @test
-     */
-    public function constructorThrowsWithInvalidVersion()
+    public function testConstructorThrowsWithInvalidVersion(): void
     {
         $this->expectException(DoNotCareException::class);
-        $payload = $this->payload;
+        $payload = self::$payload;
         $payload['ref'] = 'refs/foo/latest';
-        new GithubPushEventForDocs(json_encode($payload));
+        new GithubPushEventForDocs(json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
-    /**
-     * @test
-     */
-    public function constructorThrowsWithEmptyRepository()
+    public function testConstructorThrowsWithEmptyRepository(): void
     {
         $this->expectException(DoNotCareException::class);
-        $payload = $this->payload;
+        $payload = self::$payload;
         $payload['repository']['clone_url'] = '';
-        new GithubPushEventForDocs(json_encode($payload));
+        new GithubPushEventForDocs(json_encode($payload, JSON_THROW_ON_ERROR));
     }
 }

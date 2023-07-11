@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -14,22 +15,39 @@ use App\Service\GitRepositoryService;
 
 class RepositoryUrlUtility
 {
-    /**
-     * @param string $repositoryUrl
-     * @param string $branch
-     * @return string
-     */
+    public static function resolveComposerJsonUrl(string $repositoryUrl, string $branch, string $repositoryType = null): string
+    {
+        $url = self::extractComposerJsonUrlFromRepositoryUrl($repositoryUrl, $branch);
+        if ('' === $url || GitRepositoryService::SERVICE_BITBUCKET_SERVER === $repositoryType) {
+            $url = self::extractFromSelfHostedBitBucket($repositoryUrl, $branch);
+        }
+
+        return $url;
+    }
+
+    public static function extractRepositoryNameFromCloneUrl(string $url): string
+    {
+        $repositoryNameRegex = '/^.+:(.*)\.git$/';
+
+        if (preg_match($repositoryNameRegex, $url, $matches)) {
+            return $matches[1];
+        }
+
+        throw new \InvalidArgumentException(sprintf('Cannot extract repository from clone URL %s', $url), 1632320303);
+    }
+
     private static function extractComposerJsonUrlFromRepositoryUrl(string $repositoryUrl, string $branch): string
     {
-        if (strpos($repositoryUrl, 'https://github.com') !== false) {
+        if (str_starts_with($repositoryUrl, 'https://github.com')) {
             return self::extractFromGithub($repositoryUrl, $branch);
         }
-        if (strpos($repositoryUrl, 'https://gitlab.com') !== false) {
+        if (str_starts_with($repositoryUrl, 'https://gitlab.com')) {
             return self::extractFromGitlab($repositoryUrl, $branch);
         }
-        if (strpos($repositoryUrl, 'https://bitbucket.org') !== false) {
+        if (str_starts_with($repositoryUrl, 'https://bitbucket.org')) {
             return self::extractFromBitbucket($repositoryUrl, $branch);
         }
+
         return '';
     }
 
@@ -42,6 +60,7 @@ class RepositoryUrlUtility
             '{repoName}' => $packageParts[0] . '/' . str_replace('.git', '', $packageParts[1]),
             '{version}' => $branch,
         ];
+
         return (new GitRepositoryService())->resolvePublicComposerJsonUrl($repoService, $parameters);
     }
 
@@ -53,6 +72,7 @@ class RepositoryUrlUtility
             '{repoName}' => $packageParts[0] . '/' . $packageParts[1],
             '{version}' => $branch,
         ];
+
         return (new GitRepositoryService())->resolvePublicComposerJsonUrl($repoService, $parameters);
     }
 
@@ -63,6 +83,7 @@ class RepositoryUrlUtility
             '{baseUrl}' => str_replace('.git', '', $repositoryUrl),
             '{version}' => $branch,
         ];
+
         return (new GitRepositoryService())->resolvePublicComposerJsonUrl($repoService, $parameters);
     }
 
@@ -84,26 +105,7 @@ class RepositoryUrlUtility
             '{version}' => $branch,
             '{type}' => $tag ? 'tags' : 'heads',
         ];
+
         return (new GitRepositoryService())->resolvePublicComposerJsonUrl($repoService, $parameters);
-    }
-
-    public static function resolveComposerJsonUrl(string $repositoryUrl, string $branch, string $repositoryType = null): string
-    {
-        $url = self::extractComposerJsonUrlFromRepositoryUrl($repositoryUrl, $branch);
-        if ($url === '' || $repositoryType === GitRepositoryService::SERVICE_BITBUCKET_SERVER) {
-            $url = self::extractFromSelfHostedBitBucket($repositoryUrl, $branch);
-        }
-        return $url;
-    }
-
-    public static function extractRepositoryNameFromCloneUrl(string $url): string
-    {
-        $repositoryNameRegex = '/^.+:(.*)\.git$/';
-
-        if (preg_match($repositoryNameRegex, $url, $matches)) {
-            return $matches[1];
-        }
-
-        throw new \InvalidArgumentException(sprintf('Cannot extract repository from clone URL %s', $url), 1632320303);
     }
 }

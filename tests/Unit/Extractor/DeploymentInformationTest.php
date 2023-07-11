@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -25,10 +26,7 @@ class DeploymentInformationTest extends TestCase
         ClockMock::withClockMock(155309515.6937);
     }
 
-    /**
-     * @test
-     */
-    public function composerJsonSetsValuesAsExpected(): void
+    public function testComposerJsonSetsValuesAsExpected(): void
     {
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
@@ -49,23 +47,20 @@ class DeploymentInformationTest extends TestCase
             'bar'
         );
 
-        $this->assertSame('https://github.com/lolli42/enetcache/', $subject->repositoryUrl);
-        $this->assertSame('https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json', $subject->publicComposerJsonUrl);
-        $this->assertSame('foobar', $subject->vendor);
-        $this->assertSame('bazfnord', $subject->name);
-        $this->assertSame('foobar/bazfnord', $subject->packageName);
-        $this->assertSame('main', $subject->sourceBranch);
-        $this->assertSame('p', $subject->typeShort);
-        $this->assertSame('extension', $subject->typeLong);
-        $this->assertSame('main', $subject->targetBranchDirectory);
-        $this->assertStringContainsString('/tmp/foo/bar/', $subject->absoluteDumpFile);
-        $this->assertStringContainsString('bar/', $subject->relativeDumpFile);
+        self::assertSame('https://github.com/lolli42/enetcache/', $subject->repositoryUrl);
+        self::assertSame('https://raw.githubusercontent.com/lolli42/enetcache/main/composer.json', $subject->publicComposerJsonUrl);
+        self::assertSame('foobar', $subject->vendor);
+        self::assertSame('bazfnord', $subject->name);
+        self::assertSame('foobar/bazfnord', $subject->packageName);
+        self::assertSame('main', $subject->sourceBranch);
+        self::assertSame('p', $subject->typeShort);
+        self::assertSame('extension', $subject->typeLong);
+        self::assertSame('main', $subject->targetBranchDirectory);
+        self::assertStringContainsString('/tmp/foo/bar/', $subject->absoluteDumpFile);
+        self::assertStringContainsString('bar/', $subject->relativeDumpFile);
     }
 
-    /**
-     * @test
-     */
-    public function arrayIsReturnedAsExpected(): void
+    public function testArrayIsReturnedAsExpected(): void
     {
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
@@ -98,13 +93,10 @@ class DeploymentInformationTest extends TestCase
             '/tmp/foo',
             'bar'
         );
-        $this->assertSame($expected, $subject->toArray());
+        self::assertSame($expected, $subject->toArray());
     }
 
-    /**
-     * @return array
-     */
-    public function validPackageNameDataProvider(): array
+    public static function validPackageNameDataProvider(): array
     {
         return [
             ['husel/pusel', 'husel', 'pusel'],
@@ -116,13 +108,9 @@ class DeploymentInformationTest extends TestCase
     }
 
     /**
-     * @param string $packageName
-     * @param string $expectedVendor
-     * @param string $expectedName
      * @dataProvider validPackageNameDataProvider
-     * @test
      */
-    public function packageNamePartsAreCorrectlyResolved(string $packageName, string $expectedVendor, string $expectedName): void
+    public function testPackageNamePartsAreCorrectlyResolved(string $packageName, string $expectedVendor, string $expectedName): void
     {
         $composerJsonAsArray = [
             'name' => $packageName,
@@ -142,15 +130,12 @@ class DeploymentInformationTest extends TestCase
             '/tmp/foo',
             'bar'
         );
-        $this->assertSame($expectedVendor, $subject->vendor);
-        $this->assertSame($expectedName, $subject->name);
-        $this->assertSame($packageName, $subject->packageName);
+        self::assertSame($expectedVendor, $subject->vendor);
+        self::assertSame($expectedName, $subject->name);
+        self::assertSame($packageName, $subject->packageName);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidPackageNameDataProvider(): array
+    public static function invalidPackageNameDataProvider(): array
     {
         return [
             ['', 1558019290],
@@ -164,12 +149,9 @@ class DeploymentInformationTest extends TestCase
     }
 
     /**
-     * @param string $packageName
-     * @param int $expectedExceptionCode
      * @dataProvider invalidPackageNameDataProvider
-     * @test
      */
-    public function invalidPackageNameThrowException(?string $packageName, int $expectedExceptionCode): void
+    public function testInvalidPackageNameThrowException(?string $packageName, int $expectedExceptionCode): void
     {
         $this->expectException(ComposerJsonInvalidException::class);
         $this->expectExceptionCode($expectedExceptionCode);
@@ -192,10 +174,7 @@ class DeploymentInformationTest extends TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function packageTypeDataProvider(): array
+    public static function packageTypeDataProvider(): array
     {
         return [
             'manual' => ['typo3-cms-documentation', 'foobar/bazfnord', 'manual', 'm'],
@@ -210,13 +189,9 @@ class DeploymentInformationTest extends TestCase
     }
 
     /**
-     * @param string $type
-     * @param string $expectedLong
-     * @param string $expectedShort
      * @dataProvider packageTypeDataProvider
-     * @test
      */
-    public function packageTypePartsAreCorrectlyResolved(string $type, string $packageName, string $expectedLong, string $expectedShort): void
+    public function testPackageTypePartsAreCorrectlyResolved(string $type, string $packageName, string $expectedLong, string $expectedShort): void
     {
         $composerJsonAsArray = [
             'name' => $packageName,
@@ -236,14 +211,11 @@ class DeploymentInformationTest extends TestCase
             'bar'
         );
 
-        $this->assertSame($expectedLong, $subject->typeLong);
-        $this->assertSame($expectedShort, $subject->typeShort);
+        self::assertSame($expectedLong, $subject->typeLong);
+        self::assertSame($expectedShort, $subject->typeShort);
     }
 
-    /**
-     * @test
-     */
-    public function docsHomeTypeIsDetected(): void
+    public function testDocsHomeTypeIsDetected(): void
     {
         $composerJsonAsArray = [
             'name' => 'typo3/docs-homepage',
@@ -262,14 +234,11 @@ class DeploymentInformationTest extends TestCase
             'bar'
         );
 
-        $this->assertSame('docs-home', $subject->typeLong);
-        $this->assertSame('h', $subject->typeShort);
+        self::assertSame('docs-home', $subject->typeLong);
+        self::assertSame('h', $subject->typeShort);
     }
 
-    /**
-     * @return array
-     */
-    public function validBranchNameDataProvider(): array
+    public static function validBranchNameDataProvider(): array
     {
         return [
             [
@@ -411,13 +380,9 @@ class DeploymentInformationTest extends TestCase
     }
 
     /**
-     * @param string $type
-     * @param string $branch
-     * @param string $expectedBranch
      * @dataProvider validBranchNameDataProvider
-     * @test
      */
-    public function branchNamesAreNormalized(string $type, string $branch, string $expectedBranch): void
+    public function testBranchNamesAreNormalized(string $type, string $branch, string $expectedBranch): void
     {
         $composerJsonAsArray = [
             'name' => 'foobar/bazfnord',
@@ -437,81 +402,74 @@ class DeploymentInformationTest extends TestCase
             'bar'
         );
 
-        $this->assertSame($expectedBranch, $subject->targetBranchDirectory);
+        self::assertSame($expectedBranch, $subject->targetBranchDirectory);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidBranchNameDataProvider(): array
+    public static function invalidBranchNameDataProvider(): array
     {
         return [
             [
                 'typo3-cms-extension',
                 '1.2',
-                1557498335
+                1557498335,
             ],
             [
                 'typo3-cms-extension',
                 '',
-                1557498335
+                1557498335,
             ],
             [
                 'typo3-cms-extension',
                 'foo',
-                1557498335
+                1557498335,
             ],
             [
                 'typo3-cms-extension',
                 '1.2-dev',
-                1557498335
+                1557498335,
             ],
             [
                 'typo3-cms-extension',
                 '1..2',
-                1557498335
+                1557498335,
             ],
             [
                 'typo3-cms-extension',
                 '1.2.3.4',
-                1557498335
+                1557498335,
             ],
             [
                 'typo3-cms-extension',
                 'v1.2',
-                1557498335
+                1557498335,
             ],
             [
                 'typo3-cms-framework',
                 '1.2.3',
-                1557503542
+                1557503542,
             ],
             [
                 'typo3-cms-framework',
                 'v1.2.3',
-                1557503542
+                1557503542,
             ],
             [
                 'typo3-cms-documentation',
                 '1.2.3',
-                1557503542
+                1557503542,
             ],
             [
                 'typo3-cms-documentation',
                 '1.2.3',
-                1557503542
+                1557503542,
             ],
         ];
     }
 
     /**
-     * @param string $type
-     * @param string $branch
-     * @param int $exceptionCode
      * @dataProvider invalidBranchNameDataProvider
-     * @test
      */
-    public function invalidBranchNamesThrowException(string $type, string $branch, int $exceptionCode): void
+    public function testInvalidBranchNamesThrowException(string $type, string $branch, int $exceptionCode): void
     {
         $this->expectException(DocsPackageDoNotCareBranch::class);
         $this->expectExceptionCode($exceptionCode);

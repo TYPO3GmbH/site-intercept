@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -24,30 +25,16 @@ use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 class RenderDocumentationService
 {
-    protected DocumentationBuildInformationService $documentationBuildInformationService;
-    protected GithubService $githubService;
-    protected LoggerInterface $logger;
-    protected EntityManagerInterface $entityManager;
-    protected Security $security;
-
     public function __construct(
-        DocumentationBuildInformationService $documentationBuildInformationService,
-        GithubService $githubService,
-        LoggerInterface $logger,
-        EntityManagerInterface $entityManager,
-        Security $security
+        protected DocumentationBuildInformationService $documentationBuildInformationService,
+        protected GithubService $githubService,
+        protected LoggerInterface $logger,
+        protected EntityManagerInterface $entityManager,
+        protected Security $security
     ) {
-        $this->documentationBuildInformationService = $documentationBuildInformationService;
-        $this->githubService = $githubService;
-        $this->logger = $logger;
-        $this->entityManager = $entityManager;
-        $this->security = $security;
     }
 
     /**
-     * @param DocumentationJar $documentationJar
-     * @param string $scope
-     * @return DeploymentInformation
      * @throws DocsPackageDoNotCareBranch
      * @throws DuplicateDocumentationRepositoryException
      */
@@ -55,9 +42,12 @@ class RenderDocumentationService
     {
         $buildInformation = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
         $documentationJar = $this->documentationBuildInformationService->registerDocumentationRendering($buildInformation);
-        $bambooBuildTriggered = $this->githubService->triggerDocumentationPlan($buildInformation);
-        $this->documentationBuildInformationService->updateStatus($documentationJar, DocumentationStatus::STATUS_RENDERING);
-        $this->documentationBuildInformationService->updateBuildKey($documentationJar, $bambooBuildTriggered->buildResultKey);
+        $buildTriggered = $this->githubService->triggerDocumentationPlan($buildInformation);
+        $this->documentationBuildInformationService->update($documentationJar, function (DocumentationJar $documentationJar) use ($buildTriggered) {
+            $documentationJar->setStatus(DocumentationStatus::STATUS_RENDERING);
+            $documentationJar->setReRenderNeeded(false);
+            $documentationJar->setBuildKey($buildTriggered->buildResultKey);
+        });
         $user = $this->security->getUser();
         $userIdentifier = 'Anon.';
         if ($user instanceof KeyCloakUser) {
@@ -67,22 +57,21 @@ class RenderDocumentationService
             (new HistoryEntry())
                 ->setType('docsRendering')
                 ->setStatus('triggered')
-                ->setGroupEntry($bambooBuildTriggered->buildResultKey)
-                ->setData(
-                    [
-                        'type' => 'docsRendering',
-                        'status' => DocsRenderingHistoryStatus::TRIGGERED,
-                        'triggeredBy' => $scope,
-                        'repository' => $buildInformation->repositoryUrl,
-                        'package' => $buildInformation->packageName,
-                        'sourceBranch' => $buildInformation->sourceBranch,
-                        'targetBranch' => $buildInformation->targetBranchDirectory,
-                        'bambooKey' => $bambooBuildTriggered->buildResultKey,
-                        'user' => $userIdentifier
-                    ]
-                )
+                ->setGroupEntry($buildTriggered->buildResultKey)
+                ->setData([
+                    'type' => 'docsRendering',
+                    'status' => DocsRenderingHistoryStatus::TRIGGERED,
+                    'triggeredBy' => $scope,
+                    'repository' => $buildInformation->repositoryUrl,
+                    'package' => $buildInformation->packageName,
+                    'sourceBranch' => $buildInformation->sourceBranch,
+                    'targetBranch' => $buildInformation->targetBranchDirectory,
+                    'bambooKey' => $buildTriggered->buildResultKey,
+                    'user' => $userIdentifier,
+                ])
         );
         $this->entityManager->flush();
+
         return $buildInformation;
     }
 
@@ -90,6 +79,7 @@ class RenderDocumentationService
     {
         $buildInformation = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
         $this->documentationBuildInformationService->dumpDeploymentInformationFile($buildInformation);
+
         return $buildInformation;
     }
 }

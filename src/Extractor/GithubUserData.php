@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -14,31 +15,32 @@ use App\Exception\DoNotCareException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Extract information from a github user data request.
- * Triggered by github api service to retrieve at
- * least user name and hopefully email.
+ * Extract information from a GitHub user data request.
+ * Triggered by GitHub api service to retrieve at
+ * least username and hopefully email.
  */
-class GithubUserData
+readonly class GithubUserData
 {
     /**
-     * @var string User name or user login name, eg. 'Christian Kuhn' or 'lolli42'
+     * @var string User name or user login name, e.g. 'Christian Kuhn' or 'lolli42'
      */
     public string $user;
 
     /**
-     * @var string User email address if set, eg. 'lolli@schwarzbu.ch'
+     * @var string User email address if set, e.g. 'lolli@schwarzbu.ch'
      */
     public string $email;
 
     /**
-     * Extract information from a github pull request issue.
+     * Extract information from a GitHub pull request issue.
      *
-     * @param ResponseInterface $response Response of a github user API get
+     * @param ResponseInterface $response Response of a GitHub user API get
+     *
      * @throws DoNotCareException
      */
     public function __construct(ResponseInterface $response)
     {
-        $responseBody = (string)$response->getBody();
+        $responseBody = (string) $response->getBody();
         $userInformation = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
         $this->user = $userInformation['name'] ?? $userInformation['login'] ?? '';
         $this->email = $userInformation['email'] ?? 'noreply@example.com';

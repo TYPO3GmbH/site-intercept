@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -14,9 +14,9 @@ namespace App\Controller;
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
 use App\Extractor\GithubBuildInfo;
+use App\Repository\DocumentationJarRepository;
 use App\Service\RenderDocumentationService;
-use DateTime;
-use JsonException;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,41 +25,38 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Triggered by github with current build status.
+ * Triggered by GitHub with current build status.
  */
 class GithubBuildStatusController extends AbstractController
 {
-    /**
-     * @Route("/github/rendering-done", name="github_rendering_done")
-     * @param Request $request
-     * @param LoggerInterface $logger
-     * @param RenderDocumentationService $renderDocumentationService
-     * @return Response
-     */
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DocumentationJarRepository $documentationJarRepository,
+        private readonly LoggerInterface $logger
+    ) {
+    }
+
+    #[Route(path: '/github/rendering-done', name: 'github_rendering_done')]
     public function index(
         Request $request,
-        LoggerInterface $logger,
         RenderDocumentationService $renderDocumentationService
     ): Response {
-        $this->verifyAccess($request);
+        $this->assertValidSignature($request);
+
         $result = new GithubBuildInfo($request);
-        $buildKey = $result->buildKey;
-        $success = $result->success;
-        // This is a back-channel triggered by Github after a "documentation rendering" build is done
-        $manager = $this->getDoctrine()->getManager();
-        $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
+        // This is a back-channel triggered by GitHub after a "documentation rendering" build is done
         /** @var DocumentationJar $documentationJar */
-        $documentationJar = $documentationJarRepository->findOneBy(['buildKey' => $buildKey]);
+        $documentationJar = $this->documentationJarRepository->findOneBy(['buildKey' => $result->buildKey]);
         if ($documentationJar instanceof DocumentationJar) {
-            if ($success) {
+            if ($result->success) {
                 // Build was successful, set status to "rendered"
                 $documentationJar
-                    ->setLastRenderedAt(new DateTime('now'))
+                    ->setLastRenderedAt(new \DateTime('now'))
                     ->setStatus(DocumentationStatus::STATUS_RENDERED)
                     ->setLastRenderedLink($result->link);
                 // persist immediately
-                $manager->flush();
-                $logger->info(
+                $this->entityManager->flush();
+                $this->logger->info(
                     'Documentation rendered on Github',
                     [
                         'type' => 'docsRendering',
@@ -67,7 +64,7 @@ class GithubBuildStatusController extends AbstractController
                         'triggeredBy' => 'api',
                         'repository' => $documentationJar->getRepositoryUrl(),
                         'package' => $documentationJar->getPackageName(),
-                        'bambooKey' => $buildKey,
+                        'bambooKey' => $result->buildKey,
                         'link' => $result->link,
                     ]
                 );
@@ -76,8 +73,8 @@ class GithubBuildStatusController extends AbstractController
                 $documentationJar->setStatus(DocumentationStatus::STATUS_RENDERING_FAILED)
                     ->setLastRenderedLink($result->link);
                 // persist immediately
-                $manager->flush();
-                $logger->warning(
+                $this->entityManager->flush();
+                $this->logger->warning(
                     'Failed to render documentation',
                     [
                         'type' => 'docsRendering',
@@ -85,7 +82,7 @@ class GithubBuildStatusController extends AbstractController
                         'triggeredBy' => 'api',
                         'repository' => $documentationJar->getRepositoryUrl(),
                         'package' => $documentationJar->getPackageName(),
-                        'bambooKey' => $buildKey,
+                        'bambooKey' => $result->buildKey,
                         'link' => $result->link,
                     ]
                 );
@@ -95,33 +92,25 @@ class GithubBuildStatusController extends AbstractController
                 $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'api');
                 $documentationJar->setReRenderNeeded(false);
                 // persist immediately
-                $manager->flush();
+                $this->entityManager->flush();
             }
         }
+
         return new Response();
     }
 
-    /**
-     * @Route("/github/rendering-started", name="github_rendering_started")
-     * @param Request $request
-     * @param LoggerInterface $logger
-     * @return Response
-     */
-    public function renderingStart(
-        Request $request,
-        LoggerInterface $logger
-    ): Response {
-        $this->verifyAccess($request);
+    #[Route(path: '/github/rendering-started', name: 'github_rendering_started')]
+    public function renderingStart(Request $request): Response
+    {
+        $this->assertValidSignature($request);
+
         $result = new GithubBuildInfo($request);
-        $buildKey = $result->buildKey;
-        // This is a back-channel triggered by Github after a "documentation rendering" build is done
-        $manager = $this->getDoctrine()->getManager();
-        $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
+        // This is a back-channel triggered by GitHub after a "documentation rendering" build is done
         /** @var DocumentationJar $documentationJar */
-        $documentationJar = $documentationJarRepository->findOneBy(['buildKey' => $buildKey]);
+        $documentationJar = $this->documentationJarRepository->findOneBy(['buildKey' => $result->buildKey]);
         if ($documentationJar instanceof DocumentationJar) {
             $documentationJar->setLastRenderedLink($result->link);
-            $logger->info(
+            $this->logger->info(
                 'Documentation rendering on Github started',
                 [
                     'type' => 'docsRendering',
@@ -129,71 +118,56 @@ class GithubBuildStatusController extends AbstractController
                     'triggeredBy' => 'api',
                     'repository' => $documentationJar->getRepositoryUrl(),
                     'package' => $documentationJar->getPackageName(),
-                    'bambooKey' => $buildKey,
+                    'bambooKey' => $result->buildKey,
                     'link' => $result->link,
                 ]
             );
-            $manager->flush();
+            $this->entityManager->flush();
         }
+
         return new Response();
     }
 
-    /**
-     * @Route("/github/deletion-done", name="github_deletion_done")
-     * @param Request $request
-     * @param LoggerInterface $logger
-     * @return Response
-     */
-    public function deletionDone(
-        Request $request,
-        LoggerInterface $logger
-    ): Response {
-        $this->verifyAccess($request);
-        $result = new GithubBuildInfo($request);
-        $buildKey = $result->buildKey;
-        $success = $result->success;
-        $manager = $this->getDoctrine()->getManager();
-        // This is a back-channel triggered by Github after a "documentation rendering" build is done
-        $documentationJarRepository = $this->getDoctrine()->getRepository(DocumentationJar::class);
-        /** @var DocumentationJar $documentationJar */
-        $documentationJar = $documentationJarRepository->findOneBy(['buildKey' => $buildKey]);
-        if ($documentationJar instanceof DocumentationJar) {
-            if ($success) {
-                // Build was successful, set status to "deleted"
-                $manager->remove($documentationJar);
-                $manager->flush();
-                $logger->info(
-                    'Documentation deleted by Github',
-                    [
-                        'type' => 'docsRendering',
-                        'status' => 'documentationDeleted',
-                        'triggeredBy' => 'api',
-                        'repository' => $documentationJar->getRepositoryUrl(),
-                        'package' => $documentationJar->getPackageName(),
-                        'bambooKey' => $buildKey,
-                        'link' => $result->link,
-                    ]
-                );
-            }
-        }
-        return new Response();
-    }
-
-    /**
-     * @param Request $request
-     */
-    private function verifyAccess(Request $request): void
+    #[Route(path: '/github/deletion-done', name: 'github_deletion_done')]
+    public function deletionDone(Request $request): Response
     {
-        try {
-            // prepare content format for hashing
-            $content = json_encode($request->toArray(), JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
-            $signature = 'sha1=' . hash_hmac('sha1', $content, $_ENV['GITHUB_HOOK_SECRET'] ?? '');
-            // verify hook payload
-        } catch (JsonException $e) {
-            throw new AccessDeniedHttpException('Invalid payload');
+        $this->assertValidSignature($request);
+
+        $result = new GithubBuildInfo($request);
+        // This is a back-channel triggered by GitHub after a "documentation rendering" build is done
+        /** @var DocumentationJar $documentationJar */
+        $documentationJar = $this->documentationJarRepository->findOneBy(['buildKey' => $result->buildKey]);
+        if ($documentationJar instanceof DocumentationJar && $result->success) {
+            // Build was successful, set status to "deleted"
+            $this->entityManager->remove($documentationJar);
+            $this->entityManager->flush();
+            $this->logger->info(
+                'Documentation deleted by Github',
+                [
+                    'type' => 'docsRendering',
+                    'status' => 'documentationDeleted',
+                    'triggeredBy' => 'api',
+                    'repository' => $documentationJar->getRepositoryUrl(),
+                    'package' => $documentationJar->getPackageName(),
+                    'bambooKey' => $result->buildKey,
+                    'link' => $result->link,
+                ]
+            );
         }
-        if (!hash_equals($signature, $request->headers->get('x-hub-signature'))) {
-            throw new AccessDeniedHttpException('Non-matching signatures');
+
+        return new Response();
+    }
+
+    private function assertValidSignature(Request $request): void
+    {
+        $expectedSignature = $request->headers->get('x-hub-signature-256') ?? '';
+        if ('' === $expectedSignature) {
+            throw new AccessDeniedHttpException('Missing payload signature header');
+        }
+
+        $signature = 'sha256=' . hash_hmac('sha256', (string) $request->getContent(), $_ENV['GITHUB_HOOK_SECRET'] ?? '');
+        if (!hash_equals($expectedSignature, $signature)) {
+            throw new AccessDeniedHttpException('Content doesn\'t match expected signature "' . $expectedSignature . '"');
         }
     }
 }

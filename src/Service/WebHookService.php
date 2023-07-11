@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -15,7 +16,6 @@ use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
-use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  * - Bitbucket: Push Events
  * - Github: Push Events for branches and tags
  * - Github: Release Events
- * - Gitlab: Push Events for branches and tags
+ * - Gitlab: Push Events for branches and tags.
  */
 class WebHookService
 {
@@ -32,8 +32,8 @@ class WebHookService
      * github / gitlab / bitbucket repository hook. Used to trigger documentation
      * rendering.
      *
-     * @param Request $request
      * @return PushEvent[]
+     *
      * @throws DocsNoRstChangesException
      * @throws GitBranchDeletedException
      * @throws GithubHookPingException
@@ -46,49 +46,47 @@ class WebHookService
         if (in_array($request->headers->get('X-Gitlab-Event', ''), ['Push Hook', 'Tag Push Hook'], true)) {
             return $this->getPushEventFromGitlab($request);
         }
-        if ($request->headers->get('X-GitHub-Event', '') === 'push') {
+        if ('push' === $request->headers->get('X-GitHub-Event', '')) {
             return $this->getPushEventFromGithub($request);
         }
-        if ($request->headers->get('X-GitHub-Event', '') === 'ping') {
+        if ('ping' === $request->headers->get('X-GitHub-Event', '')) {
             $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
-            throw new GithubHookPingException('', 1557838026, null, (string)$payload->repository->html_url);
+            throw new GithubHookPingException('', 1557838026, null, (string) $payload->repository->html_url);
         }
         throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1553256930);
     }
 
     /**
-     * @param Request $request
      * @return PushEvent[]
      */
-    protected function getPushEventFromBitbucket(Request $request): array
+    private function getPushEventFromBitbucket(Request $request): array
     {
         $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
         $events = [];
+        $versions = [];
         if (isset($payload->push->changes[0]->new->target->links->html->href)) {
             // Cloud (Push)
             // Bitbucket sends one hook, even when multiple branches are pushed
             // Here we extract those brances and create a pushevent per branch
-            $versions = [];
             foreach ($payload->push->changes as $change) {
-                if (in_array((string)$change->new->name, $versions, true)) {
+                if (in_array((string) $change->new->name, $versions, true)) {
                     continue;
                 }
 
                 $events[] = $this->pushEventFromBitbucketCloudChange($payload, $change);
-                $versions[] = (string)$change->new->name;
+                $versions[] = (string) $change->new->name;
             }
         } else {
             // Server (refs_changed)
             // Bitbucket sends one hook, even when multiple branches are pushed
             // Here we extract those brances and create a pushevent per branch
-            $versions = [];
             foreach ($payload->changes as $change) {
-                if (in_array((string)$change->ref->displayId, $versions, true)) {
+                if (in_array((string) $change->ref->displayId, $versions, true)) {
                     continue;
                 }
 
                 $events[] = $this->pushEventFromBitbucketServerChange($payload, $change);
-                $versions[] = (string)$change->ref->displayId;
+                $versions[] = (string) $change->ref->displayId;
             }
         }
 
@@ -96,14 +94,13 @@ class WebHookService
     }
 
     /**
-     * @param Request $request
      * @return PushEvent[]
      */
-    protected function getPushEventFromGitlab(Request $request): array
+    private function getPushEventFromGitlab(Request $request): array
     {
         $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
-        $repositoryUrl = (string)$payload->repository->git_http_url;
-        $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
+        $repositoryUrl = (string) $payload->repository->git_http_url;
+        $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string) $payload->ref);
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITLAB);
 
@@ -111,36 +108,33 @@ class WebHookService
     }
 
     /**
-     * @param Request $request
      * @return PushEvent[]
+     *
      * @throws DocsNoRstChangesException
      * @throws GitBranchDeletedException
      */
-    protected function getPushEventFromGithub(Request $request): array
+    private function getPushEventFromGithub(Request $request): array
     {
         $content = $request->getContent();
         try {
             $payload = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
-            // If can't be decoded to json, this might be a x-www-form-encoded body
+        } catch (\JsonException) {
+            // If it can't be decoded to json, this might be an x-www-form-encoded body
             // probably by using the old legacy hook, that used this
             $payload = urldecode($content);
             $payload = substr($payload, 8); // cut off 'payload=', rest should be json, then
             try {
                 $payload = json_decode($payload, false, 512, JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
+            } catch (\JsonException) {
                 throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
             }
         }
-        if (!empty($payload->deleted) && $payload->deleted === true) {
+        if (!empty($payload->deleted) && true === $payload->deleted) {
             $cloneUrl = '';
             if (is_object($payload) && isset($payload->repository)) {
                 $cloneUrl = $payload->repository->clone_url;
             }
-            throw new GitBranchDeletedException(
-                'Webhook was triggered on a deleted branch for repository' . $cloneUrl . '.',
-                1564408696
-            );
+            throw new GitBranchDeletedException('Webhook was triggered on a deleted branch for repository' . $cloneUrl . '.', 1564408696);
         }
 
         // Only for actual push events, not releases
@@ -149,9 +143,9 @@ class WebHookService
             foreach ($payload->commits as $commit) {
                 $files = array_merge($commit->added ?? [], $commit->modified ?? [], $commit->removed ?? []);
                 foreach ($files as $file) {
-                    if (strpos($file, 'Documentation/') === 0
-                        || $file === 'README.md'
-                        || $file === 'README.rst'
+                    if ('README.md' === $file
+                        || 'README.rst' === $file
+                        || str_starts_with((string) $file, 'Documentation/')
                     ) {
                         $triggeringChange = true;
                         break 2;
@@ -164,22 +158,22 @@ class WebHookService
             }
         }
 
-        $repositoryUrl = (string)$payload->repository->clone_url;
-        $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string)$payload->ref);
+        $repositoryUrl = (string) $payload->repository->clone_url;
+        $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string) $payload->ref);
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITHUB);
 
         return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile)];
     }
 
-    protected function pushEventFromBitbucketCloudChange(stdClass $payload, stdClass $change): PushEvent
+    private function pushEventFromBitbucketCloudChange(\stdClass $payload, \stdClass $change): PushEvent
     {
         unset($payload->push->changes);
         $payload->push->changes = [0 => $change];
-        $versionString = (string)$change->new->name;
-        $repositoryUrl = (string)$change->new->target->links->html->href;
+        $versionString = (string) $change->new->name;
+        $repositoryUrl = (string) $change->new->target->links->html->href;
         // Add .git at end if it misses. This must be aligned, otherwise manual adding of configuration will go wrong.
-        if (substr($repositoryUrl, -4) !== '.git') {
+        if (!str_ends_with($repositoryUrl, '.git')) {
             $repositoryUrl .= '.git';
         }
         if (is_int(strpos($repositoryUrl, '/commits/'))) {
@@ -191,18 +185,18 @@ class WebHookService
         return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
     }
 
-    protected function pushEventFromBitbucketServerChange(stdClass $payload, stdClass $change): PushEvent
+    private function pushEventFromBitbucketServerChange(\stdClass $payload, \stdClass $change): PushEvent
     {
         unset($payload->changes);
         $payload->changes = [0 => $change];
-        $versionString = (string)$change->ref->displayId;
+        $versionString = (string) $change->ref->displayId;
         $repositoryUrl = null;
         // Server (refs_changed)
-        // In case of self hosted, Bitbucket provides a git clone url
+        // In case of self-hosted, Bitbucket provides a git clone url
         // We have to use this url, as html url will not work with git clone
         foreach ($payload->repository->links->clone as $cloneInformation) {
-            if ($cloneInformation->name === 'http') {
-                $repositoryUrl = (string)$cloneInformation->href;
+            if ('http' === $cloneInformation->name) {
+                $repositoryUrl = (string) $cloneInformation->href;
                 break;
             }
         }

@@ -18,13 +18,10 @@ use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class RequestForwarder
+readonly class RequestForwarder
 {
-    protected $request;
-
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(private ServerRequestInterface $request)
     {
-        $this->request = $request;
     }
 
     public function to(Uri $target): void

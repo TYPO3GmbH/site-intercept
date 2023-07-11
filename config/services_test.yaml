@@ -5,19 +5,3 @@ services:
 
   Jose\Component\KeyManagement\JKUFactory:
     class: App\Tests\Functional\Fixtures\JKU\JKUFactoryStub
-
-  App\Client\GerritClient:
-    tags:
-      - testDouble
-  App\Client\GithubClient:
-    tags:
-      - testDouble
-  App\Client\GeneralClient:
-    tags:
-      - testDouble
-  App\Client\RabbitManagementClient:
-    tags:
-      - testDouble
-  App\Client\SlackClient:
-    tags:
-      - testDouble

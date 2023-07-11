@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -11,129 +11,128 @@ declare(strict_types = 1);
 
 namespace App\Tests\Functional\AdminInterface\Docs;
 
-use App\Bundle\TestDoubleBundle;
-use App\Client\GithubClient;
+use App\Extractor\DeploymentInformation;
+use App\Service\GithubService;
 use App\Tests\Functional\AbstractFunctionalWebTestCase;
-use App\Tests\Functional\DatabasePrimer;
 use App\Tests\Functional\Fixtures\AdminInterface\Docs\DeploymentsControllerTestData;
-use GuzzleHttp\Psr7\Response;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\BrowserKit\AbstractBrowser;
+use GuzzleHttp\Client;
+use Symfony\Bridge\PhpUnit\ClockMock;
+use T3G\LibTestHelper\Database\DatabasePrimer;
+use T3G\LibTestHelper\Request\MockRequest;
 
 class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
 {
-    use ProphecyTrait;
-
-    /**
-     * @var AbstractBrowser
-     */
-    private $client;
+    use DatabasePrimer;
 
     protected function setUp(): void
     {
         parent::setUp();
-        TestDoubleBundle::reset();
-        $this->addRabbitManagementClientProphecy();
-    }
-
-    /**
-     * @test
-     */
-    public function indexRenderTableWithEntries(): void
-    {
-        $this->client = static::createClient();
-        $this->manualSetup();
-        $this->logInAsDocumentationMaintainer($this->client);
-        $this->client->request('GET', '/admin/docs/deployments');
-        $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('<table class="datatable-table">', $content);
-        $this->assertStringContainsString('typo3/docs-homepage', $content);
-    }
-
-    /**
-     * @test
-     */
-    public function deleteRenderTableEntries(): void
-    {
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-
-        $this->createPlainGithubProphecy();
-        $this->client = static::createClient();
-        $this->manualSetup();
-        $this->logInAsDocumentationMaintainer($this->client);
-
-        $this->client->request('GET', '/admin/docs/deployments');
-        $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('typo3/docs-homepage', $content);
-
-        $crawler = $this->client->request('GET', '/admin/docs/deployments/delete/1/confirm');
-        $github = $this->prophesize(GithubClient::class);
-        $github->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $github);
-
-        $form = $crawler->selectButton('docsformdelete')->form();
-        $this->client->submit($form, [], []);
-        $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
-
-        $this->createPlainGithubProphecy();
-        $this->logInAsDocumentationMaintainer($this->client);
-
-        $this->client->request('GET', '/admin/docs/deployments');
-
-        $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('Deleting', $content);
-    }
-
-    /**
-     * @test
-     */
-    public function approveEntry(): void
-    {
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
-        $this->addRabbitManagementClientProphecy();
 
         $this->client = static::createClient();
-        $this->manualSetup();
-        $this->logInAsDocumentationMaintainer($this->client);
-
-        $this->client->request('GET', '/admin/docs/deployments');
-        $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('Approve documentation', $content);
-
-        $github = $this->prophesize(GithubClient::class);
-        $github->post(Argument::cetera())->willReturn(new Response());
-        TestDoubleBundle::addProphecy(GithubClient::class, $github);
-        $this->client->request('GET', '/admin/docs/deployments/approve/10');
-        $this->assertEquals(302, $this->client->getResponse()->getStatusCode());
-
-        $this->logInAsDocumentationMaintainer($this->client);
-
-        $this->client->request('GET', '/admin/docs/deployments');
-
-        $content = $this->client->getResponse()->getContent();
-        $this->assertStringNotContainsString('Approve documentation', $content);
-    }
-
-
-    private function createPlainGithubProphecy(): void
-    {
-        $github = $this->prophesize(GithubClient::class);
-        TestDoubleBundle::addProphecy(GithubClient::class, $github);
-        $github->get(Argument::any(), Argument::cetera())->willReturn(
-            new Response(200, [], json_encode([]))
-        );
-    }
-
-
-    private function manualSetup(): void
-    {
-        DatabasePrimer::prime(self::$kernel);
+        $this->prime();
         (new DeploymentsControllerTestData())->load(
             self::$kernel->getContainer()->get('doctrine')->getManager()
         );
+
+        ClockMock::register(DeploymentInformation::class);
+        ClockMock::register(GithubService::class);
+        ClockMock::withClockMock(155309515.6937);
+    }
+
+    public function testIndexRenderTableWithEntries(): void
+    {
+        $this->logInAsDocumentationMaintainer($this->client);
+        $this->client->request('GET', '/admin/docs/deployments');
+        $content = $this->client->getResponse()->getContent();
+        self::assertStringContainsString('<table class="datatable-table">', $content);
+        self::assertStringContainsString('typo3/docs-homepage', $content);
+    }
+
+    public function testDeleteRenderTableEntries(): void
+    {
+        $this->logInAsDocumentationMaintainer($this->client);
+
+        $response = (new MockRequest($this->client))
+            ->setMethod('GET')
+            ->setEndPoint('/admin/docs/deployments')
+            ->execute();
+        self::assertStringContainsString('typo3/docs-homepage', $response->getContent());
+
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
+                'json' => [
+                    'event_type' => 'delete',
+                    'client_payload' => [
+                        'target_branch_directory' => 'main',
+                        'name' => 'docs-homepage',
+                        'vendor' => 'typo3',
+                        'type_short' => 'h',
+                        'id' => '1a901f53acd0cce3b2e10b633af339c36b3671d5',
+                    ],
+                ],
+            ]);
+
+        $response = (new MockRequest($this->client))
+            ->setMethod('DELETE')
+            ->setEndPoint('/admin/docs/deployments/delete/1')
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute();
+        self::assertEquals(302, $response->getStatusCode());
+
+        $this->logInAsDocumentationMaintainer($this->client);
+
+        $response = (new MockRequest($this->client))
+            ->setMethod('GET')
+            ->setEndPoint('/admin/docs/deployments')
+            ->execute();
+        self::assertStringContainsString('Deleting', $response->getContent());
+    }
+
+    public function testApproveEntry(): void
+    {
+        $this->logInAsDocumentationMaintainer($this->client);
+
+        $response = (new MockRequest($this->client))
+            ->setMethod('GET')
+            ->setEndPoint('/admin/docs/deployments')
+            ->execute();
+        self::assertStringContainsString('Approve documentation', $response->getContent());
+
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects(self::once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
+                'json' => [
+                    'event_type' => 'render',
+                    'client_payload' => [
+                        'repository_url' => 'https://github.com/georgringer/news.git',
+                        'source_branch' => 'main',
+                        'target_branch_directory' => 'main',
+                        'name' => 'news',
+                        'vendor' => 'georgringer',
+                        'type_short' => 'p',
+                        'id' => '6dec6ce1a86759e66b8b28a5a0a6ce0578d2febb',
+                    ],
+                ],
+            ]);
+
+        $response = (new MockRequest($this->client))
+            ->setMethod('GET')
+            ->setEndPoint('/admin/docs/deployments/approve/10')
+            ->withMock('guzzle.client.github', $githubClient)
+            ->execute();
+        self::assertEquals(302, $response->getStatusCode());
+
+        $this->logInAsDocumentationMaintainer($this->client);
+
+        $response = (new MockRequest($this->client))
+            ->setMethod('GET')
+            ->setEndPoint('/admin/docs/deployments')
+            ->execute();
+        self::assertStringNotContainsString('Approve documentation', $response->getContent());
     }
 }

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -21,10 +22,15 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Form class represents a form to manage DocumentationJar entries
+ * Form class represents a form to manage DocumentationJar entries.
  */
 class DocumentationDeployment extends AbstractType
 {
+    public function __construct(
+        private readonly DocumentationJarRepository $documentationJarRepository
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $optionsStep1 = $options['step2'] || $options['step3'] ? [
@@ -36,7 +42,7 @@ class DocumentationDeployment extends AbstractType
         $optionsStep2 = $options['step3'] ? [
             'attr' => [
                 'class' => 'disabled',
-                'readonly' => 'readonly'
+                'readonly' => 'readonly',
             ],
         ] : [];
 
@@ -49,12 +55,12 @@ class DocumentationDeployment extends AbstractType
                     'mapped' => false,
                     'choices' => ['Please select a repository type' => ''] + array_flip(GitRepositoryService::SERVICE_NAMES),
                     'choice_attr' => static function ($key, $val, $index) {
-                        if ($val === '') {
+                        if ('' === $val) {
                             return ['disabled' => 'disabled'];
                         }
 
                         return [];
-                    }
+                    },
                 ] + $optionsStep1
             );
 
@@ -69,14 +75,12 @@ class DocumentationDeployment extends AbstractType
                 ->add('publicComposerJsonUrl');
         }
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $event) use ($optionsStep2, $options) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($optionsStep2, $options) {
             if ($options['step2']) {
                 $repositoryUrl = $event->getData()->getRepositoryUrl();
                 $branches = (new GitRepositoryService())->getBranchesFromRepositoryUrl($repositoryUrl);
-                /** @var DocumentationJarRepository $documentationJarRepository */
-                $documentationJarRepository = $options['entity_manager']->getRepository(DocumentationJar::class);
                 foreach (array_keys($branches) as $key) {
-                    $jar = $documentationJarRepository
+                    $jar = $this->documentationJarRepository
                         ->findBy([
                             'repositoryUrl' => $repositoryUrl,
                             'branch' => $key,
@@ -98,12 +102,10 @@ class DocumentationDeployment extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => DocumentationJar::class,
-            'csrf_protection' => $_ENV['APP_ENV'] ?? '' !== 'test',
             'validation_groups' => false,
             'step1' => true,
             'step2' => false,
             'step3' => false,
-            'entity_manager' => null,
         ]);
     }
 }

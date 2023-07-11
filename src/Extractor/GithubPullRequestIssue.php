@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -14,40 +15,41 @@ use App\Exception\DoNotCareException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Extract information from a github pull request issue.
- * Triggered by github api service to retrieve at
+ * Extract information from a GitHub pull request issue.
+ * Triggered by GitHub api service to retrieve at
  * least title and url from pull request details.
  */
-class GithubPullRequestIssue
+readonly class GithubPullRequestIssue
 {
     /**
-     * @var string Github new pull request title, eg. 'Improve foo'
+     * @var string GitHub new pull request title, e.g. 'Improve foo'
      */
     public string $title;
 
     /**
-     * @var string (optional) Github new pull request body, eg. 'Fixes whatever'
+     * @var string (optional) GitHub new pull request body, e.g. 'Fixes whatever'
      */
     public string $body;
 
     /**
-     * @var string Github new pull request url, eg. 'https://github.com/psychomieze/TYPO3.CMS/pull/1`
+     * @var string GitHub new pull request url, e.g. 'https://github.com/psychomieze/TYPO3.CMS/pull/1`
      */
     public string $url;
 
     /**
-     * Extract information from a github pull request issue.
+     * Extract information from a GitHub pull request issue.
      *
-     * @param ResponseInterface $response Response of a github issue API get
+     * @param ResponseInterface $response Response of a GitHub issue API get
+     *
      * @throws DoNotCareException
      */
     public function __construct(ResponseInterface $response)
     {
-        $responseBody = (string)$response->getBody();
+        $responseBody = (string) $response->getBody();
         $issueInformation = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-        $this->title = (string)($issueInformation['title'] ?? '');
-        $this->body = (string)($issueInformation['body'] ?? '');
-        $this->url = (string)($issueInformation['html_url'] ?? '');
+        $this->title = (string) ($issueInformation['title'] ?? '');
+        $this->body = (string) ($issueInformation['body'] ?? '');
+        $this->url = (string) ($issueInformation['html_url'] ?? '');
 
         if (empty($this->title) || empty($this->url)) {
             throw new DoNotCareException('Do not care if issue information is not complete for whatever reason');

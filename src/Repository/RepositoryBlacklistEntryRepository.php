@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -26,10 +28,6 @@ class RepositoryBlacklistEntryRepository extends ServiceEntityRepository
         parent::__construct($registry, RepositoryBlacklistEntry::class);
     }
 
-    /**
-     * @param string $repositoryUrl
-     * @return bool
-     */
     public function isBlacklisted(string $repositoryUrl): bool
     {
         return null !== $this->findOneBy(['repositoryUrl' => $repositoryUrl]);

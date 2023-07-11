@@ -1,26 +1,26 @@
 security:
-    providers:
-      keycloak:
-        id: keycloak.typo3.com.user.provider
+  providers:
+    keycloak:
+      id: keycloak.typo3.com.user.provider
 
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-          anonymous: true
-          logout:
-            path: /logout
-            success_handler: App\Security\LogoutSuccessHandler
-          guard:
-            authenticators:
-              - T3G\Bundle\Keycloak\Security\KeyCloakAuthenticator
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    main:
+      anonymous: true
+      logout:
+        path: /logout
+        success_handler: App\Security\LogoutSuccessHandler
+      guard:
+        authenticators:
+          - T3G\Bundle\Keycloak\Security\KeyCloakAuthenticator
 
-    role_hierarchy:
-        # Admin role has documentation maintainer automatically
-        ROLE_ADMIN: ROLE_DOCUMENTATION_MAINTAINER
+  role_hierarchy:
+    # Admin role has documentation maintainer automatically
+    ROLE_ADMIN: ROLE_DOCUMENTATION_MAINTAINER
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
-    access_control:
-        - { path: ^/admin/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+  # Easy way to control access for large sections of your site
+  # Note: Only the *first* access control that matches will be used
+  access_control:
+    - { path: ^/admin/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }

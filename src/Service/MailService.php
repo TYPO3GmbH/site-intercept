@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -13,34 +14,23 @@ namespace App\Service;
 use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Extractor\ComposerJson;
 use App\Extractor\PushEvent;
-use Swift_Mailer;
-use Swift_Message;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Twig\Environment;
 
-class MailService
+readonly class MailService
 {
-    private Swift_Mailer $mailer;
-
-    private Environment $templating;
-
-    public function __construct(Swift_Mailer $mailer, Environment $templating)
-    {
-        $this->mailer = $mailer;
-        $this->templating = $templating;
+    public function __construct(
+        private MailerInterface $mailer,
+        private Environment $twig,
+    ) {
     }
 
-    /**
-     * @param PushEvent $pushEvent
-     * @param ComposerJson $composerJson
-     * @param string $exceptionMessage
-     * @return int
-     */
-    public function sendMailToAuthorDueToMissingDependency(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): int
+    public function sendMailToAuthorDueToMissingDependency(PushEvent $pushEvent, ComposerJson $composerJson, string $exceptionMessage): void
     {
         try {
             $author = $composerJson->getFirstAuthor();
-            $message = $this->createMessageWithTemplate(
-                'Documentation rendering failed',
+            $email = $this->createMessageWithTemplate(
                 'email/docs/renderingFailedDueToMissingDependency.html.twig',
                 [
                     'author' => $author,
@@ -50,40 +40,34 @@ class MailService
                 ]
             );
             if (!empty($author['email'])) {
-                $message
-                    ->setFrom('intercept@typo3.com')
-                    ->setTo($composerJson->getFirstAuthor()['email']);
+                $email = $email
+                    ->from('intercept@typo3.com')
+                    ->to($composerJson->getFirstAuthor()['email']);
             } else {
-                return 0;
+                return;
             }
-        } catch (DocsComposerMissingValueException $e) {
+        } catch (DocsComposerMissingValueException) {
             // Thrown if author is not set, we can't send a mail, then.
-            return 0;
+            return;
         }
 
-        return $this->send($message);
+        $this->mailer->send($email);
     }
 
-    /**
-     * @param string $subject
-     * @param string $templateFile
-     * @param array $templateVariables
-     * @return Swift_Message
-     */
-    private function createMessageWithTemplate(string $subject, string $templateFile, array $templateVariables): Swift_Message
+    private function createMessageWithTemplate(string $templateFile, array $templateVariables): Email
     {
-        $message = new Swift_Message($subject);
-        $message->setBody($this->templating->render($templateFile, $templateVariables), 'text/html');
+        $template = $this->twig->load($templateFile);
+        $subject = $template->renderBlock('subject', $templateVariables);
+        $html = $template->renderBlock('body_html', $templateVariables);
+        $text = $template->renderBlock('body_text', $templateVariables);
+        $text = implode("\n", array_map(static fn ($item) => trim($item), explode("\n", $text)));
+
+        $message = new Email();
+        $message
+            ->subject($subject)
+            ->text($text)
+            ->html($html);
 
         return $message;
-    }
-
-    /**
-     * @param Swift_Message $message
-     * @return int
-     */
-    private function send(Swift_Message $message): int
-    {
-        return $this->mailer->send($message);
     }
 }

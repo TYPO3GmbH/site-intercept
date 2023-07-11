@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /*
  * This file is part of the package t3g/intercept.
@@ -12,57 +13,43 @@ namespace App\Tests\Unit\Extractor;
 
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubUserData;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Psr\Http\Message\ResponseInterface;
 
 class GithubUserDataTest extends TestCase
 {
-    use ProphecyTrait;
-    /**
-     * @test
-     */
-    public function constructorHandlesUsername()
+    public function testConstructorHandlesUsername(): void
     {
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
-        $payload = [
+        $response = new Response(200, ['Content-Type' => 'application/json'], json_encode([
             'name' => 'Lolli Foo',
             'email' => 'lolli@example.com',
-        ];
-        $responseProphecy->getBody()->willReturn(json_encode($payload));
-        $subject = new GithubUserData($responseProphecy->reveal());
-        $this->assertSame('Lolli Foo', $subject->user);
-        $this->assertSame('lolli@example.com', $subject->email);
+        ], JSON_THROW_ON_ERROR));
+        $subject = new GithubUserData($response);
+
+        self::assertSame('Lolli Foo', $subject->user);
+        self::assertSame('lolli@example.com', $subject->email);
     }
 
-    /**
-     * @test
-     */
-    public function constructorHandlesLoginname()
+    public function testConstructorHandlesLoginname(): void
     {
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
-        $payload = [
-            'login' => 'lolli42',
+        $response = new Response(200, ['Content-Type' => 'application/json'], json_encode([
+            'name' => 'lolli42',
             'email' => 'lolli@example.com',
-        ];
-        $responseProphecy->getBody()->willReturn(json_encode($payload));
-        $subject = new GithubUserData($responseProphecy->reveal());
-        $this->assertSame('lolli42', $subject->user);
-        $this->assertSame('lolli@example.com', $subject->email);
+        ], JSON_THROW_ON_ERROR));
+        $subject = new GithubUserData($response);
+
+        self::assertSame('lolli42', $subject->user);
+        self::assertSame('lolli@example.com', $subject->email);
     }
 
-    /**
-     * @test
-     */
-    public function constructorThrowsWithEmptyName()
+    public function testConstructorThrowsWithEmptyName(): void
     {
         $this->expectException(DoNotCareException::class);
-        $responseProphecy = $this->prophesize(ResponseInterface::class);
-        $payload = [
+
+        $response = new Response(200, ['Content-Type' => 'application/json'], json_encode([
             'name' => '',
             'email' => 'lolli@example.com',
-        ];
-        $responseProphecy->getBody()->willReturn(json_encode($payload));
-        new GithubUserData($responseProphecy->reveal());
+        ], JSON_THROW_ON_ERROR));
+        new GithubUserData($response);
     }
 }

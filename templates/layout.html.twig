@@ -1,10 +1,5 @@
 {# Wrapper to extend the default layout within the project #}
 {% extends '@Template/layout.html.twig' %}
-{% block footer %}
-    {% frame with { color: 'dark' } %}
-        {{ intercept_status() }}
-    {% endframe %}
-{% endblock %}
 {% block javascripts %}
     {{ usercentrics() }}
 {% endblock %}

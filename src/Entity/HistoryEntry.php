@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the package t3g/intercept.
  *
@@ -12,44 +14,32 @@ namespace App\Entity;
 use App\Repository\HistoryEntryRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=HistoryEntryRepository::class)
- * @ORM\HasLifecycleCallbacks
- */
+#[ORM\Entity(repositoryClass: HistoryEntryRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class HistoryEntry
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private string $type;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private string $status;
 
     /**
-     * Allow grouping of history entries
-     * @ORM\Column(type="string", length=255, options={"default": "default"})
+     * Allow grouping of history entries.
      */
+    #[ORM\Column(type: 'string', length: 255, options: ['default' => 'default'])]
     private string $groupEntry = 'default';
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: 'json')]
     private array $data = [];
 
-    /**
-     * @ORM\Column(type="datetime_immutable")
-     */
-    private ?\DateTimeImmutable $createdAt;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -115,9 +105,7 @@ class HistoryEntry
         return $this;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
         $this->createdAt = new \DateTimeImmutable();
