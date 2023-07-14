@@ -235,6 +235,12 @@
                                             <span class="message-detail-value">{{ log.data.composerFile }}</span>
                                         </div>
                                     {% endif %}
+                                    {% if log.data.exceptionMessage is defined %}
+                                        <div class="message-detail-item">
+                                            <span class="message-detail-key">Reason</span>
+                                            <span class="message-detail-value">{{ log.data.exceptionMessage }}</span>
+                                        </div>
+                                    {% endif %}
                                     {% if log.data.exceptionCode is defined %}
                                         <div class="message-detail-item">
                                             <span class="message-detail-key">Exception Code</span>
