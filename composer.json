@@ -136,6 +136,9 @@
         ],
         "t3g:phpstan": [
             "phpstan analyse src/ -c build/phpstan.neon"
+        ],
+        "t3g:phpstan:create-baseline": [
+            "phpstan analyze src/ -c build/phpstan.neon --generate-baseline build/phpstan-baseline.neon"
         ]
     },
     "replace": {
