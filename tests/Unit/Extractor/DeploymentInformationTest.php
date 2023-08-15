@@ -376,6 +376,26 @@ class DeploymentInformationTest extends TestCase
                 'v1',
                 '1',
             ],
+            [
+                'typo3-cms-framework',
+                '1.2.3',
+                '1.2',
+            ],
+            [
+                'typo3-cms-framework',
+                'v1.2.3',
+                '1.2',
+            ],
+            [
+                'typo3-cms-documentation',
+                '1.2.3',
+                '1.2',
+            ],
+            [
+                'typo3-cms-documentation',
+                'v1.2.3',
+                '1.2',
+            ],
         ];
     }
 
@@ -442,26 +462,6 @@ class DeploymentInformationTest extends TestCase
                 'typo3-cms-extension',
                 'v1.2',
                 1557498335,
-            ],
-            [
-                'typo3-cms-framework',
-                '1.2.3',
-                1557503542,
-            ],
-            [
-                'typo3-cms-framework',
-                'v1.2.3',
-                1557503542,
-            ],
-            [
-                'typo3-cms-documentation',
-                '1.2.3',
-                1557503542,
-            ],
-            [
-                'typo3-cms-documentation',
-                '1.2.3',
-                1557503542,
             ],
         ];
     }

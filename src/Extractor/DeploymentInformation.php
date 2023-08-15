@@ -174,6 +174,9 @@ class DeploymentInformation
         if ('core-extension' === $type || 'manual' === $type || 'other' === $type) {
             // Rules for manuals and core extensions - render branches like '8.5' as '8.5' and '8' as '8'
             $result = str_replace(['_', '-'], '.', $result);
+            if (preg_match('/^v?((?<derivedBranchName>\d+.\d+).\d+)$/', $result, $matches) && isset($matches['derivedBranchName'])) {
+                $result = $matches['derivedBranchName'];
+            }
             if (!preg_match('/^(\d+.\d+)$/', $result) && !preg_match('/^(\d+)$/', $result)) {
                 throw new DocsPackageDoNotCareBranch('Branch / tag named \'' . $branch . '\' is ignored, only branches named \'major.minor\' or \'major\' (e.g. \'5.7\') are considered.', 1557503542);
             }
