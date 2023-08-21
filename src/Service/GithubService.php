@@ -201,7 +201,7 @@ readonly class GithubService
      */
     public function triggerDocumentationPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
     {
-        $id = sha1(time() . $deploymentInformation->packageName);
+        $id = hash('xxh128', $deploymentInformation->packageName . $deploymentInformation->sourceBranch, false, ['secret' => random_bytes(256)]);
         $postBody = [
             'event_type' => 'render',
             'client_payload' => [
@@ -230,7 +230,7 @@ readonly class GithubService
      */
     public function triggerDocumentationDeletionPlan(DeploymentInformation $deploymentInformation): BambooBuildTriggered
     {
-        $id = sha1((string) time() . $deploymentInformation->packageName);
+        $id = hash('xxh128', $deploymentInformation->packageName . $deploymentInformation->sourceBranch, false, ['secret' => random_bytes(256)]);
         $postBody = [
             'event_type' => 'delete',
             'client_payload' => [
