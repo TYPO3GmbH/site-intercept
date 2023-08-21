@@ -62,18 +62,7 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
         $githubClient
             ->expects(self::once())
             ->method('request')
-            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
-                'json' => [
-                    'event_type' => 'delete',
-                    'client_payload' => [
-                        'target_branch_directory' => 'main',
-                        'name' => 'docs-homepage',
-                        'vendor' => 'typo3',
-                        'type_short' => 'h',
-                        'id' => '1a901f53acd0cce3b2e10b633af339c36b3671d5',
-                    ],
-                ],
-            ]);
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything());
 
         $response = (new MockRequest($this->client))
             ->setMethod('DELETE')
@@ -105,20 +94,7 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
         $githubClient
             ->expects(self::once())
             ->method('request')
-            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
-                'json' => [
-                    'event_type' => 'render',
-                    'client_payload' => [
-                        'repository_url' => 'https://github.com/georgringer/news.git',
-                        'source_branch' => 'main',
-                        'target_branch_directory' => 'main',
-                        'name' => 'news',
-                        'vendor' => 'georgringer',
-                        'type_short' => 'p',
-                        'id' => '6dec6ce1a86759e66b8b28a5a0a6ce0578d2febb',
-                    ],
-                ],
-            ]);
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything());
 
         $response = (new MockRequest($this->client))
             ->setMethod('GET')

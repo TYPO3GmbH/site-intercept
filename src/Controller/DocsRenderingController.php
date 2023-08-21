@@ -131,7 +131,7 @@ class DocsRenderingController extends AbstractController
                         $this->entityManager->persist(
                             (new HistoryEntry())
                                 ->setType(HistoryEntryType::DOCS_RENDERING)
-                                ->setStatus(HistoryEntryTrigger::API)
+                                ->setStatus(DocsRenderingHistoryStatus::TRIGGERED)
                                 ->setGroupEntry($buildTriggered->buildResultKey)
                                 ->setData([
                                     'type' => HistoryEntryType::DOCS_RENDERING,
