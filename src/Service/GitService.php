@@ -49,6 +49,7 @@ readonly class GitService
             $repository->run('checkout', [$branch]);
         } else {
             $repository->run('fetch');
+            $repository->run('reset', ['--hard', 'origin/' . $branch]);
             $repository->run('checkout', [$branch]);
             $repository->run('pull');
         }
