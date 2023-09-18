@@ -61,6 +61,14 @@ services:
     tags:
       - testDouble
 
+  App\Security\LogoutSuccessSubscriber:
+    class: App\Security\LogoutSuccessSubscriber
+    arguments:
+      $urlService: '@datahub.typo3.com.urlService'
+      $appUrl: '%env(APP_URL)%'
+    tags:
+      - { name: kernel.event_subscriber }
+
   App\Service\LocalCoreGitService:
     class: App\Service\LocalCoreGitService
     public: true
@@ -128,12 +136,6 @@ services:
   App\Strategy\GithubRst\ModifiedFilesStrategy:
     arguments:
       $generalClient: '@guzzle.client.general'
-
-  App\Security\LogoutSuccessHandler:
-    class: App\Security\LogoutSuccessHandler
-    arguments:
-      $urlService: '@datahub.typo3.com.urlService'
-      $appUrl: '%env(APP_URL)%'
 
   App\EventListener\KernelTerminateListener:
     tags:

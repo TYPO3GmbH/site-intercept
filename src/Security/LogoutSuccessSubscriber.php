@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use T3G\Bundle\Datahub\Service\UrlService;
 
-readonly class LogoutSuccessHandler implements EventSubscriberInterface
+readonly class LogoutSuccessSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private UrlService $urlService,
