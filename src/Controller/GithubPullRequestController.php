@@ -51,6 +51,7 @@ class GithubPullRequestController extends AbstractController
             $gitPushOutput = $gitService->pushToGerrit($pullRequest);
             $closeComment = new GithubPullRequestCloseComment($gitPushOutput);
             $githubService->closePullRequest($pullRequest, $closeComment);
+            $githubService->removeLocalDiff($pullRequest);
         } catch (DoNotCareException) {
             // Hook payload could not be identified as hook that
             // should trigger a transfer of this PR

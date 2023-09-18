@@ -76,6 +76,12 @@ readonly class GithubService
         return new GitPatchFile($filePath);
     }
 
+    public function removeLocalDiff(GithubCorePullRequest $pullRequest): void
+    {
+        $filePath = $this->pullRequestPatchPath . sha1($pullRequest->diffUrl);
+        @unlink($filePath);
+    }
+
     /**
      * Close pull request, add a comment, lock pull request.
      */
