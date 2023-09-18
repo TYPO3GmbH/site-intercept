@@ -11,7 +11,6 @@ security:
       anonymous: true
       logout:
         path: /logout
-        success_handler: App\Security\LogoutSuccessHandler
       guard:
         authenticators:
           - T3G\Bundle\Keycloak\Security\KeyCloakAuthenticator
