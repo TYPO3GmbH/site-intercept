@@ -52,6 +52,7 @@ magephp:
         - exec: { cmd: "php ../../../cachetool/cachetool.phar opcache:reset --fcgi=/var/run/intercept.typo3.com_fpm.sock --tmp-dir=/srv/vhosts/intercept.typo3.com/site/cachetool"}
         - exec: { cmd: "rm -rf var/cache"}
         - exec: { cmd: "php8.2 ./bin/console cache:warmup"}
+        - exec: { cmd: "php8.2 ./bin/console app:docs-redirect-deploy"}
       post-deploy:
 
     develop:
