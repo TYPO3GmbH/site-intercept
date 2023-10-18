@@ -2,7 +2,8 @@ version: '3.6'
 
 services:
   keycloak-gatekeeper:
-    image: bitnami/keycloak-gatekeeper:10-scratch
+    container_name: ddev-${DDEV_SITENAME}-gatekeeper
+    image: bitnami/keycloak-gatekeeper-archived:10-scratch
     ports:
       - '3007:3007'
     volumes:
