@@ -27,7 +27,7 @@
     "require-dev": {
         "roave/security-advisories": "dev-latest",
         "phpunit/phpunit": "^10.2",
-        "mikey179/vfsstream": "^1.6"
+        "mikey179/vfsstream": "^1.6.11"
     },
     "scripts": {
         "t3g:test:php:unit": [
