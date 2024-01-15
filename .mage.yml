@@ -84,7 +84,7 @@ magephp:
       post-deploy:
 
     legacy_hook_master:
-      user: prod.docs.typo.com
+      user: prod.docs.typo3.com
       from: ./legacy_hook/
       host_path: /srv/vhosts/prod.docs.typo3.com/site/Web/services/
       hosts:
