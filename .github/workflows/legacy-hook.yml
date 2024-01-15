@@ -48,12 +48,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Change working dir
-        run:
-          cd legacy_hook
-
       - name: Install dependencies (Composer)
-        run: composer install --prefer-dist --no-progress --no-interaction --ansi
+        run: composer install --working-dir=./legacy_hook --prefer-dist --no-progress --no-interaction --ansi
         env:
           COMPOSER_AUTH: '{
             "http-basic": {
@@ -67,7 +63,7 @@ jobs:
             }
           }'
       - name: Tests
-        run: composer t3g:test
+        run: composer --working-dir=./legacy_hook t3g:test
 
   deployment:
     name: 'Deployment'

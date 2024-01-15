@@ -90,7 +90,7 @@ magephp:
       hosts:
         - prod.docs.typo3.com
       pre-deploy:
-        - composer/install: { flags: "--no-dev --no-progress --optimize-autoloader --ansi"}
+        - composer/install: { flags: "--working-dir=./legacy_hook --no-dev --no-progress --optimize-autoloader --ansi"}
       on-deploy:
       on-release:
       post-release:
