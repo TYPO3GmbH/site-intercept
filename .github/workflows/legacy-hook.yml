@@ -1,15 +1,15 @@
-name: CI
+name: Legacy webhook
 
 on:
   push:
     branches:
       - master
       - develop
-    paths-ignore:
-      - 'legacy_hook/**'
+    paths:
+      - 'legacy_hook/**/*'
   pull_request:
-    paths-ignore:
-      - 'legacy_hook/**'
+    paths:
+      - 'legacy_hook/**/*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -39,12 +39,6 @@ jobs:
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - name: Setup npm cache
-        id: npm-cache-dir
-        shell: bash
-        run: |
-          echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-
       - name: Recover Composer caches
         uses: actions/cache@v3
         with:
@@ -53,13 +47,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Recover npm caches
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      - name: Change working dir
+        run:
+          cd legacy_hook
 
       - name: Install dependencies (Composer)
         run: composer install --prefer-dist --no-progress --no-interaction --ansi
@@ -75,42 +65,13 @@ jobs:
               "github.com": "${{ secrets.ACTIONS_TOKEN }}"
             }
           }'
-
-      - name: PHP CGL
-        run: composer t3g:cgl
-
-      - name: phpstan
-        run: composer t3g:phpstan
-
-      - name: Install dependencies (npm)
-        run: npm ci
-
-      - name: Build frontend artifacts
-        run: npm run build
-
-      - name: Build is clean
-        run: |
-          git status
-          git status | grep -q "nothing to commit, working tree clean"
-
       - name: Tests
-        run: composer t3g:test:php:cover
-        env:
-          COMPOSER_PROCESS_TIMEOUT: 2400
-
-      - name: Upload coverage results to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require php-coveralls/php-coveralls --no-progress --no-interaction --ansi
-          /home/runner/.composer/vendor/bin/php-coveralls --coverage_clover=var/phpunit/coverage.xml -vvv --json_path=var/log/coveralls-upload.json
-        continue-on-error: true
-
+        run: composer t3g:test
 
   deployment:
     name: 'Deployment'
     needs: build
-    if: (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Setup SSH Key
@@ -118,11 +79,11 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh-auth.sock
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_rsa
-          chmod 0600 ~/.ssh/deploy_rsa
-          ssh-keygen -p -P "${{ secrets.SSH_PASSPHRASE }}" -N "" -f ~/.ssh/deploy_rsa
+          echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_legacy_hook_rsa
+          chmod 0600 ~/.ssh/deploy_legacy_hook_rsa
+          ssh-keygen -p -P "${{ secrets.PROD_SSH_PASSPHRASE }}" -N "" -f ~/.ssh/deploy_legacy_hook_rsa
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add ~/.ssh/deploy_rsa
+          ssh-add ~/.ssh/deploy_legacy_hook_rsa
 
       - uses: actions/checkout@v4
 
@@ -136,12 +97,6 @@ jobs:
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - name: Setup npm cache
-        id: npm-cache-dir
-        shell: bash
-        run: |
-          echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-
       - name: Recover Composer caches
         uses: actions/cache@v3
         with:
@@ -149,14 +104,6 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock', '**/composer.json') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-
-      - name: Recover npm caches
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install Magallanes
         run: |
@@ -167,7 +114,7 @@ jobs:
       - name: Get Environment
         id: environment
         run: |
-          echo "target=$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//-/g')" >> $GITHUB_OUTPUT
+          echo "target=legacy_hook_$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//-/g')" >> $GITHUB_OUTPUT
 
       - name: Deployment
         env:
@@ -187,7 +134,7 @@ jobs:
           /home/runner/.composer/vendor/bin/mage deploy ${{ steps.environment.outputs.target }} -vvv
 
       - name: Archive Logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: logs
@@ -196,21 +143,3 @@ jobs:
       - name: Echo logs
         run: find .mage/logs/ -type f -exec cat {} +
         if: always()
-
-      - name: Create Sentry release
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: typo3
-          SENTRY_PROJECT: intercept
-        run: |
-          # Install Sentry CLI
-          curl -sL https://sentry.io/get-cli/ | bash
-
-          # Create new Sentry release
-          export SENTRY_RELEASE=$(sentry-cli releases propose-version)
-          sentry-cli --url https://sentry.typo3.com releases new -p $SENTRY_PROJECT $SENTRY_RELEASE
-          sentry-cli --url https://sentry.typo3.com releases set-commits --auto $SENTRY_RELEASE
-          sentry-cli --url https://sentry.typo3.com releases finalize $SENTRY_RELEASE
-
-          # Create new deploy for this Sentry release
-          sentry-cli --url https://sentry.typo3.com releases deploys $SENTRY_RELEASE new -e ${{ steps.environment.outputs.target }}

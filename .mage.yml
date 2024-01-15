@@ -82,3 +82,16 @@ magephp:
         - exec: { cmd: "rm -rf var/cache"}
         - exec: { cmd: "php8.2 ./bin/console cache:warmup"}
       post-deploy:
+
+    legacy_hook_master:
+      user: prod.docs.typo.com
+      from: ./legacy_hook/
+      host_path: /srv/vhosts/prod.docs.typo3.com/site/Web/services/
+      hosts:
+        - prod.docs.typo3.com
+      pre-deploy:
+        - composer/install: { flags: "--no-dev --no-progress --optimize-autoloader --ansi"}
+      on-deploy:
+      on-release:
+      post-release:
+      post-deploy:
