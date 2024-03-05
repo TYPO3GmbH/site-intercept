@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 return Request::create(
     '/githubpr',
-    \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+    Request::METHOD_POST,
     [],
     [],
     [],

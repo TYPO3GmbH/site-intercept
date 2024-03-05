@@ -43,7 +43,7 @@ class GithubRstIssueController extends AbstractController
         } catch (DoNotCareException) {
             // Hook payload could not be identified as hook that should trigger git split
         } catch (\JsonException) {
-            return new Response('Invalid JSON', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
+            return new Response('Invalid JSON', Response::HTTP_BAD_REQUEST);
         }
 
         return new Response();
