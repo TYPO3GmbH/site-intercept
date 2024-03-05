@@ -15,7 +15,7 @@ use App\Service\GitRepositoryService;
 
 class RepositoryUrlUtility
 {
-    public static function resolveComposerJsonUrl(string $repositoryUrl, string $branch, string $repositoryType = null): string
+    public static function resolveComposerJsonUrl(string $repositoryUrl, string $branch, ?string $repositoryType = null): string
     {
         $url = self::extractComposerJsonUrlFromRepositoryUrl($repositoryUrl, $branch);
         if ('' === $url || GitRepositoryService::SERVICE_BITBUCKET_SERVER === $repositoryType) {

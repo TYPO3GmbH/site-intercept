@@ -29,7 +29,7 @@ readonly class DocumentationVersions
      *
      * @return Response
      */
-    public function getVersions(): Response
+    public function getVersions(string $format = 'HTML'): Response
     {
         $pathSegments = $this->resolvePathSegments();
         if (count($pathSegments) < 5) {
@@ -67,7 +67,10 @@ readonly class DocumentationVersions
         // final version entries
         $validatedVersions = $this->resolvePathInformation($validatedVersions, $pathAfterEntryPoint, $absolutePathToDocsEntryPoint, $entryPoint, $currentVersion, $currentLanguage);
 
-        return $this->getHTMLResponse($validatedVersions);
+        if ($format === 'HTML') {
+            return $this->getHTMLResponse($validatedVersions);
+        }
+        return $this->getJsonResponse($validatedVersions);
     }
 
     protected function resolvePathSegments(): array
@@ -179,6 +182,26 @@ readonly class DocumentationVersions
         $firstEntries = array_reverse($firstEntries);
         $secondEntries = array_reverse($secondEntries);
         return new Response(200, [], implode(chr(10), array_merge($firstEntries, $secondEntries)));
+    }
+
+
+    protected function getJsonResponse(array $entries): Response
+    {
+        $data = [];
+        $versions = array_column($entries, 'version');
+        array_multisort($versions, SORT_ASC, $entries);
+        foreach ($entries as $entry) {
+            $url = str_replace($GLOBALS['_SERVER']['DOCUMENT_ROOT'], '', $entry['path'] ?? '');
+            $singleUrl = str_replace($GLOBALS['_SERVER']['DOCUMENT_ROOT'], '', $entry['single_path'] ?? '');
+            $data[] = [
+                'url' => $url,
+                'singleUrl' => $singleUrl,
+                'version' => $entry['version'],
+                'language' => $entry['language'],
+            ];
+        }
+
+        return new Response(200, [], json_encode($data));
     }
 
     protected function getEmptyResponse(): Response
