@@ -18,7 +18,7 @@ class GithubHookPingException extends \Exception
 {
     private readonly string $repositoryUrl;
 
-    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null, string $repositoryUrl = '')
+    public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null, string $repositoryUrl = '')
     {
         parent::__construct($message, $code, $previous);
         $this->repositoryUrl = $repositoryUrl;

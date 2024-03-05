@@ -355,7 +355,7 @@ class DocsRenderingController extends AbstractController
             );
             $this->entityManager->flush();
 
-            return new Response(null, RESPONSE::HTTP_NO_CONTENT);
+            return new Response(null, Response::HTTP_NO_CONTENT);
         }
     }
 }

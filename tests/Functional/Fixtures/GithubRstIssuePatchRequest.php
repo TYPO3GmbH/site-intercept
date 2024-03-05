@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 return Request::create(
     '/create-rst-issue',
-    \Symfony\Component\HttpFoundation\Request::METHOD_POST,
+    Request::METHOD_POST,
     [],
     [],
     [],

@@ -167,6 +167,7 @@ class DeploymentInformation
             if (!preg_match('/^(\d+.\d+.\d+)$/', $result)) {
                 throw new DocsPackageDoNotCareBranch('Branch / tag named \'' . $branch . '\' is ignored, only tags named \'major.minor.patch\' (e.g. \'5.7.2\') are considered.', 1557498335);
             }
+
             // Remove patch level, '8.7.2' becomes '8.7'
             return implode('.', array_slice(explode('.', $result), 0, 2));
         }
