@@ -14,5 +14,11 @@ use App\DocumentationVersions;
 use App\ResponseEmitter;
 use GuzzleHttp\Psr7\ServerRequest;
 
+$request_origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (preg_match('/^http[s]?:\/\/localhost(:\d+)?$|^http[s]?:\/\/[^\/]+\.ddev\.site(:\d+)?$/', $request_origin)) {
+    // Allow requests from localhost and all domains ending with .ddev.site
+    header("Access-Control-Allow-Origin: $request_origin");
+}
+
 $response = (new DocumentationVersions(ServerRequest::fromGlobals()))->getVersions();
 new ResponseEmitter($response);
