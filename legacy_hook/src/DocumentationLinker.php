@@ -133,7 +133,7 @@ readonly class DocumentationLinker
                 return new Response(404, [], 'Invalid shortcode, no objects.inv.json found.');
             }
 
-            if (!json_validate($objectContents)) {
+            if (function_exists('json_validate') && !json_validate($objectContents)) {
                 return new Response(404, [], 'Invalid shortcode, defective objects.inv.json.');
             }
 
