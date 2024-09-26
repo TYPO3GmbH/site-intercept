@@ -133,6 +133,10 @@ readonly class DocumentationLinker
                 return new Response(404, [], 'Invalid shortcode, no objects.inv.json found.');
             }
 
+            if (!json_validate($objectContents)) {
+                return new Response(404, [], 'Invalid shortcode, defective objects.inv.json.');
+            }
+
             $json = json_decode($objectsContents, true);
             if (!is_array($json)) {
                 return new Response(404, [], 'Invalid shortcode, invalid objects.inv.json.');
@@ -207,7 +211,7 @@ readonly class DocumentationLinker
         // normalize it again here, strip any hostname component to only get a directory.
         // @todo maybe make this prettier, security-wise this only allows domain names coming from DefaultInventories.
         $entrypoint = str_replace('{typo3_version}', $version, $entrypoint);
-        return preg_replace('/^.*:\/\/[^\/]+\//imsU', '', $entrypoint);
+        return preg_replace('/^.*:\/\/[^\/]+\//msU', '', $entrypoint);
     }
 
     private function getObjectsFile(string $entrypoint): string
