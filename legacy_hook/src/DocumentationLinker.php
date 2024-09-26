@@ -118,8 +118,7 @@ readonly class DocumentationLinker
             '$/imsU',
             $url,
             $matches)) {
-            $repository = $matches[1];
-            $index = $matches[2];
+            [, $repository, $index] = $matches;
             $version = str_replace('@', '', $matches[3] ?? '');
 
             if ($version === '') {
