@@ -12,6 +12,8 @@ namespace App;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\CacheItem;
 use T3Docs\VersionHandling\DefaultInventories;
 
 /**
@@ -97,10 +99,15 @@ use T3Docs\VersionHandling\DefaultInventories;
  * https://docs.typo3.org/other/t3docs/render-guides/objects.inv.json
  * https://docs.typo3.org/p/georgringer/news/main/en-us/objects.inv.json
  */
-readonly class DocumentationLinker
+final readonly class DocumentationLinker
 {
+    private FilesystemAdapter $cache;
+    private int $cacheTime;
+
     public function __construct(private ServerRequestInterface $request)
     {
+        $this->cacheTime = 86400;
+        $this->cache = new FilesystemAdapter('DocumentationLinker', $this->cacheTime);
     }
 
     /**
@@ -109,6 +116,13 @@ readonly class DocumentationLinker
     public function redirectToLink(): Response
     {
         $url = $this->request->getQueryParams()['shortcode'] ?? '';
+
+        $cacheItem = $this->cache->getItem('shortcode_' . hash('xxh3', $url));
+        if ($cacheItem->isHit()) {
+            $cacheData = $cacheItem->get();
+            $cacheData['params']['X-Cached-Shortcode'] = 1;
+            return new Response($cacheData['code'], $cacheData['params'], $cacheData['message']);
+        }
 
         if (preg_match(
             '/^' .
@@ -130,30 +144,43 @@ readonly class DocumentationLinker
             $objectsContents = $this->getObjectsFile($entrypoint);
 
             if ($objectsContents === '') {
-                return new Response(404, [], 'Invalid shortcode, no objects.inv.json found.');
+                return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode, no objects.inv.json found.');
             }
 
-            if (function_exists('json_validate') && !json_validate($objectContents)) {
-                return new Response(404, [], 'Invalid shortcode, defective objects.inv.json.');
+            if (function_exists('json_validate') && !json_validate($objectsContents)) {
+                return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode, defective objects.inv.json.');
             }
 
             $json = json_decode($objectsContents, true);
             if (!is_array($json)) {
-                return new Response(404, [], 'Invalid shortcode, invalid objects.inv.json.');
+                return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode, invalid objects.inv.json.');
             }
 
             $link = $this->parseInventoryForIndex($index, $json);
 
             if ($link === '') {
-                return new Response(404, [], 'Invalid shortcode, could not find index.');
+                return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode, could not find index.');
             }
 
             $forwardUrl = 'https://docs.typo3.org/' . $entrypoint . $link;
 
-            return new Response(307, ['Location' => $forwardUrl], 'Redirect to ' . $forwardUrl);
+            return $this->returnAndCacheResult($cacheItem, 307, ['Location' => $forwardUrl], 'Redirect to ' . $forwardUrl);
         }
 
-        return new Response(404, [], 'Invalid shortcode.');
+        return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode.');
+    }
+
+    private function returnAndCacheResult(cacheItem $cacheItem, int $code, array $params, string $message): Response
+    {
+        $cacheItem->set([
+            'code' => $code,
+            'params' => $params,
+            'message' => $message,
+        ]);
+        $cacheItem->expiresAfter($this->cacheTime);
+        $this->cache->save($cacheItem);
+        $params['X-Cached-Shortcode'] = 0;
+        return new Response($code, $params, $message);
     }
 
     private function parseInventoryForIndex(string $index, array $json): string
