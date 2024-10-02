@@ -10,10 +10,11 @@ namespace App;
  * LICENSE file that was distributed with this source code.
  */
 
+use App\Linker\ResponseDescriber;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Cache\CacheItem;
+use Symfony\Contracts\Cache\ItemInterface;
 use T3Docs\VersionHandling\DefaultInventories;
 
 /**
@@ -117,70 +118,52 @@ final readonly class DocumentationLinker
     {
         $url = $this->request->getQueryParams()['shortcode'] ?? '';
 
-        $cacheItem = $this->cache->getItem('shortcode_' . hash('xxh3', $url));
-        if ($cacheItem->isHit()) {
-            $cacheData = $cacheItem->get();
-            $cacheData['params']['X-Cached-Shortcode'] = 1;
-            return new Response($cacheData['code'], $cacheData['params'], $cacheData['message']);
-        }
+        $cacheKey = 'shortcode_' . hash('xxh3', $url);
+        /** @var ResponseDescriber $responseDescriber */
+        $responseDescriber = $this->cache->get($cacheKey, function (ItemInterface $item) use ($url): ResponseDescriber {
+            $item->expiresAfter($this->cacheTime);
 
-        if (preg_match(
-            '/^' .
-            '([a-z0-9\-_]+):' .         // $repository
-            '([a-z0-9\-_]+)' .          // $index
-            '(@[a-z0-9\.-]+)?' .        // $version
-            '$/imsU',
-            $url,
-            $matches)) {
-            [, $repository, $index] = $matches;
-            $version = str_replace('@', '', $matches[3] ?? '');
+            if (preg_match(
+                '/^' .
+                '([a-z0-9\-_]+):' .         // $repository
+                '([a-z0-9\-_]+)' .          // $index
+                '(@[a-z0-9\.-]+)?' .        // $version
+                '$/imsU',
+                $url,
+                $matches)
+            ) {
+                [, $repository, $index] = $matches;
+                $version = str_replace('@', '', $matches[3] ?? '') ?: 'main';
+                $entrypoint = $this->resolveEntryPoint($repository, $version);
+                $objectsContents = $this->getObjectsFile($entrypoint);
 
-            if ($version === '') {
-                $version = 'main';
+                if ($objectsContents === '') {
+                    return new ResponseDescriber(404, [], 'Invalid shortcode, no objects.inv.json found.');
+                }
+
+                if (function_exists('json_validate') && !json_validate($objectsContents)) {
+                    return new ResponseDescriber(404, [], 'Invalid shortcode, defective objects.inv.json.');
+                }
+
+                $json = json_decode($objectsContents, true);
+                if (!is_array($json)) {
+                    return new ResponseDescriber(404, [], 'Invalid shortcode, invalid objects.inv.json.');
+                }
+
+                $link = $this->parseInventoryForIndex($index, $json);
+                if ($link === '') {
+                    return new ResponseDescriber(404, [], 'Invalid shortcode, could not find index.');
+                }
+
+                $forwardUrl = 'https://docs.typo3.org/' . $entrypoint . $link;
+
+                return new ResponseDescriber(307, ['Location' => $forwardUrl], 'Redirect to ' . $forwardUrl);
             }
 
-            $entrypoint = $this->resolveEntryPoint($repository, $version);
+            return new ResponseDescriber(404, [], 'Invalid shortcode.');
+        });
 
-            $objectsContents = $this->getObjectsFile($entrypoint);
-
-            if ($objectsContents === '') {
-                return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode, no objects.inv.json found.');
-            }
-
-            if (function_exists('json_validate') && !json_validate($objectsContents)) {
-                return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode, defective objects.inv.json.');
-            }
-
-            $json = json_decode($objectsContents, true);
-            if (!is_array($json)) {
-                return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode, invalid objects.inv.json.');
-            }
-
-            $link = $this->parseInventoryForIndex($index, $json);
-
-            if ($link === '') {
-                return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode, could not find index.');
-            }
-
-            $forwardUrl = 'https://docs.typo3.org/' . $entrypoint . $link;
-
-            return $this->returnAndCacheResult($cacheItem, 307, ['Location' => $forwardUrl], 'Redirect to ' . $forwardUrl);
-        }
-
-        return $this->returnAndCacheResult($cacheItem, 404, [], 'Invalid shortcode.');
-    }
-
-    private function returnAndCacheResult(cacheItem $cacheItem, int $code, array $params, string $message): Response
-    {
-        $cacheItem->set([
-            'code' => $code,
-            'params' => $params,
-            'message' => $message,
-        ]);
-        $cacheItem->expiresAfter($this->cacheTime);
-        $this->cache->save($cacheItem);
-        $params['X-Cached-Shortcode'] = 0;
-        return new Response($code, $params, $message);
+        return new Response($responseDescriber->statusCode, $responseDescriber->headers, $responseDescriber->body);
     }
 
     private function parseInventoryForIndex(string $index, array $json): string
