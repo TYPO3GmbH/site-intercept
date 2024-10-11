@@ -104,6 +104,7 @@ final readonly class DocumentationLinker
 {
     private FilesystemAdapter $cache;
     private int $cacheTime;
+    const MAIN_IDENTIFIER = 'main';
 
     public function __construct(private ServerRequestInterface $request)
     {
@@ -133,9 +134,15 @@ final readonly class DocumentationLinker
                 $matches)
             ) {
                 [, $repository, $index] = $matches;
-                $version = str_replace('@', '', $matches[3] ?? '') ?: 'main';
+                $version = str_replace('@', '', $matches[3] ?? '') ?: self::MAIN_IDENTIFIER;
                 $entrypoint = $this->resolveEntryPoint($repository, $version);
                 $objectsContents = $this->getObjectsFile($entrypoint);
+
+                if ($objectsContents === '' && $version !== self::MAIN_IDENTIFIER) {
+                    // soft-fail to resolve a maybe not-yet released version to main.
+                    $entrypoint = $this->resolveEntryPoint($repository, self::MAIN_IDENTIFIER);
+                    $objectsContents = $this->getObjectsFile($entrypoint);
+                }
 
                 if ($objectsContents === '') {
                     return new ResponseDescriber(404, [], 'Invalid shortcode, no objects.inv.json found.');
