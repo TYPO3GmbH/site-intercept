@@ -102,9 +102,10 @@ use T3Docs\VersionHandling\DefaultInventories;
  */
 final readonly class DocumentationLinker
 {
+    private const MAIN_IDENTIFIER = 'main';
+
     private FilesystemAdapter $cache;
     private int $cacheTime;
-    const MAIN_IDENTIFIER = 'main';
 
     public function __construct(private ServerRequestInterface $request)
     {
