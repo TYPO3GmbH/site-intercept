@@ -201,7 +201,7 @@ final readonly class DocumentationLinker
                         // std:confval + pagelink.html#some-entry
                         // to:
                         // pagelink.html#confval-some-entry
-                        $link = str_replace('#', '#-' . $docNodeTypeParts[1], $indexMetaData[2]);
+                        $link = str_replace('#', '#' . $docNodeTypeParts[1] . '-', $indexMetaData[2]);
                     }
                 }
             }
