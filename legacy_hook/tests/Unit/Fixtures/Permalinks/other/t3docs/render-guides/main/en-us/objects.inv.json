@@ -1,0 +1,482 @@
+{
+    "std:doc": {
+        "Developer\/AjaxVersions": [
+            "Render guides",
+            "main",
+            "Developer\/AjaxVersions.html",
+            "AJAX version switcher"
+        ],
+        "Developer\/Building": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html",
+            "Building"
+        ],
+        "Developer\/Contributing": [
+            "Render guides",
+            "main",
+            "Developer\/Contributing.html",
+            "Contributing"
+        ],
+        "Developer\/DirectoryStructure": [
+            "Render guides",
+            "main",
+            "Developer\/DirectoryStructure.html",
+            "Directory structure"
+        ],
+        "Developer\/Index": [
+            "Render guides",
+            "main",
+            "Developer\/Index.html",
+            "Developers"
+        ],
+        "Developer\/InterlinkInventories": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html",
+            "Interlink Inventories"
+        ],
+        "Developer\/MonoRepository": [
+            "Render guides",
+            "main",
+            "Developer\/MonoRepository.html",
+            "Mono-repo setup"
+        ],
+        "Developer\/ThemeCustomization": [
+            "Render guides",
+            "main",
+            "Developer\/ThemeCustomization.html",
+            "Theme Customization"
+        ],
+        "Index": [
+            "Render guides",
+            "main",
+            "Index.html",
+            "Render guides"
+        ],
+        "Installation\/Index": [
+            "Render guides",
+            "main",
+            "Installation\/Index.html",
+            "Installation"
+        ],
+        "Introduction\/Index": [
+            "Render guides",
+            "main",
+            "Introduction\/Index.html",
+            "Introduction"
+        ],
+        "KnownProblems\/Index": [
+            "Render guides",
+            "main",
+            "KnownProblems\/Index.html",
+            "Known problems"
+        ],
+        "Migration\/Index": [
+            "Render guides",
+            "main",
+            "Migration\/Index.html",
+            "Migration"
+        ]
+    },
+    "std:label": {
+        "ajaxversions": [
+            "Render guides",
+            "main",
+            "Developer\/AjaxVersions.html#AjaxVersions",
+            "AJAX version switcher"
+        ],
+        "ajaxversions-proxy": [
+            "Render guides",
+            "main",
+            "Developer\/AjaxVersions.html#AjaxVersions-proxy",
+            "Making the proxy available"
+        ],
+        "ajaxversions-data-attributes": [
+            "Render guides",
+            "main",
+            "Developer\/AjaxVersions.html#AjaxVersions-data-attributes",
+            "Configuring HTML data-attributes"
+        ],
+        "building": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#Building",
+            "Building"
+        ],
+        "deploy-azure-assets": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#deploy-azure-assets",
+            "GitHub workflow: deploy-azure-assets"
+        ],
+        "contributing": [
+            "Render guides",
+            "main",
+            "Developer\/Contributing.html#Contributing",
+            "Contributing"
+        ],
+        "directory-structure": [
+            "Render guides",
+            "main",
+            "Developer\/DirectoryStructure.html#directory_structure",
+            "Directory structure"
+        ],
+        "developers": [
+            "Render guides",
+            "main",
+            "Developer\/Index.html#Developers",
+            "Developers"
+        ],
+        "interlinkrepositories": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#InterlinkRepositories",
+            "Interlink Inventories"
+        ],
+        "available-default-inventories": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#available-default-inventories",
+            "Available default inventories"
+        ],
+        "typo3-version": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#typo3-version",
+            "Setting the preferred TYPO3 version"
+        ],
+        "mono-repository": [
+            "Render guides",
+            "main",
+            "Developer\/MonoRepository.html#mono-repository",
+            "Mono-repo setup"
+        ],
+        "repository-split": [
+            "Render guides",
+            "main",
+            "Developer\/MonoRepository.html#repository_split",
+            "Repository split (subtree-split of this mono-repository)"
+        ],
+        "theme-customization": [
+            "Render guides",
+            "main",
+            "Developer\/ThemeCustomization.html#theme-customization",
+            "Theme Customization"
+        ],
+        "start": [
+            "Render guides",
+            "main",
+            "Index.html#start",
+            "Render guides"
+        ],
+        "installation": [
+            "Render guides",
+            "main",
+            "Installation\/Index.html#installation",
+            "Installation"
+        ],
+        "setup-docker": [
+            "Render guides",
+            "main",
+            "Installation\/Index.html#Setup_Docker",
+            "Docker"
+        ],
+        "setup-ddev": [
+            "Render guides",
+            "main",
+            "Installation\/Index.html#Setup_DDEV",
+            "DDEV"
+        ],
+        "setup-php": [
+            "Render guides",
+            "main",
+            "Installation\/Index.html#Setup_PHP",
+            "PHP"
+        ],
+        "introduction": [
+            "Render guides",
+            "main",
+            "Introduction\/Index.html#introduction",
+            "Introduction"
+        ],
+        "known-problems": [
+            "Render guides",
+            "main",
+            "KnownProblems\/Index.html#known-problems",
+            "Known problems"
+        ],
+        "migration": [
+            "Render guides",
+            "main",
+            "Migration\/Index.html#migration",
+            "Migration"
+        ]
+    },
+    "std:title": {
+        "ajax-version-switcher": [
+            "Render guides",
+            "main",
+            "Developer\/AjaxVersions.html#ajax-version-switcher",
+            "AJAX version switcher"
+        ],
+        "making-the-proxy-available": [
+            "Render guides",
+            "main",
+            "Developer\/AjaxVersions.html#making-the-proxy-available",
+            "Making the proxy available"
+        ],
+        "details-on-how-the-version-switcher-is-implemented": [
+            "Render guides",
+            "main",
+            "Developer\/AjaxVersions.html#details-on-how-the-version-switcher-is-implemented",
+            "Details on how the version switcher is implemented"
+        ],
+        "configuring-html-data-attributes": [
+            "Render guides",
+            "main",
+            "Developer\/AjaxVersions.html#configuring-html-data-attributes",
+            "Configuring HTML data-attributes"
+        ],
+        "seeing-the-simulated-output": [
+            "Render guides",
+            "main",
+            "Developer\/AjaxVersions.html#seeing-the-simulated-output",
+            "Seeing the simulated output"
+        ],
+        "building": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#building",
+            "Building"
+        ],
+        "using-docker": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#using-docker",
+            "Using Docker"
+        ],
+        "using-php": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#using-php",
+            "Using PHP"
+        ],
+        "github-workflow": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#github-workflow",
+            "GitHub workflow"
+        ],
+        "github-workflow-commit-pr-stragegy": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#github-workflow-commit-pr-stragegy",
+            "GitHub workflow: Commit\/PR stragegy"
+        ],
+        "github-workflow-release-strategy": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#github-workflow-release-strategy",
+            "GitHub workflow: Release strategy"
+        ],
+        "github-workflow-github-actions-main-entry": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#github-workflow-github-actions-main-entry",
+            "GitHub workflow: GitHub Actions - Main entry"
+        ],
+        "github-workflow-deploy-azure-assets": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#github-workflow-deploy-azure-assets",
+            "GitHub workflow: deploy-azure-assets"
+        ],
+        "github-workflow-docker": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#github-workflow-docker",
+            "GitHub workflow: docker"
+        ],
+        "github-workflow-docker-test": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#github-workflow-docker-test",
+            "GitHub workflow: docker-test"
+        ],
+        "github-workflow-main": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#github-workflow-main",
+            "GitHub workflow: main"
+        ],
+        "github-workflow-phar": [
+            "Render guides",
+            "main",
+            "Developer\/Building.html#github-workflow-phar",
+            "GitHub workflow: phar"
+        ],
+        "contributing": [
+            "Render guides",
+            "main",
+            "Developer\/Contributing.html#contributing",
+            "Contributing"
+        ],
+        "directory-structure": [
+            "Render guides",
+            "main",
+            "Developer\/DirectoryStructure.html#directory-structure",
+            "Directory structure"
+        ],
+        "developers": [
+            "Render guides",
+            "main",
+            "Developer\/Index.html#developers",
+            "Developers"
+        ],
+        "interlink-inventories": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#interlink-inventories",
+            "Interlink Inventories"
+        ],
+        "interlinks-to-official-manuals": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#interlinks-to-official-manuals",
+            "Interlinks to official manuals"
+        ],
+        "available-default-inventories": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#available-default-inventories",
+            "Available default inventories"
+        ],
+        "setting-the-preferred-typo3-version": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#setting-the-preferred-typo3-version",
+            "Setting the preferred TYPO3 version"
+        ],
+        "adding-a-new-typo3-version-or-manual": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#adding-a-new-typo3-version-or-manual",
+            "Adding a new TYPO3 version or manual"
+        ],
+        "interlinks-to-system-extensions": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#interlinks-to-system-extensions",
+            "Interlinks to system extensions"
+        ],
+        "interlinks-to-third-party-extensions": [
+            "Render guides",
+            "main",
+            "Developer\/InterlinkInventories.html#interlinks-to-third-party-extensions",
+            "Interlinks to third-party extensions"
+        ],
+        "mono-repo-setup": [
+            "Render guides",
+            "main",
+            "Developer\/MonoRepository.html#mono-repo-setup",
+            "Mono-repo setup"
+        ],
+        "repository-split-subtree-split-of-this-mono-repository": [
+            "Render guides",
+            "main",
+            "Developer\/MonoRepository.html#repository-split-subtree-split-of-this-mono-repository",
+            "Repository split (subtree-split of this mono-repository)"
+        ],
+        "theme-customization-1": [
+            "Render guides",
+            "main",
+            "Developer\/ThemeCustomization.html#theme-customization-1",
+            "Theme Customization"
+        ],
+        "build-sources": [
+            "Render guides",
+            "main",
+            "Developer\/ThemeCustomization.html#build-sources",
+            "Build Sources"
+        ],
+        "debug-assets": [
+            "Render guides",
+            "main",
+            "Developer\/ThemeCustomization.html#debug-assets",
+            "Debug assets"
+        ],
+        "render-guides": [
+            "Render guides",
+            "main",
+            "Index.html#render-guides",
+            "Render guides"
+        ],
+        "installation-1": [
+            "Render guides",
+            "main",
+            "Installation\/Index.html#installation-1",
+            "Installation"
+        ],
+        "docker": [
+            "Render guides",
+            "main",
+            "Installation\/Index.html#docker",
+            "Docker"
+        ],
+        "ddev": [
+            "Render guides",
+            "main",
+            "Installation\/Index.html#ddev",
+            "DDEV"
+        ],
+        "php": [
+            "Render guides",
+            "main",
+            "Installation\/Index.html#php",
+            "PHP"
+        ],
+        "introduction-1": [
+            "Render guides",
+            "main",
+            "Introduction\/Index.html#introduction-1",
+            "Introduction"
+        ],
+        "known-problems-1": [
+            "Render guides",
+            "main",
+            "KnownProblems\/Index.html#known-problems-1",
+            "Known problems"
+        ],
+        "migration-1": [
+            "Render guides",
+            "main",
+            "Migration\/Index.html#migration-1",
+            "Migration"
+        ],
+        "with-official-docker-container": [
+            "Render guides",
+            "main",
+            "Migration\/Index.html#with-official-docker-container",
+            "With official Docker container"
+        ],
+        "with-make": [
+            "Render guides",
+            "main",
+            "Migration\/Index.html#with-make",
+            "With make"
+        ],
+        "with-ddev": [
+            "Render guides",
+            "main",
+            "Migration\/Index.html#with-ddev",
+            "With ddev"
+        ],
+        "with-php": [
+            "Render guides",
+            "main",
+            "Migration\/Index.html#with-php",
+            "With PHP"
+        ]
+    }
+}

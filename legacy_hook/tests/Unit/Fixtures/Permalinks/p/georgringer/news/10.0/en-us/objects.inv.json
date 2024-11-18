@@ -1,0 +1,2780 @@
+{
+   "std:confval": {
+      "advancedMediaPreview": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-advancedMediaPreview",
+         "-"
+      ],
+      "allowedCategoryRootIds": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-allowedCategoryRootIds",
+         "-"
+      ],
+      "allowedPage": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-allowedPage",
+         "-"
+      ],
+      "alwaysShowFilter": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-alwaysShowFilter",
+         "-"
+      ],
+      "analytics.social": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-analytics.social",
+         "-"
+      ],
+      "archive": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#confval-archive",
+         "-"
+      ],
+      "archiveDate": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-archiveDate",
+         "-"
+      ],
+      "archiveRestriction": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-archiveRestriction",
+         "-"
+      ],
+      "backPid": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-backPid",
+         "-"
+      ],
+      "categories": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-categories",
+         "-"
+      ],
+      "categoryBeGroupTceFormsRestriction": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-categoryBeGroupTceFormsRestriction",
+         "-"
+      ],
+      "categoryConjunction": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-categoryConjunction",
+         "-"
+      ],
+      "categoryRestrictionForFlexForms": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#confval-categoryRestrictionForFlexForms",
+         "-"
+      ],
+      "columns": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-columns",
+         "-"
+      ],
+      "contentElementPreview": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-contentElementPreview",
+         "-"
+      ],
+      "contentElementRelation": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-contentElementRelation",
+         "-"
+      ],
+      "controlPanels": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-controlPanels",
+         "-"
+      ],
+      "cropMaxCharacters": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-cropMaxCharacters",
+         "-"
+      ],
+      "cssFile": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-cssFile",
+         "-"
+      ],
+      "dateField": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-dateField",
+         "-"
+      ],
+      "dateTimeNotRequired": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-dateTimeNotRequired",
+         "-"
+      ],
+      "defaultDetailPid": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-defaultDetailPid",
+         "-"
+      ],
+      "defaultPid": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-defaultPid",
+         "-"
+      ],
+      "demandClass": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-demandClass",
+         "-"
+      ],
+      "detail.checkPidOfNewsRecord": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-detail.checkPidOfNewsRecord",
+         "-"
+      ],
+      "detail.errorHandling": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-detail.errorHandling",
+         "-"
+      ],
+      "detail.media": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-detail.media",
+         "-"
+      ],
+      "detail.registerProperties": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-detail.registerProperties",
+         "-"
+      ],
+      "detail.showMetaTags": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-detail.showMetaTags",
+         "-"
+      ],
+      "detail.showPrevNext": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-detail.showPrevNext",
+         "-"
+      ],
+      "detail.showSocialShareButtons": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-detail.showSocialShareButtons",
+         "-"
+      ],
+      "detailPid": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-detailPid",
+         "-"
+      ],
+      "detailPidDetermination": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-detailPidDetermination",
+         "-"
+      ],
+      "disableOverrideDemand": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-disableOverrideDemand",
+         "-"
+      ],
+      "displayDummyIfNoMedia": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-displayDummyIfNoMedia",
+         "-"
+      ],
+      "enablePreviewOfHiddenRecords": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-enablePreviewOfHiddenRecords",
+         "-"
+      ],
+      "excludeAlreadyDisplayedNews": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-excludeAlreadyDisplayedNews",
+         "-"
+      ],
+      "facebookLocale": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-facebookLocale",
+         "-"
+      ],
+      "filters": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-filters",
+         "-"
+      ],
+      "format": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-format",
+         "-"
+      ],
+      "hideIdList": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-hideIdList",
+         "-"
+      ],
+      "hidePageTreeForAdministrationModule": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-hidePageTreeForAdministrationModule",
+         "-"
+      ],
+      "hidePagination": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-hidePagination",
+         "-"
+      ],
+      "includeSubCategories": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-includeSubCategories",
+         "-"
+      ],
+      "limit": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-limit",
+         "-"
+      ],
+      "link.hrDate": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-link.hrDate",
+         "-"
+      ],
+      "link.typesOpeningInNewWindow": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-link.typesOpeningInNewWindow",
+         "-"
+      ],
+      "list.media": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-list.media",
+         "-"
+      ],
+      "list.media.dummyImage": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-list.media.dummyImage",
+         "-"
+      ],
+      "list.paginate": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-list.paginate",
+         "-"
+      ],
+      "list.paginate.itemsPerPage": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-list.paginate.itemsPerPage",
+         "-"
+      ],
+      "list.rss": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-list.rss",
+         "-"
+      ],
+      "listPid": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-listPid",
+         "-"
+      ],
+      "localizationView": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-localizationView",
+         "-"
+      ],
+      "manualSorting": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-manualSorting",
+         "-"
+      ],
+      "media.maxHeight": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-media.maxHeight",
+         "-"
+      ],
+      "media.maxWidth": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-media.maxWidth",
+         "-"
+      ],
+      "mediaPreview": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-mediaPreview",
+         "-"
+      ],
+      "offset": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-offset",
+         "-"
+      ],
+      "opengraph": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-opengraph",
+         "-"
+      ],
+      "orderBy": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-orderBy",
+         "-"
+      ],
+      "orderByAllowed": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-orderByAllowed",
+         "-"
+      ],
+      "orderDirection": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-orderDirection",
+         "-"
+      ],
+      "overrideFlexformSettingsIfEmpty": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-overrideFlexformSettingsIfEmpty",
+         "-"
+      ],
+      "prependAtCopy": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-prependAtCopy",
+         "-"
+      ],
+      "preselect": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-preselect",
+         "-"
+      ],
+      "previewHiddenRecords": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-previewHiddenRecords",
+         "-"
+      ],
+      "recursive": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-recursive",
+         "-"
+      ],
+      "redirectToPageOnStart": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#confval-redirectToPageOnStart",
+         "-"
+      ],
+      "resourceFolderImporter": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-resourceFolderImporter",
+         "-"
+      ],
+      "rteForTeaser": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-rteForTeaser",
+         "-"
+      ],
+      "search.fields": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-search.fields",
+         "-"
+      ],
+      "search.splitSearchWord": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-search.splitSearchWord",
+         "-"
+      ],
+      "showAdministrationModule": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-showAdministrationModule",
+         "-"
+      ],
+      "showContentElementsInNewsSysFolder": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#confval-showContentElementsInNewsSysFolder",
+         "-"
+      ],
+      "showImporter": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-showImporter",
+         "-"
+      ],
+      "singleNews": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-singleNews",
+         "-"
+      ],
+      "slugBehaviour": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-slugBehaviour",
+         "-"
+      ],
+      "slugPrefix": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#confval-slugPrefix",
+         "-"
+      ],
+      "startingpoint": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-startingpoint",
+         "-"
+      ],
+      "storageUidImporter": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#confval-storageUidImporter",
+         "-"
+      ],
+      "switchableControllerAction": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Plugin.html#confval-switchableControllerAction",
+         "-"
+      ],
+      "tagPid": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#confval-tagPid",
+         "-"
+      ],
+      "tags": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-tags",
+         "-"
+      ],
+      "templateLayout": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-templateLayout",
+         "-"
+      ],
+      "templateLayouts": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#confval-templateLayouts",
+         "-"
+      ],
+      "timeRestriction": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-timeRestriction",
+         "-"
+      ],
+      "timeRestrictionHigh": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-timeRestrictionHigh",
+         "-"
+      ],
+      "topNewsFirst": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-topNewsFirst",
+         "-"
+      ],
+      "topNewsRestriction": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#confval-topNewsRestriction",
+         "-"
+      ],
+      "useStdWrap": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#confval-useStdWrap",
+         "-"
+      ]
+   },
+   "std:doc": {
+      "Addons/Index": [
+         "News system",
+         "main (development)",
+         "Addons/Index.html",
+         "Addons"
+      ],
+      "Addons/NewsAdministration/Index": [
+         "News system",
+         "main (development)",
+         "Addons/NewsAdministration/Index.html",
+         "EXT:news_administration"
+      ],
+      "Addons/NewsCategoryPidConstraint/Index": [
+         "News system",
+         "main (development)",
+         "Addons/NewsCategoryPidConstraint/Index.html",
+         "EXT:news_category_pid_constraint"
+      ],
+      "Addons/NewsContentElements/Index": [
+         "News system",
+         "main (development)",
+         "Addons/NewsContentElements/Index.html",
+         "EXT:news_content_elements"
+      ],
+      "Addons/NewsFegroupPreview/Index": [
+         "News system",
+         "main (development)",
+         "Addons/NewsFegroupPreview/Index.html",
+         "EXT:news_fegroup_preview"
+      ],
+      "Addons/NewsFilter/Index": [
+         "News system",
+         "main (development)",
+         "Addons/NewsFilter/Index.html",
+         "EXT:news_filter"
+      ],
+      "Addons/NewsImporticsxml/Index": [
+         "News system",
+         "main (development)",
+         "Addons/NewsImporticsxml/Index.html",
+         "EXT:news_importicsxml"
+      ],
+      "Addons/NewsRedirectSlugChange/Index": [
+         "News system",
+         "main (development)",
+         "Addons/NewsRedirectSlugChange/Index.html",
+         "EXT:news_redirect_slug_change"
+      ],
+      "Addons/NewsTagsuggest/Index": [
+         "News system",
+         "main (development)",
+         "Addons/NewsTagsuggest/Index.html",
+         "EXT:news_tagsuggest"
+      ],
+      "Addons/NumberedPagination/Index": [
+         "News system",
+         "main (development)",
+         "Addons/NumberedPagination/Index.html",
+         "EXT:numbered_pagination"
+      ],
+      "Administration/Configuration/Index": [
+         "News system",
+         "main (development)",
+         "Administration/Configuration/Index.html",
+         "Configuration"
+      ],
+      "Administration/Index": [
+         "News system",
+         "main (development)",
+         "Administration/Index.html",
+         "Administration"
+      ],
+      "Administration/Installation/Index": [
+         "News system",
+         "main (development)",
+         "Administration/Installation/Index.html",
+         "Installation"
+      ],
+      "Administration/Migration/Index": [
+         "News system",
+         "main (development)",
+         "Administration/Migration/Index.html",
+         "Migration"
+      ],
+      "Administration/Migration/MigrationFromRealurl/Index": [
+         "News system",
+         "main (development)",
+         "Administration/Migration/MigrationFromRealurl/Index.html",
+         "Migration from realurl to news with routing"
+      ],
+      "Administration/Migration/MigrationFromTtNews/Index": [
+         "News system",
+         "main (development)",
+         "Administration/Migration/MigrationFromTtNews/Index.html",
+         "Migration from tt_news to news"
+      ],
+      "Administration/Update/Index": [
+         "News system",
+         "main (development)",
+         "Administration/Update/Index.html",
+         "Updating"
+      ],
+      "Index": [
+         "News system",
+         "main (development)",
+         "Index.html",
+         "News system"
+      ],
+      "Introduction/About/Index": [
+         "News system",
+         "main (development)",
+         "Introduction/About/Index.html",
+         "What does it do?"
+      ],
+      "Introduction/Contribution/Index": [
+         "News system",
+         "main (development)",
+         "Introduction/Contribution/Index.html",
+         "Contribution"
+      ],
+      "Introduction/Index": [
+         "News system",
+         "main (development)",
+         "Introduction/Index.html",
+         "Introduction"
+      ],
+      "Introduction/Sponsoring/Index": [
+         "News system",
+         "main (development)",
+         "Introduction/Sponsoring/Index.html",
+         "Sponsoring"
+      ],
+      "Introduction/Support/Index": [
+         "News system",
+         "main (development)",
+         "Introduction/Support/Index.html",
+         "Need Support?"
+      ],
+      "Misc/Changelog/10-0-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/10-0-0.html",
+         "10.0.0 - 20th September 2022"
+      ],
+      "Misc/Changelog/10-0-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/10-0-1.html",
+         "10.0.1 - 22nd September 2022"
+      ],
+      "Misc/Changelog/10-0-2": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/10-0-2.html",
+         "10.0.2 - 27th October 2022"
+      ],
+      "Misc/Changelog/10-0-3": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/10-0-3.html",
+         "10.0.3 - 21st November 2022"
+      ],
+      "Misc/Changelog/2-1-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/2-1-0.html",
+         "2.1.0 - 2013/03/28"
+      ],
+      "Misc/Changelog/2-2-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/2-2-0.html",
+         "2.2.0 - 2013/07/06"
+      ],
+      "Misc/Changelog/2-2-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/2-2-1.html",
+         "2.2.1 - 2013/09/23"
+      ],
+      "Misc/Changelog/2-3-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/2-3-0.html",
+         "2.3.0 - 2013/12/12"
+      ],
+      "Misc/Changelog/3-0-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-0-0.html",
+         "3.0.0 - 2014/05/16"
+      ],
+      "Misc/Changelog/3-0-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-0-1.html",
+         "3.0.1 - 2014/06/03"
+      ],
+      "Misc/Changelog/3-1-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-1-0.html",
+         "3.1.0 - 2015/02/12"
+      ],
+      "Misc/Changelog/3-2-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-2-0.html",
+         "3.2.0 - 2015/05/19"
+      ],
+      "Misc/Changelog/3-2-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-2-1.html",
+         "3.2.1 - 2015/07/11"
+      ],
+      "Misc/Changelog/3-2-2": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-2-2.html",
+         "3.2.1 - 2015/07/13"
+      ],
+      "Misc/Changelog/3-2-3": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-2-3.html",
+         "3.2.3 - 2015/09/25"
+      ],
+      "Misc/Changelog/3-2-4": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-2-4.html",
+         "3.2.4 - 2015/09/26"
+      ],
+      "Misc/Changelog/3-2-5": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-2-5.html",
+         "3.2.5 - 2016/03/01"
+      ],
+      "Misc/Changelog/3-2-6": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/3-2-6.html",
+         "3.2.6 - 2016/07/13"
+      ],
+      "Misc/Changelog/4-0-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/4-0-0.html",
+         "4.0.0 - 2015/11/10"
+      ],
+      "Misc/Changelog/4-1-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/4-1-0.html",
+         "4.1.0 - 2016/01/27"
+      ],
+      "Misc/Changelog/4-2-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/4-2-0.html",
+         "4.2.0 - 2016/03/02"
+      ],
+      "Misc/Changelog/4-2-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/4-2-1.html",
+         "4.2.1 - 2016/03/11"
+      ],
+      "Misc/Changelog/4-3-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/4-3-0.html",
+         "4.3.0 - 2016/07/13"
+      ],
+      "Misc/Changelog/5-0-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/5-0-0.html",
+         "5.0.0 - 2016/09/03"
+      ],
+      "Misc/Changelog/5-1-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/5-1-0.html",
+         "5.1.0 - 2016/09/12"
+      ],
+      "Misc/Changelog/5-2-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/5-2-0.html",
+         "5.2.0 - 2016/09/23"
+      ],
+      "Misc/Changelog/5-3-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/5-3-0.html",
+         "5.3.0 - 2016/11/24"
+      ],
+      "Misc/Changelog/5-3-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/5-3-1.html",
+         "5.3.1 - 2016/11/24"
+      ],
+      "Misc/Changelog/5-3-2": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/5-3-2.html",
+         "5.3.1 - 2017/01/21"
+      ],
+      "Misc/Changelog/6-0-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/6-0-0.html",
+         "6.0.0 - 2017/21/03"
+      ],
+      "Misc/Changelog/6-1-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/6-1-0.html",
+         "6.1.0 - 2017/08/31"
+      ],
+      "Misc/Changelog/6-1-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/6-1-1.html",
+         "6.1.1 - 2017/09/06"
+      ],
+      "Misc/Changelog/6-2-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/6-2-0.html",
+         "6.2.0 - 2018/01/23"
+      ],
+      "Misc/Changelog/6-2-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/6-2-1.html",
+         "6.2.1- 2018/01/24"
+      ],
+      "Misc/Changelog/6-3-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/6-3-0.html",
+         "6.3.0 - 2018/02/01"
+      ],
+      "Misc/Changelog/7-0-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-0-0.html",
+         "7.0.0 - 2018/26/04"
+      ],
+      "Misc/Changelog/7-0-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-0-1.html",
+         "7.0.1 - 2018/27/04"
+      ],
+      "Misc/Changelog/7-0-4": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-0-4.html",
+         "7.0.4 - 2018/16/05"
+      ],
+      "Misc/Changelog/7-0-5": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-0-5.html",
+         "7.0.5 - 2018/16/05"
+      ],
+      "Misc/Changelog/7-0-6": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-0-6.html",
+         "7.0.6 - 2018/08/10"
+      ],
+      "Misc/Changelog/7-0-7": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-0-7.html",
+         "7.0.7 - 2018/24/10"
+      ],
+      "Misc/Changelog/7-0-8": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-0-8.html",
+         "7.0.8 - 2018/06/11"
+      ],
+      "Misc/Changelog/7-1-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-1-0.html",
+         "7.1.0 - 2019/07/03"
+      ],
+      "Misc/Changelog/7-2-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-2-0.html",
+         "7.2.0 - 2019/04/15"
+      ],
+      "Misc/Changelog/7-2-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-2-1.html",
+         "7.2.1 - 2019/08/04"
+      ],
+      "Misc/Changelog/7-2-2": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-2-2.html",
+         "7.2.2 - 2019/08/05"
+      ],
+      "Misc/Changelog/7-2-3": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-2-3.html",
+         "7.2.3 - 2019/08/06"
+      ],
+      "Misc/Changelog/7-3-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-3-0.html",
+         "7.3.0 - 2019/28/08"
+      ],
+      "Misc/Changelog/7-3-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/7-3-1.html",
+         "7.3.1 - 2019/29/08"
+      ],
+      "Misc/Changelog/8-0-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-0-0.html",
+         "8.0.0 - 2020/21/04"
+      ],
+      "Misc/Changelog/8-1-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-1-0.html",
+         "8.1.0 - 28th April 2020"
+      ],
+      "Misc/Changelog/8-1-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-1-1.html",
+         "8.1.1 - 4th May 2020"
+      ],
+      "Misc/Changelog/8-2-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-2-0.html",
+         "8.2.0 - 4th May 2020"
+      ],
+      "Misc/Changelog/8-3-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-3-0.html",
+         "8.3.0 - 12th May 2020"
+      ],
+      "Misc/Changelog/8-4-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-4-0.html",
+         "8.4.0 - 18th August 2020"
+      ],
+      "Misc/Changelog/8-4-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-4-1.html",
+         "8.4.1 - 25th September 2020"
+      ],
+      "Misc/Changelog/8-5-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-5-0.html",
+         "8.5.0 - 20th October 2020"
+      ],
+      "Misc/Changelog/8-5-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-5-1.html",
+         "8.5.1 - 8th January 2021"
+      ],
+      "Misc/Changelog/8-5-2": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-5-2.html",
+         "8.5.2 - 12th January 2021"
+      ],
+      "Misc/Changelog/8-6-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/8-6-0.html",
+         "8.6.0 - 22th July 2021"
+      ],
+      "Misc/Changelog/9-0-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/9-0-0.html",
+         "9.0.0 - 23th October 2021"
+      ],
+      "Misc/Changelog/9-1-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/9-1-0.html",
+         "9.1.0 - 11th November 2021"
+      ],
+      "Misc/Changelog/9-1-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/9-1-1.html",
+         "9.1.1 - 20th December 2021"
+      ],
+      "Misc/Changelog/9-2-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/9-2-0.html",
+         "9.2.2 - 25th January 2022"
+      ],
+      "Misc/Changelog/9-3-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/9-3-0.html",
+         "9.3.0 - 14th March 2022"
+      ],
+      "Misc/Changelog/9-3-1": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/9-3-1.html",
+         "9.3.1 - 17th March 2022"
+      ],
+      "Misc/Changelog/9-4-0": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/9-4-0.html",
+         "9.4.0 - 26th April 2022"
+      ],
+      "Misc/Changelog/Index": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/Index.html",
+         "ChangeLog"
+      ],
+      "QuickStart/Configuration": [
+         "News system",
+         "main (development)",
+         "QuickStart/Configuration.html",
+         "Quick configuration"
+      ],
+      "QuickStart/CreateRecords": [
+         "News system",
+         "main (development)",
+         "QuickStart/CreateRecords.html",
+         "Create some initial content"
+      ],
+      "QuickStart/Index": [
+         "News system",
+         "main (development)",
+         "QuickStart/Index.html",
+         "Quick start"
+      ],
+      "QuickStart/Installation": [
+         "News system",
+         "main (development)",
+         "QuickStart/Installation.html",
+         "Quick installation"
+      ],
+      "QuickStart/Templating": [
+         "News system",
+         "main (development)",
+         "QuickStart/Templating.html",
+         "Quick templating in Fluid"
+      ],
+      "Reference/Events/Index": [
+         "News system",
+         "main (development)",
+         "Reference/Events/Index.html",
+         "Events"
+      ],
+      "Reference/ExtensionConfiguration/Index": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html",
+         "Extension Configuration"
+      ],
+      "Reference/Index": [
+         "News system",
+         "main (development)",
+         "Reference/Index.html",
+         "Reference"
+      ],
+      "Reference/MissingKnownErrors/Index": [
+         "News system",
+         "main (development)",
+         "Reference/MissingKnownErrors/Index.html",
+         "Known problems"
+      ],
+      "Reference/TsConfig/Administration": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html",
+         "Administration module"
+      ],
+      "Reference/TsConfig/General": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html",
+         "General configuration"
+      ],
+      "Reference/TsConfig/Index": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Index.html",
+         "TsConfig"
+      ],
+      "Reference/TsConfig/Plugin": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Plugin.html",
+         "Plugin configuration"
+      ],
+      "Reference/TypoScript/GeneralSettings": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html",
+         "General settings"
+      ],
+      "Reference/TypoScript/Index": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/Index.html",
+         "TypoScript"
+      ],
+      "Reference/TypoScript/PluginSettings": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html",
+         "Plugin settings"
+      ],
+      "Reference/ViewHelpers/ExcludeDisplayedNewsViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/ExcludeDisplayedNewsViewHelper.html",
+         "ExcludeDisplayedNewsViewHelper"
+      ],
+      "Reference/ViewHelpers/Format/NothingViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/Format/NothingViewHelper.html",
+         "Format / NothingViewHelper"
+      ],
+      "Reference/ViewHelpers/HeaderDataViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/HeaderDataViewHelper.html",
+         "HeaderDataViewHelper"
+      ],
+      "Reference/ViewHelpers/IncludeFileViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/IncludeFileViewHelper.html",
+         "IncludeFileViewHelper"
+      ],
+      "Reference/ViewHelpers/Index": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/Index.html",
+         "ViewHelpers reference"
+      ],
+      "Reference/ViewHelpers/LinkViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/LinkViewHelper.html",
+         "LinkViewHelper"
+      ],
+      "Reference/ViewHelpers/MediaFactoryViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/MediaFactoryViewHelper.html",
+         "MediaFactoryViewHelper"
+      ],
+      "Reference/ViewHelpers/MetaTagViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/MetaTagViewHelper.html",
+         "MetaTagViewHelper"
+      ],
+      "Reference/ViewHelpers/PaginateBodytextViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/PaginateBodytextViewHelper.html",
+         "PaginateBodytextViewHelper"
+      ],
+      "Reference/ViewHelpers/TargetLinkViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/TargetLinkViewHelper.html",
+         "TargetLinkViewHelper"
+      ],
+      "Reference/ViewHelpers/TitleTagViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/TitleTagViewHelper.html",
+         "TitleTagViewHelper"
+      ],
+      "Reference/ViewHelpers/Widget/PaginateViewHelper": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/Widget/PaginateViewHelper.html",
+         "Widget / PaginateViewHelper"
+      ],
+      "Sitemap": [
+         "News system",
+         "main (development)",
+         "Sitemap.html",
+         "-"
+      ],
+      "Tutorials/BestPractice/AvailableContentElements/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/AvailableContentElements/Index.html",
+         "Limit content elements"
+      ],
+      "Tutorials/BestPractice/BreadcrumbMenu": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/BreadcrumbMenu.html",
+         "Breadcrumb menu"
+      ],
+      "Tutorials/BestPractice/ClearCache/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/ClearCache/Index.html",
+         "Cache clearing"
+      ],
+      "Tutorials/BestPractice/HideDetailPage/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/HideDetailPage/Index.html",
+         "Hide detail page in URL"
+      ],
+      "Tutorials/BestPractice/ICalendar/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/ICalendar/Index.html",
+         "ICalendar feed"
+      ],
+      "Tutorials/BestPractice/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Index.html",
+         "Best practice"
+      ],
+      "Tutorials/BestPractice/InfiniteScroll/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/InfiniteScroll/Index.html",
+         "Ajax based pagination"
+      ],
+      "Tutorials/BestPractice/IntegrationWithTypoScript/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/IntegrationWithTypoScript/Index.html",
+         "Integrations with TypoScript"
+      ],
+      "Tutorials/BestPractice/Linkhandler/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Linkhandler/Index.html",
+         "LinkHandler"
+      ],
+      "Tutorials/BestPractice/PredefineFields/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/PredefineFields/Index.html",
+         "Predefine values"
+      ],
+      "Tutorials/BestPractice/PreviewOfRecord/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/PreviewOfRecord/Index.html",
+         "View button"
+      ],
+      "Tutorials/BestPractice/Realurl/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Realurl/Index.html",
+         "Replace RealURL with routing"
+      ],
+      "Tutorials/BestPractice/Routing/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Routing/Index.html",
+         "Use Routing to rewrite URLs"
+      ],
+      "Tutorials/BestPractice/Rss/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Rss/Index.html",
+         "RSS feed"
+      ],
+      "Tutorials/BestPractice/Seo/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Seo/Index.html",
+         "SEO"
+      ],
+      "Tutorials/BestPractice/TsConfigExamples/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/TsConfigExamples/Index.html",
+         "TSconfig code snippets"
+      ],
+      "Tutorials/ExtendNews/AddCustomType/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/AddCustomType/Index.html",
+         "Custom news types"
+      ],
+      "Tutorials/ExtendNews/DataProcessing/AddNewsToMenuProcessor": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/DataProcessing/AddNewsToMenuProcessor.html",
+         "AddNewsToMenuProcessor"
+      ],
+      "Tutorials/ExtendNews/DataProcessing/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/DataProcessing/Index.html",
+         "Data processing"
+      ],
+      "Tutorials/ExtendNews/DataProcessing/LanguageMenuProcessor": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/DataProcessing/LanguageMenuProcessor.html",
+         "LanguageMenuProcessor"
+      ],
+      "Tutorials/ExtendNews/Demands/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Demands/Index.html",
+         "Demands"
+      ],
+      "Tutorials/ExtendNews/Events/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Events/Index.html",
+         "Events"
+      ],
+      "Tutorials/ExtendNews/ExtendFlexforms/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/ExtendFlexforms/Index.html",
+         "Extend FlexForms"
+      ],
+      "Tutorials/ExtendNews/ExtensionBasedOnNews/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/ExtensionBasedOnNews/Index.html",
+         "Extensions based on EXT:news"
+      ],
+      "Tutorials/ExtendNews/Hooks/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Hooks/Index.html",
+         "Hooks"
+      ],
+      "Tutorials/ExtendNews/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Index.html",
+         "Extend News"
+      ],
+      "Tutorials/ExtendNews/ProxyClassGenerator/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/ProxyClassGenerator/Index.html",
+         "Add custom fields"
+      ],
+      "Tutorials/ExternalTutorials": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExternalTutorials.html",
+         "External tutorials"
+      ],
+      "Tutorials/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Index.html",
+         "Tutorials"
+      ],
+      "Tutorials/Templates/GroupNewsRecords/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/GroupNewsRecords/Index.html",
+         "Group news records"
+      ],
+      "Tutorials/Templates/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/Index.html",
+         "Templates"
+      ],
+      "Tutorials/Templates/MultiCategorySelection/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/MultiCategorySelection/Index.html",
+         "Filter news by multiple categories"
+      ],
+      "Tutorials/Templates/OverwriteDemandInFrontend/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/OverwriteDemandInFrontend/Index.html",
+         "Set overwriteDemand in links"
+      ],
+      "Tutorials/Templates/RenderContentElements/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/RenderContentElements/Index.html",
+         "Render content elements"
+      ],
+      "Tutorials/Templates/Snippets/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/Snippets/Index.html",
+         "Assorted snippets"
+      ],
+      "Tutorials/Templates/Start/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/Start/Index.html",
+         "Changing & editing templates"
+      ],
+      "Tutorials/Templates/TemplateSelector/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/TemplateSelector/Index.html",
+         "Template selector"
+      ],
+      "Tutorials/Templates/TwitterBootstrap/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/TwitterBootstrap/Index.html",
+         "Bootstrap templates"
+      ],
+      "Tutorials/Templates/ViewHelpers/Index": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/ViewHelpers/Index.html",
+         "ViewHelpers"
+      ],
+      "UsersManual/Index": [
+         "News system",
+         "main (development)",
+         "UsersManual/Index.html",
+         "Editors manual"
+      ],
+      "UsersManual/ListModule/Index": [
+         "News system",
+         "main (development)",
+         "UsersManual/ListModule/Index.html",
+         "List module"
+      ],
+      "UsersManual/NewsModule/Index": [
+         "News system",
+         "main (development)",
+         "UsersManual/NewsModule/Index.html",
+         "News administration module"
+      ],
+      "UsersManual/Plugins/Index": [
+         "News system",
+         "main (development)",
+         "UsersManual/Plugins/Index.html",
+         "Plugin"
+      ],
+      "UsersManual/Records/Category/Index": [
+         "News system",
+         "main (development)",
+         "UsersManual/Records/Category/Index.html",
+         "Category"
+      ],
+      "UsersManual/Records/Index": [
+         "News system",
+         "main (development)",
+         "UsersManual/Records/Index.html",
+         "Records"
+      ],
+      "UsersManual/Records/News/Index": [
+         "News system",
+         "main (development)",
+         "UsersManual/Records/News/Index.html",
+         "News"
+      ],
+      "UsersManual/Records/Tag/Index": [
+         "News system",
+         "main (development)",
+         "UsersManual/Records/Tag/Index.html",
+         "Tag"
+      ],
+      "genindex": [
+         "News system",
+         "main (development)",
+         "genindex.html",
+         "Index"
+      ]
+   },
+   "std:label": {
+      "addcustomtype": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/AddCustomType/Index.html#addcustomtype",
+         "Custom news types"
+      ],
+      "addons": [
+         "News system",
+         "main (development)",
+         "Addons/Index.html#addons",
+         "Addons"
+      ],
+      "admin-manual": [
+         "News system",
+         "main (development)",
+         "Administration/Index.html#admin-manual",
+         "Administration"
+      ],
+      "breadcrumb": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/BreadcrumbMenu.html#breadcrumb",
+         "Breadcrumb menu"
+      ],
+      "breadcrumbfluid": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/BreadcrumbMenu.html#breadcrumbfluid",
+         "Breadcrumb based on data processing and Fluid"
+      ],
+      "breadcrumbtyposcript": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/BreadcrumbMenu.html#breadcrumbtyposcript",
+         "Breadcrumb based on TypoScript (legacy)"
+      ],
+      "cacheclearing": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/ClearCache/Index.html#cacheclearing",
+         "Cache clearing"
+      ],
+      "cacheclearing-changed-records": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/ClearCache/Index.html#cacheclearing-changed-records",
+         "Clearing the cache after changing news records"
+      ],
+      "cacheclearing-publishing-date": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/ClearCache/Index.html#cacheclearing-publishing-date",
+         "Cache lifetime and auto publishing (by setting start date)"
+      ],
+      "changelog": [
+         "News system",
+         "main (development)",
+         "Misc/Changelog/Index.html#changelog",
+         "ChangeLog"
+      ],
+      "configuration": [
+         "News system",
+         "main (development)",
+         "Administration/Configuration/Index.html#configuration",
+         "Configuration"
+      ],
+      "contribution": [
+         "News system",
+         "main (development)",
+         "Introduction/Contribution/Index.html#contribution",
+         "Contribution"
+      ],
+      "dataprocessing": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/DataProcessing/Index.html#dataprocessing",
+         "Data processing"
+      ],
+      "dataprocessing_addnewstomenuprocessor": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/DataProcessing/AddNewsToMenuProcessor.html#dataprocessing-addnewstomenuprocessor",
+         "AddNewsToMenuProcessor"
+      ],
+      "dataprocessing_languagemenuprocessor": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/DataProcessing/LanguageMenuProcessor.html#dataprocessing-languagemenuprocessor",
+         "LanguageMenuProcessor"
+      ],
+      "demand_custom": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Demands/Index.html#demand-custom",
+         "Custom demand class"
+      ],
+      "demands": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Demands/Index.html#demands",
+         "Demands"
+      ],
+      "events": [
+         "News system",
+         "main (development)",
+         "Reference/Events/Index.html#events",
+         "Events"
+      ],
+      "eventstutorial": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Events/Index.html#eventstutorial",
+         "Events"
+      ],
+      "ext-based-on-news": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/ExtensionBasedOnNews/Index.html#ext-based-on-news",
+         "Extensions based on EXT:news"
+      ],
+      "extendflexforms": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/ExtendFlexforms/Index.html#extendflexforms",
+         "Extend FlexForms"
+      ],
+      "extension_custom_controller": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/ExtensionBasedOnNews/Index.html#extension-custom-controller",
+         "Classes/Controller/FilterController.php"
+      ],
+      "extensionconfiguration": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfiguration",
+         "Extension Configuration"
+      ],
+      "extensionconfigurationadvancedmediapreview": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationadvancedmediapreview",
+         "Advanced preview configuration for media files advancedMediaPreview"
+      ],
+      "extensionconfigurationarchivedate": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationarchivedate",
+         "Archive Date archiveDate"
+      ],
+      "extensionconfigurationcategorybegrouptceformsrestriction": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationcategorybegrouptceformsrestriction",
+         "Editor needs to have permissions to all selected categories to save a news item categoryBeGroupTceFormsRestriction"
+      ],
+      "extensionconfigurationcategoryrestriction": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationcategoryrestriction",
+         "Category restriction categoryRestriction"
+      ],
+      "extensionconfigurationcontentelementpreview": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationcontentelementpreview",
+         "Improved preview of content element relations contentElementPreview"
+      ],
+      "extensionconfigurationcontentelementrelation": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationcontentelementrelation",
+         "Use content element relation contentElementRelation"
+      ],
+      "extensionconfigurationdatetimenotrequired": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationdatetimenotrequired",
+         "Disable required date field dateTimeNotRequired"
+      ],
+      "extensionconfigurationhidepagetreeforadministrationmodule": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationhidepagetreeforadministrationmodule",
+         "Hide page tree for Administration module hidePageTreeForAdministrationModule"
+      ],
+      "extensionconfigurationmanualsorting": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationmanualsorting",
+         "Enable manual sorting of news records manualSorting"
+      ],
+      "extensionconfigurationmediapreview": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationmediapreview",
+         "Show thumbnails in backend list module mediaPreview"
+      ],
+      "extensionconfigurationprependatcopy": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationprependatcopy",
+         "Prepend at copy prependAtCopy"
+      ],
+      "extensionconfigurationresourcefolderimporter": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationresourcefolderimporter",
+         "In which folder should the importer save files/images (has to exist) resourceFolderImporter"
+      ],
+      "extensionconfigurationshowadministrationmodule": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationshowadministrationmodule",
+         "Show administration module showAdministrationModule"
+      ],
+      "extensionconfigurationshowimporter": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationshowimporter",
+         "Hide page tree for Administration module hidePageTreeForAdministrationModule"
+      ],
+      "extensionconfigurationslugbehaviour": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationslugbehaviour",
+         "Slug behaviour slugBehaviour"
+      ],
+      "extensionconfigurationstorageuidimporter": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationstorageuidimporter",
+         "UID of storage to use when importing files/images storageUidImporter"
+      ],
+      "extensionconfigurationtagpid": [
+         "News system",
+         "main (development)",
+         "Reference/ExtensionConfiguration/Index.html#extensionconfigurationtagpid",
+         "Define pid of tag records tagPid"
+      ],
+      "general_tsconfig_examples": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/TsConfigExamples/Index.html#general-tsconfig-examples",
+         "TSconfig code snippets"
+      ],
+      "hidedetailpage": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/HideDetailPage/Index.html#hidedetailpage",
+         "Hide detail page in URL"
+      ],
+      "hooks": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Hooks/Index.html#hooks",
+         "Hooks"
+      ],
+      "hooks_example_finddemanded": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Hooks/Index.html#hooks-example-finddemanded",
+         "Domain/Repository/AbstractDemandedRepository.php findDemanded"
+      ],
+      "how_to_rewrite_urls": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Routing/Index.html#how-to-rewrite-urls",
+         "How to rewrite URLs with news parameters"
+      ],
+      "howtostart": [
+         "News system",
+         "main (development)",
+         "QuickStart/CreateRecords.html#howtostart",
+         "Create some initial content"
+      ],
+      "howtostartaddplugin": [
+         "News system",
+         "main (development)",
+         "QuickStart/CreateRecords.html#howtostartaddplugin",
+         "Add plugins: display the news in the frontend"
+      ],
+      "howtostartcreaterecords": [
+         "News system",
+         "main (development)",
+         "QuickStart/CreateRecords.html#howtostartcreaterecords",
+         "Create news records"
+      ],
+      "icalendar": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/ICalendar/Index.html#icalendar",
+         "ICalendar feed"
+      ],
+      "infinitescroll": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/InfiniteScroll/Index.html#infinitescroll",
+         "Ajax based pagination"
+      ],
+      "installation": [
+         "News system",
+         "main (development)",
+         "Administration/Installation/Index.html#installation",
+         "Installation"
+      ],
+      "integrationtyposcript": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/IntegrationWithTypoScript/Index.html#integrationtyposcript",
+         "Integrations with TypoScript"
+      ],
+      "introduction": [
+         "News system",
+         "main (development)",
+         "Introduction/Index.html#introduction",
+         "Introduction"
+      ],
+      "limitce": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/AvailableContentElements/Index.html#limitce",
+         "Limit content elements"
+      ],
+      "linkhandler": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Linkhandler/Index.html#linkhandler",
+         "LinkHandler"
+      ],
+      "listaddfirstrecord": [
+         "News system",
+         "main (development)",
+         "UsersManual/ListModule/Index.html#listaddfirstrecord",
+         "Add the first news record to a new folder"
+      ],
+      "listmodule": [
+         "News system",
+         "main (development)",
+         "UsersManual/ListModule/Index.html#listmodule",
+         "List module"
+      ],
+      "migration_realurl_routing": [
+         "News system",
+         "main (development)",
+         "Administration/Migration/MigrationFromRealurl/Index.html#migration-realurl-routing",
+         "Migration from realurl to news with routing"
+      ],
+      "modindex": [
+         "News system",
+         "main (development)",
+         "py-modindex.html",
+         "Module Index"
+      ],
+      "newsadministration": [
+         "News system",
+         "main (development)",
+         "Addons/NewsAdministration/Index.html#newsadministration",
+         "EXT:news_administration"
+      ],
+      "newsadminmodule": [
+         "News system",
+         "main (development)",
+         "UsersManual/NewsModule/Index.html#newsadminmodule",
+         "News administration module"
+      ],
+      "newscategorypidconstraint": [
+         "News system",
+         "main (development)",
+         "Addons/NewsCategoryPidConstraint/Index.html#newscategorypidconstraint",
+         "EXT:news_category_pid_constraint"
+      ],
+      "newscontentelements": [
+         "News system",
+         "main (development)",
+         "Addons/NewsContentElements/Index.html#newscontentelements",
+         "EXT:news_content_elements"
+      ],
+      "newsfegrouppreview": [
+         "News system",
+         "main (development)",
+         "Addons/NewsFegroupPreview/Index.html#newsfegrouppreview",
+         "EXT:news_fegroup_preview"
+      ],
+      "newsfilter": [
+         "News system",
+         "main (development)",
+         "Addons/NewsFilter/Index.html#newsfilter",
+         "EXT:news_filter"
+      ],
+      "newsimporticsxml": [
+         "News system",
+         "main (development)",
+         "Addons/NewsImporticsxml/Index.html#newsimporticsxml",
+         "EXT:news_importicsxml"
+      ],
+      "newsmodulecreatecategory": [
+         "News system",
+         "main (development)",
+         "UsersManual/NewsModule/Index.html#newsmodulecreatecategory",
+         "Create a category"
+      ],
+      "newsmodulecreatenews": [
+         "News system",
+         "main (development)",
+         "UsersManual/NewsModule/Index.html#newsmodulecreatenews",
+         "Add a news record"
+      ],
+      "newsmodulecreatetag": [
+         "News system",
+         "main (development)",
+         "UsersManual/NewsModule/Index.html#newsmodulecreatetag",
+         "Create a tag"
+      ],
+      "newsredirectslugchange": [
+         "News system",
+         "main (development)",
+         "Addons/NewsRedirectSlugChange/Index.html#newsredirectslugchange",
+         "EXT:news_redirect_slug_change"
+      ],
+      "newstagsuggest": [
+         "News system",
+         "main (development)",
+         "Addons/NewsTagsuggest/Index.html#newstagsuggest",
+         "EXT:news_tagsuggest"
+      ],
+      "numberedpagination": [
+         "News system",
+         "main (development)",
+         "Addons/NumberedPagination/Index.html#numberedpagination",
+         "EXT:numbered_pagination"
+      ],
+      "overwritedemand-in-frontend": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/OverwriteDemandInFrontend/Index.html#overwritedemand-in-frontend",
+         "Set overwriteDemand in links"
+      ],
+      "php-modindex": [
+         "News system",
+         "main (development)",
+         "php-modindex.html",
+         "PHP Namespace Index"
+      ],
+      "php-objectsindex": [
+         "News system",
+         "main (development)",
+         "php-objectsindex.html",
+         "PHP Objects Index"
+      ],
+      "plugin": [
+         "News system",
+         "main (development)",
+         "UsersManual/Plugins/Index.html#plugin",
+         "Plugin"
+      ],
+      "plugin-categorylist": [
+         "News system",
+         "main (development)",
+         "UsersManual/Plugins/Index.html#plugin-categorylist",
+         "Category menu"
+      ],
+      "plugin-datemenu": [
+         "News system",
+         "main (development)",
+         "UsersManual/Plugins/Index.html#plugin-datemenu",
+         "Date menu"
+      ],
+      "plugin-detail": [
+         "News system",
+         "main (development)",
+         "UsersManual/Plugins/Index.html#plugin-detail",
+         "Detail"
+      ],
+      "plugin-list": [
+         "News system",
+         "main (development)",
+         "UsersManual/Plugins/Index.html#plugin-list",
+         "List"
+      ],
+      "plugin-searchform": [
+         "News system",
+         "main (development)",
+         "UsersManual/Plugins/Index.html#plugin-searchform",
+         "Search form"
+      ],
+      "plugin-searchresult": [
+         "News system",
+         "main (development)",
+         "UsersManual/Plugins/Index.html#plugin-searchresult",
+         "Search result"
+      ],
+      "plugin-taglist": [
+         "News system",
+         "main (development)",
+         "UsersManual/Plugins/Index.html#plugin-taglist",
+         "Tag list"
+      ],
+      "predefinevalues": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/PredefineFields/Index.html#predefinevalues",
+         "Predefine values"
+      ],
+      "proxyclassgenerator": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/ProxyClassGenerator/Index.html#proxyclassgenerator",
+         "Add custom fields"
+      ],
+      "py-modindex": [
+         "News system",
+         "main (development)",
+         "py-modindex.html",
+         "Python Module Index"
+      ],
+      "quickconfiguration": [
+         "News system",
+         "main (development)",
+         "QuickStart/Configuration.html#quickconfiguration",
+         "Quick configuration"
+      ],
+      "quickcontent": [
+         "News system",
+         "main (development)",
+         "QuickStart/CreateRecords.html#quickcontent",
+         "Create some initial content"
+      ],
+      "quickinstallation": [
+         "News system",
+         "main (development)",
+         "QuickStart/Installation.html#quickinstallation",
+         "Quick installation"
+      ],
+      "quicknewsrecords": [
+         "News system",
+         "main (development)",
+         "QuickStart/CreateRecords.html#quicknewsrecords",
+         "Create news records"
+      ],
+      "quickpagestructure": [
+         "News system",
+         "main (development)",
+         "QuickStart/CreateRecords.html#quickpagestructure",
+         "Recommended page structure"
+      ],
+      "quickstart": [
+         "News system",
+         "main (development)",
+         "QuickStart/Index.html#quickstart",
+         "Quick start"
+      ],
+      "quicktemplating": [
+         "News system",
+         "main (development)",
+         "QuickStart/Templating.html#quicktemplating",
+         "Quick templating in Fluid"
+      ],
+      "realurl": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Realurl/Index.html#realurl",
+         "Replace RealURL with routing"
+      ],
+      "recordcategory": [
+         "News system",
+         "main (development)",
+         "UsersManual/Records/Category/Index.html#recordcategory",
+         "Category"
+      ],
+      "recordnews": [
+         "News system",
+         "main (development)",
+         "UsersManual/Records/News/Index.html#recordnews",
+         "News"
+      ],
+      "records": [
+         "News system",
+         "main (development)",
+         "UsersManual/Records/Index.html#records",
+         "Records"
+      ],
+      "recordtag": [
+         "News system",
+         "main (development)",
+         "UsersManual/Records/Tag/Index.html#recordtag",
+         "Tag"
+      ],
+      "reference": [
+         "News system",
+         "main (development)",
+         "Reference/Index.html#reference",
+         "Reference"
+      ],
+      "referenceevents": [
+         "News system",
+         "main (development)",
+         "Reference/Events/Index.html#referenceevents",
+         "Events"
+      ],
+      "rendercontentelements": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/RenderContentElements/Index.html#rendercontentelements",
+         "Render content elements"
+      ],
+      "routing": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Routing/Index.html#routing",
+         "Use Routing to rewrite URLs"
+      ],
+      "rss": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Rss/Index.html#rss",
+         "RSS feed"
+      ],
+      "search": [
+         "News system",
+         "main (development)",
+         "search.html",
+         "Search Page"
+      ],
+      "seo": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Seo/Index.html#seo",
+         "SEO"
+      ],
+      "seo_language_menus": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Seo/Index.html#seo-language-menus",
+         "Language menu on news detail pages"
+      ],
+      "sponsoring": [
+         "News system",
+         "main (development)",
+         "Introduction/Sponsoring/Index.html#sponsoring",
+         "Sponsoring"
+      ],
+      "support": [
+         "News system",
+         "main (development)",
+         "Introduction/Support/Index.html#support",
+         "Need Support?"
+      ],
+      "support-personal": [
+         "News system",
+         "main (development)",
+         "Introduction/Support/Index.html#support-personal",
+         "Personal support"
+      ],
+      "support-slack": [
+         "News system",
+         "main (development)",
+         "Introduction/Support/Index.html#support-slack",
+         "Slack"
+      ],
+      "support-stackoverflow": [
+         "News system",
+         "main (development)",
+         "Introduction/Support/Index.html#support-stackoverflow",
+         "Stackoverflow"
+      ],
+      "templatesbootstrap": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/TwitterBootstrap/Index.html#templatesbootstrap",
+         "Bootstrap templates"
+      ],
+      "templatesgroupnews": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/GroupNewsRecords/Index.html#templatesgroupnews",
+         "Group news records"
+      ],
+      "templatesmultiplecats": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/MultiCategorySelection/Index.html#templatesmultiplecats",
+         "Filter news by multiple categories"
+      ],
+      "templatesselector": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/TemplateSelector/Index.html#templatesselector",
+         "Template selector"
+      ],
+      "templatessnippets": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/Snippets/Index.html#templatessnippets",
+         "Assorted snippets"
+      ],
+      "templatingexamples": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/Index.html#templatingexamples",
+         "Templates"
+      ],
+      "templatingsitepackage": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/Start/Index.html#templatingsitepackage",
+         "Use a site package extension"
+      ],
+      "templatingstart": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/Start/Index.html#templatingstart",
+         "Changing & editing templates"
+      ],
+      "thanks": [
+         "News system",
+         "main (development)",
+         "Introduction/Sponsoring/Index.html#thanks",
+         "Sponsoring"
+      ],
+      "ts": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/Index.html#ts",
+         "TypoScript"
+      ],
+      "tsanalyticssocial": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsanalyticssocial",
+         "analytics.social"
+      ],
+      "tsarchiverestriction": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsarchiverestriction",
+         "Archive archiveRestriction"
+      ],
+      "tsbackpid": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsbackpid",
+         "PageId to return to backPid"
+      ],
+      "tscategories": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tscategories",
+         "Category selection categories"
+      ],
+      "tscategoryconjunction": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tscategoryconjunction",
+         "Category mode categoryConjunction"
+      ],
+      "tsconfig": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Index.html#tsconfig",
+         "TsConfig"
+      ],
+      "tsconfigadministration": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#tsconfigadministration",
+         "Administration module"
+      ],
+      "tsconfigallowedpage": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#tsconfigallowedpage",
+         "allowedPage"
+      ],
+      "tsconfigalwaysshowfilter_": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#tsconfigalwaysshowfilter",
+         "alwaysShowFilter"
+      ],
+      "tsconfigarchive": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#tsconfigarchive",
+         "archive"
+      ],
+      "tsconfigcategoryrestrictionforflexforms": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#tsconfigcategoryrestrictionforflexforms",
+         "categoryRestrictionForFlexForms"
+      ],
+      "tsconfigcolumns": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#tsconfigcolumns",
+         "columns"
+      ],
+      "tsconfigdefaultpid": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#tsconfigdefaultpid",
+         "defaultPid"
+      ],
+      "tsconfiggeneral": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#tsconfiggeneral",
+         "General configuration"
+      ],
+      "tsconfigplugin": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Plugin.html#tsconfigplugin",
+         "Plugin configuration"
+      ],
+      "tsconfigpreselect": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#tsconfigpreselect",
+         "preselect"
+      ],
+      "tsconfigredirecttopageonstart": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/Administration.html#tsconfigredirecttopageonstart",
+         "redirectToPageOnStart"
+      ],
+      "tsconfigshowcontentelementsinnewssysfolder": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#tsconfigshowcontentelementsinnewssysfolder",
+         "showContentElementsInNewsSysFolder"
+      ],
+      "tsconfigslugprefix": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#tsconfigslugprefix",
+         "slugPrefix"
+      ],
+      "tsconfigtagpid": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#tsconfigtagpid",
+         "tagPid"
+      ],
+      "tsconfigtemplatelayouts": [
+         "News system",
+         "main (development)",
+         "Reference/TsConfig/General.html#tsconfigtemplatelayouts",
+         "templateLayouts"
+      ],
+      "tscropmaxcharacters": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tscropmaxcharacters",
+         "Length of teaser (in chars) cropMaxCharacters"
+      ],
+      "tscssfile": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tscssfile",
+         "cssFile"
+      ],
+      "tsdatefield": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsdatefield",
+         "Date field to use dateField"
+      ],
+      "tsdefaultdetailpid": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdefaultdetailpid",
+         "defaultDetailPid"
+      ],
+      "tsdemandclass": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdemandclass",
+         "demandClass"
+      ],
+      "tsdetailcheckpidofnewsrecord": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdetailcheckpidofnewsrecord",
+         "detail.checkPidOfNewsRecord"
+      ],
+      "tsdetailerrorhandling": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdetailerrorhandling",
+         "detail.errorHandling"
+      ],
+      "tsdetailmedia": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdetailmedia",
+         "detail.media"
+      ],
+      "tsdetailpid": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsdetailpid",
+         "PageId for single news display detailPid"
+      ],
+      "tsdetailpiddetermination": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdetailpiddetermination",
+         "detailPidDetermination"
+      ],
+      "tsdetailregisterproperties": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdetailregisterproperties",
+         "detail.registerProperties"
+      ],
+      "tsdetailshowmetatags": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdetailshowmetatags",
+         "detail.showMetaTags"
+      ],
+      "tsdetailshowprevnext": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdetailshowprevnext",
+         "detail.showPrevNext"
+      ],
+      "tsdetailshowsocialsharebuttons": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdetailshowsocialsharebuttons",
+         "detail.showSocialShareButtons"
+      ],
+      "tsdisableoverridedemand": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsdisableoverridedemand",
+         "Disable override demand disableOverrideDemand"
+      ],
+      "tsdisplaydummyifnomedia": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsdisplaydummyifnomedia",
+         "displayDummyIfNoMedia"
+      ],
+      "tsexcludealreadydisplayednews": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsexcludealreadydisplayednews",
+         "Exclude already displayed news excludeAlreadyDisplayedNews"
+      ],
+      "tsfacebooklocale": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsfacebooklocale",
+         "facebookLocale"
+      ],
+      "tsformat": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsformat",
+         "format"
+      ],
+      "tshideidlist": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tshideidlist",
+         "hideIdList"
+      ],
+      "tshidepagination": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tshidepagination",
+         "Hide the pagination hidePagination"
+      ],
+      "tsincludesubcategories": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsincludesubcategories",
+         "Include subcategories includeSubCategories"
+      ],
+      "tslimit": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tslimit",
+         "Max records displayed limit"
+      ],
+      "tslinkhrdate": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tslinkhrdate",
+         "link.hrDate"
+      ],
+      "tslinktypesopeninginnewwindow": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tslinktypesopeninginnewwindow",
+         "link.typesOpeningInNewWindow"
+      ],
+      "tslistpaginate": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tslistpaginate",
+         "list.paginate"
+      ],
+      "tslistpaginateitemsperpage": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tslistpaginateitemsperpage",
+         "Items per Page list.paginate.itemsPerPage"
+      ],
+      "tslistpid": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tslistpid",
+         "PageId for list display listPid"
+      ],
+      "tslistrss": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tslistrss",
+         "list.rss"
+      ],
+      "tsmediamaxheight": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsmediamaxheight",
+         "Max height for media elements media.maxHeight"
+      ],
+      "tsmediamaxwidth": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsmediamaxwidth",
+         "Max width for media elements media.maxWidth"
+      ],
+      "tsoffset": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsoffset",
+         "Starting with given news record offset"
+      ],
+      "tsopengraph": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsopengraph",
+         "opengraph"
+      ],
+      "tsorderby": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsorderby",
+         "Sort by orderBy"
+      ],
+      "tsorderbyallowed": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsorderbyallowed",
+         "orderByAllowed"
+      ],
+      "tsorderdirection": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsorderdirection",
+         "Sort direction orderDirection"
+      ],
+      "tsoverrideflexformsettingsifempty": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tsoverrideflexformsettingsifempty",
+         "overrideFlexformSettingsIfEmpty"
+      ],
+      "tspreviewhiddenrecords": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tspreviewhiddenrecords",
+         "Allow preview of hidden records previewHiddenRecords"
+      ],
+      "tsrecursive": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsrecursive",
+         "Recursive recursive"
+      ],
+      "tssearchfields": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#tssearchfields",
+         "search.fields"
+      ],
+      "tssinglenews": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tssinglenews",
+         "Show a single news record singleNews"
+      ],
+      "tsstartingpoint": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tsstartingpoint",
+         "Startingpoint startingpoint"
+      ],
+      "tstags": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tstags",
+         "Tags tags"
+      ],
+      "tstemplatelayout": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tstemplatelayout",
+         "Template Layout templateLayout"
+      ],
+      "tstimerestriction": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tstimerestriction",
+         "Time limit (LOW) timeRestriction"
+      ],
+      "tstimerestrictionhigh": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tstimerestrictionhigh",
+         "Time limit (HIGH) timeRestrictionHigh"
+      ],
+      "tstopnewsfirst": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tstopnewsfirst",
+         "Sort \"Top news\" before topNewsFirst"
+      ],
+      "tstopnewsrestriction": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#tstopnewsrestriction",
+         "Top news topNewsRestriction"
+      ],
+      "tutorialextendnews": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExtendNews/Index.html#tutorialextendnews",
+         "Extend News"
+      ],
+      "tutorials": [
+         "News system",
+         "main (development)",
+         "Tutorials/Index.html#tutorials",
+         "Tutorials"
+      ],
+      "tutorialsbestpractice": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/Index.html#tutorialsbestpractice",
+         "Best practice"
+      ],
+      "tutorialsexternal": [
+         "News system",
+         "main (development)",
+         "Tutorials/ExternalTutorials.html#tutorialsexternal",
+         "External tutorials"
+      ],
+      "typoscript": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/Index.html#typoscript",
+         "TypoScript"
+      ],
+      "typoscriptgeneral": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/GeneralSettings.html#typoscriptgeneral",
+         "General settings"
+      ],
+      "typoscriptplugin": [
+         "News system",
+         "main (development)",
+         "Reference/TypoScript/PluginSettings.html#typoscriptplugin",
+         "Plugin settings"
+      ],
+      "usermanual": [
+         "News system",
+         "main (development)",
+         "UsersManual/Index.html#usermanual",
+         "Editors manual"
+      ],
+      "viewbutton": [
+         "News system",
+         "main (development)",
+         "Tutorials/BestPractice/PreviewOfRecord/Index.html#viewbutton",
+         "View button"
+      ],
+      "viewhelperlink": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/LinkViewHelper.html#viewhelperlink",
+         "LinkViewHelper"
+      ],
+      "viewhelpersreference": [
+         "News system",
+         "main (development)",
+         "Reference/ViewHelpers/Index.html#viewhelpersreference",
+         "ViewHelpers reference"
+      ],
+      "viewhelperstutorial": [
+         "News system",
+         "main (development)",
+         "Tutorials/Templates/ViewHelpers/Index.html#viewhelperstutorial",
+         "ViewHelpers"
+      ],
+      "whatdoesitdo": [
+         "News system",
+         "main (development)",
+         "Introduction/About/Index.html#whatdoesitdo",
+         "What does it do?"
+      ]
+   }
+}

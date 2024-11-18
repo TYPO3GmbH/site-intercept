@@ -1,0 +1,524 @@
+{
+    "std:doc": {
+        "Configuration\/General": [
+            "<project>",
+            "main",
+            "Configuration\/General.html",
+            "General configuration"
+        ],
+        "Configuration\/Index": [
+            "<project>",
+            "main",
+            "Configuration\/Index.html",
+            "Configuration"
+        ],
+        "Configuration\/TSconfig": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html",
+            "TSconfig reference"
+        ],
+        "Configuration\/TypoScriptReference\/Constants": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Constants.html",
+            "Constants"
+        ],
+        "Configuration\/TypoScriptReference\/Index": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Index.html",
+            "TypoScript reference"
+        ],
+        "Configuration\/TypoScriptReference\/Setup": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Setup.html",
+            "Setup"
+        ],
+        "Developer\/Index": [
+            "<project>",
+            "main",
+            "Developer\/Index.html",
+            "Developer corner"
+        ],
+        "Editor\/Index": [
+            "<project>",
+            "main",
+            "Editor\/Index.html",
+            "For Editors"
+        ],
+        "Index": [
+            "<project>",
+            "main",
+            "Index.html",
+            "<project>"
+        ],
+        "Installation\/Index": [
+            "<project>",
+            "main",
+            "Installation\/Index.html",
+            "Installation"
+        ],
+        "Introduction\/Index": [
+            "<project>",
+            "main",
+            "Introduction\/Index.html",
+            "Introduction"
+        ],
+        "KnownProblems\/Index": [
+            "<project>",
+            "main",
+            "KnownProblems\/Index.html",
+            "Known problems"
+        ],
+        "Sitemap": [
+            "<project>",
+            "main",
+            "Sitemap.html",
+            "Sitemap"
+        ],
+        "Templates\/Examples": [
+            "<project>",
+            "main",
+            "Templates\/Examples.html",
+            "Templating examples"
+        ],
+        "Templates\/Index": [
+            "<project>",
+            "main",
+            "Templates\/Index.html",
+            "Templates"
+        ],
+        "Templates\/Override": [
+            "<project>",
+            "main",
+            "Templates\/Override.html",
+            "Overriding templates"
+        ],
+        "Templates\/ViewHelpers": [
+            "<project>",
+            "main",
+            "Templates\/ViewHelpers.html",
+            "Custom ViewHelpers"
+        ]
+    },
+    "std:label": {
+        "configuration-general": [
+            "<project>",
+            "main",
+            "Configuration\/General.html#configuration-general",
+            "General configuration"
+        ],
+        "configuration-typical": [
+            "<project>",
+            "main",
+            "Configuration\/General.html#configuration_typical",
+            "Typical example"
+        ],
+        "configuration-example": [
+            "<project>",
+            "main",
+            "Configuration\/General.html#configuration_example",
+            "Typical example"
+        ],
+        "configuration": [
+            "<project>",
+            "main",
+            "Configuration\/Index.html#configuration",
+            "Configuration"
+        ],
+        "configuration-tsconfig": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html#configuration-tsconfig",
+            "TSconfig reference"
+        ],
+        "configuration-tsconfig-page": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html#configuration-tsconfig_page",
+            "User TSconfig"
+        ],
+        "configuration-tsconfig-user": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html#configuration-tsconfig_user",
+            "Page TSconfig"
+        ],
+        "configuration-typoscript-constants": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Constants.html#configuration-typoscript-constants",
+            "Constants"
+        ],
+        "configuration-typoscript": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Index.html#configuration-typoscript",
+            "TypoScript reference"
+        ],
+        "configuration-typoscript-setup": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Setup.html#configuration-typoscript-setup",
+            "Setup"
+        ],
+        "developer": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#developer",
+            "Developer corner"
+        ],
+        "developer-api": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#developer-api",
+            "API"
+        ],
+        "for-editors": [
+            "<project>",
+            "main",
+            "Editor\/Index.html#for-editors",
+            "For Editors"
+        ],
+        "editor-faq": [
+            "<project>",
+            "main",
+            "Editor\/Index.html#editor-faq",
+            "FAQ"
+        ],
+        "start": [
+            "<project>",
+            "main",
+            "Index.html#start",
+            "<project>"
+        ],
+        "installation": [
+            "<project>",
+            "main",
+            "Installation\/Index.html#installation",
+            "Installation"
+        ],
+        "introduction": [
+            "<project>",
+            "main",
+            "Introduction\/Index.html#introduction",
+            "Introduction"
+        ],
+        "what-it-does": [
+            "<project>",
+            "main",
+            "Introduction\/Index.html#what-it-does",
+            "What does it do?"
+        ],
+        "screenshots": [
+            "<project>",
+            "main",
+            "Introduction\/Index.html#screenshots",
+            "Screenshots"
+        ],
+        "known-problems": [
+            "<project>",
+            "main",
+            "KnownProblems\/Index.html#known-problems",
+            "Known problems"
+        ],
+        "templates-examples": [
+            "<project>",
+            "main",
+            "Templates\/Examples.html#templates-examples",
+            "Templating examples"
+        ],
+        "templates": [
+            "<project>",
+            "main",
+            "Templates\/Index.html#templates",
+            "Templates"
+        ],
+        "templates-override": [
+            "<project>",
+            "main",
+            "Templates\/Override.html#templates-override",
+            "Overriding templates"
+        ],
+        "templates-viewhelpers": [
+            "<project>",
+            "main",
+            "Templates\/ViewHelpers.html#templates-viewhelpers",
+            "Custom ViewHelpers"
+        ]
+    },
+    "std:title": {
+        "general-configuration": [
+            "<project>",
+            "main",
+            "Configuration\/General.html#general-configuration",
+            "General configuration"
+        ],
+        "typical-example": [
+            "<project>",
+            "main",
+            "Configuration\/General.html#typical-example",
+            "Typical example"
+        ],
+        "configuration-1": [
+            "<project>",
+            "main",
+            "Configuration\/Index.html#configuration-1",
+            "Configuration"
+        ],
+        "tsconfig-reference": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html#tsconfig-reference",
+            "TSconfig reference"
+        ],
+        "user-tsconfig": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html#user-tsconfig",
+            "User TSconfig"
+        ],
+        "page-tsconfig": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html#page-tsconfig",
+            "Page TSconfig"
+        ],
+        "constants": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Constants.html#constants",
+            "Constants"
+        ],
+        "enable-disable-some-options": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Setup.html#enable-disable-some-options",
+            "Enable \/ disable some options"
+        ],
+        "configure-page-ids": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Constants.html#configure-page-ids",
+            "Configure page ids"
+        ],
+        "typoscript-reference": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Index.html#typoscript-reference",
+            "TypoScript reference"
+        ],
+        "setup": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Setup.html#setup",
+            "Setup"
+        ],
+        "developer-corner": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#developer-corner",
+            "Developer corner"
+        ],
+        "api": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#api",
+            "API"
+        ],
+        "interfaces": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#interfaces",
+            "Interfaces"
+        ],
+        "examples": [
+            "<project>",
+            "main",
+            "Templates\/ViewHelpers.html#examples",
+            "Examples"
+        ],
+        "for-editors-1": [
+            "<project>",
+            "main",
+            "Editor\/Index.html#for-editors-1",
+            "For Editors"
+        ],
+        "faq": [
+            "<project>",
+            "main",
+            "Editor\/Index.html#faq",
+            "FAQ"
+        ],
+        "project": [
+            "<project>",
+            "main",
+            "Index.html#project",
+            "<project>"
+        ],
+        "installation-1": [
+            "<project>",
+            "main",
+            "Installation\/Index.html#installation-1",
+            "Installation"
+        ],
+        "introduction-1": [
+            "<project>",
+            "main",
+            "Introduction\/Index.html#introduction-1",
+            "Introduction"
+        ],
+        "what-does-it-do": [
+            "<project>",
+            "main",
+            "Introduction\/Index.html#what-does-it-do",
+            "What does it do?"
+        ],
+        "screenshots": [
+            "<project>",
+            "main",
+            "Introduction\/Index.html#screenshots",
+            "Screenshots"
+        ],
+        "known-problems-1": [
+            "<project>",
+            "main",
+            "KnownProblems\/Index.html#known-problems-1",
+            "Known problems"
+        ],
+        "sitemap": [
+            "<project>",
+            "main",
+            "Sitemap.html#sitemap",
+            "Sitemap"
+        ],
+        "templating-examples": [
+            "<project>",
+            "main",
+            "Templates\/Examples.html#templating-examples",
+            "Templating examples"
+        ],
+        "templates-1": [
+            "<project>",
+            "main",
+            "Templates\/Index.html#templates-1",
+            "Templates"
+        ],
+        "overriding-templates": [
+            "<project>",
+            "main",
+            "Templates\/Override.html#overriding-templates",
+            "Overriding templates"
+        ],
+        "change-the-templates-using-typoscript-constants": [
+            "<project>",
+            "main",
+            "Templates\/Override.html#change-the-templates-using-typoscript-constants",
+            "Change the templates using TypoScript constants"
+        ],
+        "custom-viewhelpers": [
+            "<project>",
+            "main",
+            "Templates\/ViewHelpers.html#custom-viewhelpers",
+            "Custom ViewHelpers"
+        ],
+        "all-viewhelpers": [
+            "<project>",
+            "main",
+            "Templates\/ViewHelpers.html#all-viewhelpers",
+            "All ViewHelpers"
+        ],
+        "exampletag": [
+            "<project>",
+            "main",
+            "Templates\/ViewHelpers.html#exampletag",
+            "exampleTag"
+        ],
+        "basic-example": [
+            "<project>",
+            "main",
+            "Templates\/ViewHelpers.html#basic-example",
+            "Basic Example"
+        ]
+    },
+    "std:confval": {
+        "enablesomething": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html#enablesomething",
+            "enableSomething"
+        ],
+        "limitsomething": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html#limitsomething",
+            "limitSomething"
+        ],
+        "someimportantpages": [
+            "<project>",
+            "main",
+            "Configuration\/TSconfig.html#someimportantpages",
+            "someImportantPages"
+        ],
+        "enablethis": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Constants.html#enablethis",
+            "enableThis"
+        ],
+        "storageid": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Constants.html#storageid",
+            "storageId"
+        ],
+        "enablethat": [
+            "<project>",
+            "main",
+            "Configuration\/TypoScriptReference\/Setup.html#enablethat",
+            "enableThat"
+        ]
+    },
+    "php:interface": {
+        "vendor-myextension-interfaces-exampleinterface": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#vendor-myextension-interfaces-exampleinterface",
+            "\\Vendor\\MyExtension\\Interfaces\\ExampleInterface"
+        ],
+        "vendor-myextension-interfaces-anotherimportantinterface": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#vendor-myextension-interfaces-anotherimportantinterface",
+            "\\Vendor\\MyExtension\\Interfaces\\AnotherImportantInterface"
+        ],
+        "vendor-myextension-interfaces-requirejsmoduleinterface": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#vendor-myextension-interfaces-requirejsmoduleinterface",
+            "\\Vendor\\MyExtension\\Interfaces\\RequireJsModuleInterface"
+        ]
+    },
+    "php:method": {
+        "vendor-myextension-interfaces-exampleinterface-methodone": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#vendor-myextension-interfaces-exampleinterface-methodone",
+            "\\Vendor\\MyExtension\\Interfaces\\ExampleInterface::methodOne"
+        ],
+        "vendor-myextension-interfaces-requirejsmoduleinterface-getrequirejsmodules": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#vendor-myextension-interfaces-requirejsmoduleinterface-getrequirejsmodules",
+            "\\Vendor\\MyExtension\\Interfaces\\RequireJsModuleInterface::getRequireJsModules"
+        ],
+        "vendor-myextension-interfaces-requirejsmoduleinterface-setdate": [
+            "<project>",
+            "main",
+            "Developer\/Index.html#vendor-myextension-interfaces-requirejsmoduleinterface-setdate",
+            "\\Vendor\\MyExtension\\Interfaces\\RequireJsModuleInterface::setDate"
+        ]
+    }
+}
