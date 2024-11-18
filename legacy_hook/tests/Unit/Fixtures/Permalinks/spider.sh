@@ -14,6 +14,8 @@ wget -x --cut-dirs=0 -nH https://docs.typo3.org/m/typo3/reference-coreapi/12.4/e
 wget -x --cut-dirs=0 -nH https://docs.typo3.org/m/typo3/reference-coreapi/13.4/en-us/objects.inv.json
 wget -x --cut-dirs=0 -nH https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/objects.inv.json
 
+wget -x --cut-dirs=0 -nH https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/objects.inv.json
+
 ### OTHER TYPO3-docs without inventory
 wget -x --cut-dirs=0 -nH https://docs.typo3.org/other/typo3/view-helper-reference/13.4/en-us/objects.inv.json
 wget -x --cut-dirs=0 -nH https://docs.typo3.org/other/typo3/view-helper-reference/main/en-us/objects.inv.json

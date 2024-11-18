@@ -51,14 +51,34 @@ class PermalinksTest extends TestCase
     {
         return [
             'core manual, wrong anchor' => [
-                    'permalink' => 'changelog:important-4711',
+                'permalink' => 'changelog:important-4711',
             ],
-
-            'core cms-package manual, wrong number version' => [
-                'permalink' => 'typo3-cms-seo:developer@47.11',
+            'missing inventory' => [
+                'permalink' => 't3tsconfiguration:nothing',
             ],
-            'core cms-package manual, wrong named version' => [
-                'permalink' => 'typo3-cms-seo:developer@superunstable',
+            'missing composer package' => [
+                'permalink' => 'georgringer-nonews:nothing',
+            ],
+            'missing repository' => [
+                'permalink' => 'typo3-cms',
+            ],
+            'missing split repository' => [
+                'permalink' => 'typo3-cms-seo',
+            ],
+            'only version' => [
+                'permalink' => '@12.4',
+            ],
+            'only version, slash' => [
+                'permalink' => '/@12.4',
+            ],
+            'only version, repo' => [
+                'permalink' => 'repo:@12.4',
+            ],
+            'only version, multi repo' => [
+                'permalink' => 'repo:repo:repo',
+            ],
+            'too many slashes' => [
+                'permalink' => '../../../../../../../../../etc/passwd',
             ],
         ];
     }
@@ -162,7 +182,26 @@ class PermalinksTest extends TestCase
                 'location' => 'https://docs.typo3.org/p/georgringer/news/10.0/en-us/Reference/Index.html#reference',
             ],
 
+            // Soft-fail to main
+            'core cms-package manual, wrong number version' => [
+                'permalink' => 'typo3-cms-seo:developer@47.11',
+                'location' => 'https://docs.typo3.org/c/typo3/cms-seo/main/en-us/Developer/Index.html#developer',
+            ],
+            'core cms-package manual, wrong named version' => [
+                'permalink' => 'typo3-cms-seo:developer@superunstable',
+                'location' => 'https://docs.typo3.org/c/typo3/cms-seo/main/en-us/Developer/Index.html#developer',
+            ],
+
             # Confval example
+            'confval tlo resolve' => [
+                'permalink' => 't3tsref:tlo-module-properties-settings',
+                'location' => 'https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/TopLevelObjects/Module.html#tlo-module-properties-settings',
+            ],
+
+            'confval resolve' => [
+                'permalink' => 't3tsref:confval-module-settings',
+                'location' => 'https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/TopLevelObjects/Module.html#confval-module-settings',
+            ],
         ];
     }
 
