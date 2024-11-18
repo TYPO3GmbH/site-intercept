@@ -108,6 +108,8 @@ use T3Docs\VersionHandling\Typo3VersionMapping;
  */
 final readonly class DocumentationLinker
 {
+    private const MAIN_IDENTIFIER = 'main';
+
     private FilesystemAdapter $cache;
     private int $cacheTime;
 
@@ -138,18 +140,24 @@ final readonly class DocumentationLinker
     public function resolvePermalink(string $url): ResponseDescriber
     {
         if (preg_match(
-            '/^' .
-            '([a-z0-9\-_]+):' .         // $repository
-            '([a-z0-9\-_]+)' .          // $index
-            '(@[a-z0-9\.-]+)?' .        // $version
-            '$/imsU',
-            $url,
-            $matches)
+              '/^' .
+              '([a-z0-9\-_]+):' .         // $repository
+              '([a-z0-9\-_]+)' .          // $index
+              '(@[a-z0-9\.-]+)?' .        // $version
+              '$/imsU',
+              $url,
+              $matches)
         ) {
             [, $repository, $index] = $matches;
-            $version = str_replace('@', '', $matches[3] ?? '') ?: 'main';
+            $version = str_replace('@', '', $matches[3] ?? '') ?: self::MAIN_IDENTIFIER;
             $entrypoint = $this->resolveEntryPoint($repository, $version);
             $objectsContents = $this->getObjectsFile($entrypoint);
+
+            if ($objectsContents === '' && $version !== self::MAIN_IDENTIFIER) {
+                // soft-fail to resolve a maybe not-yet released version to main.
+                $entrypoint = $this->resolveEntryPoint($repository, self::MAIN_IDENTIFIER);
+                $objectsContents = $this->getObjectsFile($entrypoint);
+            }
 
             if ($objectsContents === '') {
                 return new ResponseDescriber(404, [], 'Invalid shortcode, no objects.inv.json found.');
@@ -205,7 +213,7 @@ final readonly class DocumentationLinker
                         // std:confval + pagelink.html#some-entry
                         // to:
                         // pagelink.html#confval-some-entry
-                        $link = str_replace('#', '#-' . $docNodeTypeParts[1], $indexMetaData[2]);
+                        $link = str_replace('#', '#' . $docNodeTypeParts[1] . '-', $indexMetaData[2]);
                     }
                 }
             }
