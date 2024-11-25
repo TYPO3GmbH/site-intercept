@@ -232,7 +232,7 @@ final readonly class DocumentationLinker
         } elseif ($inventory = DefaultInventories::tryFrom($repository)) {
             // CASE: Official TYPO3 Documentation with known inventories. Provides "{typo3_version}" internally
             // (some inventories DO NOT have that and always go to 'main'!)
-            $entrypoint = $inventory->getUrl();
+            $entrypoint = $inventory->getUrl($version);
         } else {
             // CASE: Third party documentation, based on composer-keys like https://docs.typo3.org/p/georgringer/news
             //       A permalink like https://docs.typo3.org/permalink/someVendor-some-extension/ is resolved to https://docs.typo3.org/p/somevendor/some-extension/

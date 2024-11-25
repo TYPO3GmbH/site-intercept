@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "213392227f486ccbd5133ddebbb38522",
+    "content-hash": "af2a6c9fcd988358618d45e871897cb9",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -1311,16 +1311,16 @@
         },
         {
             "name": "t3docs/typo3-version-handling",
-            "version": "0.16.3",
+            "version": "0.21.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TYPO3-Documentation/t3docs-typo3-version-handling.git",
-                "reference": "59a8e5c0a3ccc1370db929f7696509145ba19931"
+                "reference": "9548ef3cc6575c6d4fa991032dfeb110e47c0dea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TYPO3-Documentation/t3docs-typo3-version-handling/zipball/59a8e5c0a3ccc1370db929f7696509145ba19931",
-                "reference": "59a8e5c0a3ccc1370db929f7696509145ba19931",
+                "url": "https://api.github.com/repos/TYPO3-Documentation/t3docs-typo3-version-handling/zipball/9548ef3cc6575c6d4fa991032dfeb110e47c0dea",
+                "reference": "9548ef3cc6575c6d4fa991032dfeb110e47c0dea",
                 "shasum": ""
             },
             "type": "library",
@@ -1336,9 +1336,9 @@
             "description": "Version Handling for TYPO3 Documentation",
             "support": {
                 "issues": "https://github.com/TYPO3-Documentation/t3docs-typo3-version-handling/issues",
-                "source": "https://github.com/TYPO3-Documentation/t3docs-typo3-version-handling/tree/0.16.3"
+                "source": "https://github.com/TYPO3-Documentation/t3docs-typo3-version-handling/tree/0.21.0"
             },
-            "time": "2024-10-30T14:36:49+00:00"
+            "time": "2024-11-25T08:20:48+00:00"
         }
     ],
     "packages-dev": [
