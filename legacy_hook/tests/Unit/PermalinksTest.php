@@ -11,7 +11,6 @@ namespace App\Tests\Unit;
  */
 
 use App\DocumentationLinker;
-use App\NotFoundApplication;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -181,6 +180,10 @@ class PermalinksTest extends TestCase
                 'permalink' => 'georgringer-news:reference@10.0',
                 'location' => 'https://docs.typo3.org/p/georgringer/news/10.0/en-us/Reference/Index.html#reference',
             ],
+            'Third party docs, 10.0 version, underscores' => [
+                'permalink' => 'georgringer-news:how_to_rewrite_urls@10.0',
+                'location' => 'https://docs.typo3.org/p/georgringer/news/10.0/en-us/Tutorials/BestPractice/Routing/Index.html#how-to-rewrite-urls',
+            ],
 
             // Soft-fail to main
             'core cms-package manual, wrong number version' => [
@@ -201,6 +204,40 @@ class PermalinksTest extends TestCase
             'confval resolve' => [
                 'permalink' => 't3tsref:confval-module-settings',
                 'location' => 'https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/TopLevelObjects/Module.html#confval-module-settings',
+            ],
+
+            # Lower/Uppercase normalization
+            'Other documentation, no version, UPPER/lower casing' => [
+                'permalink' => 'T3RENDERGUIDES:ajaxversions-data-attributes',
+                'location' => 'https://docs.typo3.org/other/t3docs/render-guides/main/en-us/Developer/AjaxVersions.html#AjaxVersions-data-attributes',
+            ],
+            'Other documentation, main version, UPPER/lower casing' => [
+                'permalink' => 't3renderguides:AJAXversions-data-attributes@MAIN',
+                'location' => 'https://docs.typo3.org/other/t3docs/render-guides/main/en-us/Developer/AjaxVersions.html#AjaxVersions-data-attributes',
+            ],
+            'Other documentation, 0.19 version, UPPER/lower casing' => [
+                'permalink' => 't3RENDERguides:AjaxVersions-Data-Attributes@0.19',
+                'location' => 'https://docs.typo3.org/other/t3docs/render-guides/main/en-us/Developer/AjaxVersions.html#AjaxVersions-data-attributes',
+            ],
+            'Other documentation, wrong numbered version, UPPER/lower casing' => [
+                'permalink' => 't3renderguides:ajaxversions-data-attributes@13.4',
+                'location' => 'https://docs.typo3.org/other/t3docs/render-guides/main/en-us/Developer/AjaxVersions.html#AjaxVersions-data-attributes',
+            ],
+            'official "other" manual, no version, UPPER/lower case' => [
+                'permalink' => 't3VIEWhelper:TYPO3fluid-fluid-comment',
+                'location' => 'https://docs.typo3.org/other/typo3/view-helper-reference/main/en-us/Global/Comment.html#typo3fluid-fluid-comment',
+            ],
+            'official "other" manual, main version, UPPER/lower case' => [
+                'permalink' => 'T3VIEWHELPER:tyPO3fluid-FLuid-Comment@MaIn',
+                'location' => 'https://docs.typo3.org/other/typo3/view-helper-reference/main/en-us/Global/Comment.html#typo3fluid-fluid-comment',
+            ],
+            'official "other" manual, 13.4 version, UPPER/lower case' => [
+                'permalink' => 't3viewhelper:typO3fluid-FLUID-comment@13.4',
+                'location' => 'https://docs.typo3.org/other/typo3/view-helper-reference/13.4/en-us/Global/Comment.html#typo3fluid-fluid-comment',
+            ],
+            'Third party docs, 10.0 version, underscores, UPPER/lower case' => [
+                'permalink' => 'georgringer-NEWS:How_To_rEwrite_Urls@10.0',
+                'location' => 'https://docs.typo3.org/p/georgringer/news/10.0/en-us/Tutorials/BestPractice/Routing/Index.html#how-to-rewrite-urls',
             ],
         ];
     }

@@ -149,7 +149,10 @@ final readonly class DocumentationLinker
               $matches)
         ) {
             [, $repository, $index] = $matches;
-            $version = str_replace('@', '', $matches[3] ?? '') ?: self::MAIN_IDENTIFIER;
+            $repository = mb_strtolower($repository);
+            $index = mb_strtolower($index);
+            $version = mb_strtolower(str_replace('@', '', $matches[3] ?? '') ?: self::MAIN_IDENTIFIER);
+
             $entrypoint = $this->resolveEntryPoint($repository, $version);
             $objectsContents = $this->getObjectsFile($entrypoint);
 
