@@ -9294,6 +9294,12 @@
             "Changelog\/13.4\/Index.html",
             "13.4 Changes"
         ],
+        "Changelog\/13.4.x\/Feature-105638-ModifyFetchedPageContent": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/13.4.x\/Feature-105638-ModifyFetchedPageContent.html",
+            "Feature: #105638 - Modify fetched page content"
+        ],
         "Changelog\/13.4.x\/Important-105007-ManipulationOfFinalSearchQueryInEXTindexed_search": [
             "TYPO3 Core Changelog",
             "main",
@@ -9311,6 +9317,36 @@
             "main",
             "Changelog\/14.0\/Breaking-105377-DeprecatedFunctionalityRemoved.html",
             "Breaking: #105377 - Deprecated functionality removed"
+        ],
+        "Changelog\/14.0\/Breaking-105686-AvoidObsoleteCharsetInSanitizeFileName": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105686-AvoidObsoleteCharsetInSanitizeFileName.html",
+            "Breaking: #105686 - Avoid obsolete $charset in sanitizeFileName()"
+        ],
+        "Changelog\/14.0\/Breaking-105695-SimplifiedCharsetConverter": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105695-SimplifiedCharsetConverter.html",
+            "Breaking: #105695 - Simplified CharsetConverter"
+        ],
+        "Changelog\/14.0\/Breaking-105728-ExtbaseBackendModulesDoNotGuessPageIdForTypoScriptAnymore": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105728-ExtbaseBackendModulesDoNotGuessPageIdForTypoScriptAnymore.html",
+            "Breaking: #105728 - Extbase backend modules not in page context rely on global TypoScript only"
+        ],
+        "Changelog\/14.0\/Breaking-105733-FileNameValidatorNoLongerAcceptsCustomRegexIn__construct": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105733-FileNameValidatorNoLongerAcceptsCustomRegexIn__construct.html",
+            "Breaking: #105733 - FileNameValidator no longer accepts custom regex in __construct()"
+        ],
+        "Changelog\/14.0\/Feature-105624-PSR-14EventAfterBackendUserPasswordReset": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Feature-105624-PSR-14EventAfterBackendUserPasswordReset.html",
+            "Feature: #105624 - PSR-14 event after a Backend user password has been reset"
         ],
         "Changelog\/14.0\/Important-105538-ListTypeAndSubTypes": [
             "TYPO3 Core Changelog",
@@ -29438,6 +29474,12 @@
             "Changelog\/13.4\/Important-105175-MoveFrontendBackendUserAuthenticationIntoEXTfrontend.html#important-105175-1727799093",
             "Important: #105175 - Move FrontendBackendUserAuthentication into EXT:frontend"
         ],
+        "feature-105638-1732034075": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/13.4.x\/Feature-105638-ModifyFetchedPageContent.html#feature-105638-1732034075",
+            "Feature: #105638 - Modify fetched page content"
+        ],
         "important-105007-1728977233": [
             "TYPO3 Core Changelog",
             "main",
@@ -29449,6 +29491,36 @@
             "main",
             "Changelog\/14.0\/Breaking-105377-DeprecatedFunctionalityRemoved.html#breaking-105377-1729513863",
             "Breaking: #105377 - Deprecated functionality removed"
+        ],
+        "breaking-105686-1732289792": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105686-AvoidObsoleteCharsetInSanitizeFileName.html#breaking-105686-1732289792",
+            "Breaking: #105686 - Avoid obsolete $charset in sanitizeFileName()"
+        ],
+        "breaking-105695-1732540153": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105695-SimplifiedCharsetConverter.html#breaking-105695-1732540153",
+            "Breaking: #105695 - Simplified CharsetConverter"
+        ],
+        "breaking-105728-1732882067": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105728-ExtbaseBackendModulesDoNotGuessPageIdForTypoScriptAnymore.html#breaking-105728-1732882067",
+            "Breaking: #105728 - Extbase backend modules not in page context rely on global TypoScript only"
+        ],
+        "breaking-105733-1733018161": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105733-FileNameValidatorNoLongerAcceptsCustomRegexIn__construct.html#breaking-105733-1733018161",
+            "Breaking: #105733 - FileNameValidator no longer accepts custom regex in __construct()"
+        ],
+        "feature-105624-1731956541": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Feature-105624-PSR-14EventAfterBackendUserPasswordReset.html#feature-105624-1731956541",
+            "Feature: #105624 - PSR-14 event after a Backend user password has been reset"
         ],
         "important-105538-1730752784": [
             "TYPO3 Core Changelog",
@@ -52018,6 +52090,12 @@
             "Changelog\/13.4\/Index.html#13-4-changes",
             "13.4 Changes"
         ],
+        "feature-105638-modify-fetched-page-content": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/13.4.x\/Feature-105638-ModifyFetchedPageContent.html#feature-105638-modify-fetched-page-content",
+            "Feature: #105638 - Modify fetched page content"
+        ],
         "important-105007-manipulation-of-final-search-query-in-ext-indexed-search": [
             "TYPO3 Core Changelog",
             "main",
@@ -52035,6 +52113,36 @@
             "main",
             "Changelog\/14.0\/Breaking-105377-DeprecatedFunctionalityRemoved.html#breaking-105377-deprecated-functionality-removed",
             "Breaking: #105377 - Deprecated functionality removed"
+        ],
+        "breaking-105686-avoid-obsolete-charset-in-sanitizefilename": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105686-AvoidObsoleteCharsetInSanitizeFileName.html#breaking-105686-avoid-obsolete-charset-in-sanitizefilename",
+            "Breaking: #105686 - Avoid obsolete $charset in sanitizeFileName()"
+        ],
+        "breaking-105695-simplified-charsetconverter": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105695-SimplifiedCharsetConverter.html#breaking-105695-simplified-charsetconverter",
+            "Breaking: #105695 - Simplified CharsetConverter"
+        ],
+        "breaking-105728-extbase-backend-modules-not-in-page-context-rely-on-global-typoscript-only": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105728-ExtbaseBackendModulesDoNotGuessPageIdForTypoScriptAnymore.html#breaking-105728-extbase-backend-modules-not-in-page-context-rely-on-global-typoscript-only",
+            "Breaking: #105728 - Extbase backend modules not in page context rely on global TypoScript only"
+        ],
+        "breaking-105733-filenamevalidator-no-longer-accepts-custom-regex-in-construct": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Breaking-105733-FileNameValidatorNoLongerAcceptsCustomRegexIn__construct.html#breaking-105733-filenamevalidator-no-longer-accepts-custom-regex-in-construct",
+            "Breaking: #105733 - FileNameValidator no longer accepts custom regex in __construct()"
+        ],
+        "feature-105624-psr-14-event-after-a-backend-user-password-has-been-reset": [
+            "TYPO3 Core Changelog",
+            "main",
+            "Changelog\/14.0\/Feature-105624-PSR-14EventAfterBackendUserPasswordReset.html#feature-105624-psr-14-event-after-a-backend-user-password-has-been-reset",
+            "Feature: #105624 - PSR-14 event after a Backend user password has been reset"
         ],
         "important-105538-list-type-and-sub-types": [
             "TYPO3 Core Changelog",

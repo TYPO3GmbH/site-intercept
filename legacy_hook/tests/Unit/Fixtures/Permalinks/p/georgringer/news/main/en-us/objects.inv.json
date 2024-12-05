@@ -246,6 +246,12 @@
             "Misc\/Changelog\/12-1-0.html",
             "12.1.0 - 15th November 2024"
         ],
+        "Misc\/Changelog\/12-2-0": [
+            "News system",
+            "main",
+            "Misc\/Changelog\/12-2-0.html",
+            "12.2.0 - 27th November 2024"
+        ],
         "Misc\/Changelog\/2-1-0": [
             "News system",
             "main",
@@ -2090,12 +2096,6 @@
             "Tutorials\/ExtendNews\/Hooks\/Index.html#hooks",
             "Hooks"
         ],
-        "hooks-example-finddemanded": [
-            "News system",
-            "main",
-            "Tutorials\/ExtendNews\/Hooks\/Index.html#hooks_example_findDemanded",
-            "Domain\/Repository\/AbstractDemandedRepository.php findDemanded"
-        ],
         "tutorialextendnews": [
             "News system",
             "main",
@@ -2305,6 +2305,594 @@
             "main",
             "UsersManual\/Records\/Tag\/Index.html#recordTag",
             "Tag"
+        ],
+        "confval-archivedate": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-archivedate",
+            "archiveDate"
+        ],
+        "confval-rteforteaser": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-rteforteaser",
+            "rteForTeaser"
+        ],
+        "confval-extensionconfigurationtagpid": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-extensionconfigurationtagpid",
+            "tagPid"
+        ],
+        "confval-prependatcopy": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-prependatcopy",
+            "prependAtCopy"
+        ],
+        "confval-categorybegrouptceformsrestriction": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-categorybegrouptceformsrestriction",
+            "categoryBeGroupTceFormsRestriction"
+        ],
+        "confval-contentelementrelation": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-contentelementrelation",
+            "contentElementRelation"
+        ],
+        "confval-manualsorting": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-manualsorting",
+            "manualSorting"
+        ],
+        "confval-datetimenotrequired": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-datetimenotrequired",
+            "dateTimeNotRequired"
+        ],
+        "confval-mediapreview": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-mediapreview",
+            "mediaPreview"
+        ],
+        "confval-advancedmediapreview": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-advancedmediapreview",
+            "advancedMediaPreview"
+        ],
+        "confval-slugbehaviour": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-slugbehaviour",
+            "slugBehaviour"
+        ],
+        "confval-pagetreepluginpreview": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-pagetreepluginpreview",
+            "pageTreePluginPreview"
+        ],
+        "confval-showadministrationmodule": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-showadministrationmodule",
+            "showAdministrationModule"
+        ],
+        "confval-hidepagetreeforadministrationmodule": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-hidepagetreeforadministrationmodule",
+            "hidePageTreeForAdministrationModule"
+        ],
+        "confval-storageuidimporter": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-storageuidimporter",
+            "storageUidImporter"
+        ],
+        "confval-resourcefolderimporter": [
+            "News system",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#confval-resourcefolderimporter",
+            "resourceFolderImporter"
+        ],
+        "confval-menu-tsconfig-module": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-menu-tsconfig-module",
+            "Properties"
+        ],
+        "confval-preselect": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-preselect",
+            "preselect"
+        ],
+        "confval-columns": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-columns",
+            "columns"
+        ],
+        "confval-defaultpid": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-defaultpid",
+            "defaultPid"
+        ],
+        "confval-localizationview": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-localizationview",
+            "localizationView"
+        ],
+        "confval-controlpanels": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-controlpanels",
+            "controlPanels"
+        ],
+        "confval-allowedcategoryrootids": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-allowedcategoryrootids",
+            "allowedCategoryRootIds"
+        ],
+        "confval-redirecttopageonstart": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-redirecttopageonstart",
+            "redirectToPageOnStart"
+        ],
+        "confval-allowedpage": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-allowedpage",
+            "allowedPage"
+        ],
+        "confval-alwaysshowfilter": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-alwaysshowfilter",
+            "alwaysShowFilter"
+        ],
+        "confval-filters": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/Administration.html#confval-filters",
+            "filters"
+        ],
+        "confval-menu-tsconfig-general": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/General.html#confval-menu-tsconfig-general",
+            "Properties"
+        ],
+        "confval-templatelayouts": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/General.html#confval-templatelayouts",
+            "templateLayouts"
+        ],
+        "confval-slugprefix": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/General.html#confval-slugprefix",
+            "slugPrefix"
+        ],
+        "confval-archive": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/General.html#confval-archive",
+            "archive"
+        ],
+        "confval-tx-news-tagpid": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/General.html#confval-tx-news-tagpid",
+            "tagPid"
+        ],
+        "confval-categoryrestrictionforflexforms": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/General.html#confval-categoryrestrictionforflexforms",
+            "categoryRestrictionForFlexForms"
+        ],
+        "confval-showcontentelementsinnewssysfolder": [
+            "News system",
+            "main",
+            "Reference\/TsConfig\/General.html#confval-showcontentelementsinnewssysfolder",
+            "showContentElementsInNewsSysFolder"
+        ],
+        "confval-cssfile": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-cssfile",
+            "cssFile"
+        ],
+        "confval-format": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-format",
+            "format"
+        ],
+        "confval-usestdwrap": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-usestdwrap",
+            "useStdWrap"
+        ],
+        "confval-overrideflexformsettingsifempty": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-overrideflexformsettingsifempty",
+            "overrideFlexformSettingsIfEmpty"
+        ],
+        "confval-displaydummyifnomedia": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-displaydummyifnomedia",
+            "displayDummyIfNoMedia"
+        ],
+        "confval-list-media-dummyimage": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-list-media-dummyimage",
+            "list.media.dummyImage"
+        ],
+        "confval-detailpiddetermination": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-detailpiddetermination",
+            "detailPidDetermination"
+        ],
+        "confval-defaultdetailpid": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-defaultdetailpid",
+            "defaultDetailPid"
+        ],
+        "confval-hideidlist": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-hideidlist",
+            "hideIdList"
+        ],
+        "confval-orderbyallowed": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-orderbyallowed",
+            "orderByAllowed"
+        ],
+        "confval-analytics-social": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-analytics-social",
+            "analytics.social"
+        ],
+        "confval-demandclass": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-demandclass",
+            "demandClass"
+        ],
+        "confval-link-hrdate": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-link-hrdate",
+            "link.hrDate"
+        ],
+        "confval-link-typesopeninginnewwindow": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-link-typesopeninginnewwindow",
+            "link.typesOpeningInNewWindow"
+        ],
+        "confval-facebooklocale": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-facebooklocale",
+            "facebookLocale"
+        ],
+        "confval-opengraph": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-opengraph",
+            "opengraph"
+        ],
+        "confval-detail-media": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-detail-media",
+            "detail.media"
+        ],
+        "confval-detail-errorhandling": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-detail-errorhandling",
+            "detail.errorHandling"
+        ],
+        "confval-detail-checkpidofnewsrecord": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-detail-checkpidofnewsrecord",
+            "detail.checkPidOfNewsRecord"
+        ],
+        "confval-detail-showmetatags": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-detail-showmetatags",
+            "detail.showMetaTags"
+        ],
+        "confval-detail-showprevnext": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-detail-showprevnext",
+            "detail.showPrevNext"
+        ],
+        "confval-detail-registerproperties": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-detail-registerproperties",
+            "detail.registerProperties"
+        ],
+        "confval-detail-showsocialsharebuttons": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-detail-showsocialsharebuttons",
+            "detail.showSocialShareButtons"
+        ],
+        "confval-list-media": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-list-media",
+            "list.media"
+        ],
+        "confval-list-paginate": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-list-paginate",
+            "list.paginate"
+        ],
+        "confval-list-rss": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-list-rss",
+            "list.rss"
+        ],
+        "confval-search-fields": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-search-fields",
+            "search.fields"
+        ],
+        "confval-search-splitsearchword": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/GeneralSettings.html#confval-search-splitsearchword",
+            "search.splitSearchWord"
+        ],
+        "confval-orderby": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-orderby",
+            "orderBy"
+        ],
+        "confval-orderdirection": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-orderdirection",
+            "orderDirection"
+        ],
+        "confval-datefield": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-datefield",
+            "dateField"
+        ],
+        "confval-categories": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-categories",
+            "categories"
+        ],
+        "confval-categoryconjunction": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-categoryconjunction",
+            "categoryConjunction"
+        ],
+        "confval-includesubcategories": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-includesubcategories",
+            "includeSubCategories"
+        ],
+        "confval-archiverestriction": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-archiverestriction",
+            "archiveRestriction"
+        ],
+        "confval-timerestriction": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-timerestriction",
+            "timeRestriction"
+        ],
+        "confval-timerestrictionhigh": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-timerestrictionhigh",
+            "timeRestrictionHigh"
+        ],
+        "confval-topnewsrestriction": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-topnewsrestriction",
+            "topNewsRestriction"
+        ],
+        "confval-singlenews": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-singlenews",
+            "singleNews"
+        ],
+        "confval-previewhiddenrecords": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-previewhiddenrecords",
+            "previewHiddenRecords"
+        ],
+        "confval-enablepreviewofhiddenrecords": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-enablepreviewofhiddenrecords",
+            "enablePreviewOfHiddenRecords"
+        ],
+        "confval-startingpoint": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-startingpoint",
+            "startingpoint"
+        ],
+        "confval-recursive": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-recursive",
+            "recursive"
+        ],
+        "confval-detailpid": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-detailpid",
+            "detailPid"
+        ],
+        "confval-listpid": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-listpid",
+            "listPid"
+        ],
+        "confval-backpid": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-backpid",
+            "backPid"
+        ],
+        "confval-limit": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-limit",
+            "limit"
+        ],
+        "confval-offset": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-offset",
+            "offset"
+        ],
+        "confval-tags": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-tags",
+            "tags"
+        ],
+        "confval-hidepagination": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-hidepagination",
+            "hidePagination"
+        ],
+        "confval-list-paginate-itemsperpage": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-list-paginate-itemsperpage",
+            "list.paginate.itemsPerPage"
+        ],
+        "confval-topnewsfirst": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-topnewsfirst",
+            "topNewsFirst"
+        ],
+        "confval-excludealreadydisplayednews": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-excludealreadydisplayednews",
+            "excludeAlreadyDisplayedNews"
+        ],
+        "confval-disableoverridedemand": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-disableoverridedemand",
+            "disableOverrideDemand"
+        ],
+        "confval-media-maxwidth": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-media-maxwidth",
+            "media.maxWidth"
+        ],
+        "confval-media-maxheight": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-media-maxheight",
+            "media.maxHeight"
+        ],
+        "confval-cropmaxcharacters": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-cropmaxcharacters",
+            "cropMaxCharacters"
+        ],
+        "confval-templatelayout": [
+            "News system",
+            "main",
+            "Reference\/TypoScript\/PluginSettings.html#confval-templatelayout",
+            "templateLayout"
+        ],
+        "confval-title": [
+            "News system",
+            "main",
+            "UsersManual\/Records\/Tag\/Index.html#confval-title",
+            "Title"
+        ],
+        "confval-hidden": [
+            "News system",
+            "main",
+            "UsersManual\/Records\/Tag\/Index.html#confval-hidden",
+            "Hidden"
+        ],
+        "confval-seo-title-tag": [
+            "News system",
+            "main",
+            "UsersManual\/Records\/Tag\/Index.html#confval-seo-title-tag",
+            "SEO: <title>-Tag"
+        ],
+        "confval-seo-meta-description": [
+            "News system",
+            "main",
+            "UsersManual\/Records\/Tag\/Index.html#confval-seo-meta-description",
+            "SEO: Meta-Description"
+        ],
+        "confval-seo-headline": [
+            "News system",
+            "main",
+            "UsersManual\/Records\/Tag\/Index.html#confval-seo-headline",
+            "SEO: Headline"
+        ],
+        "confval-seo-text": [
+            "News system",
+            "main",
+            "UsersManual\/Records\/Tag\/Index.html#confval-seo-text",
+            "SEO: Text"
         ]
     },
     "std:title": {
@@ -2877,6 +3465,36 @@
             "main",
             "Misc\/Changelog\/12-1-0.html#add-statusinformation-to-pages-with-news",
             "Add StatusInformation to pages with news"
+        ],
+        "12-2-0-27th-november-2024": [
+            "News system",
+            "main",
+            "Misc\/Changelog\/12-2-0.html#12-2-0-27th-november-2024",
+            "12.2.0 - 27th November 2024"
+        ],
+        "changed-behavior-for-ts-settings-search-paginate-itemsperpage": [
+            "News system",
+            "main",
+            "Misc\/Changelog\/12-2-0.html#changed-behavior-for-ts-settings-search-paginate-itemsperpage",
+            "Changed behavior for TS settings.search.paginate.itemsPerPage"
+        ],
+        "deprecated-hooks": [
+            "News system",
+            "main",
+            "Misc\/Changelog\/12-2-0.html#deprecated-hooks",
+            "Deprecated hooks"
+        ],
+        "support-of-php-8-4": [
+            "News system",
+            "main",
+            "Misc\/Changelog\/12-2-0.html#support-of-php-8-4",
+            "Support of PHP 8.4"
+        ],
+        "new-events": [
+            "News system",
+            "main",
+            "Misc\/Changelog\/12-2-0.html#new-events",
+            "New events"
         ],
         "2-1-0-2013-03-28": [
             "News system",
@@ -4831,7 +5449,7 @@
         "examples": [
             "News system",
             "main",
-            "Tutorials\/ExtendNews\/DataProcessing\/LanguageMenuProcessor.html#examples",
+            "Tutorials\/ExtendNews\/Events\/Index.html#examples",
             "Examples"
         ],
         "basic-example": [
@@ -5482,24 +6100,6 @@
             "Tutorials\/ExtendNews\/Demands\/Index.html#custom-controllers",
             "Custom controllers"
         ],
-        "hooks": [
-            "News system",
-            "main",
-            "Tutorials\/ExtendNews\/Hooks\/Index.html#hooks",
-            "Hooks"
-        ],
-        "hook-finddemanded": [
-            "News system",
-            "main",
-            "Tutorials\/ExtendNews\/Demands\/Index.html#hook-finddemanded",
-            "Hook findDemanded"
-        ],
-        "hook-createdemandobjectfromsettings": [
-            "News system",
-            "main",
-            "Tutorials\/ExtendNews\/Demands\/Index.html#hook-createdemandobjectfromsettings",
-            "Hook createDemandObjectFromSettings"
-        ],
         "events": [
             "News system",
             "main",
@@ -5512,17 +6112,23 @@
             "Tutorials\/ExtendNews\/Demands\/Index.html#custom-demand-class",
             "Custom demand class"
         ],
-        "connect-to-event": [
+        "provide-more-variables-to-the-view": [
             "News system",
             "main",
-            "Tutorials\/ExtendNews\/Events\/Index.html#connect-to-event",
-            "Connect to Event"
+            "Tutorials\/ExtendNews\/Events\/Index.html#provide-more-variables-to-the-view",
+            "Provide more variables to the view"
         ],
-        "write-your-eventlistener": [
+        "georgringer-news-event-modifydemandrepositoryevent": [
             "News system",
             "main",
-            "Tutorials\/ExtendNews\/Events\/Index.html#write-your-eventlistener",
-            "Write your EventListener"
+            "Tutorials\/ExtendNews\/Events\/Index.html#georgringer-news-event-modifydemandrepositoryevent",
+            "GeorgRingerNewsEventModifyDemandRepositoryEvent"
+        ],
+        "controller-newscontroller-overridesettings": [
+            "News system",
+            "main",
+            "Tutorials\/ExtendNews\/Events\/Index.html#controller-newscontroller-overridesettings",
+            "Controller\/NewsController overrideSettings"
         ],
         "extend-flexforms": [
             "News system",
@@ -5619,24 +6225,6 @@
             "main",
             "Tutorials\/ExtendNews\/Hooks\/Index.html#hooks-1",
             "Hooks"
-        ],
-        "domain-repository-abstractdemandedrepository-php-finddemanded": [
-            "News system",
-            "main",
-            "Tutorials\/ExtendNews\/Hooks\/Index.html#domain-repository-abstractdemandedrepository-php-finddemanded",
-            "Domain\/Repository\/AbstractDemandedRepository.php findDemanded"
-        ],
-        "example": [
-            "News system",
-            "main",
-            "Tutorials\/ExtendNews\/Hooks\/Index.html#example",
-            "Example"
-        ],
-        "controller-newscontroller-overridesettings": [
-            "News system",
-            "main",
-            "Tutorials\/ExtendNews\/Hooks\/Index.html#controller-newscontroller-overridesettings",
-            "Controller\/NewsController overrideSettings"
         ],
         "extend-news": [
             "News system",
