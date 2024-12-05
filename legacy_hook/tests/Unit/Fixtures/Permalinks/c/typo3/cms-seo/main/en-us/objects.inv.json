@@ -1,0 +1,600 @@
+{
+    "std:doc": {
+        "Configuration\/Index": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html",
+            "Configuration"
+        ],
+        "Configuration\/Settings": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html",
+            "Site sets settings of EXT:seo"
+        ],
+        "Configuration\/SettingsEditor": [
+            "SEO",
+            "main",
+            "Configuration\/SettingsEditor.html",
+            "Settings editor"
+        ],
+        "Developer\/Index": [
+            "SEO",
+            "main",
+            "Developer\/Index.html",
+            "Developer Corner"
+        ],
+        "Editor\/DashboardWidgets": [
+            "SEO",
+            "main",
+            "Editor\/DashboardWidgets.html",
+            "Dashboard widgets for SEO"
+        ],
+        "Editor\/Index": [
+            "SEO",
+            "main",
+            "Editor\/Index.html",
+            "For Editors"
+        ],
+        "GeneralRecommendations\/Index": [
+            "SEO",
+            "main",
+            "GeneralRecommendations\/Index.html",
+            "General Recommendations"
+        ],
+        "Index": [
+            "SEO",
+            "main",
+            "Index.html",
+            "TYPO3 Search Engine Optimization"
+        ],
+        "Installation\/Index": [
+            "SEO",
+            "main",
+            "Installation\/Index.html",
+            "Installation"
+        ],
+        "Introduction\/Index": [
+            "SEO",
+            "main",
+            "Introduction\/Index.html",
+            "Introduction"
+        ],
+        "Sitemap": [
+            "SEO",
+            "main",
+            "Sitemap.html",
+            "Sitemap"
+        ]
+    },
+    "std:label": {
+        "configuration": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#configuration",
+            "Configuration"
+        ],
+        "configuration-site-sets": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#configuration-site-sets",
+            "Site sets"
+        ],
+        "config-tags": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#config-tags",
+            "Tags"
+        ],
+        "config-hreflang-tags": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#config-hreflang-tags",
+            "Hreflang link-tags"
+        ],
+        "config-canonical-tag": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#config-canonical-tag",
+            "Canonical Tag"
+        ],
+        "configuration-site-set-settings": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#configuration-site-set-settings",
+            "Site sets settings of EXT:seo"
+        ],
+        "settings-editor": [
+            "SEO",
+            "main",
+            "Configuration\/SettingsEditor.html#settings-editor",
+            "Settings editor"
+        ],
+        "developer": [
+            "SEO",
+            "main",
+            "Developer\/Index.html#developer",
+            "Developer Corner"
+        ],
+        "dashboard-widgets": [
+            "SEO",
+            "main",
+            "Editor\/DashboardWidgets.html#dashboard-widgets",
+            "Dashboard widgets for SEO"
+        ],
+        "dashboard-widgets-missing-description": [
+            "SEO",
+            "main",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description",
+            "\"Missing Meta Description\" widget"
+        ],
+        "dashboard-widgets-missing-description-add": [
+            "SEO",
+            "main",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description-add",
+            "Adding the \"Missing Meta Description\" widget to your personal Dashboard"
+        ],
+        "dashboard-widgets-missing-description-use": [
+            "SEO",
+            "main",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description-use",
+            "Using the \"Missing Meta Description\" widget to improve SEO results"
+        ],
+        "for-editors": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#for-editors",
+            "For Editors"
+        ],
+        "title-for-search-engines": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#title-for-search-engines",
+            "Title for search engines"
+        ],
+        "description": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#description",
+            "Description"
+        ],
+        "index-page": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#index-page",
+            "Index this page"
+        ],
+        "recommendations": [
+            "SEO",
+            "main",
+            "GeneralRecommendations\/Index.html#recommendations",
+            "General Recommendations"
+        ],
+        "recommendations-extensions": [
+            "SEO",
+            "main",
+            "GeneralRecommendations\/Index.html#recommendations_extensions",
+            "Recommendations for additional SEO extensions"
+        ],
+        "recommendations-field-description": [
+            "SEO",
+            "main",
+            "GeneralRecommendations\/Index.html#recommendations_field_description",
+            "Recommendations for the description field"
+        ],
+        "start": [
+            "SEO",
+            "main",
+            "Index.html#start",
+            "TYPO3 Search Engine Optimization"
+        ],
+        "installation": [
+            "SEO",
+            "main",
+            "Installation\/Index.html#installation",
+            "Installation"
+        ],
+        "introduction": [
+            "SEO",
+            "main",
+            "Introduction\/Index.html#introduction",
+            "Introduction"
+        ],
+        "screenshots": [
+            "SEO",
+            "main",
+            "Introduction\/Index.html#screenshots",
+            "Screenshots"
+        ]
+    },
+    "std:title": {
+        "configuration-1": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#configuration-1",
+            "Configuration"
+        ],
+        "site-sets": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#site-sets",
+            "Site sets"
+        ],
+        "typoscript-settings": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#typoscript-settings",
+            "TypoScript Settings"
+        ],
+        "site-configuration": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#site-configuration",
+            "Site configuration"
+        ],
+        "entry-point": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#entry-point",
+            "Entry Point"
+        ],
+        "languages": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#languages",
+            "Languages"
+        ],
+        "error-handling": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#error-handling",
+            "Error Handling"
+        ],
+        "robots-txt": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#robots-txt",
+            "robots.txt"
+        ],
+        "static-routes-and-redirects": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#static-routes-and-redirects",
+            "Static Routes and redirects"
+        ],
+        "tags": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#tags",
+            "Tags"
+        ],
+        "hreflang-link-tags": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#hreflang-link-tags",
+            "Hreflang link-tags"
+        ],
+        "canonical-tag": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#canonical-tag",
+            "Canonical Tag"
+        ],
+        "working-links": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#working-links",
+            "Working links"
+        ],
+        "typoscript-examples": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#typoscript-examples",
+            "TypoScript examples"
+        ],
+        "setting-missing-opengraph-meta-tags": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#setting-missing-opengraph-meta-tags",
+            "Setting missing OpenGraph meta tags"
+        ],
+        "setting-fallbacks-for-meta-tags": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#setting-fallbacks-for-meta-tags",
+            "Setting fallbacks for meta tags"
+        ],
+        "setting-fallbacks-for-og-image-and-twitter-image": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#setting-fallbacks-for-og-image-and-twitter-image",
+            "Setting fallbacks for og:image and twitter:image"
+        ],
+        "setting-defaults-for-the-author-on-meta-tags": [
+            "SEO",
+            "main",
+            "Configuration\/Index.html#setting-defaults-for-the-author-on-meta-tags",
+            "Setting defaults for the author on meta tags"
+        ],
+        "site-sets-settings-of-ext-seo": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#site-sets-settings-of-ext-seo",
+            "Site sets settings of EXT:seo"
+        ],
+        "settings-editor-1": [
+            "SEO",
+            "main",
+            "Configuration\/SettingsEditor.html#settings-editor-1",
+            "Settings editor"
+        ],
+        "developer-corner": [
+            "SEO",
+            "main",
+            "Developer\/Index.html#developer-corner",
+            "Developer Corner"
+        ],
+        "dashboard-widgets-for-seo": [
+            "SEO",
+            "main",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-for-seo",
+            "Dashboard widgets for SEO"
+        ],
+        "missing-meta-description-widget": [
+            "SEO",
+            "main",
+            "Editor\/DashboardWidgets.html#missing-meta-description-widget",
+            "\"Missing Meta Description\" widget"
+        ],
+        "adding-the-missing-meta-description-widget-to-your-personal-dashboard": [
+            "SEO",
+            "main",
+            "Editor\/DashboardWidgets.html#adding-the-missing-meta-description-widget-to-your-personal-dashboard",
+            "Adding the \"Missing Meta Description\" widget to your personal Dashboard"
+        ],
+        "using-the-missing-meta-description-widget-to-improve-seo-results": [
+            "SEO",
+            "main",
+            "Editor\/DashboardWidgets.html#using-the-missing-meta-description-widget-to-improve-seo-results",
+            "Using the \"Missing Meta Description\" widget to improve SEO results"
+        ],
+        "for-editors-1": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#for-editors-1",
+            "For Editors"
+        ],
+        "general-tab": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#general-tab",
+            "General tab"
+        ],
+        "page-title": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#page-title",
+            "Page Title"
+        ],
+        "url-segment-slug": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#url-segment-slug",
+            "URL Segment (slug)"
+        ],
+        "seo-tab": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#seo-tab",
+            "SEO Tab"
+        ],
+        "title-for-search-engines": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#title-for-search-engines",
+            "Title for search engines"
+        ],
+        "description": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#description",
+            "Description"
+        ],
+        "index-this-page": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#index-this-page",
+            "Index this page"
+        ],
+        "follow-this-page": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#follow-this-page",
+            "Follow this page"
+        ],
+        "canonical-link": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#canonical-link",
+            "Canonical link"
+        ],
+        "change-frequency": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#change-frequency",
+            "Change frequency"
+        ],
+        "priority": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#priority",
+            "Priority"
+        ],
+        "social-media": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#social-media",
+            "Social media"
+        ],
+        "title": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#title",
+            "Title"
+        ],
+        "image": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#image",
+            "Image"
+        ],
+        "metadata-tab": [
+            "SEO",
+            "main",
+            "Editor\/Index.html#metadata-tab",
+            "Metadata Tab"
+        ],
+        "general-recommendations": [
+            "SEO",
+            "main",
+            "GeneralRecommendations\/Index.html#general-recommendations",
+            "General Recommendations"
+        ],
+        "recommendations-for-additional-seo-extensions": [
+            "SEO",
+            "main",
+            "GeneralRecommendations\/Index.html#recommendations-for-additional-seo-extensions",
+            "Recommendations for additional SEO extensions"
+        ],
+        "recommendations-for-the-description-field": [
+            "SEO",
+            "main",
+            "GeneralRecommendations\/Index.html#recommendations-for-the-description-field",
+            "Recommendations for the description field"
+        ],
+        "typo3-search-engine-optimization": [
+            "SEO",
+            "main",
+            "Index.html#typo3-search-engine-optimization",
+            "TYPO3 Search Engine Optimization"
+        ],
+        "installation-1": [
+            "SEO",
+            "main",
+            "Installation\/Index.html#installation-1",
+            "Installation"
+        ],
+        "installation-with-composer": [
+            "SEO",
+            "main",
+            "Installation\/Index.html#installation-with-composer",
+            "Installation with Composer"
+        ],
+        "installation-without-composer": [
+            "SEO",
+            "main",
+            "Installation\/Index.html#installation-without-composer",
+            "Installation without Composer"
+        ],
+        "introduction-1": [
+            "SEO",
+            "main",
+            "Introduction\/Index.html#introduction-1",
+            "Introduction"
+        ],
+        "what-does-it-do": [
+            "SEO",
+            "main",
+            "Introduction\/Index.html#what-does-it-do",
+            "What does it do?"
+        ],
+        "screenshots": [
+            "SEO",
+            "main",
+            "Introduction\/Index.html#screenshots",
+            "Screenshots"
+        ],
+        "hreflang-tags": [
+            "SEO",
+            "main",
+            "Introduction\/Index.html#hreflang-tags",
+            "Hreflang Tags"
+        ],
+        "canonical-tags": [
+            "SEO",
+            "main",
+            "Introduction\/Index.html#canonical-tags",
+            "Canonical Tags"
+        ],
+        "xml-sitemap": [
+            "SEO",
+            "main",
+            "Introduction\/Index.html#xml-sitemap",
+            "XML Sitemap"
+        ],
+        "sitemap": [
+            "SEO",
+            "main",
+            "Sitemap.html#sitemap",
+            "Sitemap"
+        ]
+    },
+    "std:confval-menu": {
+        "seo-settings": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#seo-settings",
+            ""
+        ]
+    },
+    "std:confval": {
+        "seo-settings-category-seo": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#seo-settings-category-seo",
+            "seo"
+        ],
+        "seo-settings-category-seo-templates": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#seo-settings-category-seo-templates",
+            "seo.templates"
+        ],
+        "seo-settings-seo-sitemap-view-templaterootpath": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#seo-settings-seo-sitemap-view-templaterootpath",
+            "seo.sitemap.view.templateRootPath"
+        ],
+        "seo-settings-seo-sitemap-view-partialrootpath": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#seo-settings-seo-sitemap-view-partialrootpath",
+            "seo.sitemap.view.partialRootPath"
+        ],
+        "seo-settings-seo-sitemap-view-layoutrootpath": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#seo-settings-seo-sitemap-view-layoutrootpath",
+            "seo.sitemap.view.layoutRootPath"
+        ],
+        "seo-settings-seo-sitemap-pages-excludeddoktypes": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#seo-settings-seo-sitemap-pages-excludeddoktypes",
+            "seo.sitemap.pages.excludedDoktypes"
+        ],
+        "seo-settings-seo-sitemap-pages-excludepagesrecursive": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#seo-settings-seo-sitemap-pages-excludepagesrecursive",
+            "seo.sitemap.pages.excludePagesRecursive"
+        ],
+        "seo-settings-seo-sitemap-pages-additionalwhere": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#seo-settings-seo-sitemap-pages-additionalwhere",
+            "seo.sitemap.pages.additionalWhere"
+        ]
+    }
+}

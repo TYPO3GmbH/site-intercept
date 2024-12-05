@@ -24,7 +24,7 @@
         "psr/http-message": "^1.1",
         "symfony/cache": "^5.4",
         "symfony/finder": "^5.4",
-        "t3docs/typo3-version-handling": "^0.14.0"
+        "t3docs/typo3-version-handling": "^0.21.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",

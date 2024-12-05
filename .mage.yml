@@ -14,13 +14,14 @@ magephp:
     - ./.env.local
     - ./.env.test
     - ./.mage.yml
-    - ./assets
-    - ./build
-    - ./node_modules
     - ./.php_cs.cache
     - ./.php_cs.dist
-    - ./auth.json
+    - ./assets
+    - ./build
+    - ./legacy_hook/tests
+    - ./node_modules
     - ./tests
+    - ./auth.json
     - ./phpunit.xml.dist
     - ./package.json
     - ./README.md

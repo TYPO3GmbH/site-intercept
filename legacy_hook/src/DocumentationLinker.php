@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 use T3Docs\VersionHandling\DefaultInventories;
+use T3Docs\VersionHandling\Typo3VersionMapping;
 
 /**
  * Redirect to a specify interlink target, example:
@@ -31,6 +32,9 @@ use T3Docs\VersionHandling\DefaultInventories;
  *
  * linkToDocs.php?shortcode=t3coreapi:caching@main
  * -> forwards to: https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/CachingFramework/Index.html#caching
+ *
+ * linkToDocs.php?shortcode=georgringer-news:start@main
+ * -> forwards to: https://docs.typo3.org/p/georgringer/news/en-us/Index.html#start
  *
  * Also, all TYPO3 core extensions can be resolved via "typo3-cms-XXX" prefixing:
  * linkToDocs.php?shortcode=typo3-cms-seo:introduction@main
@@ -80,9 +84,9 @@ use T3Docs\VersionHandling\DefaultInventories;
  * https://docs.typo3.org/c/typo3/cms-XXX/main/en-us/objects.inv.json
  *
  * Additional TYPO3 Manuals:
- * https://docs.typo3.org/other/typo3/cms-XXX/main/en-us/objects.inv.json
+ * https://docs.typo3.org/other/typo3/XXX/main/en-us/objects.inv.json
  *
- * Public TYPO3 extensions (not within the scope of redirection at the moment):
+ * Public TYPO3 extensions (xxx/yyy is the composer packagist key):
  * https://docs.typo3.org/p/XXX/YYY/main/en-us/objects.inv.json
  *
  * The logic is this:
@@ -99,6 +103,8 @@ use T3Docs\VersionHandling\DefaultInventories;
  * https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/objects.inv.json
  * https://docs.typo3.org/other/t3docs/render-guides/objects.inv.json
  * https://docs.typo3.org/p/georgringer/news/main/en-us/objects.inv.json
+ *
+ * @see Unit Test in legacy_hook/tests/Unit/PermalinksTest.php for examples.
  */
 final readonly class DocumentationLinker
 {
@@ -125,53 +131,61 @@ final readonly class DocumentationLinker
         $responseDescriber = $this->cache->get($cacheKey, function (ItemInterface $item) use ($url): ResponseDescriber {
             $item->expiresAfter($this->cacheTime);
 
-            if (preg_match(
-                '/^' .
-                '([a-z0-9\-_]+):' .         // $repository
-                '([a-z0-9\-_]+)' .          // $index
-                '(@[a-z0-9\.-]+)?' .        // $version
-                '$/imsU',
-                $url,
-                $matches)
-            ) {
-                [, $repository, $index] = $matches;
-                $version = str_replace('@', '', $matches[3] ?? '') ?: self::MAIN_IDENTIFIER;
-                $entrypoint = $this->resolveEntryPoint($repository, $version);
-                $objectsContents = $this->getObjectsFile($entrypoint);
-
-                if ($objectsContents === '' && $version !== self::MAIN_IDENTIFIER) {
-                    // soft-fail to resolve a maybe not-yet released version to main.
-                    $entrypoint = $this->resolveEntryPoint($repository, self::MAIN_IDENTIFIER);
-                    $objectsContents = $this->getObjectsFile($entrypoint);
-                }
-
-                if ($objectsContents === '') {
-                    return new ResponseDescriber(404, [], 'Invalid shortcode, no objects.inv.json found.');
-                }
-
-                if (function_exists('json_validate') && !json_validate($objectsContents)) {
-                    return new ResponseDescriber(404, [], 'Invalid shortcode, defective objects.inv.json.');
-                }
-
-                $json = json_decode($objectsContents, true);
-                if (!is_array($json)) {
-                    return new ResponseDescriber(404, [], 'Invalid shortcode, invalid objects.inv.json.');
-                }
-
-                $link = $this->parseInventoryForIndex($index, $json);
-                if ($link === '') {
-                    return new ResponseDescriber(404, [], 'Invalid shortcode, could not find index.');
-                }
-
-                $forwardUrl = 'https://docs.typo3.org/' . $entrypoint . $link;
-
-                return new ResponseDescriber(307, ['Location' => $forwardUrl], 'Redirect to ' . $forwardUrl);
-            }
-
-            return new ResponseDescriber(404, [], 'Invalid shortcode.');
+            return $this->resolvePermalink($url);
         });
 
         return new Response($responseDescriber->statusCode, $responseDescriber->headers, $responseDescriber->body);
+    }
+
+    public function resolvePermalink(string $url): ResponseDescriber
+    {
+        if (preg_match(
+              '/^' .
+              '([a-z0-9\-_]+):' .         // $repository
+              '([a-z0-9\-_]+)' .          // $index
+              '(@[a-z0-9\.-]+)?' .        // $version
+              '$/imsU',
+              $url,
+              $matches)
+        ) {
+            [, $repository, $index] = $matches;
+            $repository = mb_strtolower($repository);
+            $index = mb_strtolower($index);
+            $version = mb_strtolower(str_replace('@', '', $matches[3] ?? '') ?: self::MAIN_IDENTIFIER);
+
+            $entrypoint = $this->resolveEntryPoint($repository, $version);
+            $objectsContents = $this->getObjectsFile($entrypoint);
+
+            if ($objectsContents === '' && $version !== self::MAIN_IDENTIFIER) {
+                // soft-fail to resolve a maybe not-yet released version to main.
+                $entrypoint = $this->resolveEntryPoint($repository, self::MAIN_IDENTIFIER);
+                $objectsContents = $this->getObjectsFile($entrypoint);
+            }
+
+            if ($objectsContents === '') {
+                return new ResponseDescriber(404, [], 'Invalid shortcode, no objects.inv.json found.');
+            }
+
+            if (function_exists('json_validate') && !json_validate($objectsContents)) {
+                return new ResponseDescriber(404, [], 'Invalid shortcode, defective objects.inv.json.');
+            }
+
+            $json = json_decode($objectsContents, true);
+            if (!is_array($json)) {
+                return new ResponseDescriber(404, [], 'Invalid shortcode, invalid objects.inv.json.');
+            }
+
+            $link = $this->parseInventoryForIndex($index, $json);
+            if ($link === '') {
+                return new ResponseDescriber(404, [], 'Invalid shortcode, could not find index.');
+            }
+
+            $forwardUrl = 'https://docs.typo3.org/' . $entrypoint . $link;
+
+            return new ResponseDescriber(307, ['Location' => $forwardUrl], 'Redirect to ' . $forwardUrl);
+        }
+
+        return new ResponseDescriber(404, [], 'Invalid shortcode.');
     }
 
     private function parseInventoryForIndex(string $index, array $json): string
@@ -214,21 +228,37 @@ final readonly class DocumentationLinker
     // Note: Currently hardcoded to 'en-us'
     private function resolveEntryPoint(string $repository, string $version): string
     {
+        $useCoreVersionResolving = true;
         if (preg_match('/^typo3-(cms-[0-9a-z\-]+)$/i', $repository, $repositoryParts)) {
+            // CASE: TYPO3 core manuals
             $entrypoint = 'https://docs.typo3.org/c/typo3/' . strtolower($repositoryParts[1]) . '/{typo3_version}/en-us/';
         } elseif ($inventory = DefaultInventories::tryFrom($repository)) {
-            $entrypoint = $inventory->getUrl();
+            // CASE: Official TYPO3 Documentation with known inventories. Provides "{typo3_version}" internally
+            // (some inventories DO NOT have that and always go to 'main'!)
+            $entrypoint = $inventory->getUrl($version);
         } else {
-            // $entrypoint = 'https://docs.typo3.org/p/' . strtolower($repository) . '/{typo3_version}/en-us/';
-            // The '/p/' notation is currently out-of-scope. Would need special handling of slashes.
-            $entrypoint = '';
+            // CASE: Third party documentation, based on composer-keys like https://docs.typo3.org/p/georgringer/news
+            //       A permalink like https://docs.typo3.org/permalink/someVendor-some-extension/ is resolved to https://docs.typo3.org/p/somevendor/some-extension/
+            $entrypoint = 'https://docs.typo3.org/p/' . preg_replace('/-/', '/', strtolower($repository), 1) . '/{typo3_version}/en-us/';
+            $useCoreVersionResolving = false;
+        }
+
+        if ($useCoreVersionResolving) {
+            // Core Version resolving. Uses the composer package t3docs/typo3-version-handling which allows to
+            // interpret strings as "dev", "stable", "oldstable" and can map "12" to latest 12.4.x version.
+            // If not resolvable, uses the raw version number as lookup (for example "12.4"). An invalid version
+            // string like "99.9999" will later fail when searching for the directory.
+            $resolvedVersion = Typo3VersionMapping::tryFrom($version)?->getVersion() ?? $version;
+        } else {
+            // Third party extensions use their own versioning.
+            $resolvedVersion = $version;
         }
 
         // Do replacements.
         // The 'https://docs.typo3.org/' notation comes from the external dependency,
         // normalize it again here, strip any hostname component to only get a directory.
         // @todo maybe make this prettier, security-wise this only allows domain names coming from DefaultInventories.
-        $entrypoint = str_replace('{typo3_version}', $version, $entrypoint);
+        $entrypoint = str_replace('{typo3_version}', $resolvedVersion, $entrypoint);
         return preg_replace('/^.*:\/\/[^\/]+\//msU', '', $entrypoint);
     }
 
