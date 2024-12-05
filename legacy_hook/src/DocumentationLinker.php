@@ -248,12 +248,7 @@ final readonly class DocumentationLinker
             // interpret strings as "dev", "stable", "oldstable" and can map "12" to latest 12.4.x version.
             // If not resolvable, uses the raw version number as lookup (for example "12.4"). An invalid version
             // string like "99.9999" will later fail when searching for the directory.
-            $resolvedVersionEnum = Typo3VersionMapping::tryFrom($version);
-            if ($resolvedVersionEnum === null) {
-                $resolvedVersion = $version;
-            } else {
-                $resolvedVersion = $resolvedVersionEnum->getVersion();
-            }
+            $resolvedVersion = Typo3VersionMapping::tryFrom($version)?->getVersion() ?? $version;
         } else {
             // Third party extensions use their own versioning.
             $resolvedVersion = $version;
