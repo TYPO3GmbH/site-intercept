@@ -1,0 +1,494 @@
+{
+    "std:doc": {
+        "Configuration\/Index": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html",
+            "Configuration"
+        ],
+        "Developer\/Index": [
+            "SEO",
+            "12.4",
+            "Developer\/Index.html",
+            "Developer Corner"
+        ],
+        "Editor\/DashboardWidgets": [
+            "SEO",
+            "12.4",
+            "Editor\/DashboardWidgets.html",
+            "Dashboard widgets for SEO"
+        ],
+        "Editor\/Index": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html",
+            "For Editors"
+        ],
+        "GeneralRecommendations\/Index": [
+            "SEO",
+            "12.4",
+            "GeneralRecommendations\/Index.html",
+            "General Recommendations"
+        ],
+        "Index": [
+            "SEO",
+            "12.4",
+            "Index.html",
+            "TYPO3 Search Engine Optimization"
+        ],
+        "Installation\/Index": [
+            "SEO",
+            "12.4",
+            "Installation\/Index.html",
+            "Installation"
+        ],
+        "Introduction\/Index": [
+            "SEO",
+            "12.4",
+            "Introduction\/Index.html",
+            "Introduction"
+        ],
+        "Sitemap": [
+            "SEO",
+            "12.4",
+            "Sitemap.html",
+            "Sitemap"
+        ]
+    },
+    "std:label": {
+        "configuration": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#configuration",
+            "Configuration"
+        ],
+        "config-tags": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#config-tags",
+            "Tags"
+        ],
+        "config-hreflang-tags": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#config-hreflang-tags",
+            "Hreflang link-tags"
+        ],
+        "config-canonical-tag": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#config-canonical-tag",
+            "Canonical Tag"
+        ],
+        "developer": [
+            "SEO",
+            "12.4",
+            "Developer\/Index.html#developer",
+            "Developer Corner"
+        ],
+        "dashboard-widgets": [
+            "SEO",
+            "12.4",
+            "Editor\/DashboardWidgets.html#dashboard-widgets",
+            "Dashboard widgets for SEO"
+        ],
+        "dashboard-widgets-missing-description": [
+            "SEO",
+            "12.4",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description",
+            "\"Missing Meta Description\" widget"
+        ],
+        "dashboard-widgets-missing-description-add": [
+            "SEO",
+            "12.4",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description-add",
+            "Adding the \"Missing Meta Description\" widget to your personal Dashboard"
+        ],
+        "dashboard-widgets-missing-description-use": [
+            "SEO",
+            "12.4",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description-use",
+            "Using the \"Missing Meta Description\" widget to improve SEO results"
+        ],
+        "for-editors": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#for-editors",
+            "For Editors"
+        ],
+        "title-for-search-engines": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#title-for-search-engines",
+            "Title for search engines"
+        ],
+        "description": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#description",
+            "Description"
+        ],
+        "index-page": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#index-page",
+            "Index this page"
+        ],
+        "recommendations": [
+            "SEO",
+            "12.4",
+            "GeneralRecommendations\/Index.html#recommendations",
+            "General Recommendations"
+        ],
+        "recommendations-extensions": [
+            "SEO",
+            "12.4",
+            "GeneralRecommendations\/Index.html#recommendations_extensions",
+            "Recommendations for additional SEO extensions"
+        ],
+        "recommendations-field-description": [
+            "SEO",
+            "12.4",
+            "GeneralRecommendations\/Index.html#recommendations_field_description",
+            "Recommendations for the description field"
+        ],
+        "start": [
+            "SEO",
+            "12.4",
+            "Index.html#start",
+            "TYPO3 Search Engine Optimization"
+        ],
+        "installation": [
+            "SEO",
+            "12.4",
+            "Installation\/Index.html#installation",
+            "Installation"
+        ],
+        "introduction": [
+            "SEO",
+            "12.4",
+            "Introduction\/Index.html#introduction",
+            "Introduction"
+        ],
+        "screenshots": [
+            "SEO",
+            "12.4",
+            "Introduction\/Index.html#screenshots",
+            "Screenshots"
+        ]
+    },
+    "std:title": {
+        "configuration-1": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#configuration-1",
+            "Configuration"
+        ],
+        "typoscript-settings": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#typoscript-settings",
+            "TypoScript Settings"
+        ],
+        "site-configuration": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#site-configuration",
+            "Site configuration"
+        ],
+        "entry-point": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#entry-point",
+            "Entry Point"
+        ],
+        "languages": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#languages",
+            "Languages"
+        ],
+        "error-handling": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#error-handling",
+            "Error Handling"
+        ],
+        "robots-txt": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#robots-txt",
+            "robots.txt"
+        ],
+        "static-routes-and-redirects": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#static-routes-and-redirects",
+            "Static Routes and redirects"
+        ],
+        "tags": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#tags",
+            "Tags"
+        ],
+        "hreflang-link-tags": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#hreflang-link-tags",
+            "Hreflang link-tags"
+        ],
+        "canonical-tag": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#canonical-tag",
+            "Canonical Tag"
+        ],
+        "working-links": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#working-links",
+            "Working links"
+        ],
+        "typoscript-examples": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#typoscript-examples",
+            "TypoScript examples"
+        ],
+        "setting-missing-opengraph-meta-tags": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#setting-missing-opengraph-meta-tags",
+            "Setting missing OpenGraph meta tags"
+        ],
+        "setting-fallbacks-for-meta-tags": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#setting-fallbacks-for-meta-tags",
+            "Setting fallbacks for meta tags"
+        ],
+        "setting-fallbacks-for-og-image-and-twitter-image": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#setting-fallbacks-for-og-image-and-twitter-image",
+            "Setting fallbacks for og:image and twitter:image"
+        ],
+        "setting-defaults-for-the-author-on-meta-tags": [
+            "SEO",
+            "12.4",
+            "Configuration\/Index.html#setting-defaults-for-the-author-on-meta-tags",
+            "Setting defaults for the author on meta tags"
+        ],
+        "developer-corner": [
+            "SEO",
+            "12.4",
+            "Developer\/Index.html#developer-corner",
+            "Developer Corner"
+        ],
+        "dashboard-widgets-for-seo": [
+            "SEO",
+            "12.4",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-for-seo",
+            "Dashboard widgets for SEO"
+        ],
+        "missing-meta-description-widget": [
+            "SEO",
+            "12.4",
+            "Editor\/DashboardWidgets.html#missing-meta-description-widget",
+            "\"Missing Meta Description\" widget"
+        ],
+        "adding-the-missing-meta-description-widget-to-your-personal-dashboard": [
+            "SEO",
+            "12.4",
+            "Editor\/DashboardWidgets.html#adding-the-missing-meta-description-widget-to-your-personal-dashboard",
+            "Adding the \"Missing Meta Description\" widget to your personal Dashboard"
+        ],
+        "using-the-missing-meta-description-widget-to-improve-seo-results": [
+            "SEO",
+            "12.4",
+            "Editor\/DashboardWidgets.html#using-the-missing-meta-description-widget-to-improve-seo-results",
+            "Using the \"Missing Meta Description\" widget to improve SEO results"
+        ],
+        "for-editors-1": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#for-editors-1",
+            "For Editors"
+        ],
+        "general-tab": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#general-tab",
+            "General tab"
+        ],
+        "page-title": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#page-title",
+            "Page Title"
+        ],
+        "url-segment-slug": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#url-segment-slug",
+            "URL Segment (slug)"
+        ],
+        "seo-tab": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#seo-tab",
+            "SEO Tab"
+        ],
+        "title-for-search-engines": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#title-for-search-engines",
+            "Title for search engines"
+        ],
+        "description": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#description",
+            "Description"
+        ],
+        "index-this-page": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#index-this-page",
+            "Index this page"
+        ],
+        "follow-this-page": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#follow-this-page",
+            "Follow this page"
+        ],
+        "canonical-link": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#canonical-link",
+            "Canonical link"
+        ],
+        "change-frequency": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#change-frequency",
+            "Change frequency"
+        ],
+        "priority": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#priority",
+            "Priority"
+        ],
+        "social-media": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#social-media",
+            "Social media"
+        ],
+        "title": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#title",
+            "Title"
+        ],
+        "image": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#image",
+            "Image"
+        ],
+        "metadata-tab": [
+            "SEO",
+            "12.4",
+            "Editor\/Index.html#metadata-tab",
+            "Metadata Tab"
+        ],
+        "general-recommendations": [
+            "SEO",
+            "12.4",
+            "GeneralRecommendations\/Index.html#general-recommendations",
+            "General Recommendations"
+        ],
+        "recommendations-for-additional-seo-extensions": [
+            "SEO",
+            "12.4",
+            "GeneralRecommendations\/Index.html#recommendations-for-additional-seo-extensions",
+            "Recommendations for additional SEO extensions"
+        ],
+        "recommendations-for-the-description-field": [
+            "SEO",
+            "12.4",
+            "GeneralRecommendations\/Index.html#recommendations-for-the-description-field",
+            "Recommendations for the description field"
+        ],
+        "typo3-search-engine-optimization": [
+            "SEO",
+            "12.4",
+            "Index.html#typo3-search-engine-optimization",
+            "TYPO3 Search Engine Optimization"
+        ],
+        "installation-1": [
+            "SEO",
+            "12.4",
+            "Installation\/Index.html#installation-1",
+            "Installation"
+        ],
+        "installation-with-composer": [
+            "SEO",
+            "12.4",
+            "Installation\/Index.html#installation-with-composer",
+            "Installation with Composer"
+        ],
+        "installation-without-composer": [
+            "SEO",
+            "12.4",
+            "Installation\/Index.html#installation-without-composer",
+            "Installation without Composer"
+        ],
+        "introduction-1": [
+            "SEO",
+            "12.4",
+            "Introduction\/Index.html#introduction-1",
+            "Introduction"
+        ],
+        "what-does-it-do": [
+            "SEO",
+            "12.4",
+            "Introduction\/Index.html#what-does-it-do",
+            "What does it do?"
+        ],
+        "screenshots": [
+            "SEO",
+            "12.4",
+            "Introduction\/Index.html#screenshots",
+            "Screenshots"
+        ],
+        "hreflang-tags": [
+            "SEO",
+            "12.4",
+            "Introduction\/Index.html#hreflang-tags",
+            "Hreflang Tags"
+        ],
+        "canonical-tags": [
+            "SEO",
+            "12.4",
+            "Introduction\/Index.html#canonical-tags",
+            "Canonical Tags"
+        ],
+        "xml-sitemap": [
+            "SEO",
+            "12.4",
+            "Introduction\/Index.html#xml-sitemap",
+            "XML Sitemap"
+        ],
+        "sitemap": [
+            "SEO",
+            "12.4",
+            "Sitemap.html#sitemap",
+            "Sitemap"
+        ]
+    }
+}
