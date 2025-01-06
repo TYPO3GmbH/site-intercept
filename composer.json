@@ -65,7 +65,7 @@
         "t3g/datahub-api-library": "^3.0",
         "t3g/symfony-datahub-bundle": "^2.0.5",
         "t3g/symfony-keycloak-bundle": "@dev",
-        "t3g/symfony-template-bundle": "^3.6.0",
+        "t3g/symfony-template-bundle": "^4.0.3",
         "t3g/symfony-usercentrics-bundle": "^1.0.0",
         "twig/twig": "^3.6"
     },
