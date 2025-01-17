@@ -190,39 +190,64 @@ final readonly class DocumentationLinker
 
     private function parseInventoryForIndex(string $index, array $json): string
     {
-        // This is some VERY simplified logic to parse the JSON.
-        // @todo may need refinement. This logic is deeply coupled to the phpdocumentor/guides parser
-        // We recognize a matching index in these groups to be the final
-        // URL with a fragment identifier:
+        // This is some simplified logic to parse the JSON.
+        // The $index is what is the input permalink, something like 'upgrade-run'.
+        // We search the whole objects.inv.json array structure for this specific key.
+        // Ideally, it is found in "std:label" (highest priority).
+        // Some other keys are also parsed as a fallback.
+        // If a key is prefixed like "confval-opcache-save-comments", this prefixed key is contained in std:label.
+        // It would have a second match in the "std:confval" array, but there without the "confval-" prefix,
+        // but the resolve is done through "std:label".
+        // The fallbacks will help if (accidentally) a permalink was made using a filename instead of a real anchor key.
         $docNodes = [
-            'std:doc' => '',
-            'std:label' => '',
-            'std:title' => '',
-            'std:option' => '',
+            'std:label', // Highest priority, this is what does 99,99% of all resolving!
+            'std:doc',
+            'std:title',
+            'std:option',
+            'php:class',
+            'php:method',
+            'php:interface',
+            'php:property',
         ];
-        // Everything NOT in this array uses a key like 'std:confval'
-        // to prefix 'confval'. Known: std:confval, std:confval-menu,
 
-        $link = '';
+        // Sort the JSON array to use the priority above. All unknown keys retain their order.
+        uksort($json, function ($keyA, $keyB) use ($docNodes) {
+            $indexA = array_search($keyA, $docNodes, true);
+            $indexB = array_search($keyB, $docNodes, true);
+
+            // Keys in the desired order come first and are sorted according to their position in the desired order array $docNodes
+            if ($indexA !== false && $indexB !== false) {
+                return $indexA <=> $indexB;
+            }
+
+            // Keys not in the desired order retain their relative position
+            if ($indexA !== false) {
+                return -1;
+            }
+
+            if ($indexB !== false) {
+                return 1;
+            }
+
+            return 0;
+        });
+
         foreach ($json as $mainKey => $subKeys) {
             foreach ($subKeys as $indexName => $indexMetaData) {
                 if ($indexName === $index) {
-                    if (isset($docNodes[$mainKey])) {
+                    if (in_array($mainKey, $docNodes, true)) {
                         // Resolves to an entry like 'ApiOverview/Events/Events/Core/Security/InvestigateMutationsEvent.html#typo3-cms-core-security-contentsecuritypolicy-event-investigatemutationsevent-policy'
-                        $link = $indexMetaData[2];
+                        return $indexMetaData[2];
                     } else {
-                        $docNodeTypeParts = explode(':', $mainKey);
-                        // We make the link more specific by replacing something like
-                        // std:confval + pagelink.html#some-entry
-                        // to:
-                        // pagelink.html#confval-some-entry
-                        $link = str_replace('#', '#' . $docNodeTypeParts[1] . '-', $indexMetaData[2]);
+                        // Currently, no replacement is needed, but let's have a distinct case for this
+                        // for forward compatibility.
+                        return $indexMetaData[2];
                     }
                 }
             }
         }
 
-        return $link;
+        return '';
     }
 
     // Note: Currently hardcoded to 'en-us'
