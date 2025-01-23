@@ -211,7 +211,7 @@ final readonly class DocumentationLinker
         ];
 
         // Sort the JSON array to use the priority above. All unknown keys retain their order.
-        uksort($json, function ($keyA, $keyB) use ($docNodes) {
+        uksort($json, static function (string $keyA, string $keyB) use ($docNodes): int {
             $indexA = array_search($keyA, $docNodes, true);
             $indexB = array_search($keyB, $docNodes, true);
 
