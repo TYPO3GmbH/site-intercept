@@ -24,23 +24,17 @@
             "Developer\/Index.html",
             "Developer Corner"
         ],
-        "Editor\/DashboardWidgets": [
+        "Features\/Index": [
             "SEO",
             "main",
-            "Editor\/DashboardWidgets.html",
-            "Dashboard widgets for SEO"
+            "Features\/Index.html",
+            "Features of the TYPO3 system extension \"seo\""
         ],
-        "Editor\/Index": [
+        "Features\/XmlSitemap": [
             "SEO",
             "main",
-            "Editor\/Index.html",
-            "For Editors"
-        ],
-        "GeneralRecommendations\/Index": [
-            "SEO",
-            "main",
-            "GeneralRecommendations\/Index.html",
-            "General Recommendations"
+            "Features\/XmlSitemap.html",
+            "XML sitemap"
         ],
         "Index": [
             "SEO",
@@ -80,24 +74,6 @@
             "Configuration\/Index.html#configuration-site-sets",
             "Site sets"
         ],
-        "config-tags": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#config-tags",
-            "Tags"
-        ],
-        "config-hreflang-tags": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#config-hreflang-tags",
-            "Hreflang link-tags"
-        ],
-        "config-canonical-tag": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#config-canonical-tag",
-            "Canonical Tag"
-        ],
         "configuration-site-set-settings": [
             "SEO",
             "main",
@@ -116,71 +92,113 @@
             "Developer\/Index.html#developer",
             "Developer Corner"
         ],
-        "dashboard-widgets": [
+        "features": [
             "SEO",
             "main",
-            "Editor\/DashboardWidgets.html#dashboard-widgets",
-            "Dashboard widgets for SEO"
+            "Features\/Index.html#features",
+            "Features of the TYPO3 system extension \"seo\""
         ],
-        "dashboard-widgets-missing-description": [
+        "seo-page-properties": [
             "SEO",
             "main",
-            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description",
-            "\"Missing Meta Description\" widget"
+            "Features\/Index.html#seo-page-properties",
+            "Additional tabs \"SEO\" and \"Social media\" in the page properties"
         ],
-        "dashboard-widgets-missing-description-add": [
+        "seo-page-dashboard": [
             "SEO",
             "main",
-            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description-add",
-            "Adding the \"Missing Meta Description\" widget to your personal Dashboard"
+            "Features\/Index.html#seo-page-dashboard",
+            "A Dashboard Widget for SEO"
         ],
-        "dashboard-widgets-missing-description-use": [
+        "xml-sitemap": [
             "SEO",
             "main",
-            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description-use",
-            "Using the \"Missing Meta Description\" widget to improve SEO results"
+            "Features\/Index.html#xml-sitemap",
+            "XML Sitemap"
         ],
-        "for-editors": [
+        "canonical-url": [
             "SEO",
             "main",
-            "Editor\/Index.html#for-editors",
-            "For Editors"
+            "Features\/Index.html#canonical-url",
+            "Canonical URL"
         ],
-        "title-for-search-engines": [
+        "seo-page-title-provider": [
             "SEO",
             "main",
-            "Editor\/Index.html#title-for-search-engines",
-            "Title for search engines"
+            "Features\/Index.html#seo-page-title-provider",
+            "SEO page title provider"
         ],
-        "description": [
+        "seo-meta-tag-provider": [
             "SEO",
             "main",
-            "Editor\/Index.html#description",
-            "Description"
+            "Features\/Index.html#seo-meta-tag-provider",
+            "Additional meta tag handling"
         ],
-        "index-page": [
+        "seo-hreflang": [
             "SEO",
             "main",
-            "Editor\/Index.html#index-page",
-            "Index this page"
+            "Features\/Index.html#seo-hreflang",
+            "Hreflang tags"
         ],
-        "recommendations": [
+        "xmlsitemap": [
             "SEO",
             "main",
-            "GeneralRecommendations\/Index.html#recommendations",
-            "General Recommendations"
+            "Features\/XmlSitemap.html#xmlsitemap",
+            "XML sitemap"
         ],
-        "recommendations-extensions": [
+        "xmlsitemap-url": [
             "SEO",
             "main",
-            "GeneralRecommendations\/Index.html#recommendations_extensions",
-            "Recommendations for additional SEO extensions"
+            "Features\/XmlSitemap.html#xmlsitemap-url",
+            "How to access your XML sitemap"
         ],
-        "recommendations-field-description": [
+        "xmlsitemap-routing": [
             "SEO",
             "main",
-            "GeneralRecommendations\/Index.html#recommendations_field_description",
-            "Recommendations for the description field"
+            "Features\/XmlSitemap.html#xmlsitemap-routing",
+            "How to setup routing for the XML sitemap"
+        ],
+        "xmlsitemap-data-providers": [
+            "SEO",
+            "main",
+            "Features\/XmlSitemap.html#xmlsitemap-data-providers",
+            "Data providers for XML sitemaps"
+        ],
+        "xmlsitemap-data-providers-pages": [
+            "SEO",
+            "main",
+            "Features\/XmlSitemap.html#xmlsitemap-data-providers-pages",
+            "For pages: PagesXmlSitemapDataProvider"
+        ],
+        "xmlsitemap-data-providers-records": [
+            "SEO",
+            "main",
+            "Features\/XmlSitemap.html#xmlsitemap-data-providers-records",
+            "For database records: RecordsXmlSitemapDataProvider"
+        ],
+        "xmlsitemap-changefreq-priority": [
+            "SEO",
+            "main",
+            "Features\/XmlSitemap.html#xmlsitemap-changefreq-priority",
+            "Change frequency and priority"
+        ],
+        "xmlsitemap-without-sorting": [
+            "SEO",
+            "main",
+            "Features\/XmlSitemap.html#xmlsitemap-without-sorting",
+            "Sitemap of records without sorting field"
+        ],
+        "xmlsitemap-custom-provider": [
+            "SEO",
+            "main",
+            "Features\/XmlSitemap.html#xmlsitemap-custom-provider",
+            "Create a custom XML sitemap provider"
+        ],
+        "sitemap-xslfile": [
+            "SEO",
+            "main",
+            "Features\/XmlSitemap.html#sitemap-xslFile",
+            "Use a customized sitemap XSL file"
         ],
         "start": [
             "SEO",
@@ -200,288 +218,204 @@
             "Introduction\/Index.html#introduction",
             "Introduction"
         ],
-        "screenshots": [
+        "confval-menu-seo-settings": [
             "SEO",
             "main",
-            "Introduction\/Index.html#screenshots",
-            "Screenshots"
+            "Configuration\/Settings.html#confval-menu-seo-settings",
+            ""
+        ],
+        "confval-seo-settings-category-seo": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#confval-seo-settings-category-seo",
+            "seo"
+        ],
+        "confval-seo-settings-category-seo-templates": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#confval-seo-settings-category-seo-templates",
+            "seo.templates"
+        ],
+        "confval-seo-settings-seo-sitemap-view-templaterootpath": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-view-templaterootpath",
+            "seo.sitemap.view.templateRootPath"
+        ],
+        "confval-seo-settings-seo-sitemap-view-partialrootpath": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-view-partialrootpath",
+            "seo.sitemap.view.partialRootPath"
+        ],
+        "confval-seo-settings-seo-sitemap-view-layoutrootpath": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-view-layoutrootpath",
+            "seo.sitemap.view.layoutRootPath"
+        ],
+        "confval-seo-settings-seo-sitemap-pages-excludeddoktypes": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-pages-excludeddoktypes",
+            "seo.sitemap.pages.excludedDoktypes"
+        ],
+        "confval-seo-settings-seo-sitemap-pages-excludepagesrecursive": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-pages-excludepagesrecursive",
+            "seo.sitemap.pages.excludePagesRecursive"
+        ],
+        "confval-seo-settings-seo-sitemap-pages-additionalwhere": [
+            "SEO",
+            "main",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-pages-additionalwhere",
+            "seo.sitemap.pages.additionalWhere"
         ]
     },
     "std:title": {
         "configuration-1": [
             "SEO",
             "main",
-            "Configuration\/Index.html#configuration-1",
+            "Configuration\/Index.html#configuration",
             "Configuration"
         ],
         "site-sets": [
             "SEO",
             "main",
-            "Configuration\/Index.html#site-sets",
+            "Configuration\/Index.html#configuration-site-sets",
             "Site sets"
-        ],
-        "typoscript-settings": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#typoscript-settings",
-            "TypoScript Settings"
-        ],
-        "site-configuration": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#site-configuration",
-            "Site configuration"
-        ],
-        "entry-point": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#entry-point",
-            "Entry Point"
-        ],
-        "languages": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#languages",
-            "Languages"
-        ],
-        "error-handling": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#error-handling",
-            "Error Handling"
-        ],
-        "robots-txt": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#robots-txt",
-            "robots.txt"
-        ],
-        "static-routes-and-redirects": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#static-routes-and-redirects",
-            "Static Routes and redirects"
-        ],
-        "tags": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#tags",
-            "Tags"
-        ],
-        "hreflang-link-tags": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#hreflang-link-tags",
-            "Hreflang link-tags"
-        ],
-        "canonical-tag": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#canonical-tag",
-            "Canonical Tag"
-        ],
-        "working-links": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#working-links",
-            "Working links"
-        ],
-        "typoscript-examples": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#typoscript-examples",
-            "TypoScript examples"
-        ],
-        "setting-missing-opengraph-meta-tags": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#setting-missing-opengraph-meta-tags",
-            "Setting missing OpenGraph meta tags"
-        ],
-        "setting-fallbacks-for-meta-tags": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#setting-fallbacks-for-meta-tags",
-            "Setting fallbacks for meta tags"
-        ],
-        "setting-fallbacks-for-og-image-and-twitter-image": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#setting-fallbacks-for-og-image-and-twitter-image",
-            "Setting fallbacks for og:image and twitter:image"
-        ],
-        "setting-defaults-for-the-author-on-meta-tags": [
-            "SEO",
-            "main",
-            "Configuration\/Index.html#setting-defaults-for-the-author-on-meta-tags",
-            "Setting defaults for the author on meta tags"
         ],
         "site-sets-settings-of-ext-seo": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#site-sets-settings-of-ext-seo",
+            "Configuration\/Settings.html#configuration-site-set-settings",
             "Site sets settings of EXT:seo"
         ],
         "settings-editor-1": [
             "SEO",
             "main",
-            "Configuration\/SettingsEditor.html#settings-editor-1",
+            "Configuration\/SettingsEditor.html#settings-editor",
             "Settings editor"
         ],
         "developer-corner": [
             "SEO",
             "main",
-            "Developer\/Index.html#developer-corner",
+            "Developer\/Index.html#developer",
             "Developer Corner"
         ],
-        "dashboard-widgets-for-seo": [
+        "features-of-the-typo3-system-extension-seo": [
             "SEO",
             "main",
-            "Editor\/DashboardWidgets.html#dashboard-widgets-for-seo",
-            "Dashboard widgets for SEO"
+            "Features\/Index.html#features",
+            "Features of the TYPO3 system extension \"seo\""
         ],
-        "missing-meta-description-widget": [
+        "additional-tabs-seo-and-social-media-in-the-page-properties": [
             "SEO",
             "main",
-            "Editor\/DashboardWidgets.html#missing-meta-description-widget",
-            "\"Missing Meta Description\" widget"
+            "Features\/Index.html#seo-page-properties",
+            "Additional tabs \"SEO\" and \"Social media\" in the page properties"
         ],
-        "adding-the-missing-meta-description-widget-to-your-personal-dashboard": [
+        "a-dashboard-widget-for-seo": [
             "SEO",
             "main",
-            "Editor\/DashboardWidgets.html#adding-the-missing-meta-description-widget-to-your-personal-dashboard",
-            "Adding the \"Missing Meta Description\" widget to your personal Dashboard"
+            "Features\/Index.html#seo-page-dashboard",
+            "A Dashboard Widget for SEO"
         ],
-        "using-the-missing-meta-description-widget-to-improve-seo-results": [
+        "xml-sitemap": [
             "SEO",
             "main",
-            "Editor\/DashboardWidgets.html#using-the-missing-meta-description-widget-to-improve-seo-results",
-            "Using the \"Missing Meta Description\" widget to improve SEO results"
+            "Features\/XmlSitemap.html#xmlsitemap",
+            "XML sitemap"
         ],
-        "for-editors-1": [
+        "canonical-url": [
             "SEO",
             "main",
-            "Editor\/Index.html#for-editors-1",
-            "For Editors"
+            "Features\/Index.html#canonical-url",
+            "Canonical URL"
         ],
-        "general-tab": [
+        "seo-page-title-provider": [
             "SEO",
             "main",
-            "Editor\/Index.html#general-tab",
-            "General tab"
+            "Features\/Index.html#seo-page-title-provider",
+            "SEO page title provider"
         ],
-        "page-title": [
+        "additional-meta-tag-handling": [
             "SEO",
             "main",
-            "Editor\/Index.html#page-title",
-            "Page Title"
+            "Features\/Index.html#seo-meta-tag-provider",
+            "Additional meta tag handling"
         ],
-        "url-segment-slug": [
+        "hreflang-tags": [
             "SEO",
             "main",
-            "Editor\/Index.html#url-segment-slug",
-            "URL Segment (slug)"
+            "Features\/Index.html#seo-hreflang",
+            "Hreflang tags"
         ],
-        "seo-tab": [
+        "how-to-access-your-xml-sitemap": [
             "SEO",
             "main",
-            "Editor\/Index.html#seo-tab",
-            "SEO Tab"
+            "Features\/XmlSitemap.html#xmlsitemap-url",
+            "How to access your XML sitemap"
         ],
-        "title-for-search-engines": [
+        "how-to-setup-routing-for-the-xml-sitemap": [
             "SEO",
             "main",
-            "Editor\/Index.html#title-for-search-engines",
-            "Title for search engines"
+            "Features\/XmlSitemap.html#xmlsitemap-routing",
+            "How to setup routing for the XML sitemap"
         ],
-        "description": [
+        "data-providers-for-xml-sitemaps": [
             "SEO",
             "main",
-            "Editor\/Index.html#description",
-            "Description"
+            "Features\/XmlSitemap.html#xmlsitemap-data-providers",
+            "Data providers for XML sitemaps"
         ],
-        "index-this-page": [
+        "for-pages-pagesxmlsitemapdataprovider": [
             "SEO",
             "main",
-            "Editor\/Index.html#index-this-page",
-            "Index this page"
+            "Features\/XmlSitemap.html#xmlsitemap-data-providers-pages",
+            "For pages: PagesXmlSitemapDataProvider"
         ],
-        "follow-this-page": [
+        "for-database-records-recordsxmlsitemapdataprovider": [
             "SEO",
             "main",
-            "Editor\/Index.html#follow-this-page",
-            "Follow this page"
+            "Features\/XmlSitemap.html#xmlsitemap-data-providers-records",
+            "For database records: RecordsXmlSitemapDataProvider"
         ],
-        "canonical-link": [
+        "change-frequency-and-priority": [
             "SEO",
             "main",
-            "Editor\/Index.html#canonical-link",
-            "Canonical link"
+            "Features\/XmlSitemap.html#xmlsitemap-changefreq-priority",
+            "Change frequency and priority"
         ],
-        "change-frequency": [
+        "sitemap-of-records-without-sorting-field": [
             "SEO",
             "main",
-            "Editor\/Index.html#change-frequency",
-            "Change frequency"
+            "Features\/XmlSitemap.html#xmlsitemap-without-sorting",
+            "Sitemap of records without sorting field"
         ],
-        "priority": [
+        "create-a-custom-xml-sitemap-provider": [
             "SEO",
             "main",
-            "Editor\/Index.html#priority",
-            "Priority"
+            "Features\/XmlSitemap.html#xmlsitemap-custom-provider",
+            "Create a custom XML sitemap provider"
         ],
-        "social-media": [
+        "use-a-customized-sitemap-xsl-file": [
             "SEO",
             "main",
-            "Editor\/Index.html#social-media",
-            "Social media"
-        ],
-        "title": [
-            "SEO",
-            "main",
-            "Editor\/Index.html#title",
-            "Title"
-        ],
-        "image": [
-            "SEO",
-            "main",
-            "Editor\/Index.html#image",
-            "Image"
-        ],
-        "metadata-tab": [
-            "SEO",
-            "main",
-            "Editor\/Index.html#metadata-tab",
-            "Metadata Tab"
-        ],
-        "general-recommendations": [
-            "SEO",
-            "main",
-            "GeneralRecommendations\/Index.html#general-recommendations",
-            "General Recommendations"
-        ],
-        "recommendations-for-additional-seo-extensions": [
-            "SEO",
-            "main",
-            "GeneralRecommendations\/Index.html#recommendations-for-additional-seo-extensions",
-            "Recommendations for additional SEO extensions"
-        ],
-        "recommendations-for-the-description-field": [
-            "SEO",
-            "main",
-            "GeneralRecommendations\/Index.html#recommendations-for-the-description-field",
-            "Recommendations for the description field"
+            "Features\/XmlSitemap.html#sitemap-xslFile",
+            "Use a customized sitemap XSL file"
         ],
         "typo3-search-engine-optimization": [
             "SEO",
             "main",
-            "Index.html#typo3-search-engine-optimization",
+            "Index.html#start",
             "TYPO3 Search Engine Optimization"
         ],
         "installation-1": [
             "SEO",
             "main",
-            "Installation\/Index.html#installation-1",
+            "Installation\/Index.html#installation",
             "Installation"
         ],
         "installation-with-composer": [
@@ -499,38 +433,8 @@
         "introduction-1": [
             "SEO",
             "main",
-            "Introduction\/Index.html#introduction-1",
+            "Introduction\/Index.html#introduction",
             "Introduction"
-        ],
-        "what-does-it-do": [
-            "SEO",
-            "main",
-            "Introduction\/Index.html#what-does-it-do",
-            "What does it do?"
-        ],
-        "screenshots": [
-            "SEO",
-            "main",
-            "Introduction\/Index.html#screenshots",
-            "Screenshots"
-        ],
-        "hreflang-tags": [
-            "SEO",
-            "main",
-            "Introduction\/Index.html#hreflang-tags",
-            "Hreflang Tags"
-        ],
-        "canonical-tags": [
-            "SEO",
-            "main",
-            "Introduction\/Index.html#canonical-tags",
-            "Canonical Tags"
-        ],
-        "xml-sitemap": [
-            "SEO",
-            "main",
-            "Introduction\/Index.html#xml-sitemap",
-            "XML Sitemap"
         ],
         "sitemap": [
             "SEO",
@@ -543,7 +447,7 @@
         "seo-settings": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#seo-settings",
+            "Configuration\/Settings.html#confval-menu-seo-settings",
             ""
         ]
     },
@@ -551,49 +455,49 @@
         "seo-settings-category-seo": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#seo-settings-category-seo",
+            "Configuration\/Settings.html#confval-seo-settings-category-seo",
             "seo"
         ],
         "seo-settings-category-seo-templates": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#seo-settings-category-seo-templates",
+            "Configuration\/Settings.html#confval-seo-settings-category-seo-templates",
             "seo.templates"
         ],
         "seo-settings-seo-sitemap-view-templaterootpath": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#seo-settings-seo-sitemap-view-templaterootpath",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-view-templaterootpath",
             "seo.sitemap.view.templateRootPath"
         ],
         "seo-settings-seo-sitemap-view-partialrootpath": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#seo-settings-seo-sitemap-view-partialrootpath",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-view-partialrootpath",
             "seo.sitemap.view.partialRootPath"
         ],
         "seo-settings-seo-sitemap-view-layoutrootpath": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#seo-settings-seo-sitemap-view-layoutrootpath",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-view-layoutrootpath",
             "seo.sitemap.view.layoutRootPath"
         ],
         "seo-settings-seo-sitemap-pages-excludeddoktypes": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#seo-settings-seo-sitemap-pages-excludeddoktypes",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-pages-excludeddoktypes",
             "seo.sitemap.pages.excludedDoktypes"
         ],
         "seo-settings-seo-sitemap-pages-excludepagesrecursive": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#seo-settings-seo-sitemap-pages-excludepagesrecursive",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-pages-excludepagesrecursive",
             "seo.sitemap.pages.excludePagesRecursive"
         ],
         "seo-settings-seo-sitemap-pages-additionalwhere": [
             "SEO",
             "main",
-            "Configuration\/Settings.html#seo-settings-seo-sitemap-pages-additionalwhere",
+            "Configuration\/Settings.html#confval-seo-settings-seo-sitemap-pages-additionalwhere",
             "seo.sitemap.pages.additionalWhere"
         ]
     }

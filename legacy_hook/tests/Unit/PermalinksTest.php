@@ -85,6 +85,10 @@ class PermalinksTest extends TestCase
     public static function redirectWorksDataProvider(): array
     {
         return [
+            'dupe sorting' => [
+                'permalink' => 'dummyvendor-dummy:dupe-entry',
+                'location' => 'https://docs.typo3.org/p/dummyvendor/dummy/main/en-us/Index.html#dupe-entry',
+            ],
             'core manual, no version' => [
                 'permalink' => 'changelog:important-100889-1690476872',
                 'location' => 'https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/11.5.x/Important-100889-AllowInsecureSiteResolutionByQueryParameters.html#important-100889-1690476872',
@@ -202,8 +206,44 @@ class PermalinksTest extends TestCase
             ],
 
             'confval resolve' => [
+                'permalink' => 't3tsref:module-settings',
+                'location' => 'https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/TopLevelObjects/Module.html#confval-module-settings',
+            ],
+
+            'confval resolve (fallback)' => [
                 'permalink' => 't3tsref:confval-module-settings',
                 'location' => 'https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/TopLevelObjects/Module.html#confval-module-settings',
+            ],
+
+            'confval-menu resolve' => [
+                'permalink' => 't3coreapi:backend-module',
+                'location' => 'https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/Backend/BackendModules/ModuleConfiguration/Index.html#confval-menu-backend-module',
+            ],
+
+            'confval-menu resolve (fallback)' => [
+                'permalink' => 't3coreapi:confval-menu-backend-module',
+                'location' => 'https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/Backend/BackendModules/ModuleConfiguration/Index.html#confval-menu-backend-module',
+            ],
+
+            # console command example
+            'console command list' => [
+                'permalink' => 't3coreapi:apioverview-commandcontrollers-listcommands',
+                'location' => 'https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/CommandControllers/ListCommands.html#console-command-list-apioverview-commandcontrollers-listcommands',
+            ],
+
+            'console command fallback' => [
+                'permalink' => 't3coreapi:console-command-list-apioverview-commandcontrollers-listcommands',
+                'location' => 'https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/CommandControllers/ListCommands.html#console-command-list-apioverview-commandcontrollers-listcommands',
+            ],
+
+            'console command item' => [
+                'permalink' => 't3coreapi:completion',
+                'location' => 'https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/CommandControllers/ListCommands.html#console-command-completion',
+            ],
+
+            'console command item fallback' => [
+                'permalink' => 't3coreapi:console-command-completion',
+                'location' => 'https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ApiOverview/CommandControllers/ListCommands.html#console-command-completion',
             ],
 
             # Lower/Uppercase normalization
@@ -249,7 +289,7 @@ class PermalinksTest extends TestCase
         self::assertInstanceOf(DocumentationLinker::class, $this->subject);
         $describer = $this->subject->resolvePermalink($permalink);
 
-        self::assertSame(307, $describer->statusCode);
+        self::assertSame(307, $describer->statusCode, 'Header mismatch: ' . $describer->body);
         self::assertSame(['Location' => $location], $describer->headers);
         self::assertStringContainsString('Redirect to', $describer->body);
     }
