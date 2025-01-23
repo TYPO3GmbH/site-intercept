@@ -1,0 +1,74 @@
+{
+    "std:doc": {
+        "dupe-entry": [
+            "Dummy",
+            "main",
+            "Index.html#std-doc",
+            "Dummy"
+        ]
+    },
+    "std:title": {
+        "dupe-entry": [
+            "Dummy",
+            "main",
+            "Index.html#std-title",
+            "Dummy"
+        ]
+    },
+    "std:confval": {
+        "dupe-entry": [
+            "Dummy",
+            "main",
+            "Index.html#std-confval",
+            "Dummy"
+        ]
+    },
+    "std:option": {
+        "dupe-entry": [
+            "Dummy",
+            "main",
+            "Index.html#std-option",
+            "Dummy"
+        ]
+    },
+    "std:console:command-list": {
+        "dupe-entry": [
+            "Dummy",
+            "main",
+            "Index.html#std-console-command-list",
+            "Dummy"
+        ]
+    },
+    "std:console:command": {
+        "dupe-entry": [
+            "Dummy",
+            "main",
+            "Index.html#std-console-command",
+            "Dummy"
+        ]
+    },
+    "php:property": {
+        "dupe-entry": [
+            "Dummy",
+            "main",
+            "Index.html#php-property",
+            "Dummy"
+        ]
+    },
+    "000anything:random": {
+        "dupe-entry": [
+            "Dummy",
+            "main",
+            "Index.html#anything-random",
+            "Dummy"
+        ]
+    },
+    "std:label": {
+        "dupe-entry": [
+            "Dummy",
+            "main",
+            "Index.html#dupe-entry",
+            "The real dupe target to prove sorting kind of works"
+        ]
+    }
+}

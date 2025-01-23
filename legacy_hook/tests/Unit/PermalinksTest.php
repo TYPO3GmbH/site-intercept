@@ -85,6 +85,10 @@ class PermalinksTest extends TestCase
     public static function redirectWorksDataProvider(): array
     {
         return [
+            'dupe sorting' => [
+                'permalink' => 'dummyvendor-dummy:dupe-entry',
+                'location' => 'https://docs.typo3.org/p/dummyvendor/dummy/main/en-us/Index.html#dupe-entry',
+            ],
             'core manual, no version' => [
                 'permalink' => 'changelog:important-100889-1690476872',
                 'location' => 'https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/11.5.x/Important-100889-AllowInsecureSiteResolutionByQueryParameters.html#important-100889-1690476872',
@@ -285,7 +289,7 @@ class PermalinksTest extends TestCase
         self::assertInstanceOf(DocumentationLinker::class, $this->subject);
         $describer = $this->subject->resolvePermalink($permalink);
 
-        self::assertSame(307, $describer->statusCode);
+        self::assertSame(307, $describer->statusCode, 'Header mismatch: ' . $describer->body);
         self::assertSame(['Location' => $location], $describer->headers);
         self::assertStringContainsString('Redirect to', $describer->body);
     }

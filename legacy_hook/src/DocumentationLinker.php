@@ -232,17 +232,16 @@ final readonly class DocumentationLinker
             return 0;
         });
 
-        foreach ($json as $mainKey => $subKeys) {
+        foreach ($json as $subKeys) {
             foreach ($subKeys as $indexName => $indexMetaData) {
+                // Note: In the future, we may want to do a check for
+                // in_array($mainKey, $docNodes, true)
+                // ($mainKey would be the key of the foreach($json) loop)
+                // to differentiate between a match contained in the $docNodes
+                // array above, or a fallback match. For now, this all just leads
+                // to the resolved links like 'ApiOverview/Events/Events/Core/Security/InvestigateMutationsEvent.html#typo3-cms-core-security-contentsecuritypolicy-event-investigatemutationsevent-policy'
                 if ($indexName === $index) {
-                    if (in_array($mainKey, $docNodes, true)) {
-                        // Resolves to an entry like 'ApiOverview/Events/Events/Core/Security/InvestigateMutationsEvent.html#typo3-cms-core-security-contentsecuritypolicy-event-investigatemutationsevent-policy'
-                        return $indexMetaData[2];
-                    } else {
-                        // Currently, no replacement is needed, but let's have a distinct case for this
-                        // for forward compatibility.
-                        return $indexMetaData[2];
-                    }
+                    return $indexMetaData[2];
                 }
             }
         }
