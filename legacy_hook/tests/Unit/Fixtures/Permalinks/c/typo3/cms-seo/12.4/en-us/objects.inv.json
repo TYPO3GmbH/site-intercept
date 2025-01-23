@@ -181,7 +181,7 @@
         "configuration-1": [
             "SEO",
             "12.4",
-            "Configuration\/Index.html#configuration-1",
+            "Configuration\/Index.html#configuration",
             "Configuration"
         ],
         "typoscript-settings": [
@@ -229,19 +229,19 @@
         "tags": [
             "SEO",
             "12.4",
-            "Configuration\/Index.html#tags",
+            "Configuration\/Index.html#config-tags",
             "Tags"
         ],
         "hreflang-link-tags": [
             "SEO",
             "12.4",
-            "Configuration\/Index.html#hreflang-link-tags",
+            "Configuration\/Index.html#config-hreflang-tags",
             "Hreflang link-tags"
         ],
         "canonical-tag": [
             "SEO",
             "12.4",
-            "Configuration\/Index.html#canonical-tag",
+            "Configuration\/Index.html#config-canonical-tag",
             "Canonical Tag"
         ],
         "working-links": [
@@ -283,37 +283,37 @@
         "developer-corner": [
             "SEO",
             "12.4",
-            "Developer\/Index.html#developer-corner",
+            "Developer\/Index.html#developer",
             "Developer Corner"
         ],
         "dashboard-widgets-for-seo": [
             "SEO",
             "12.4",
-            "Editor\/DashboardWidgets.html#dashboard-widgets-for-seo",
+            "Editor\/DashboardWidgets.html#dashboard-widgets",
             "Dashboard widgets for SEO"
         ],
         "missing-meta-description-widget": [
             "SEO",
             "12.4",
-            "Editor\/DashboardWidgets.html#missing-meta-description-widget",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description",
             "\"Missing Meta Description\" widget"
         ],
         "adding-the-missing-meta-description-widget-to-your-personal-dashboard": [
             "SEO",
             "12.4",
-            "Editor\/DashboardWidgets.html#adding-the-missing-meta-description-widget-to-your-personal-dashboard",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description-add",
             "Adding the \"Missing Meta Description\" widget to your personal Dashboard"
         ],
         "using-the-missing-meta-description-widget-to-improve-seo-results": [
             "SEO",
             "12.4",
-            "Editor\/DashboardWidgets.html#using-the-missing-meta-description-widget-to-improve-seo-results",
+            "Editor\/DashboardWidgets.html#dashboard-widgets-missing-description-use",
             "Using the \"Missing Meta Description\" widget to improve SEO results"
         ],
         "for-editors-1": [
             "SEO",
             "12.4",
-            "Editor\/Index.html#for-editors-1",
+            "Editor\/Index.html#for-editors",
             "For Editors"
         ],
         "general-tab": [
@@ -355,7 +355,7 @@
         "index-this-page": [
             "SEO",
             "12.4",
-            "Editor\/Index.html#index-this-page",
+            "Editor\/Index.html#index-page",
             "Index this page"
         ],
         "follow-this-page": [
@@ -409,31 +409,31 @@
         "general-recommendations": [
             "SEO",
             "12.4",
-            "GeneralRecommendations\/Index.html#general-recommendations",
+            "GeneralRecommendations\/Index.html#recommendations",
             "General Recommendations"
         ],
         "recommendations-for-additional-seo-extensions": [
             "SEO",
             "12.4",
-            "GeneralRecommendations\/Index.html#recommendations-for-additional-seo-extensions",
+            "GeneralRecommendations\/Index.html#recommendations_extensions",
             "Recommendations for additional SEO extensions"
         ],
         "recommendations-for-the-description-field": [
             "SEO",
             "12.4",
-            "GeneralRecommendations\/Index.html#recommendations-for-the-description-field",
+            "GeneralRecommendations\/Index.html#recommendations_field_description",
             "Recommendations for the description field"
         ],
         "typo3-search-engine-optimization": [
             "SEO",
             "12.4",
-            "Index.html#typo3-search-engine-optimization",
+            "Index.html#start",
             "TYPO3 Search Engine Optimization"
         ],
         "installation-1": [
             "SEO",
             "12.4",
-            "Installation\/Index.html#installation-1",
+            "Installation\/Index.html#installation",
             "Installation"
         ],
         "installation-with-composer": [
@@ -451,7 +451,7 @@
         "introduction-1": [
             "SEO",
             "12.4",
-            "Introduction\/Index.html#introduction-1",
+            "Introduction\/Index.html#introduction",
             "Introduction"
         ],
         "what-does-it-do": [
