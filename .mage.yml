@@ -51,9 +51,10 @@ magephp:
         - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}
         - exec: { cmd: "[ -f ../../../cachetool/cachetool.phar ] || curl -L -o ../../../cachetool/cachetool.phar https://gordalina.github.io/cachetool/downloads/cachetool.phar && chmod +x ../../../cachetool/cachetool.phar"}
         - exec: { cmd: "php ../../../cachetool/cachetool.phar opcache:reset --fcgi=/var/run/intercept.typo3.com_fpm.sock --tmp-dir=/srv/vhosts/intercept.typo3.com/site/cachetool"}
+        - exec: { cmd: "/usr/bin/php8.2 /usr/bin/composer dump-env prod" }
         - exec: { cmd: "rm -rf var/cache"}
-        - exec: { cmd: "php8.2 ./bin/console cache:warmup"}
-        - exec: { cmd: "php8.2 ./bin/console app:docs-redirect-deploy"}
+        - exec: { cmd: "/usr/bin/php8.2 ./bin/console cache:warmup"}
+        - exec: { cmd: "/usr/bin/php8.2 ./bin/console app:docs-redirect-deploy"}
       post-deploy:
 
     develop:
@@ -80,8 +81,9 @@ magephp:
         - exec: { cmd: "[ -d ../../../cachetool ] || mkdir -p ../../../cachetool"}
         - exec: { cmd: "[ -f ../../../cachetool/cachetool.phar ] || curl -L -o ../../../cachetool/cachetool.phar https://gordalina.github.io/cachetool/downloads/cachetool.phar && chmod +x ../../../cachetool/cachetool.phar"}
         - exec: { cmd: "php ../../../cachetool/cachetool.phar opcache:reset --fcgi=/var/run/stage.intercept.typo3.com_fpm.sock --tmp-dir=/srv/vhosts/stage.intercept.typo3.com/site/cachetool"}
+        - exec: { cmd: "/usr/bin/php8.2 /usr/bin/composer dump-env prod" }
         - exec: { cmd: "rm -rf var/cache"}
-        - exec: { cmd: "php8.2 ./bin/console cache:warmup"}
+        - exec: { cmd: "/usr/bin/php8.2 ./bin/console cache:warmup"}
       post-deploy:
 
     legacy_hook_master:
