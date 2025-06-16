@@ -16,8 +16,10 @@ use App\Service\GithubService;
 use App\Tests\Functional\AbstractFunctionalWebTestCase;
 use App\Tests\Functional\Fixtures\AdminInterface\Docs\RedirectControllerTestData;
 use GuzzleHttp\Client;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Response;
 use T3G\LibTestHelper\Database\DatabasePrimer;
 use T3G\LibTestHelper\Request\MockRequest;
 
@@ -45,9 +47,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
-        self::assertStringContainsString('<table class="datatable-table">', $content);
-        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('<table class="datatable-table">', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
 
     public function testShowRenderTableWithRedirectEntries(): void
@@ -55,9 +57,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1');
         $content = $this->client->getResponse()->getContent();
-        self::assertStringContainsString('<table class="datatable-table">', $content);
-        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('<table class="datatable-table">', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
 
     public function testEditRenderTableWithRedirectEntries(): void
@@ -65,8 +67,8 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
-        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
     }
 
     public function testUpdateRenderTableWithRedirectEntries(): void
@@ -78,9 +80,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
             ->setEndPoint('/redirect/1/edit')
             ->execute();
         $content = $response->getContent();
-        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
-        self::assertStringContainsString('302', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('302', $content);
 
         $this->rebootState();
 
@@ -88,7 +90,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $githubClient = $this->createMock(Client::class);
         $githubClient
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('request')
             ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
                 'json' => [
@@ -111,15 +113,15 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
             ])
             ->withMock('guzzle.client.github', $githubClient)
             ->execute();
-        self::assertEquals(302, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/1/edit');
         $content = $this->client->getResponse()->getContent();
-        self::assertStringContainsString('/p/vendor/packageOld/1.0/Bar.html', $content);
-        self::assertStringContainsString('/p/vendor/packageNew/1.0/Bar.html', $content);
-        self::assertStringContainsString('302', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Bar.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Bar.html', $content);
+        $this->assertStringContainsString('302', $content);
     }
 
     public function testNewRenderTableWithRedirectEntries(): void
@@ -128,7 +130,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $githubClient = $this->createMock(Client::class);
         $githubClient
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('request')
             ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
                 'json' => [
@@ -151,14 +153,14 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
             ])
             ->withMock('guzzle.client.github', $githubClient)
             ->execute();
-        self::assertEquals(302, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
-        self::assertStringContainsString('/p/vendor/packageOld/4.0/Bar.html', $content);
-        self::assertStringContainsString('/p/vendor/packageNew/4.0/Bar.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/4.0/Bar.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/4.0/Bar.html', $content);
     }
 
     public function testDeleteRenderTableWithRedirectEntries(): void
@@ -167,8 +169,8 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $this->client->request('GET', '/redirect/');
         $content = $this->client->getResponse()->getContent();
-        self::assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        self::assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
 
         $this->rebootState();
 
@@ -176,7 +178,7 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $githubClient = $this->createMock(Client::class);
         $githubClient
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('request')
             ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
                 'json' => [
@@ -190,21 +192,24 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         $response = (new MockRequest($this->client))
             ->setMethod('DELETE')
             ->setEndPoint('/redirect/1')
+            ->setBody([
+                'delete_redirect' => [
+                    'delete' => '',
+                ],
+            ])
             ->withMock('guzzle.client.github', $githubClient)
             ->execute();
-        self::assertEquals(302, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
         $this->logInAsDocumentationMaintainer($this->client);
 
         $this->client->request('GET', '/redirect/');
 
         $content = $this->client->getResponse()->getContent();
-        self::assertStringContainsString('no records found', $content);
+        $this->assertStringContainsString('no records found', $content);
     }
 
-    /**
-     * @dataProvider invalidRedirectStringsDataProvider
-     */
+    #[DataProvider('invalidRedirectStringsDataProvider')]
     public function testInvalidSourceInputTriggersValidationError(string $input): void
     {
         $this->logInAsDocumentationMaintainer($this->client);
@@ -219,18 +224,16 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
         ]);
         $this->client->submit($form);
         $response = $this->client->getResponse();
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
         $content = $response->getContent();
 
         $responseCrawler = new Crawler('');
         $responseCrawler->addHtmlContent($content);
         $sourceLabel = $responseCrawler->filter('#docs_server_redirect div label')->text();
-        self::assertStringContainsString('Source', $sourceLabel);
+        $this->assertStringContainsString('Source', $sourceLabel);
     }
 
-    /**
-     * @dataProvider invalidRedirectStringsDataProvider
-     */
+    #[DataProvider('invalidRedirectStringsDataProvider')]
     public function testInvalidTargetInputTriggersValidationError(string $input): void
     {
         $this->logInAsDocumentationMaintainer($this->client);
@@ -246,25 +249,23 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $this->client->submit($form);
         $response = $this->client->getResponse();
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
         $content = $response->getContent();
 
         $responseCrawler = new Crawler('');
         $responseCrawler->addHtmlContent($content);
         $targetLabel = $responseCrawler->filter('#docs_server_redirect')->children()->getNode(1)->textContent;
-        self::assertStringContainsString('Target', $targetLabel);
+        $this->assertStringContainsString('Target', $targetLabel);
     }
 
-    /**
-     * @dataProvider validRedirectStringsDataProvider
-     */
+    #[DataProvider('validRedirectStringsDataProvider')]
     public function testValidTargetInputTriggersFormSubmit(string $input): void
     {
         $this->logInAsDocumentationMaintainer($this->client);
 
         $githubClient = $this->createMock(Client::class);
         $githubClient
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('request')
             ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
                 'json' => [
@@ -287,40 +288,36 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
             ])
             ->withMock('guzzle.client.github', $githubClient)
             ->execute();
-        self::assertEquals(302, $response->getStatusCode());
-        self::assertStringContainsString('Redirecting to <a href="/redirect/">/redirect/</a>.', $response->getContent());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        $this->assertStringContainsString('Redirecting to <a href="/redirect/">/redirect/</a>.', $response->getContent());
     }
 
-    public static function validRedirectStringsDataProvider(): array
+    public static function validRedirectStringsDataProvider(): \Iterator
     {
-        return [
-            'package' => [
-                '/p/vendor/packageOld/2.0/Foo.html',
-            ],
-            'manual' => [
-                '/m/vendor/packageOld/2.0/Foo.html',
-            ],
-            'system extension' => [
-                '/c/vendor/packageOld/2.0/Foo.html',
-            ],
-            'home' => [
-                '/h/vendor/packageOld/2.0/Foo.html',
-            ],
-            'third party' => [
-                '/other/vendor/packageOld/2.0/Foo.html',
-            ],
+        yield 'package' => [
+            '/p/vendor/packageOld/2.0/Foo.html',
+        ];
+        yield 'manual' => [
+            '/m/vendor/packageOld/2.0/Foo.html',
+        ];
+        yield 'system extension' => [
+            '/c/vendor/packageOld/2.0/Foo.html',
+        ];
+        yield 'home' => [
+            '/h/vendor/packageOld/2.0/Foo.html',
+        ];
+        yield 'third party' => [
+            '/other/vendor/packageOld/2.0/Foo.html',
         ];
     }
 
-    public static function invalidRedirectStringsDataProvider(): array
+    public static function invalidRedirectStringsDataProvider(): \Iterator
     {
-        return [
-            'something random' => [
-                'invalid-target/String',
-            ],
-            'package without vendor' => [
-                '/p/packageOld/2.0/Foo.html',
-            ],
+        yield 'something random' => [
+            'invalid-target/String',
+        ];
+        yield 'package without vendor' => [
+            '/p/packageOld/2.0/Foo.html',
         ];
     }
 }

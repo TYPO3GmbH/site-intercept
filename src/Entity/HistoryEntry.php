@@ -38,7 +38,7 @@ class HistoryEntry
     #[ORM\Column(type: 'json')]
     private array $data = [];
 
-    #[ORM\Column(type: 'datetime_immutable')]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
@@ -69,6 +69,7 @@ class HistoryEntry
 
         return $this;
     }
+
     public function getGroupEntry(): ?string
     {
         return $this->groupEntry;

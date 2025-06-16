@@ -16,6 +16,7 @@ use App\Entity\HistoryEntry;
 use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\HistoryEntryTrigger;
 use App\Enum\HistoryEntryType;
+use App\Form\DeleteRedirectType;
 use App\Form\DocsServerRedirectType;
 use App\Form\RedirectFilterType;
 use App\Repository\DocsServerRedirectRepository;
@@ -23,15 +24,15 @@ use App\Repository\HistoryEntryRepository;
 use App\Service\DocsServerNginxService;
 use App\Service\GithubService;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 #[Route(path: '/redirect')]
@@ -61,7 +62,7 @@ class RedirectController extends AbstractController
 
         $requestSortDirection = $request->query->get('direction');
         $requestSortField = $request->query->get('sort');
-        $sortDirection = 'asc' === $requestSortDirection ? Criteria::ASC : Criteria::DESC;
+        $sortDirection = 'asc' === $requestSortDirection ? Order::Ascending : Order::Descending;
         $sortField = in_array($requestSortField, ['source', 'target']) ? $requestSortField : 'target';
         $criteria->orderBy([$sortField => $sortDirection]);
 
@@ -89,7 +90,7 @@ class RedirectController extends AbstractController
                 'currentConfiguration' => $currentConfigurationFile,
                 'logMessages' => $recentLogsMessages,
                 'pagination' => $pagination,
-                'filter' => $form->createView(),
+                'filter' => $form,
                 'staticConfiguration' => $staticConfigurationFile,
             ]
         );
@@ -117,7 +118,7 @@ class RedirectController extends AbstractController
             'docs_redirect/new.html.twig',
             [
                 'redirect' => $redirect,
-                'form' => $form->createView(),
+                'form' => $form,
             ]
         );
     }
@@ -127,10 +128,15 @@ class RedirectController extends AbstractController
     public function show(
         DocsServerRedirect $redirect
     ): Response {
+        $deleteRedirectForm = $this->createForm(DeleteRedirectType::class, [], [
+            'action' => $this->generateUrl('admin_redirect_delete', ['id' => $redirect->getId()]),
+        ]);
+
         return $this->render(
             'docs_redirect/show.html.twig',
             [
                 'redirect' => $redirect,
+                'deleteForm' => $deleteRedirectForm,
             ]
         );
     }
@@ -141,6 +147,9 @@ class RedirectController extends AbstractController
         Request $request,
         DocsServerRedirect $redirect
     ): Response {
+        $deleteRedirectForm = $this->createForm(DeleteRedirectType::class, [], [
+            'action' => $this->generateUrl('admin_redirect_delete', ['id' => $redirect->getId()]),
+        ]);
         $form = $this->createForm(DocsServerRedirectType::class, $redirect);
         $form->handleRequest($request);
 
@@ -156,7 +165,8 @@ class RedirectController extends AbstractController
             'docs_redirect/edit.html.twig',
             [
                 'redirect' => $redirect,
-                'form' => $form->createView(),
+                'form' => $form,
+                'deleteForm' => $deleteRedirectForm,
             ]
         );
     }
@@ -166,10 +176,10 @@ class RedirectController extends AbstractController
     public function delete(
         Request $request,
         DocsServerRedirect $redirect,
-        ParameterBagInterface $parameterBag
     ): Response {
-        $csrfIsEnabled = (bool) $parameterBag->get('form.type_extension.csrf.enabled');
-        if (!$csrfIsEnabled || $this->isCsrfTokenValid('delete' . $redirect->getId(), $request->request->get('_token'))) {
+        $form = $this->createForm(DeleteRedirectType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->remove($redirect);
             $this->entityManager->flush();
             $this->createRedirectsAndDeploy('delete', $redirect);

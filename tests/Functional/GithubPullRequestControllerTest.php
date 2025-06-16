@@ -16,6 +16,7 @@ use App\Service\LocalCoreGitService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Redmine\Api\Issue;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use T3G\LibTestHelper\Request\AssertRequestTrait;
 use T3G\LibTestHelper\Request\MockRequest;
 use T3G\LibTestHelper\Request\RequestExpectation;
@@ -53,7 +54,7 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
             (new RequestExpectation(
                 'PATCH',
                 'https://api.github.com/repos/psychomieze/TYPO3.CMS/pulls/1',
-                new Response(200)
+                new Response(SymfonyResponse::HTTP_OK)
             ))->withPayload([
                 'headers' => [
                     'Authorization' => 'token 4711',
@@ -65,7 +66,7 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
             (new RequestExpectation(
                 'POST',
                 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/comments',
-                new Response(200)
+                new Response(SymfonyResponse::HTTP_OK)
             ))->withPayload([
                 'headers' => [
                     'Authorization' => 'token 4711',
@@ -77,7 +78,7 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
             (new RequestExpectation(
                 'PUT',
                 'https://api.github.com/repos/psychomieze/TYPO3.CMS/issues/1/lock',
-                new Response(200)
+                new Response(SymfonyResponse::HTTP_OK)
             ))->withPayload([
                 'headers' => [
                     'Authorization' => 'token 4711',
@@ -89,7 +90,7 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
 
         $forgeClient = $this->createMock(\Redmine\Client\Client::class);
         $forgeIssueApi = $this->createMock(Issue::class);
-        $forgeIssueApi->expects(self::once())->method('create')->with([
+        $forgeIssueApi->expects($this->once())->method('create')->with([
             'project_id' => 27,
             'tracker_id' => 4,
             'subject' => 'issue title',
@@ -102,28 +103,28 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
                 ],
             ],
         ])->willReturn(new \SimpleXMLElement('<?xml version="1.0"?><root><id>42</id></root>'));
-        $forgeClient->expects(self::once())->method('getApi')->with('issue')->willReturn($forgeIssueApi);
+        $forgeClient->expects($this->once())->method('getApi')->with('issue')->willReturn($forgeIssueApi);
 
         $gitService = $this->createMock(LocalCoreGitService::class);
-        $gitService->expects(self::once())->method('commitPatchAsUser');
-        $gitService->expects(self::once())->method('pushToGerrit')->willReturn(new GitPushOutput('https://review.typo3.org/c/Packages/TYPO3.CMS/+/12345'));
+        $gitService->expects($this->once())->method('commitPatchAsUser');
+        $gitService->expects($this->once())->method('pushToGerrit')->willReturn(new GitPushOutput('https://review.typo3.org/c/Packages/TYPO3.CMS/+/12345'));
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.general', $generalClient)
             ->withMock('redmine.client.forge', $forgeClient)
             ->withMock(LocalCoreGitService::class, $gitService)
             ->execute(require __DIR__ . '/Fixtures/GithubPullRequestGoodRequest.php');
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_OK, $response->getStatusCode());
     }
 
     public function testPullRequestIsNotTransformed(): void
     {
         $generalClient = $this->createMock(Client::class);
-        $generalClient->expects(self::never())->method('request');
+        $generalClient->expects($this->never())->method('request');
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.general', $generalClient)
             ->execute(require __DIR__ . '/Fixtures/GithubPullRequestBadRequest.php');
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_OK, $response->getStatusCode());
     }
 }

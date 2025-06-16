@@ -80,7 +80,7 @@ class GithubPushEventForCore
                 $this->type = self::TYPE_PATCH;
                 $this->sourceBranch = $this->getSourceBranch($fullPullRequestInformation['ref']);
                 $this->targetBranch = $this->sourceBranch;
-                $this->headCommitTitle = explode("\n", $fullPullRequestInformation['head_commit']['message'] ?? '', 2)[0] ?? '';
+                $this->headCommitTitle = explode("\n", $fullPullRequestInformation['head_commit']['message'] ?? '', 2)[0];
             } elseif ($this->isPushedTag($fullPullRequestInformation)) {
                 $this->type = self::TYPE_TAG;
                 $this->sourceBranch = $fullPullRequestInformation['repository']['master_branch'] ?? 'main';

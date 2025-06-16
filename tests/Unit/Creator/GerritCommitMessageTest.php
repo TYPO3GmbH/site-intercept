@@ -32,9 +32,9 @@ class GerritCommitMessageTest extends TestCase
         $forgeIssue = new ForgeNewIssue($xml);
 
         $subject = new GerritCommitMessage($pullRequest, $forgeIssue);
-        self::assertStringContainsString('[TASK] Patch title', $subject->message);
-        self::assertStringContainsString('Patch body', $subject->message);
-        self::assertStringContainsString('Resolves: #4711', $subject->message);
+        $this->assertStringContainsString('[TASK] Patch title', $subject->message);
+        $this->assertStringContainsString('Patch body', $subject->message);
+        $this->assertStringContainsString('Resolves: #4711', $subject->message);
     }
 
     public function testMessageStripsLongTitle(): void
@@ -50,9 +50,9 @@ class GerritCommitMessageTest extends TestCase
         $forgeIssue = new ForgeNewIssue($xml);
 
         $subject = new GerritCommitMessage($pullRequest, $forgeIssue);
-        self::assertStringContainsString('[TASK] 0123456789012345678901234567890123456789012345678901234567890123456', $subject->message);
-        self::assertStringContainsString('Patch body', $subject->message);
-        self::assertStringContainsString('Resolves: #4711', $subject->message);
+        $this->assertStringContainsString('[TASK] 0123456789012345678901234567890123456789012345678901234567890123456', $subject->message);
+        $this->assertStringContainsString('Patch body', $subject->message);
+        $this->assertStringContainsString('Resolves: #4711', $subject->message);
     }
 
     public function testMessageKeepsTitlePrefix(): void
@@ -68,8 +68,8 @@ class GerritCommitMessageTest extends TestCase
         $forgeIssue = new ForgeNewIssue($xml);
 
         $subject = new GerritCommitMessage($pullRequest, $forgeIssue);
-        self::assertStringContainsString('[BUGFIX] Patch title', $subject->message);
-        self::assertStringContainsString('Patch body', $subject->message);
-        self::assertStringContainsString('Resolves: #4711', $subject->message);
+        $this->assertStringContainsString('[BUGFIX] Patch title', $subject->message);
+        $this->assertStringContainsString('Patch body', $subject->message);
+        $this->assertStringContainsString('Resolves: #4711', $subject->message);
     }
 }

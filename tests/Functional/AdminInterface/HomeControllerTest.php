@@ -20,6 +20,6 @@ class HomeControllerTest extends AbstractFunctionalWebTestCase
     {
         $client = static::createClient();
         $client->request('GET', '/admin');
-        self::assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
     }
 }

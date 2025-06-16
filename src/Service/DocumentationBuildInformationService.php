@@ -140,8 +140,8 @@ readonly class DocumentationBuildInformationService
             'packageName' => $deploymentInformation->packageName,
         ]);
         foreach ($records as $record) {
-            if ($record instanceof DocumentationJar && $record->getRepositoryUrl() !== $deploymentInformation->repositoryUrl) {
-                throw new DocsPackageRegisteredWithDifferentRepositoryException('Package ' . $deploymentInformation->packageName . ' from repository ' . $deploymentInformation->repositoryUrl . ' is already registered for repository ' . $record->getRepositoryUrl(), 1553090750);
+            if ($record->getRepositoryUrl() !== $deploymentInformation->repositoryUrl) {
+                throw new DocsPackageRegisteredWithDifferentRepositoryException($deploymentInformation->packageName, 'Package ' . $deploymentInformation->packageName . ' from repository ' . $deploymentInformation->repositoryUrl . ' is already registered for repository ' . $record->getRepositoryUrl(), 1553090750);
             }
         }
     }

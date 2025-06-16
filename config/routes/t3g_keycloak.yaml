@@ -1,0 +1,3 @@
+t3g_keycloak_controllers:
+  resource: '@T3GKeycloakBundle/Resources/config/routes.xml'
+  prefix: /

@@ -16,6 +16,7 @@ use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Repository\DocumentationJarRepository;
 use App\Service\RenderDocumentationService;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,11 +26,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @codeCoverageIgnore No business logic code, no production app code, just glue
  */
+#[AsCommand(name: 'app:docs-dump-render-info', description: 'Command to re-render all docs or one specific')]
 class DocsDumpRenderInformationCommand extends Command
 {
-    protected static $defaultName = 'app:docs-dump-render-info';
-    protected static $defaultDescription = 'Command to re-render all docs or one specific';
-
     public function __construct(
         private readonly RenderDocumentationService $renderDocumentationService,
         private readonly DocumentationJarRepository $documentationJarRepository

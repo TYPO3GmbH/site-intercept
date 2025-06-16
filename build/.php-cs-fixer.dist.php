@@ -12,17 +12,15 @@ LICENSE file that was distributed with this source code.
 EOF;
 
 return (new PhpCsFixer\Config())
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
+    ->setCacheFile('.php-cs-fixer.cache')
     ->setRiskyAllowed(true)
-    ->setCacheFile(__DIR__ . '/.php-cs-fixer.cache')
     ->setRules([
         '@Symfony' => true,
-        '@PHP82Migration' => true,
+        '@PHP83Migration' => true,
         'declare_strict_types' => true,
         'array_syntax' => ['syntax' => 'short'],
         'concat_space' => ['spacing' => 'one'],
-        'class_attributes_separation' => [
-            'elements' => ['property' => 'only_if_meta']
-        ],
         'general_phpdoc_annotation_remove' => [
             'annotations' => ['author']
         ],
@@ -35,7 +33,6 @@ return (new PhpCsFixer\Config())
             'assertions' => ['assertEquals', 'assertSame', 'assertNotEquals', 'assertNotSame']
         ],
         'php_unit_mock_short_will_return' => true,
-        'php_unit_test_case_static_method_calls' => ['call_type' => 'self'],
     ])
     ->setFinder(
         PhpCsFixer\Finder::create()

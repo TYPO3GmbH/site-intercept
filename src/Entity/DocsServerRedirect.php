@@ -41,10 +41,10 @@ class DocsServerRedirect
     #[ORM\Column(type: 'integer')]
     private int $id;
 
-    #[ORM\Column(name: 'created_at', type: 'datetime')]
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime')]
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: 'string', length: 2000)]
@@ -57,7 +57,7 @@ class DocsServerRedirect
     #[Assert\Regex(pattern: '@^/([pcmh]{1}|other)/([^/]*)/([^/]*)/([^/]*)/(.*)$@m', message: "The path doesn't match the required format")]
     private string $target = '';
 
-    #[ORM\Column(name: 'is_legacy', type: 'integer')]
+    #[ORM\Column(name: 'is_legacy', type: 'boolean')]
     private bool $isLegacy = false;
 
     #[ORM\Column(type: 'integer')]

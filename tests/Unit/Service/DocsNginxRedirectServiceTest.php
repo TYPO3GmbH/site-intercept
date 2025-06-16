@@ -59,16 +59,16 @@ class DocsNginxRedirectServiceTest extends TestCase
     {
         $fileContent = implode(chr(10), $this->subject->getDynamicConfiguration());
 
-        self::assertStringContainsString('# Rule: 1 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00', $fileContent);
-        self::assertStringContainsString('location = /p/vendor/packageOld/1.0/Foo.html {', $fileContent);
-        self::assertStringContainsString('return 303 /p/vendor/packageNew/1.0/Foo.html;', $fileContent);
+        $this->assertStringContainsString('# Rule: 1 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00', $fileContent);
+        $this->assertStringContainsString('location = /p/vendor/packageOld/1.0/Foo.html {', $fileContent);
+        $this->assertStringContainsString('return 303 /p/vendor/packageNew/1.0/Foo.html;', $fileContent);
 
-        self::assertStringContainsString('# Rule: 2 | Created: 20.03.2019 13:00 | Updated: 20.03.2019 13:00', $fileContent);
-        self::assertStringContainsString('location = /p/vendor/packageOld/2.0/Foo.html {', $fileContent);
-        self::assertStringContainsString('return 302 /p/vendor/packageNew/2.0/Foo.html;', $fileContent);
+        $this->assertStringContainsString('# Rule: 2 | Created: 20.03.2019 13:00 | Updated: 20.03.2019 13:00', $fileContent);
+        $this->assertStringContainsString('location = /p/vendor/packageOld/2.0/Foo.html {', $fileContent);
+        $this->assertStringContainsString('return 302 /p/vendor/packageNew/2.0/Foo.html;', $fileContent);
 
-        self::assertStringContainsString('# Rule: 3 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00 | Legacy', $fileContent);
-        self::assertStringContainsString('location ~ ^/typo3cms/extensions/packageOld/1.0/(.*) {', $fileContent);
-        self::assertStringContainsString('return 303 /p/vendor/packageOld/1.0/$1;', $fileContent);
+        $this->assertStringContainsString('# Rule: 3 | Created: 21.03.2019 13:00 | Updated: 21.03.2019 13:00 | Legacy', $fileContent);
+        $this->assertStringContainsString('location ~ ^/typo3cms/extensions/packageOld/1.0/(.*) {', $fileContent);
+        $this->assertStringContainsString('return 303 /p/vendor/packageOld/1.0/$1;', $fileContent);
     }
 }

@@ -14,9 +14,9 @@ namespace App\Strategy\GithubRst;
 use App\Extractor\GithubPushEventForCore;
 use GuzzleHttp\ClientInterface;
 
-readonly class DeletedFilesStrategy implements StrategyInterface
+class DeletedFilesStrategy implements StrategyInterface
 {
-    public function __construct(private ClientInterface $generalClient)
+    public function __construct(private readonly ClientInterface $generalClient)
     {
     }
 

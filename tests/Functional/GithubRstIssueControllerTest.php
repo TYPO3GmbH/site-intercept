@@ -13,6 +13,7 @@ namespace App\Tests\Functional;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use T3G\LibTestHelper\Request\AssertRequestTrait;
 use T3G\LibTestHelper\Request\MockRequest;
 use T3G\LibTestHelper\Request\RequestExpectation;
@@ -71,28 +72,28 @@ class GithubRstIssueControllerTest extends AbstractFunctionalWebTestCase
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.general', $generalClient)
             ->execute(require __DIR__ . '/Fixtures/GithubRstIssuePatchRequest.php');
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_OK, $response->getStatusCode());
     }
 
     public function testGithubIssueIsNotCreatedForChangesInNonMainBranch(): void
     {
         $generalClient = $this->createMock(Client::class);
-        $generalClient->expects(self::never())->method('request');
+        $generalClient->expects($this->never())->method('request');
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.general', $generalClient)
             ->execute(require __DIR__ . '/Fixtures/GithubRstIssuePatchBackportRequest.php');
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_OK, $response->getStatusCode());
     }
 
     public function testGithubIssueIsNotCreatedForChangesWithoutDocsChanges(): void
     {
         $generalClient = $this->createMock(Client::class);
-        $generalClient->expects(self::never())->method('request');
+        $generalClient->expects($this->never())->method('request');
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.general', $generalClient)
             ->execute(require __DIR__ . '/Fixtures/GithubRstIssuePatchNoDocsChangesRequest.php');
-        self::assertEquals(200, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_OK, $response->getStatusCode());
     }
 }

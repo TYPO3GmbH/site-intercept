@@ -17,6 +17,7 @@ use App\Tests\Functional\AbstractFunctionalWebTestCase;
 use App\Tests\Functional\Fixtures\AdminInterface\Docs\DeploymentsControllerTestData;
 use GuzzleHttp\Client;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\HttpFoundation\Response;
 use T3G\LibTestHelper\Database\DatabasePrimer;
 use T3G\LibTestHelper\Request\MockRequest;
 
@@ -44,8 +45,8 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
         $this->logInAsDocumentationMaintainer($this->client);
         $this->client->request('GET', '/admin/docs/deployments');
         $content = $this->client->getResponse()->getContent();
-        self::assertStringContainsString('<table class="datatable-table">', $content);
-        self::assertStringContainsString('typo3/docs-homepage', $content);
+        $this->assertStringContainsString('<table class="datatable-table">', $content);
+        $this->assertStringContainsString('typo3/docs-homepage', $content);
     }
 
     public function testDeleteRenderTableEntries(): void
@@ -56,20 +57,25 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
             ->setMethod('GET')
             ->setEndPoint('/admin/docs/deployments')
             ->execute();
-        self::assertStringContainsString('typo3/docs-homepage', $response->getContent());
+        $this->assertStringContainsString('typo3/docs-homepage', $response->getContent());
 
         $githubClient = $this->createMock(Client::class);
         $githubClient
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('request')
             ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything());
 
         $response = (new MockRequest($this->client))
             ->setMethod('DELETE')
             ->setEndPoint('/admin/docs/deployments/delete/1')
+            ->setBody([
+                'delete_deployment' => [
+                    'delete' => '',
+                ],
+            ])
             ->withMock('guzzle.client.github', $githubClient)
             ->execute();
-        self::assertEquals(302, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
         $this->logInAsDocumentationMaintainer($this->client);
 
@@ -77,7 +83,7 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
             ->setMethod('GET')
             ->setEndPoint('/admin/docs/deployments')
             ->execute();
-        self::assertStringContainsString('Deleting', $response->getContent());
+        $this->assertStringContainsString('Deleting', $response->getContent());
     }
 
     public function testApproveEntry(): void
@@ -88,11 +94,11 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
             ->setMethod('GET')
             ->setEndPoint('/admin/docs/deployments')
             ->execute();
-        self::assertStringContainsString('Approve documentation', $response->getContent());
+        $this->assertStringContainsString('Approve documentation', $response->getContent());
 
         $githubClient = $this->createMock(Client::class);
         $githubClient
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('request')
             ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything());
 
@@ -101,7 +107,7 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
             ->setEndPoint('/admin/docs/deployments/approve/10')
             ->withMock('guzzle.client.github', $githubClient)
             ->execute();
-        self::assertEquals(302, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
         $this->logInAsDocumentationMaintainer($this->client);
 
@@ -109,6 +115,6 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
             ->setMethod('GET')
             ->setEndPoint('/admin/docs/deployments')
             ->execute();
-        self::assertStringNotContainsString('Approve documentation', $response->getContent());
+        $this->assertStringNotContainsString('Approve documentation', $response->getContent());
     }
 }

@@ -27,8 +27,8 @@ class GithubPushEventForDocsTest extends TestCase
     public function testConstructorExtractsValues(): void
     {
         $subject = new GithubPushEventForDocs(json_encode(self::$payload, JSON_THROW_ON_ERROR));
-        self::assertSame('1.2.3', $subject->tagOrBranchName);
-        self::assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
+        $this->assertSame('1.2.3', $subject->tagOrBranchName);
+        $this->assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
     }
 
     public function testConstructorExtractsFromBranch(): void
@@ -36,8 +36,8 @@ class GithubPushEventForDocsTest extends TestCase
         $payload = self::$payload;
         $payload['ref'] = 'refs/heads/latest';
         $subject = new GithubPushEventForDocs(json_encode($payload, JSON_THROW_ON_ERROR));
-        self::assertSame('latest', $subject->tagOrBranchName);
-        self::assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
+        $this->assertSame('latest', $subject->tagOrBranchName);
+        $this->assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-Typoscript.git', $subject->repositoryUrl);
     }
 
     public function testConstructorThrowsWithInvalidVersion(): void
