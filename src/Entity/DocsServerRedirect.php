@@ -27,10 +27,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table('redirect')]
 class DocsServerRedirect
 {
+    final public const STATUS_CODE_301 = 301; // Permanent Redirect. Keep pagerank
     final public const STATUS_CODE_302 = 302; // Found
     final public const STATUS_CODE_303 = 303; // See Other
     final public const STATUS_CODE_307 = 307; // Temporary Redirect
     public static array $allowedStatusCodes = [
+        self::STATUS_CODE_301,
         self::STATUS_CODE_302,
         self::STATUS_CODE_303,
         self::STATUS_CODE_307,
@@ -61,7 +63,7 @@ class DocsServerRedirect
     private bool $isLegacy = false;
 
     #[ORM\Column(type: 'integer')]
-    private int $statusCode = self::STATUS_CODE_303;
+    private int $statusCode = self::STATUS_CODE_301;
 
     /**
      * @throws \Exception
