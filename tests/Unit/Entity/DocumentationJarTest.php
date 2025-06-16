@@ -16,24 +16,20 @@ use PHPUnit\Framework\TestCase;
 
 class DocumentationJarTest extends TestCase
 {
-    public static function repositoryUrlDataProvider(): array
+    public static function repositoryUrlDataProvider(): \Iterator
     {
-        return [
-            ['https://github.com/mautic/mautic-typo3.git', 1],
-            ['https://github.com/mautic/mautic-typo3', 0],
-            ['http://github.com/mautic/mautic-typo3.git', 0],
-            ['https://bitbucket.org/vendor/package.git', 1],
-            ['https://gitlab.com/vendor/package.git', 1],
-        ];
+        yield ['https://github.com/mautic/mautic-typo3.git', 1];
+        yield ['https://github.com/mautic/mautic-typo3', 0];
+        yield ['http://github.com/mautic/mautic-typo3.git', 0];
+        yield ['https://bitbucket.org/vendor/package.git', 1];
+        yield ['https://gitlab.com/vendor/package.git', 1];
     }
 
-    /**
-     * @dataProvider repositoryUrlDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('repositoryUrlDataProvider')]
     public function testRepositoryUrlRegex(string $url, int $expected): void
     {
         $result = preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, $url);
 
-        self::assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 }

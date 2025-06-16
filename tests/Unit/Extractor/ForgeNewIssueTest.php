@@ -20,7 +20,7 @@ class ForgeNewIssueTest extends TestCase
     {
         $xml = new \SimpleXMLElement('<?xml version="1.0"?><root><id>42</id></root>');
         $subject = new ForgeNewIssue($xml);
-        self::assertSame(42, $subject->id);
+        $this->assertSame(42, $subject->id);
     }
 
     public function testConstructorThrowsIfIdWasNotFound(): void

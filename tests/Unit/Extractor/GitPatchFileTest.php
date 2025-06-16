@@ -19,7 +19,7 @@ class GitPatchFileTest extends TestCase
     public function testConstructorExtractsFilename(): void
     {
         $subject = new GitPatchFile('/foo/bar.txt');
-        self::assertSame('/foo/bar.txt', $subject->file);
+        $this->assertSame('/foo/bar.txt', $subject->file);
     }
 
     public function testConstructorThrowsWithEmptyFile(): void

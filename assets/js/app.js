@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    var documentationDeploymentRepositoryUrl = document.getElementById('documentation_deployment_repositoryUrl');
+    const documentationDeploymentRepositoryUrl = document.getElementById('documentation_deployment_repositoryUrl');
     if (documentationDeploymentRepositoryUrl) {
         documentationDeploymentRepositoryUrl.addEventListener('change', function() {
             const value = documentationDeploymentRepositoryUrl.value;
             const documentationRepositoryType = document.getElementById('documentation_deployment_repositoryType');
             if (value.indexOf('https://github.com') === 0) {
                 documentationRepositoryType.setAttribute('readonly', true);
-                for(i = 0; i < documentationRepositoryType.options.length; i++) {
+                for(let i = 0; i < documentationRepositoryType.options.length; i++) {
                     if (documentationRepositoryType.options[i].value === 'github') {
                         documentationRepositoryType.selectedIndex = i;
                         documentationRepositoryType.options[i].disabled = false;
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else if (value.indexOf('https://gitlab.com') === 0) {
                 documentationRepositoryType.setAttribute('readonly', true);
-                for(i = 0; i < documentationRepositoryType.options.length; i++) {
+                for(let i = 0; i < documentationRepositoryType.options.length; i++) {
                     if (documentationRepositoryType.options[i].value === 'gitlab') {
                         documentationRepositoryType.selectedIndex = i;
                         documentationRepositoryType.options[i].disabled = false;
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else if (value.indexOf('https://bitbucket.org') === 0) {
                 documentationRepositoryType.setAttribute('readonly', true);
-                for(i = 0; i < documentationRepositoryType.options.length; i++) {
+                for(let i = 0; i < documentationRepositoryType.options.length; i++) {
                     if (documentationRepositoryType.options[i].value === 'bitbucket-cloud') {
                         documentationRepositoryType.selectedIndex = i;
                         documentationRepositoryType.options[i].disabled = false;
@@ -37,14 +37,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else {
                 documentationRepositoryType.removeAttribute('readonly');
-                for(i = 0; i < documentationRepositoryType.options.length; i++) {
+                for(let i = 0; i < documentationRepositoryType.options.length; i++) {
                     documentationRepositoryType.options[i].disabled = false
                 }
             }
         });
     }
 
-    var discordWebhookType = document.getElementById('discord_webhook_type');
+    const discordWebhookType = document.getElementById('discord_webhook_type');
     if (discordWebhookType) {
         discordWebhookType.addEventListener('change', function() {
             if (discordWebhookType.options[discordWebhookType.selectedIndex].value === "3") {

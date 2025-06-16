@@ -16,21 +16,17 @@ use PHPUnit\Framework\TestCase;
 
 class RepositoryUrlUtilityTest extends TestCase
 {
-    public static function extractRepositoryNameFromCloneUrlDataProvider(): array
+    public static function extractRepositoryNameFromCloneUrlDataProvider(): \Iterator
     {
-        return [
-            ['git@github.com:typo3/typo3.git', 'typo3/typo3'],
-            ['git@github.com:TYPO3GmbH/elts-9.5-release.git', 'TYPO3GmbH/elts-9.5-release'],
-            ['git@github.com:TYPO3GmbH/elts-8.7-release.git', 'TYPO3GmbH/elts-8.7-release'],
-        ];
+        yield ['git@github.com:typo3/typo3.git', 'typo3/typo3'];
+        yield ['git@github.com:TYPO3GmbH/elts-9.5-release.git', 'TYPO3GmbH/elts-9.5-release'];
+        yield ['git@github.com:TYPO3GmbH/elts-8.7-release.git', 'TYPO3GmbH/elts-8.7-release'];
     }
 
-    /**
-     * @dataProvider extractRepositoryNameFromCloneUrlDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('extractRepositoryNameFromCloneUrlDataProvider')]
     public function testExtractRepositoryNameFromCloneUrlReturnsName(string $url, string $expectedName): void
     {
-        self::assertSame($expectedName, RepositoryUrlUtility::extractRepositoryNameFromCloneUrl($url));
+        $this->assertSame($expectedName, RepositoryUrlUtility::extractRepositoryNameFromCloneUrl($url));
     }
 
     public function testExtractRepositoryNameFromCloneUrlThrowsException(): void

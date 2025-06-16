@@ -131,7 +131,7 @@ class WebHookService
         }
         if (!empty($payload->deleted) && true === $payload->deleted) {
             $cloneUrl = '';
-            if (is_object($payload) && isset($payload->repository)) {
+            if (isset($payload->repository)) {
                 $cloneUrl = $payload->repository->clone_url;
             }
             throw new GitBranchDeletedException(sprintf('Webhook was triggered on deleted branch %s for repository %s.', $payload->ref ?? '[unknown]', $cloneUrl), 1564408696);
@@ -154,7 +154,7 @@ class WebHookService
             }
 
             if (!$triggeringChange) {
-                throw new DocsNoRstChangesException(sprintf('The commit %s pushed to %s:%s doesn\'t contain any changed .rst files', $payload->head_commit?->id ?? '[unknown]', $payload->repository?->full_name ?? '[unknown]', $payload->ref ?? '[unknown]'), 1570011098);
+                throw new DocsNoRstChangesException(sprintf('The commit %s pushed to %s:%s doesn\'t contain any changed .rst files', $payload->head_commit->id ?? '[unknown]', $payload->repository->full_name ?? '[unknown]', $payload->ref ?? '[unknown]'), 1570011098);
             }
         }
 

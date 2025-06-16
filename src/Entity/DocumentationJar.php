@@ -35,7 +35,7 @@ class DocumentationJar
     #[Assert\Url]
     private string $repositoryUrl;
 
-    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
+    #[ORM\Column(type: 'string', length: 255, nullable: true, options: ['default' => ''])]
     #[Assert\NotBlank]
     #[Assert\Url]
     private ?string $publicComposerJsonUrl = null;
@@ -59,10 +59,10 @@ class DocumentationJar
     #[ORM\Column(type: 'string', length: 255)]
     private string $branch;
 
-    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(type: 'datetime', nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(type: 'datetime', nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $lastRenderedAt = null;
 
     #[ORM\Column(type: 'string', length: 255)]

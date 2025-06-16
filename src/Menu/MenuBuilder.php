@@ -103,7 +103,7 @@ class MenuBuilder extends TemplateMenuBuider
             $menu->addChild(
                 'login',
                 [
-                    'route' => 'admin_login',
+                    'route' => 'login',
                     'label' => 'Login',
                     'extras' => [
                         'icon' => 'actions-login',

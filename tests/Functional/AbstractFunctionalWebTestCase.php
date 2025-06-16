@@ -13,9 +13,8 @@ namespace App\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 use T3G\LibTestHelper\Database\DatabasePrimer;
 
@@ -27,11 +26,11 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
     /**
      * Log in a client as documentation maintainer.
      */
-    protected function logInAsDocumentationMaintainer(AbstractBrowser $client): void
+    protected function logInAsDocumentationMaintainer(KernelBrowser $client): void
     {
-        $session = $client->getContainer()->get('session');
+        $session = $client->getContainer()->get('session.factory')->createSession();
         $firewall = 'main';
-        $token = new PostAuthenticationGuardToken(
+        $token = new PostAuthenticationToken(
             new KeyCloakUser('xX_DocsBoi_Xx', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_DOCUMENTATION_MAINTAINER'], 'oelie@boelie.nl', 'Use the force, Harry ~ Gandalf'),
             'keycloak.typo3.com.user.provider',
             ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_DOCUMENTATION_MAINTAINER']
@@ -48,11 +47,11 @@ abstract class AbstractFunctionalWebTestCase extends WebTestCase
     /**
      * Log in a client as admin.
      */
-    protected function logInAsAdmin(AbstractBrowser $client): void
+    protected function logInAsAdmin(KernelBrowser $client): void
     {
-        $session = $client->getContainer()->get('session');
+        $session = $client->getContainer()->get('session.factory')->createSession();
         $firewall = 'main';
-        $token = new PostAuthenticationGuardToken(
+        $token = new PostAuthenticationToken(
             new KeyCloakUser('Oelie Boelie', ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_ADMIN'], 'oelie@boelie.nl', 'Oelie Boelie'),
             'keycloak.typo3.com.user.provider',
             ['ROLE_OAUTH_USER', 'ROLE_USER', 'ROLE_ADMIN']

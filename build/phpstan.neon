@@ -2,8 +2,11 @@ includes:
 	- %currentWorkingDirectory%/build/phpstan-baseline.neon
 
 parameters:
-	checkMissingIterableValueType: false
-	checkGenericClassInNonGenericObjectType: false
+	ignoreErrors:
+		-
+			identifier: missingType.iterableValue
+		-
+			identifier: missingType.generics
 	symfony:
-		container_xml_path: ../var/cache/dev/App_KernelDevDebugContainer.xml
+		containerXmlPath: %currentWorkingDirectory%/var/cache/dev/App_KernelDevDebugContainer.xml
 	level: 6

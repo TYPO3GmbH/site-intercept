@@ -21,6 +21,6 @@ class GithubPullRequestCloseCommentTest extends TestCase
     {
         $pushOutput = new GitPushOutput('Foo https://review.typo3.org/c/Packages/TYPO3.CMS/+/58930/ bar');
         $subject = new GithubPullRequestCloseComment($pushOutput);
-        self::assertStringContainsString('https://review.typo3.org/c/Packages/TYPO3.CMS/+/58930', $subject->comment);
+        $this->assertStringContainsString('https://review.typo3.org/c/Packages/TYPO3.CMS/+/58930', $subject->comment);
     }
 }

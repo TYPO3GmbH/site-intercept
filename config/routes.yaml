@@ -1,8 +1,11 @@
 controllers:
-  resource: '../src/Controller/*'
-  type: annotation
-  trailing_slash_on_root: false
+  resource:
+    path: ../src/Controller/
+    namespace: App\Controller
+  type: attribute
 
-# A static logout route
 logout:
   path: /logout
+
+login:
+  alias: t3g_keycloak_login

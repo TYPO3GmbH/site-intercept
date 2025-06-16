@@ -29,9 +29,9 @@ class GithubPullRequestIssueTest extends TestCase
         $response = new Response(200, ['Content-Type' => 'application/json'], json_encode(self::$body, JSON_THROW_ON_ERROR));
         $subject = new GithubPullRequestIssue($response);
 
-        self::assertSame('Pull request title', $subject->title);
-        self::assertSame('Pull request body', $subject->body);
-        self::assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1', $subject->url);
+        $this->assertSame('Pull request title', $subject->title);
+        $this->assertSame('Pull request body', $subject->body);
+        $this->assertSame('https://github.com/psychomieze/TYPO3.CMS/pull/1', $subject->url);
     }
 
     public function testConstructorThrowsIfDetailDataIsEmpty(): void

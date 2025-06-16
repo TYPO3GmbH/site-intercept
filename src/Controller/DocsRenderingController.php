@@ -37,7 +37,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 /**
@@ -73,6 +73,9 @@ class DocsRenderingController extends AbstractController
             $errorMessage = '';
 
             foreach ($pushEvents as $pushEvent) {
+                $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
+                $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
+
                 try {
                     if ($repositoryBlacklistEntryRepository->isBlacklisted($pushEvent->getRepositoryUrl())) {
                         $this->entityManager->persist(
@@ -92,8 +95,6 @@ class DocsRenderingController extends AbstractController
                         $this->entityManager->flush();
                         continue;
                     }
-                    $composerJson = $documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
-                    $composerAsObject = $documentationBuildInformationService->getComposerJsonObject($composerJson);
                     $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
                     $documentationBuildInformationService->assertBuildWasTriggeredByRepositoryOwner($buildInformation);
                     $documentationJar = $documentationBuildInformationService->registerDocumentationRendering($buildInformation);
@@ -202,7 +203,7 @@ class DocsRenderingController extends AbstractController
                             'exceptionCode' => $e->getCode(),
                             'exceptionMessage' => $e->getMessage(),
                             'repository' => $pushEvent->getRepositoryUrl(),
-                            'package' => $buildInformation->packageName,
+                            'package' => $e->getPackageName(),
                             'user' => $userIdentifier,
                         ])
                     );
@@ -272,7 +273,7 @@ class DocsRenderingController extends AbstractController
                         if (filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
                             $mailService->sendMailToAuthorDueToMissingDependency($pushEvent, $composerAsObject, $e->getMessage());
                         }
-                    } catch (DocsComposerMissingValueException $e) {
+                    } catch (DocsComposerMissingValueException) {
                         // Do not send mail if 'authors' is not set in composer.json
                     }
                     ++$erroredPushes;
