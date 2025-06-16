@@ -20,17 +20,17 @@ class GithubPushEventForCoreTest extends TestCase
     public function testConstructorHandlesPatchMainBranch(): void
     {
         $subject = new GithubPushEventForCore(['ref' => 'refs/heads/main']);
-        self::assertSame('main', $subject->sourceBranch);
-        self::assertSame('main', $subject->targetBranch);
-        self::assertSame('patch', $subject->type);
+        $this->assertSame('main', $subject->sourceBranch);
+        $this->assertSame('main', $subject->targetBranch);
+        $this->assertSame('patch', $subject->type);
     }
 
     public function testConstructorHandlesPatchNineBranch(): void
     {
         $subject = new GithubPushEventForCore(['ref' => 'refs/heads/9.2']);
-        self::assertSame('9.2', $subject->sourceBranch);
-        self::assertSame('9.2', $subject->targetBranch);
-        self::assertSame('patch', $subject->type);
+        $this->assertSame('9.2', $subject->sourceBranch);
+        $this->assertSame('9.2', $subject->targetBranch);
+        $this->assertSame('patch', $subject->type);
     }
 
     public function testConstructorHandlesTagNineBranch(): void
@@ -39,8 +39,8 @@ class GithubPushEventForCoreTest extends TestCase
             'ref' => 'refs/tags/v9.5.1',
             'created' => true,
         ]);
-        self::assertSame('v9.5.1', $subject->tag);
-        self::assertSame('tag', $subject->type);
+        $this->assertSame('v9.5.1', $subject->tag);
+        $this->assertSame('tag', $subject->type);
     }
 
     public function testConstructorThrowsWithEmptyRef(): void

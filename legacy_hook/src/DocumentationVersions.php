@@ -117,7 +117,7 @@ readonly class DocumentationVersions
         $mapping = [];
         try {
             $mapping = json_decode(file_get_contents(__DIR__ . '/../versionconfig.json'), true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
+        } catch (\JsonException) {
             // purposefully left blank
         }
 
@@ -134,7 +134,7 @@ readonly class DocumentationVersions
                 $mappedPath &&
                 (is_file($docsRootPath . '/' . $mappedPathWithoutAnchor) || is_dir($docsRootPath . '/' . $mappedPathWithoutAnchor))
             ) {
-                $validatedVersion['path'] = $docsRootPath . '/' . ltrim($mappedPath, '/');
+                $validatedVersion['path'] = $docsRootPath . '/' . ltrim((string) $mappedPath, '/');
                 $found = true;
             } else {
                 for ($i = 0; $i < $subPathCount; $i++) {

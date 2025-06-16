@@ -21,6 +21,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method DocumentationJar|null findOneBy(array $criteria, array $orderBy = null)
  * @method DocumentationJar[]    findAll()
  * @method DocumentationJar[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
+ * @extends ServiceEntityRepository<DocumentationJar>
  */
 class DocumentationJarRepository extends ServiceEntityRepository
 {

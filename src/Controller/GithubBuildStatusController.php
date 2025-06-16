@@ -22,7 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Triggered by GitHub with current build status.
@@ -45,7 +45,6 @@ class GithubBuildStatusController extends AbstractController
 
         $result = new GithubBuildInfo($request);
         // This is a back-channel triggered by GitHub after a "documentation rendering" build is done
-        /** @var DocumentationJar $documentationJar */
         $documentationJar = $this->documentationJarRepository->findOneBy(['buildKey' => $result->buildKey]);
         if ($documentationJar instanceof DocumentationJar) {
             if ($result->success) {
@@ -106,7 +105,6 @@ class GithubBuildStatusController extends AbstractController
 
         $result = new GithubBuildInfo($request);
         // This is a back-channel triggered by GitHub after a "documentation rendering" build is done
-        /** @var DocumentationJar $documentationJar */
         $documentationJar = $this->documentationJarRepository->findOneBy(['buildKey' => $result->buildKey]);
         if ($documentationJar instanceof DocumentationJar) {
             $documentationJar->setLastRenderedLink($result->link);
@@ -135,7 +133,6 @@ class GithubBuildStatusController extends AbstractController
 
         $result = new GithubBuildInfo($request);
         // This is a back-channel triggered by GitHub after a "documentation rendering" build is done
-        /** @var DocumentationJar $documentationJar */
         $documentationJar = $this->documentationJarRepository->findOneBy(['buildKey' => $result->buildKey]);
         if ($documentationJar instanceof DocumentationJar && $result->success) {
             // Build was successful, set status to "deleted"

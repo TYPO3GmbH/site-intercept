@@ -22,12 +22,12 @@ use App\Form\DocumentationDeployment;
 use App\Repository\RepositoryBlacklistEntryRepository;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\DocumentationService;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ConfigurationController extends AbstractController
 {
@@ -58,7 +58,7 @@ class ConfigurationController extends AbstractController
             'docs_configuration/form.html.twig',
             [
                 'redirect' => $documentationJar,
-                'form' => $form->createView(),
+                'form' => $form,
                 'showPrev' => false,
             ]
         );
@@ -86,7 +86,7 @@ class ConfigurationController extends AbstractController
             'docs_configuration/form.html.twig',
             [
                 'redirect' => $documentationJar,
-                'form' => $form->createView(),
+                'form' => $form,
                 'showPrev' => true,
             ]
         );
@@ -138,7 +138,7 @@ class ConfigurationController extends AbstractController
             'docs_configuration/form.html.twig',
             [
                 'redirect' => $doc,
-                'form' => $form->createView(),
+                'form' => $form,
                 'showPrev' => true,
             ]
         );

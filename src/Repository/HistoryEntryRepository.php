@@ -20,6 +20,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method HistoryEntry|null findOneBy(array $criteria, array $orderBy = null)
  * @method HistoryEntry[]    findAll()
  * @method HistoryEntry[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
+ * @extends ServiceEntityRepository<HistoryEntry>
  */
 class HistoryEntryRepository extends ServiceEntityRepository
 {
@@ -42,9 +44,9 @@ class HistoryEntryRepository extends ServiceEntityRepository
     public function deleteOldEntries(): void
     {
         $date = (new \DateTimeImmutable('-1 week'));
-        $qb = $this->_em->createQueryBuilder();
+        $qb = $this->createQueryBuilder('h');
         $qb
-            ->delete('App:HistoryEntry', 'h')
+            ->delete(HistoryEntry::class, 'h')
             ->where(
                 $qb->expr()->lt('h.createdAt', ':date')
             )

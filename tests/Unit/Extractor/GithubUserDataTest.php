@@ -26,8 +26,8 @@ class GithubUserDataTest extends TestCase
         ], JSON_THROW_ON_ERROR));
         $subject = new GithubUserData($response);
 
-        self::assertSame('Lolli Foo', $subject->user);
-        self::assertSame('lolli@example.com', $subject->email);
+        $this->assertSame('Lolli Foo', $subject->user);
+        $this->assertSame('lolli@example.com', $subject->email);
     }
 
     public function testConstructorHandlesLoginname(): void
@@ -38,8 +38,8 @@ class GithubUserDataTest extends TestCase
         ], JSON_THROW_ON_ERROR));
         $subject = new GithubUserData($response);
 
-        self::assertSame('lolli42', $subject->user);
-        self::assertSame('lolli@example.com', $subject->email);
+        $this->assertSame('lolli42', $subject->user);
+        $this->assertSame('lolli@example.com', $subject->email);
     }
 
     public function testConstructorThrowsWithEmptyName(): void

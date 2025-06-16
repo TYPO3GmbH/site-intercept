@@ -52,7 +52,7 @@ readonly class DocumentationService
             ->getQuery()
             ->getResult();
         if (!empty($existWithDifferentUrl)) {
-            throw new DocsPackageRegisteredWithDifferentRepositoryException('This package already exists with a different repository url', 1558697388);
+            throw new DocsPackageRegisteredWithDifferentRepositoryException($packageName, 'This package already exists with a different repository url', 1558697388);
         }
     }
 
@@ -124,9 +124,7 @@ readonly class DocumentationService
                 ComposerJsonInvalidException|
                 DocsComposerDependencyException|
                 DocsPackageDoNotCareBranch|
-                DocsComposerMissingValueException|
-                \UnexpectedValueException|
-                DocsPackageRegisteredWithDifferentRepositoryException $e
+                DocsComposerMissingValueException $e
             ) {
                 $this->logger->warning('Cannot render documentation: ' . $e->getMessage(), [
                     'type' => 'docsRendering',

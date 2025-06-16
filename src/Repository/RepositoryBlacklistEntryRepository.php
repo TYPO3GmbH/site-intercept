@@ -20,6 +20,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method RepositoryBlacklistEntry|null findOneBy(array $criteria, array $orderBy = null)
  * @method RepositoryBlacklistEntry[]    findAll()
  * @method RepositoryBlacklistEntry[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
+ * @extends ServiceEntityRepository<RepositoryBlacklistEntry>
  */
 class RepositoryBlacklistEntryRepository extends ServiceEntityRepository
 {

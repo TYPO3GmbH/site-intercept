@@ -30,21 +30,17 @@ class ComposerJsonTest extends TestCase
     public function testNameIsReturnedAsExpected(): void
     {
         $composerJson = new ComposerJson(['name' => 'foobar/baz']);
-        self::assertSame('foobar/baz', $composerJson->getName());
+        $this->assertSame('foobar/baz', $composerJson->getName());
     }
 
-    public static function emptyNameDataProvider(): array
+    public static function emptyNameDataProvider(): \Iterator
     {
-        return [
-            [''],
-            ['     '],
-            [null],
-        ];
+        yield [''];
+        yield ['     '];
+        yield [null];
     }
 
-    /**
-     * @dataProvider emptyNameDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emptyNameDataProvider')]
     public function testEmptyNameThrowsException(mixed $value): void
     {
         $this->expectException(DocsComposerMissingValueException::class);
@@ -57,46 +53,42 @@ class ComposerJsonTest extends TestCase
     public function testTypeIsReturnedAsExpected(): void
     {
         $composerJson = new ComposerJson(['name' => '123', 'type' => 'typo3-cms-extension']);
-        self::assertSame('typo3-cms-extension', $composerJson->getType());
+        $this->assertSame('typo3-cms-extension', $composerJson->getType());
     }
 
-    /**
-     * @dataProvider otherTypeDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('otherTypeDataProvider')]
     public function testTypeIsReturnedAsExpectedIfShouldBeOther($value): void
     {
         $composerJson = new ComposerJson(['name' => $value, 'type' => 'package']);
-        self::assertSame('other', $composerJson->getType());
+        $this->assertSame('other', $composerJson->getType());
     }
 
-    public static function otherTypeDataProvider(): array
+    public static function otherTypeDataProvider(): \Iterator
     {
-        return [
-            ['typo3/surf'],
-            ['typo3/tailor'],
-            [''],
-            [null],
-            ['     '],
-        ];
+        yield ['typo3/surf'];
+        yield ['typo3/tailor'];
+        yield [''];
+        yield [null];
+        yield ['     '];
     }
 
     public function testRequirementsAreFoundCorrectly(): void
     {
         $composerJson = new ComposerJson(['require' => ['foobar/bark' => '^4.2']]);
-        self::assertTrue($composerJson->requires('foobar/bark'));
-        self::assertFalse($composerJson->requires('idonot/exist'));
+        $this->assertTrue($composerJson->requires('foobar/bark'));
+        $this->assertFalse($composerJson->requires('idonot/exist'));
     }
 
     public function testEmptyRequirementsDefinitionDoNotThrowException(): void
     {
         $composerJson = new ComposerJson(['require' => []]);
-        self::assertFalse($composerJson->requires('idonot/exist'));
+        $this->assertFalse($composerJson->requires('idonot/exist'));
     }
 
     public function testMissingRequirementsDefinitionDoNotThrowException(): void
     {
         $composerJson = new ComposerJson([]);
-        self::assertFalse($composerJson->requires('idonot/exist'));
+        $this->assertFalse($composerJson->requires('idonot/exist'));
     }
 
     public function testEmptyMinimumCmsCoreRequireThrowsException(): void
@@ -137,30 +129,26 @@ class ComposerJsonTest extends TestCase
         ];
     }
 
-    public static function cmsCoreConstraintProvider(): array
+    public static function cmsCoreConstraintProvider(): \Iterator
     {
-        return [
-            ['^9.5', '9.5', '9.5'],
-            ['^7.5.6 || ^8', '7.6', '8.7'],
-            ['10.0.x-dev', '', ''],
-            ['^9.5 || 10.4.*@dev', '9.5', '10.4'],
-            ['~9.5', '9.5', '9.5'],
-            ['^9', '9.5', '9.5'],
-            ['~9.5.6', '9.5', '9.5'],
-            ['^9.5.17 || ^10.4.2', '9.5', '10.4'],
-            ['^10.0', '10.4', '10.4'],
-        ];
+        yield ['^9.5', '9.5', '9.5'];
+        yield ['^7.5.6 || ^8', '7.6', '8.7'];
+        yield ['10.0.x-dev', '', ''];
+        yield ['^9.5 || 10.4.*@dev', '9.5', '10.4'];
+        yield ['~9.5', '9.5', '9.5'];
+        yield ['^9', '9.5', '9.5'];
+        yield ['~9.5.6', '9.5', '9.5'];
+        yield ['^9.5.17 || ^10.4.2', '9.5', '10.4'];
+        yield ['^10.0', '10.4', '10.4'];
     }
 
-    /**
-     * @dataProvider cmsCoreConstraintProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('cmsCoreConstraintProvider')]
     public function testCoreConstraints(string $versionString, string $expectedMin, string $expectedMax): void
     {
         $composerJson = new ComposerJson($this->dummyComposerJsonArray($versionString));
 
-        self::assertEquals($expectedMin, $composerJson->getMinimumTypoVersion());
-        self::assertEquals($expectedMax, $composerJson->getMaximumTypoVersion());
+        $this->assertSame($expectedMin, $composerJson->getMinimumTypoVersion());
+        $this->assertSame($expectedMax, $composerJson->getMaximumTypoVersion());
     }
 
     public function testExceptionIsNotThrownForTypo3CmsCorePackage(): void
@@ -172,7 +160,7 @@ class ComposerJsonTest extends TestCase
             'authors' => [['name' => 'Husel Pusel', 'email' => 'husel@example.com']],
         ]);
 
-        self::assertEquals('', $composerJson->getMinimumTypoVersion());
-        self::assertEquals('', $composerJson->getMaximumTypoVersion());
+        $this->assertSame('', $composerJson->getMinimumTypoVersion());
+        $this->assertSame('', $composerJson->getMaximumTypoVersion());
     }
 }

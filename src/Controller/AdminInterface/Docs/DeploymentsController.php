@@ -20,6 +20,7 @@ use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Exception\UnsupportedWebHookRequestException;
+use App\Form\DeleteDeploymentType;
 use App\Form\DocsDeploymentFilterType;
 use App\Repository\DocumentationJarRepository;
 use App\Repository\HistoryEntryRepository;
@@ -27,13 +28,14 @@ use App\Service\DocumentationBuildInformationService;
 use App\Service\GithubService;
 use App\Service\RenderDocumentationService;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 /**
@@ -53,7 +55,7 @@ class DeploymentsController extends AbstractController
 
         $requestSortDirection = $request->query->get('direction');
         $requestSortField = $request->query->get('sort');
-        $sortDirection = 'asc' === $requestSortDirection ? Criteria::ASC : Criteria::DESC;
+        $sortDirection = 'asc' === $requestSortDirection ? Order::Ascending : Order::Descending;
         $sortField = in_array($requestSortField, ['packageName', 'typeLong', 'lastRenderedAt']) ? $requestSortField : 'lastRenderedAt';
         $criteria->orderBy([$sortField => $sortDirection]);
 
@@ -82,7 +84,7 @@ class DeploymentsController extends AbstractController
         return $this->render(
             'docs_deployments/index.html.twig',
             [
-                'filter' => $form->createView(),
+                'filter' => $form,
                 'pagination' => $pagination,
                 'logMessages' => $recentLogsMessages,
                 'warnings' => DocsRenderingHistoryStatus::$warnings,
@@ -103,11 +105,16 @@ class DeploymentsController extends AbstractController
             return $this->redirectToRoute('admin_docs_deployments');
         }
 
+        $deleteDeploymentForm = $this->createForm(DeleteDeploymentType::class, [], [
+            'action' => $this->generateUrl('admin_docs_deployments_delete_action', ['documentationJarId' => $jar->getId()]),
+        ]);
+
         return $this->render(
             'docs_deployments/delete.html.twig',
             [
                 'deployment' => $jar,
                 'docsLiveServer' => $_ENV['DOCS_LIVE_SERVER'] ?? '',
+                'deleteForm' => $deleteDeploymentForm,
             ]
         );
     }
@@ -119,44 +126,49 @@ class DeploymentsController extends AbstractController
     #[Route(path: '/admin/docs/deployments/delete/{documentationJarId}', name: 'admin_docs_deployments_delete_action', requirements: ['documentationJarId' => '\d+'], methods: ['DELETE'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function delete(
+        Request $request,
         int $documentationJarId,
         DocumentationJarRepository $documentationJarRepository,
         EntityManagerInterface $entityManager,
         DocumentationBuildInformationService $documentationBuildInformationService,
         GithubService $githubService
     ): Response {
-        $jar = $documentationJarRepository->find($documentationJarId);
+        $form = $this->createForm(DeleteDeploymentType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $jar = $documentationJarRepository->find($documentationJarId);
 
-        if (null !== $jar && $jar->isDeletable()) {
-            $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($jar);
-            $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
-            $buildTriggered = $githubService->triggerDocumentationDeletionPlan($informationFile);
+            if (null !== $jar && $jar->isDeletable()) {
+                $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($jar);
+                $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
+                $buildTriggered = $githubService->triggerDocumentationDeletionPlan($informationFile);
 
-            $jar
-                ->setBuildKey($buildTriggered->buildResultKey)
-                ->setStatus(DocumentationStatus::STATUS_DELETING);
-            $entityManager->persist($jar);
-            $user = $this->getUser();
-            $userIdentifier = 'Anon.';
-            if ($user instanceof KeyCloakUser) {
-                $userIdentifier = $user->getDisplayName();
+                $jar
+                    ->setBuildKey($buildTriggered->buildResultKey)
+                    ->setStatus(DocumentationStatus::STATUS_DELETING);
+                $entityManager->persist($jar);
+                $user = $this->getUser();
+                $userIdentifier = 'Anon.';
+                if ($user instanceof KeyCloakUser) {
+                    $userIdentifier = $user->getDisplayName();
+                }
+                $entityManager->persist(
+                    (new HistoryEntry())
+                        ->setType('docsRendering')
+                        ->setStatus(DocsRenderingHistoryStatus::PACKAGE_DELETED)
+                        ->setGroupEntry($buildTriggered->buildResultKey)
+                        ->setData([
+                            'type' => HistoryEntryType::DOCS_RENDERING,
+                            'status' => DocsRenderingHistoryStatus::PACKAGE_DELETED,
+                            'triggeredBy' => HistoryEntryTrigger::WEB,
+                            'repository' => $jar->getRepositoryUrl(),
+                            'package' => $jar->getPackageName(),
+                            'bambooKey' => $buildTriggered->buildResultKey,
+                            'user' => $userIdentifier,
+                        ])
+                );
+                $entityManager->flush();
             }
-            $entityManager->persist(
-                (new HistoryEntry())
-                    ->setType('docsRendering')
-                    ->setStatus(DocsRenderingHistoryStatus::PACKAGE_DELETED)
-                    ->setGroupEntry($buildTriggered->buildResultKey)
-                    ->setData([
-                        'type' => HistoryEntryType::DOCS_RENDERING,
-                        'status' => DocsRenderingHistoryStatus::PACKAGE_DELETED,
-                        'triggeredBy' => HistoryEntryTrigger::WEB,
-                        'repository' => $jar->getRepositoryUrl(),
-                        'package' => $jar->getPackageName(),
-                        'bambooKey' => $buildTriggered->buildResultKey,
-                        'user' => $userIdentifier,
-                    ])
-            );
-            $entityManager->flush();
         }
 
         return $this->redirectToRoute('admin_docs_deployments');

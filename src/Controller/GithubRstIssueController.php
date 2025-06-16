@@ -17,7 +17,7 @@ use App\Service\GithubService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller for GitH1ub rst files issue creation.
@@ -27,8 +27,6 @@ class GithubRstIssueController extends AbstractController
 {
     /**
      * Called by GitHub post merge, this checks the incoming merge for rst file changes and posts them on a GitHub repository as issues.
-     *
-     * @throws \JsonException
      */
     #[Route(path: '/create-rst-issue', name: 'docs_github_rst_issue_create', methods: ['POST'])]
     public function index(Request $request, GithubService $githubService, string $githubChangelogToLogRepository): Response

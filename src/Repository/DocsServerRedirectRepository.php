@@ -20,6 +20,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method DocsServerRedirect|null findOneBy(array $criteria, array $orderBy = null)
  * @method DocsServerRedirect[]    findAll()
  * @method DocsServerRedirect[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ *
+ * @extends ServiceEntityRepository<DocsServerRedirect>
  */
 class DocsServerRedirectRepository extends ServiceEntityRepository
 {

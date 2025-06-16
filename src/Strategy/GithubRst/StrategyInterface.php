@@ -16,6 +16,8 @@ use App\Extractor\GithubPushEventForCore;
 interface StrategyInterface
 {
     public function match(string $type): bool;
+
     public function getFromGithub(GithubPushEventForCore $pushEvent, string $filename): string;
+
     public function formatResponse(string $response): string;
 }

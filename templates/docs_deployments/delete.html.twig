@@ -72,14 +72,7 @@
                 }}
             </div>
             <div class="col-auto">
-                <form class="d-inline-block" method="post" action="{{ path('admin_docs_deployments_delete_action', {'documentationJarId': deployment.getId()}) }}">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ deployment.getId()) }}">
-                    <button class="btn btn-danger" id="docsformdelete">
-                        {{ icon('actions-delete') }}
-                        Delete
-                    </button>
-                </form>
+                {{ form(deleteForm) }}
             </div>
         </div>
     {% endframe %}

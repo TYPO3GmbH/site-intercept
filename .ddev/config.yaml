@@ -9,11 +9,8 @@ additional_fqdns: []
 database:
     type: mariadb
     version: "10.2"
-hooks:
-    pre-start:
-        - exec-host: php -r "file_exists('.ddev/keycloak-gatekeeper.conf') || copy('.ddev/keycloak-gatekeeper.conf.tmpl', '.ddev/keycloak-gatekeeper.conf');"
 omit_containers: [db]
-webimage_extra_packages: [php8.2-gmp, ssh]
+webimage_extra_packages: [php8.2-gmp]
 use_dns_when_possible: true
 composer_version: "2"
 web_environment: []

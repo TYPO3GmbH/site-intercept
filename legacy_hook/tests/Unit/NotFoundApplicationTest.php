@@ -19,7 +19,6 @@ use org\bovigo\vfs\vfsStream;
 
 class NotFoundApplicationTest extends TestCase
 {
-    private ServerRequestInterface&MockObject $requestMock;
     private UriInterface&MockObject $uriMock;
 
     private NotFoundApplication $subject;
@@ -48,12 +47,12 @@ class NotFoundApplicationTest extends TestCase
         ]);
         $GLOBALS['_SERVER']['DOCUMENT_ROOT'] = vfsStream::url('root/site/');
 
-        $this->requestMock = $this->getMockBuilder(ServerRequestInterface::class)->getMock();
+        $requestMock = $this->getMockBuilder(ServerRequestInterface::class)->getMock();
         $this->uriMock = $this->getMockBuilder(UriInterface::class)->getMock();
-        $this->requestMock->expects($this->any())
+        $requestMock
             ->method('getUri')
             ->willReturn($this->uriMock);
-        $this->subject = new NotFoundApplication($this->requestMock);
+        $this->subject = new NotFoundApplication($requestMock);
     }
 
     public function tearDown(): void
@@ -123,7 +122,7 @@ class NotFoundApplicationTest extends TestCase
 
     private function configureRequestUriPath(string $path = ''): void
     {
-        $this->uriMock->expects($this->any())
+        $this->uriMock
             ->method('getPath')
             ->willReturn($path);
     }

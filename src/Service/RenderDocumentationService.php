@@ -20,7 +20,6 @@ use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Extractor\DeploymentInformation;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Security;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 class RenderDocumentationService
@@ -30,7 +29,7 @@ class RenderDocumentationService
         protected GithubService $githubService,
         protected LoggerInterface $logger,
         protected EntityManagerInterface $entityManager,
-        protected Security $security
+        protected \Symfony\Bundle\SecurityBundle\Security $security
     ) {
     }
 

@@ -27,7 +27,7 @@ class DocsDeploymentFilterType extends AbstractType
             ->setMethod(Request::METHOD_GET)
             ->add('search', SearchType::class, [
                 'label' => false,
-                ])
+            ])
             ->add('type', ChoiceType::class, [
                 'label' => false,
                 'placeholder' => 'All',
