@@ -257,6 +257,43 @@ class PermalinksTest extends TestCase
             'georgringer-NEWS:How_To_rEwrite_Urls@10.0',
             'https://docs.typo3.org/p/georgringer/news/10.0/en-us/Tutorials/BestPractice/Routing/Index.html#how-to-rewrite-urls',
         ];
+        # slasher
+        yield 'core cms-package manual, no version, slash syntax' => [
+            'typo3/cms-seo:developer',
+            'https://docs.typo3.org/c/typo3/cms-seo/main/en-us/Developer/Index.html#developer',
+        ];
+        yield 'core cms-package manual, with number version, slash syntax' => [
+            'typo3/cms-seo:developer@13.4',
+            'https://docs.typo3.org/c/typo3/cms-seo/13.4/en-us/Developer/Index.html#developer',
+        ];
+        yield 'core cms-package manual, with stable version, slash syntax' => [
+            'typo3/cms-seo:developer@stable',
+            'https://docs.typo3.org/c/typo3/cms-seo/13.4/en-us/Developer/Index.html#developer',
+        ];
+        yield 'core cms-package manual, with oldstable version, slash syntax' => [
+            'typo3/cms-seo:developer@oldstable',
+            'https://docs.typo3.org/c/typo3/cms-seo/12.4/en-us/Developer/Index.html#developer',
+        ];
+        yield 'core cms-package manual, with dev version, slash syntax' => [
+            'typo3/cms-seo:developer@dev',
+            'https://docs.typo3.org/c/typo3/cms-seo/main/en-us/Developer/Index.html#developer',
+        ];
+        yield 'Third party docs, no version, slash syntax' => [
+            'georgringer/news:reference',
+            'https://docs.typo3.org/p/georgringer/news/main/en-us/Reference/Index.html#reference',
+        ];
+        yield 'Third party docs, 12.1 version, slash syntax' => [
+            'georgringer/news:reference@12.1',
+            'https://docs.typo3.org/p/georgringer/news/12.1/en-us/Reference/Index.html#reference',
+        ];
+        yield 'Third party docs, 10.0 version, slash syntax' => [
+            'georgringer/news:reference@10.0',
+            'https://docs.typo3.org/p/georgringer/news/10.0/en-us/Reference/Index.html#reference',
+        ];
+        yield 'Third party docs, 10.0 version, underscores, slash syntax' => [
+            'georgringer/news:how_to_rewrite_urls@10.0',
+            'https://docs.typo3.org/p/georgringer/news/10.0/en-us/Tutorials/BestPractice/Routing/Index.html#how-to-rewrite-urls',
+        ];
     }
 
     #[DataProvider('redirectWorksDataProvider')]

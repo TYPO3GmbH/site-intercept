@@ -115,7 +115,11 @@ final readonly class DocumentationLinker
 
     public function __construct(private ServerRequestInterface $request)
     {
-        $this->cacheTime = 86400;
+        // If a documentation is rendered with errors, a permalink might temporarily resolve to a 404.
+        // We reduce the cache time from a day to a shorter time, so that errors will not a full day
+        // to recover in resolving.
+        // @todo - Ideally, the caching could respect the filemtime() of inventory files
+        $this->cacheTime = 7200;
         $this->cache = new FilesystemAdapter('DocumentationLinker', $this->cacheTime);
     }
 
@@ -141,7 +145,7 @@ final readonly class DocumentationLinker
     {
         if (preg_match(
               '/^' .
-              '([a-z0-9\-_]+):' .         // $repository
+              '([a-z0-9\-\/_]+):' .       // $repository
               '([a-z0-9\-_]+)' .          // $index
               '(@[a-z0-9\.-]+)?' .        // $version
               '$/imsU',
@@ -253,7 +257,7 @@ final readonly class DocumentationLinker
     private function resolveEntryPoint(string $repository, string $version): string
     {
         $useCoreVersionResolving = true;
-        if (preg_match('/^typo3-(cms-[0-9a-z\-]+)$/i', $repository, $repositoryParts)) {
+        if (preg_match('/^typo3[\/-](cms-[0-9a-z\-]+)$/i', $repository, $repositoryParts)) {
             // CASE: TYPO3 core manuals
             $entrypoint = 'https://docs.typo3.org/c/typo3/' . strtolower($repositoryParts[1]) . '/{typo3_version}/en-us/';
         } elseif ($inventory = DefaultInventories::tryFrom($repository)) {
