@@ -116,7 +116,7 @@ final readonly class DocumentationLinker
     public function __construct(private ServerRequestInterface $request)
     {
         // If a documentation is rendered with errors, a permalink might temporarily resolve to a 404.
-        // We reduce the cache time from a day to a shorter time, so that errors will not a full day
+        // We use a short cache time to prevent (temporary) resolving errors to be returned for a long time.
         // @todo - Ideally, the caching could respect the filemtime() of inventory files
         $this->cacheTime = 7200;
         $this->cache = new FilesystemAdapter('DocumentationLinker', $this->cacheTime);
