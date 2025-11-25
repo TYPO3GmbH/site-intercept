@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c483ce42110ce7dcde8a4f88fcebb50b",
+    "content-hash": "cb669bd94e4ff58e2bf1a5fe422a112a",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -1152,16 +1152,16 @@
         },
         {
             "name": "t3docs/typo3-version-handling",
-            "version": "0.21.0",
+            "version": "0.34.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TYPO3-Documentation/t3docs-typo3-version-handling.git",
-                "reference": "9548ef3cc6575c6d4fa991032dfeb110e47c0dea"
+                "reference": "48d37b4f78047753b023ea9c58060de862406b8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TYPO3-Documentation/t3docs-typo3-version-handling/zipball/9548ef3cc6575c6d4fa991032dfeb110e47c0dea",
-                "reference": "9548ef3cc6575c6d4fa991032dfeb110e47c0dea",
+                "url": "https://api.github.com/repos/TYPO3-Documentation/t3docs-typo3-version-handling/zipball/48d37b4f78047753b023ea9c58060de862406b8a",
+                "reference": "48d37b4f78047753b023ea9c58060de862406b8a",
                 "shasum": ""
             },
             "type": "library",
@@ -1177,9 +1177,9 @@
             "description": "Version Handling for TYPO3 Documentation",
             "support": {
                 "issues": "https://github.com/TYPO3-Documentation/t3docs-typo3-version-handling/issues",
-                "source": "https://github.com/TYPO3-Documentation/t3docs-typo3-version-handling/tree/0.21.0"
+                "source": "https://github.com/TYPO3-Documentation/t3docs-typo3-version-handling/tree/0.34.0"
             },
-            "time": "2024-11-25T08:20:48+00:00"
+            "time": "2025-09-20T06:46:11+00:00"
         }
     ],
     "packages-dev": [
