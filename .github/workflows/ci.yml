@@ -28,6 +28,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
       - name: Setup PHP ${{ matrix.php-versions }}
         uses: shivammathur/setup-php@v2
         with:
@@ -125,6 +130,11 @@ jobs:
           ssh-add ~/.ssh/deploy_rsa
 
       - uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
 
       - name: Setup PHP ${{ matrix.php-versions }}
         uses: shivammathur/setup-php@v2
