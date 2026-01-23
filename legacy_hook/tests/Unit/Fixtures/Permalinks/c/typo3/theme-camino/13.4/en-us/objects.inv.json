@@ -1,0 +1,42 @@
+{
+    "std:doc": {
+        "Index": [
+            "Camino Theme",
+            "13.4",
+            "Index.html",
+            "TYPO3 Camino Theme"
+        ]
+    },
+    "std:label": {
+        "camino": [
+            "Camino Theme",
+            "13.4",
+            "Index.html#camino",
+            "Camino"
+        ]
+    },
+    "std:title": {
+        "camino": [
+            "Camino Theme",
+            "13.4",
+            "Index.html#camino",
+            "Camino"
+        ]
+    },
+    "std:confval-menu": {
+        "camino-settings": [
+            "Camino Theme",
+            "13.4",
+            "Index.html#confval-camino-settings",
+            ""
+        ]
+    },
+    "std:confval": {
+        "camino-settings": [
+            "Camino Theme",
+            "13.4",
+            "Index.html#confval-camino-settings",
+            "camino.settings"
+        ]
+    }
+}
