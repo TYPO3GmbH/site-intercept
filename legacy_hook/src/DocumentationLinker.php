@@ -258,11 +258,8 @@ final readonly class DocumentationLinker
     private function resolveEntryPoint(string $repository, string $version): string
     {
         $useCoreVersionResolving = true;
-        if (preg_match('/^typo3[\/-](cms-[0-9a-z\-]+)$/i', $repository, $repositoryParts)) {
-            // CASE: TYPO3 core manuals with "cms-" prefix
-            $entrypoint = 'https://docs.typo3.org/c/typo3/' . strtolower($repositoryParts[1]) . '/{typo3_version}/en-us/';
-        } elseif (preg_match('/^typo3[\/-]([0-9a-z\-]+)$/i', $repository, $repositoryParts)) {
-            // CASE: TYPO3 core manuals without "cms-prefix" (like theme-camino)
+        if (preg_match('/^typo3[\/-]([0-9a-z\-]+)$/i', $repository, $repositoryParts)) {
+            // CASE: Packages within the "typo3/" namespace (e.g. cms-adminpanel, theme-camino)
             $entrypoint = 'https://docs.typo3.org/c/typo3/' . strtolower($repositoryParts[1]) . '/{typo3_version}/en-us/';
         } elseif ($inventory = DefaultInventories::tryFrom($repository)) {
             // CASE: Official TYPO3 Documentation with known inventories. Provides "{typo3_version}" internally
