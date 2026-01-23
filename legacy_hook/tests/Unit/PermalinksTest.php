@@ -119,6 +119,26 @@ class PermalinksTest extends TestCase
             'typo3-cms-seo:developer@dev',
             'https://docs.typo3.org/c/typo3/cms-seo/main/en-us/Developer/Index.html#developer',
         ];
+        yield 'core manual, no cms- prefix, no version' => [
+            'typo3-theme-camino:camino',
+            'https://docs.typo3.org/c/typo3/theme-camino/main/en-us/Index.html#camino',
+        ];
+        yield 'core manual, no cms- prefix, with number version' => [
+            'typo3-theme-camino:camino@12.4',
+            'https://docs.typo3.org/c/typo3/theme-camino/12.4/en-us/Index.html#camino',
+        ];
+        yield 'core manual, no cms- prefix, with stable version' => [
+            'typo3-theme-camino:camino@stable',
+            'https://docs.typo3.org/c/typo3/theme-camino/13.4/en-us/Index.html#camino',
+        ];
+        yield 'core manual, no cms- prefix, with oldstable version' => [
+            'typo3-theme-camino:camino@oldstable',
+            'https://docs.typo3.org/c/typo3/theme-camino/12.4/en-us/Index.html#camino',
+        ];
+        yield 'core manual, no cms- prefix, with dev version' => [
+            'typo3-theme-camino:camino@dev',
+            'https://docs.typo3.org/c/typo3/theme-camino/main/en-us/Index.html#camino',
+        ];
         yield 'official "other" manual, no version' => [
             't3viewhelper:typo3fluid-fluid-comment',
             'https://docs.typo3.org/other/typo3/view-helper-reference/main/en-us/Global/Comment.html#typo3fluid-fluid-comment',

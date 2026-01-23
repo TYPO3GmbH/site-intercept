@@ -36,9 +36,11 @@ use T3Docs\VersionHandling\Typo3VersionMapping;
  * linkToDocs.php?shortcode=georgringer-news:start@main
  * -> forwards to: https://docs.typo3.org/p/georgringer/news/en-us/Index.html#start
  *
- * Also, all TYPO3 core extensions can be resolved via "typo3-cms-XXX" prefixing:
+ * Also, all TYPO3 core extensions can be resolved via "typo3-(cms-)?XXX" prefixing:
  * linkToDocs.php?shortcode=typo3-cms-seo:introduction@main
  * -> forwards to: https://docs.typo3.org/c/typo3/cms-seo/main/en-us/Introduction/Index.html#introduction
+ * linkToDocs.php?shortcode=typo3-theme-camino:introduction@main
+ * * -> forwards to: https://docs.typo3.org/c/typo3/theme-camino/main/en-us/Introduction/Index.html#introduction
  *
  * The parts of 'shortcode' URI GET/POST param 'shortcode' are:
  *
@@ -81,7 +83,7 @@ use T3Docs\VersionHandling\Typo3VersionMapping;
  * https://docs.typo3.org/m/XXX/main/en-us/objects.inv.json
  *
  * Core TYPO3 Extension manuals:
- * https://docs.typo3.org/c/typo3/cms-XXX/main/en-us/objects.inv.json
+ * https://docs.typo3.org/c/typo3/(cms-)?XXX/main/en-us/objects.inv.json
  *
  * Additional TYPO3 Manuals:
  * https://docs.typo3.org/other/typo3/XXX/main/en-us/objects.inv.json
@@ -256,8 +258,8 @@ final readonly class DocumentationLinker
     private function resolveEntryPoint(string $repository, string $version): string
     {
         $useCoreVersionResolving = true;
-        if (preg_match('/^typo3[\/-](cms-[0-9a-z\-]+)$/i', $repository, $repositoryParts)) {
-            // CASE: TYPO3 core manuals
+        if (preg_match('/^typo3[\/-]([0-9a-z\-]+)$/i', $repository, $repositoryParts)) {
+            // CASE: Packages within the "typo3/" namespace (e.g. cms-adminpanel, theme-camino)
             $entrypoint = 'https://docs.typo3.org/c/typo3/' . strtolower($repositoryParts[1]) . '/{typo3_version}/en-us/';
         } elseif ($inventory = DefaultInventories::tryFrom($repository)) {
             // CASE: Official TYPO3 Documentation with known inventories. Provides "{typo3_version}" internally
