@@ -34,9 +34,9 @@ Encore
 
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning()
-    .configureBabel(() => {}, {
-        useBuiltIns: 'usage',
-        corejs: 3
+    .configureBabelPresetEnv((config) => {
+        config.useBuiltIns = 'usage';
+        config.corejs = '3.38';
     })
     .copyFiles({
         from: './assets/images',
