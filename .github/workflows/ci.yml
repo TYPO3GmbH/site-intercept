@@ -103,14 +103,6 @@ jobs:
         env:
           COMPOSER_PROCESS_TIMEOUT: 2400
 
-      - name: Upload coverage results to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require php-coveralls/php-coveralls --no-progress --no-interaction --ansi
-          /home/runner/.composer/vendor/bin/php-coveralls --coverage_clover=var/phpunit/coverage.xml -vvv --json_path=var/log/coveralls-upload.json
-        continue-on-error: true
-
 
   deployment:
     name: 'Deployment'
