@@ -28,25 +28,40 @@ readonly class SlackService
      */
     public function __construct(
         private ClientInterface $client,
+        private DocsService $docsService,
         private string $hook
     ) {
     }
 
     public function sendRepositoryDiscoveryMessage(DocumentationJar $jar): ResponseInterface
     {
+        $repoKey = $jar->getVendor() . '/' . $jar->getName();
+        $docsLink = $this->docsService->generateLinkToDocs($jar);
+        $deploymentsUrl = 'https://intercept.typo3.com/admin/docs/deployments';
+        $webhookDocsUrl = $this->docsService->getDocsServer() . '/permalink/h2document:webhook';
+        $sourceUrl = 'https://github.com/TYPO3GmbH/site-intercept/blob/develop/src/Service/SlackService.php';
+        $avatarUrl = 'https://intercept.typo3.com/build/images/webhookavatars/default.png';
+
         $message = [
             'channel' => '#typo3-documentation',
             'username' => 'Intercept',
-            'icon_url' => 'https://intercept.typo3.com/build/images/webhookavatars/default.png',
+            'icon_url' => $avatarUrl,
             'attachments' => [
                 [
-                    'title' => 'New repository on Intercept',
-                    'title_link' => 'https://intercept.typo3.com/admin/docs/deployments',
-                    'color' => '#4682B4',
-                    'text' => 'Repository *' . $jar->getVendor() . '/' . $jar->getName() . '* was discovered.',
-                    'fallback' => 'Repository *' . $jar->getVendor() . '/' . $jar->getName() . '* was discovered.',
-                    'footer' => 'TYPO3 Intercept',
-                    'footer_icon' => 'https://intercept.typo3.com/build/images/webhookavatars/default.png',
+                    'title' => 'New extension documentation awaiting approval',
+                    'title_link' => $deploymentsUrl,
+                    'color' => '#FF8C00',
+                    'text' => "Repository *{$repoKey}* was discovered and is awaiting approval by a Documentation Team maintainer.\n\n"
+                        . ":clipboard: *What happens next:*\n"
+                        . "\u{2022} A documentation maintainer will review and approve the repository\n"
+                        . "\u{2022} Once approved, docs will be rendered and deployed to <{$docsLink}|docs.typo3.org>\n"
+                        . "\u{2022} This is handled by volunteers \u{2014} please be patient\n\n"
+                        . ":hammer_and_wrench: *Maintainers:* <{$deploymentsUrl}|Review pending deployments>\n"
+                        . ":information_source: *Extension authors:* <{$webhookDocsUrl}|How does this work?>",
+                    'fallback' => "Repository {$repoKey} is awaiting documentation approval at {$deploymentsUrl}",
+                    'footer' => "TYPO3 Intercept \u{00b7} <{$sourceUrl}|(?)>",
+                    'footer_icon' => $avatarUrl,
+                    'mrkdwn_in' => ['text'],
                 ],
             ],
         ];

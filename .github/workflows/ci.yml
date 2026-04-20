@@ -26,12 +26,12 @@ jobs:
           - '8.2'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.nvmrc'
 
       - name: Setup PHP ${{ matrix.php-versions }}
         uses: shivammathur/setup-php@v2
@@ -44,27 +44,13 @@ jobs:
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - name: Setup npm cache
-        id: npm-cache-dir
-        shell: bash
-        run: |
-          echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-
       - name: Recover Composer caches
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock', '**/composer.json') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-
-      - name: Recover npm caches
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies (Composer)
         run: composer install --prefer-dist --no-progress --no-interaction --ansi
@@ -103,14 +89,6 @@ jobs:
         env:
           COMPOSER_PROCESS_TIMEOUT: 2400
 
-      - name: Upload coverage results to Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require php-coveralls/php-coveralls --no-progress --no-interaction --ansi
-          /home/runner/.composer/vendor/bin/php-coveralls --coverage_clover=var/phpunit/coverage.xml -vvv --json_path=var/log/coveralls-upload.json
-        continue-on-error: true
-
 
   deployment:
     name: 'Deployment'
@@ -129,12 +107,12 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           ssh-add ~/.ssh/deploy_rsa
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.nvmrc'
 
       - name: Setup PHP ${{ matrix.php-versions }}
         uses: shivammathur/setup-php@v2
@@ -146,27 +124,13 @@ jobs:
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      - name: Setup npm cache
-        id: npm-cache-dir
-        shell: bash
-        run: |
-          echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-
       - name: Recover Composer caches
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock', '**/composer.json') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-
-      - name: Recover npm caches
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install Magallanes
         run: |
@@ -197,7 +161,7 @@ jobs:
           /home/runner/.composer/vendor/bin/mage deploy ${{ steps.environment.outputs.target }} -vvv
 
       - name: Archive Logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: logs

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace App\Twig;
 
+use App\Service\DocsService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -19,6 +20,11 @@ use Twig\TwigFilter;
  */
 class InterceptDocsServerLink extends AbstractExtension
 {
+    public function __construct(
+        private readonly DocsService $docsService
+    ) {
+    }
+
     public function getFilters(): array
     {
         return [
@@ -28,10 +34,9 @@ class InterceptDocsServerLink extends AbstractExtension
 
     public function render(string $value): string
     {
-        $server = $_ENV['DOCS_LIVE_SERVER'] ?? '';
         $path = str_starts_with($value, '/') ? substr($value, 1) : $value;
 
-        return $server . $path;
+        return $this->docsService->getDocsServer() . '/' . $path;
     }
 
     public function getName(): string

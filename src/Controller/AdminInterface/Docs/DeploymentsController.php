@@ -24,6 +24,7 @@ use App\Form\DeleteDeploymentType;
 use App\Form\DocsDeploymentFilterType;
 use App\Repository\DocumentationJarRepository;
 use App\Repository\HistoryEntryRepository;
+use App\Service\DocsService;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\GithubService;
 use App\Service\RenderDocumentationService;
@@ -43,14 +44,19 @@ use T3G\Bundle\Keycloak\Security\KeyCloakUser;
  */
 class DeploymentsController extends AbstractController
 {
+    public function __construct(
+        private readonly PaginatorInterface $paginator,
+        private readonly HistoryEntryRepository $historyEntryRepository,
+        private readonly DocumentationJarRepository $documentationJarRepository,
+        private readonly DocsService $docsService,
+    ) {
+    }
+
     #[Route(path: '/admin/docs/deployments', name: 'admin_docs_deployments')]
     public function index(
         Request $request,
-        PaginatorInterface $paginator,
-        HistoryEntryRepository $historyEntryRepository,
-        DocumentationJarRepository $documentationJarRepository
     ): Response {
-        $recentLogsMessages = $historyEntryRepository->findByType('docsRendering', 30);
+        $recentLogsMessages = $this->historyEntryRepository->findByType('docsRendering', 30);
         $criteria = Criteria::create();
 
         $requestSortDirection = $request->query->get('direction');
@@ -75,8 +81,8 @@ class DeploymentsController extends AbstractController
             }
         }
 
-        $deployments = $documentationJarRepository->matching($criteria);
-        $pagination = $paginator->paginate(
+        $deployments = $this->documentationJarRepository->matching($criteria);
+        $pagination = $this->paginator->paginate(
             $deployments,
             $request->query->getInt('page', 1)
         );
@@ -89,7 +95,7 @@ class DeploymentsController extends AbstractController
                 'logMessages' => $recentLogsMessages,
                 'warnings' => DocsRenderingHistoryStatus::$warnings,
                 'translations' => DocsRenderingHistoryStatus::$messages,
-                'docsLiveServer' => $_ENV['DOCS_LIVE_SERVER'] ?? '',
+                'docsLiveServer' => $this->docsService->getDocsServer(),
             ]
         );
     }
@@ -98,9 +104,8 @@ class DeploymentsController extends AbstractController
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function deleteConfirm(
         int $documentationJarId,
-        DocumentationJarRepository $documentationJarRepository
     ): Response {
-        $jar = $documentationJarRepository->find($documentationJarId);
+        $jar = $this->documentationJarRepository->find($documentationJarId);
         if (null === $jar || !$jar->isDeletable()) {
             return $this->redirectToRoute('admin_docs_deployments');
         }
@@ -113,7 +118,7 @@ class DeploymentsController extends AbstractController
             'docs_deployments/delete.html.twig',
             [
                 'deployment' => $jar,
-                'docsLiveServer' => $_ENV['DOCS_LIVE_SERVER'] ?? '',
+                'docsLiveServer' => $this->docsService->getDocsServer(),
                 'deleteForm' => $deleteDeploymentForm,
             ]
         );
