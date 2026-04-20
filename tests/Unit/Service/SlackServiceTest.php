@@ -19,22 +19,6 @@ use PHPUnit\Framework\TestCase;
 
 class SlackServiceTest extends TestCase
 {
-    private ?string $originalDocsLiveServer = null;
-
-    protected function setUp(): void
-    {
-        $this->originalDocsLiveServer = $_ENV['DOCS_LIVE_SERVER'] ?? null;
-    }
-
-    protected function tearDown(): void
-    {
-        if (null === $this->originalDocsLiveServer) {
-            unset($_ENV['DOCS_LIVE_SERVER']);
-        } else {
-            $_ENV['DOCS_LIVE_SERVER'] = $this->originalDocsLiveServer;
-        }
-    }
-
     public function testSendRepositoryDiscoveryMessageContainsExpectedPayload(): void
     {
         $capturedPayload = null;
