@@ -25,6 +25,8 @@
 /providers/platform.yaml
 /providers/upsun.yaml
 /sequelpro.spf
+/share-providers/cloudflared.sh
+/share-providers/ngrok.sh
 /traefik/config/intercept.yaml
 /traefik/certs/intercept.crt
 /traefik/certs/intercept.key
