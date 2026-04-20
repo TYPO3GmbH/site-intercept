@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repository\DocumentationJarRepository;
-use App\Utility\DocsUtility;
+use App\Service\DocsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +24,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class AssetsDocsController extends AbstractController
 {
     public function __construct(
-        private readonly DocumentationJarRepository $documentationJarRepository
+        private readonly DocumentationJarRepository $documentationJarRepository,
+        private readonly DocsService $docsService,
     ) {
     }
 
@@ -66,12 +67,12 @@ class AssetsDocsController extends AbstractController
             }
 
             $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getBranch()] = [
-                'url' => DocsUtility::generateLinkToDocs($extension),
+                'url' => $this->docsService->generateLinkToDocs($extension),
                 'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
             ];
 
             $aggregatedExtensions[$extension->getExtensionKey()]['docs'][$extension->getTargetBranchDirectory()] = [
-                'url' => DocsUtility::generateLinkToDocs($extension),
+                'url' => $this->docsService->generateLinkToDocs($extension),
                 'rendered' => $extension->getLastRenderedAt()->format(\DateTimeInterface::ATOM),
             ];
         }

@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace App\Twig;
 
 use App\Entity\DocumentationJar;
-use App\Utility\DocsUtility;
+use App\Service\DocsService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -21,6 +21,11 @@ use Twig\TwigFilter;
  */
 class InterceptLinkToDocsExtension extends AbstractExtension
 {
+    public function __construct(
+        private readonly DocsService $docsService,
+    ) {
+    }
+
     public function getFilters(): array
     {
         return [
@@ -30,7 +35,7 @@ class InterceptLinkToDocsExtension extends AbstractExtension
 
     public function render(DocumentationJar $documentationJar): string
     {
-        return DocsUtility::generateLinkToDocs($documentationJar);
+        return $this->docsService->generateLinkToDocs($documentationJar);
     }
 
     public function getName(): string

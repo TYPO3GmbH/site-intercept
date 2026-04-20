@@ -19,6 +19,7 @@ services:
     bind:
       $projectDir: '%kernel.project_dir%'
       $githubChangelogToLogRepository: '%env(GITHUB_CHANGELOG_TO_LOG_REPOSITORY)%'
+      $docsServer: '%env(DOCS_LIVE_SERVER)%'
 
   _instanceof:
     App\Strategy\GithubRst\StrategyInterface:
