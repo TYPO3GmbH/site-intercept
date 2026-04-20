@@ -9,15 +9,16 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace App\Tests\Unit\Service;
+namespace App\Tests\Functional\Service;
 
 use App\Entity\DocumentationJar;
+use App\Service\DocsService;
 use App\Service\SlackService;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class SlackServiceTest extends TestCase
+class SlackServiceTest extends KernelTestCase
 {
     public function testSendRepositoryDiscoveryMessageContainsExpectedPayload(): void
     {
@@ -38,8 +39,6 @@ class SlackServiceTest extends TestCase
             )
             ->willReturn(new Response());
 
-        $_ENV['DOCS_LIVE_SERVER'] = 'https://docs.typo3.org/';
-
         $jar = new DocumentationJar();
         $jar->setVendor('acme');
         $jar->setName('my-extension');
@@ -47,7 +46,11 @@ class SlackServiceTest extends TestCase
         $jar->setTypeShort('p');
         $jar->setTargetBranchDirectory('main');
 
-        $service = new SlackService($mockClient, 'https://hooks.slack.com/test');
+        $service = new SlackService(
+            $mockClient,
+            self::getContainer()->get(DocsService::class),
+            'https://hooks.slack.com/test'
+        );
         $service->sendRepositoryDiscoveryMessage($jar);
 
         self::assertNotNull($capturedPayload, 'Slack message payload was not captured');
@@ -76,13 +79,13 @@ class SlackServiceTest extends TestCase
         self::assertStringContainsString('volunteer', strtolower($attachment['text']));
 
         // Must contain the specific docs link for this package
-        self::assertStringContainsString('docs.typo3.org/p/acme/my-extension/main/en-us', $attachment['text']);
+        self::assertStringContainsString('localhost/docs/p/acme/my-extension/main/en-us', $attachment['text']);
 
         // Must link to deployments admin for maintainers
         self::assertStringContainsString('intercept.typo3.com/admin/docs/deployments', $attachment['text']);
 
         // Must link to webhook docs for extension authors
-        self::assertStringContainsString('docs.typo3.org/permalink/h2document:webhook', $attachment['text']);
+        self::assertStringContainsString('localhost/docs/permalink/h2document:webhook', $attachment['text']);
 
         // Footer must contain source link to SlackService.php on GitHub
         self::assertStringContainsString('github.com/TYPO3GmbH/site-intercept', $attachment['footer']);

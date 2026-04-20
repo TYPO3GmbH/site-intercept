@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\DocumentationJar;
-use App\Utility\DocsUtility;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
@@ -29,6 +28,7 @@ readonly class SlackService
      */
     public function __construct(
         private ClientInterface $client,
+        private DocsService $docsService,
         private string $hook
     ) {
     }
@@ -36,9 +36,9 @@ readonly class SlackService
     public function sendRepositoryDiscoveryMessage(DocumentationJar $jar): ResponseInterface
     {
         $repoKey = $jar->getVendor() . '/' . $jar->getName();
-        $docsLink = DocsUtility::generateLinkToDocs($jar);
+        $docsLink = $this->docsService->generateLinkToDocs($jar);
         $deploymentsUrl = 'https://intercept.typo3.com/admin/docs/deployments';
-        $webhookDocsUrl = 'https://docs.typo3.org/permalink/h2document:webhook';
+        $webhookDocsUrl = $this->docsService->getDocsServer() . '/permalink/h2document:webhook';
         $sourceUrl = 'https://github.com/TYPO3GmbH/site-intercept/blob/develop/src/Service/SlackService.php';
         $avatarUrl = 'https://intercept.typo3.com/build/images/webhookavatars/default.png';
 
