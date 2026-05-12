@@ -30,9 +30,6 @@ class MenuBuilder extends TemplateMenuBuider
             [
                 'route' => 'admin_docs_deployments',
                 'label' => 'Documentation',
-                'extras' => [
-                    'icon' => 'actions-notebook',
-                ],
             ]
         );
         $menu['documentation']->addChild(

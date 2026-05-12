@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f58204f712aa41beeafb00405b87a376",
+    "content-hash": "1b6a3c8434ce48e27605d64e6f7377a9",
     "packages": [
         {
             "name": "brick/math",
@@ -10509,16 +10509,16 @@
         },
         {
             "name": "t3g/symfony-template-bundle",
-            "version": "4.0.8",
+            "version": "6.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TYPO3GmbH/symfony-template-bundle.git",
-                "reference": "7b3d31d8aeb1f5d26b472fd9f56b4cd23257340c"
+                "reference": "a202722cfddfd70efedc9bd557558e5132d1e959"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TYPO3GmbH/symfony-template-bundle/zipball/7b3d31d8aeb1f5d26b472fd9f56b4cd23257340c",
-                "reference": "7b3d31d8aeb1f5d26b472fd9f56b4cd23257340c",
+                "url": "https://api.github.com/repos/TYPO3GmbH/symfony-template-bundle/zipball/a202722cfddfd70efedc9bd557558e5132d1e959",
+                "reference": "a202722cfddfd70efedc9bd557558e5132d1e959",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -10530,26 +10530,26 @@
             "require": {
                 "erusev/parsedown": "^1.7 || 2.*.*@dev",
                 "knplabs/knp-menu-bundle": "^2.2 || ^3.0",
-                "knplabs/knp-paginator-bundle": "^3.0 || ^4.0 || ^5.0",
+                "knplabs/knp-paginator-bundle": "^3.0 || ^4.0 || ^5.0 || ^6.0",
                 "php": "^8.1",
                 "setasign/fpdi": "^2.3",
-                "symfony/asset": "^5.4 || ^6.4",
-                "symfony/dependency-injection": "^5.4 || ^6.4",
+                "symfony/asset": "^5.4 || ^6.4 || ^7.4",
+                "symfony/dependency-injection": "^5.4 || ^6.4 || ^7.4",
                 "symfony/deprecation-contracts": "^2.5 || ^3.0",
-                "symfony/form": "^5.4 || ^6.4",
-                "symfony/framework-bundle": "^5.4 || ^6.4",
-                "symfony/http-kernel": "^5.4 || ^6.4",
-                "symfony/security-bundle": "^5.4 || ^6.4",
-                "symfony/translation": "^5.4 || ^6.4",
-                "symfony/twig-bundle": "^5.4 || ^6.4",
+                "symfony/form": "^5.4 || ^6.4 || ^7.4",
+                "symfony/framework-bundle": "^5.4 || ^6.4 || ^7.4",
+                "symfony/http-kernel": "^5.4 || ^6.4 || ^7.4",
+                "symfony/security-bundle": "^5.4 || ^6.4 || ^7.4",
+                "symfony/translation": "^5.4 || ^6.4 || ^7.4",
+                "symfony/twig-bundle": "^5.4 || ^6.4 || ^7.4",
                 "tecnickcom/tcpdf": "^6.7",
-                "twig/twig": "^3.0"
+                "twig/twig": "^3.21"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.0",
                 "overtrue/phplint": "^5.5.0",
-                "symfony/phpunit-bridge": "^5.4 || ^6.4",
-                "symfony/webpack-encore-bundle": "^1.13"
+                "symfony/phpunit-bridge": "^5.4 || ^6.4 || ^7.4",
+                "symfony/webpack-encore-bundle": "^2.4"
             },
             "suggest": {
                 "symfony/webpack-encore-bundle": "Needed to support encore entrypoints."
@@ -10601,10 +10601,10 @@
                 "Templates"
             ],
             "support": {
-                "source": "https://github.com/TYPO3GmbH/symfony-template-bundle/tree/4.0.8",
+                "source": "https://github.com/TYPO3GmbH/symfony-template-bundle/tree/6.1.0",
                 "issues": "https://github.com/TYPO3GmbH/symfony-template-bundle/issues"
             },
-            "time": "2025-06-06T07:18:50+00:00"
+            "time": "2026-05-12T13:42:56+00:00"
         },
         {
             "name": "t3g/symfony-usercentrics-bundle",
@@ -14898,5 +14898,5 @@
     "platform-overrides": {
         "php": "8.2"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
