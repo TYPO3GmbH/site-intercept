@@ -31,31 +31,31 @@ class WebHookServiceTest extends TestCase
     {
         yield 'Payload_Bitbucket_Cloud_Event_Push' => [
             new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:push'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Cloud_Event_Push.json')),
-            new PushEvent('https://bitbucket.org/DanielSiepmann/contacts', 'documentation-draft', 'https://bitbucket.org/DanielSiepmann/contacts/raw/documentation-draft/composer.json'),
+            new PushEvent('https://bitbucket.org/DanielSiepmann/contacts', 'documentation-draft', 'https://bitbucket.org/DanielSiepmann/contacts/raw/documentation-draft/composer.json', '{}'),
         ];
         yield 'Payload_Bitbucket_Server_Event_Refs_Changed' => [
             new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:refs_changed'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Server_Event_Refs_Changed.json')),
-            new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft'),
+            new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft', '{}'),
         ];
         yield 'Payload_Bitbucket_Server_Event_Push' => [
             new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:refs_changed'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Server_Event_Push.json')),
-            new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft'),
+            new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft', '{}'),
         ];
         yield 'Payload_GitHub_Event_Push_Branch' => [
             new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Branch.json')),
-            new PushEvent('https://github.com/Codertocat/Hello-World.git', 'main', 'https://raw.githubusercontent.com/Codertocat/Hello-World/main/composer.json'),
+            new PushEvent('https://github.com/Codertocat/Hello-World.git', 'main', 'https://raw.githubusercontent.com/Codertocat/Hello-World/main/composer.json', '{}'),
         ];
         yield 'Payload_GitHub_Event_Push_Tag' => [
             new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Tag.json')),
-            new PushEvent('https://github.com/Codertocat/Hello-World.git', 'simple-tag', 'https://raw.githubusercontent.com/Codertocat/Hello-World/simple-tag/composer.json'),
+            new PushEvent('https://github.com/Codertocat/Hello-World.git', 'simple-tag', 'https://raw.githubusercontent.com/Codertocat/Hello-World/simple-tag/composer.json', '{}'),
         ];
         yield 'Payload_Gitlab_Event_Push_Branch' => [
             new Request([], [], [], [], [], ['HTTP_X-Gitlab-Event' => 'Push Hook'], file_get_contents(__DIR__ . '/Fixtures/Payload_Gitlab_Event_Push_Branch.json')),
-            new PushEvent('http://example.com/mike/diaspora.git', 'main', 'http://example.com/mike/diaspora/raw/main/composer.json'),
+            new PushEvent('http://example.com/mike/diaspora.git', 'main', 'http://example.com/mike/diaspora/raw/main/composer.json', '{}'),
         ];
         yield 'Payload_Gitlab_Event_Push_Tag' => [
             new Request([], [], [], [], [], ['HTTP_X-Gitlab-Event' => 'Tag Push Hook'], file_get_contents(__DIR__ . '/Fixtures/Payload_Gitlab_Event_Push_Tag.json')),
-            new PushEvent('http://example.com/jsmith/example.git', 'v1.0.0', 'http://example.com/jsmith/example/raw/v1.0.0/composer.json'),
+            new PushEvent('http://example.com/jsmith/example.git', 'v1.0.0', 'http://example.com/jsmith/example/raw/v1.0.0/composer.json', '{}'),
         ];
     }
 
@@ -66,6 +66,7 @@ class WebHookServiceTest extends TestCase
         $this->assertSame($pushEvent->getVersionString(), $createdPushEvent[0]->getVersionString());
         $this->assertSame($pushEvent->getRepositoryUrl(), $createdPushEvent[0]->getRepositoryUrl());
         $this->assertSame($pushEvent->getUrlToComposerFile(), $createdPushEvent[0]->getUrlToComposerFile());
+        $this->assertSame($pushEvent->getPayload(), $createdPushEvent[0]->getPayload());
     }
 
     public static function createPushEventsDataProvider(): \Iterator
@@ -73,22 +74,22 @@ class WebHookServiceTest extends TestCase
         yield 'Payload_Bitbucket_Cloud_Event_Push_Multiple' => [
             new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:push'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Cloud_Event_Push_Multiple.json')),
             [
-                new PushEvent('https://bitbucket.org/pathfindermediagroup/eso-export-addon', 'main', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json'),
-                new PushEvent('https://bitbucket.org/pathfindermediagroup/eso-export-addon', 'test', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/test/composer.json'),
+                new PushEvent('https://bitbucket.org/pathfindermediagroup/eso-export-addon', 'main', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json', '{}'),
+                new PushEvent('https://bitbucket.org/pathfindermediagroup/eso-export-addon', 'test', 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/test/composer.json', '{}'),
             ],
         ];
         yield 'Payload_Bitbucket_Server_Event_Refs_Changed_Multiple' => [
             new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:refs_changed'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Server_Event_Refs_Changed.json')),
             [
-                new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft'),
-                new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'some-other-branch', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fsome-other-branch'),
+                new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft', '{}'),
+                new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'some-other-branch', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fsome-other-branch', '{}'),
             ],
         ];
         yield 'Payload_Bitbucket_Server_Event_Push_Multiple' => [
             new Request([], [], [], [], [], ['HTTP_X-Event-Key' => 'repo:refs_changed'], file_get_contents(__DIR__ . '/Fixtures/Payload_Bitbucket_Server_Event_Push.json')),
             [
-                new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft'),
-                new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'some-other-branch', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fsome-other-branch'),
+                new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'documentation-draft', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fdocumentation-draft', '{}'),
+                new PushEvent('https://bitbucket.typo3.com/scm/ext/querybuilder.git', 'some-other-branch', 'https://bitbucket.typo3.com/projects/EXT/repos/querybuilder/raw/composer.json?at=refs%2Fheads%2Fsome-other-branch', '{}'),
             ],
         ];
     }

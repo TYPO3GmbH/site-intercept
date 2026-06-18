@@ -98,13 +98,14 @@ class WebHookService
      */
     private function getPushEventFromGitlab(Request $request): array
     {
-        $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
+        $content = $request->getContent();
+        $payload = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
         $repositoryUrl = (string) $payload->repository->git_http_url;
         $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string) $payload->ref);
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITLAB);
 
-        return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile)];
+        return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile, $content)];
     }
 
     /**
@@ -163,7 +164,7 @@ class WebHookService
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITHUB);
 
-        return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile)];
+        return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile, $content)];
     }
 
     private function pushEventFromBitbucketCloudChange(\stdClass $payload, \stdClass $change): PushEvent
@@ -182,7 +183,7 @@ class WebHookService
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET_CLOUD);
 
-        return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
+        return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile, json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
     private function pushEventFromBitbucketServerChange(\stdClass $payload, \stdClass $change): PushEvent
@@ -208,6 +209,6 @@ class WebHookService
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_BITBUCKET_SERVER);
 
-        return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile);
+        return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile, json_encode($payload, JSON_THROW_ON_ERROR));
     }
 }

@@ -1,0 +1,45 @@
+{% extends 'layout.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Delete domain {{ knownDomain.domain }}{% endblock %}
+{% block headline %}Delete domain {{ knownDomain.domain }}{% endblock %}
+{% block body %}
+
+    {% frame %}
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        {{ form(form) }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card mb-0">
+                    <div class="datatable">
+                        <table class="datatable-table">
+                            <tbody>
+                            <tr>
+                                <th>Domain</th>
+                                <td>{{ knownDomain.domain }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    {% if knownDomain.allowed %}
+                                        <span class="text-success">Allowed domain</span>
+                                    {% elseif knownDomain.disallowed %}
+                                        <span class="text-danger">Disallowed domain</span>
+                                    {% else %}
+                                        <span class="text-info">Unknown domain status</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endframe %}
+
+{% endblock %}

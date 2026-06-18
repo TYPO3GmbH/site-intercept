@@ -17,6 +17,7 @@ final class DocsRenderingHistoryStatus
     public const RE_RENDER_NEEDED = 're-render-needed';
     public const NO_COMPOSER_JSON = 'noComposerJson';
     public const INVALID_COMPOSER_JSON = 'invalidComposerJson';
+    public const UNKNOWN_REPOSITORY_DOMAIN = 'unknownRepositoryDomain';
     public const PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY = 'packageRegisteredWithDifferentRepository';
     public const NO_RELEVANT_BRANCH_OR_TAG = 'noRelevantBranchOrTag';
     public const MISSING_VALUE_IN_COMPOSER_JSON = 'missingValueInComposerJson';
@@ -32,6 +33,7 @@ final class DocsRenderingHistoryStatus
         self::RE_RENDER_NEEDED,
         self::NO_COMPOSER_JSON,
         self::INVALID_COMPOSER_JSON,
+        self::UNKNOWN_REPOSITORY_DOMAIN,
         self::PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY,
         self::NO_RELEVANT_BRANCH_OR_TAG,
         self::MISSING_VALUE_IN_COMPOSER_JSON,
@@ -50,6 +52,7 @@ final class DocsRenderingHistoryStatus
         self::RE_RENDER_NEEDED => 'Re-rendering needed.',
         self::NO_COMPOSER_JSON => 'No composer.json found.',
         self::INVALID_COMPOSER_JSON => 'Invalid composer.json.',
+        self::UNKNOWN_REPOSITORY_DOMAIN => 'Unknown repository domain.',
         self::PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY => 'Package registered with different repository.',
         self::NO_RELEVANT_BRANCH_OR_TAG => 'No relevant branch or tag found.',
         self::MISSING_VALUE_IN_COMPOSER_JSON => 'Missing value in composer.json.',

@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional;
 
 use App\Entity\DocumentationJar;
+use App\Entity\KnownRepositoryDomain;
+use App\Enum\RepositoryDomainStatus;
 use App\Extractor\DeploymentInformation;
 use App\Repository\DocumentationJarRepository;
 use App\Service\GithubService;
@@ -44,6 +46,25 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         ClockMock::withClockMock(155309515.6937);
     }
 
+    public function testGithubBuildIsNotTriggeredWithUnknownDomain(): void
+    {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient->expects($this->never())->method('request');
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
+        $generalClient = $this->createMock(Client::class);
+        $generalClient->expects($this->never())->method('request');
+
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects($this->never())->method('request');
+
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
+        $this->assertSame(SymfonyResponse::HTTP_PRECONDITION_FAILED, $response->getStatusCode());
+    }
+
     public function testGithubBuildIsNotTriggeredWithNewRepo(): void
     {
         $githubClient = $this->createMock(Client::class);
@@ -59,6 +80,12 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
 
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK));
+
+        $knownRepositoryDomain = (new KnownRepositoryDomain())
+            ->setDomain('raw.githubusercontent.com')
+            ->setStatus(RepositoryDomainStatus::ALLOWED);
+        $this->getEntityManager()->persist($knownRepositoryDomain);
+        $this->getEntityManager()->flush();
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
@@ -86,6 +113,12 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
 
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK));
+
+        $knownRepositoryDomain = (new KnownRepositoryDomain())
+            ->setDomain('raw.githubusercontent.com')
+            ->setStatus(RepositoryDomainStatus::ALLOWED);
+        $this->getEntityManager()->persist($knownRepositoryDomain);
+        $this->getEntityManager()->flush();
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
@@ -139,6 +172,12 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
 
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK));
+
+        $knownRepositoryDomain = (new KnownRepositoryDomain())
+            ->setDomain('bitbucket.org')
+            ->setStatus(RepositoryDomainStatus::ALLOWED);
+        $this->getEntityManager()->persist($knownRepositoryDomain);
+        $this->getEntityManager()->flush();
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
@@ -219,6 +258,12 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooBadRequestComposerWithoutDependency.json')));
 
+        $knownRepositoryDomain = (new KnownRepositoryDomain())
+            ->setDomain('raw.githubusercontent.com')
+            ->setStatus(RepositoryDomainStatus::ALLOWED);
+        $this->getEntityManager()->persist($knownRepositoryDomain);
+        $this->getEntityManager()->flush();
+
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
             ->withMock('guzzle.client.general', $generalClient)
@@ -250,6 +295,12 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             ->method('request')
             ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
+
+        $knownRepositoryDomain = (new KnownRepositoryDomain())
+            ->setDomain('raw.githubusercontent.com')
+            ->setStatus(RepositoryDomainStatus::ALLOWED);
+        $this->getEntityManager()->persist($knownRepositoryDomain);
+        $this->getEntityManager()->flush();
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)

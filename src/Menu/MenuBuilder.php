@@ -25,14 +25,14 @@ class MenuBuilder extends TemplateMenuBuider
     {
         $menu = $this->factory->createItem('root');
 
-        $menu->addChild(
+        $documentationMenu = $menu->addChild(
             'documentation',
             [
                 'route' => 'admin_docs_deployments',
                 'label' => 'Documentation',
             ]
         );
-        $menu['documentation']->addChild(
+        $documentationMenu->addChild(
             'docs_deployments',
             [
                 'route' => 'admin_docs_deployments',
@@ -40,19 +40,39 @@ class MenuBuilder extends TemplateMenuBuider
             ]
         );
         if ($this->authorizationChecker->isGranted('ROLE_DOCUMENTATION_MAINTAINER')) {
-            $menu['documentation']->addChild($this->getDivider());
-            $menu['documentation']->addChild(
+            $documentationMenu->addChild($this->getDivider());
+            $documentationMenu->addChild(
                 'docs_redirect_index',
                 [
                     'route' => 'admin_redirect_index',
                     'label' => 'Redirects',
                 ]
             );
-            $menu['documentation']->addChild(
+            $documentationMenu->addChild(
                 'docs_blacklist_index',
                 [
                     'route' => 'admin_docs_deployments_blacklist_index',
                     'label' => 'Blacklist',
+                ]
+            );
+        }
+
+        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            $documentationMenu->addChild($this->getDivider());
+            $this->addDropdownHeader($documentationMenu, 'admin_docs_quarantine', 'Quarantine management');
+
+            $documentationMenu->addChild(
+                'admin_docs_quarantine_index',
+                [
+                    'route' => 'admin_docs_quarantine_index',
+                    'label' => 'Quarantined render requests',
+                ]
+            );
+            $documentationMenu->addChild(
+                'admin_docs_domains_index',
+                [
+                    'route' => 'admin_docs_domains_index',
+                    'label' => 'Known domains',
                 ]
             );
         }
@@ -110,5 +130,15 @@ class MenuBuilder extends TemplateMenuBuider
         }
 
         return $menu;
+    }
+
+    private function addDropdownHeader(ItemInterface $menu, string $key, string $label): void
+    {
+        $menu
+            ->addChild($key, [
+                'label' => $label,
+            ])
+            ->setLabelAttribute('class', 'dropdown-header text-truncate')
+            ->setLabelAttribute('title', $label);
     }
 }

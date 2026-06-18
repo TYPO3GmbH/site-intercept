@@ -17,18 +17,23 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Send slack messages.
+ * Send Slack messages.
  */
 readonly class SlackService
 {
+    private const AVATAR_URL = 'https://intercept.typo3.com/build/images/webhookavatars/default.png';
+    private const SOURCE_URL = 'https://github.com/TYPO3GmbH/site-intercept/blob/develop/src/Service/SlackService.php';
+
     /**
      * SlackService constructor.
      */
     public function __construct(
         private ClientInterface $client,
         private DocsService $docsService,
+        private RouterInterface $router,
         private string $hook
     ) {
     }
@@ -37,15 +42,13 @@ readonly class SlackService
     {
         $repoKey = $jar->getVendor() . '/' . $jar->getName();
         $docsLink = $this->docsService->generateLinkToDocs($jar);
-        $deploymentsUrl = 'https://intercept.typo3.com/admin/docs/deployments';
+        $deploymentsUrl = $this->router->generate('admin_docs_deployments', [], RouterInterface::ABSOLUTE_URL);
         $webhookDocsUrl = $this->docsService->getDocsServer() . '/permalink/h2document:webhook';
-        $sourceUrl = 'https://github.com/TYPO3GmbH/site-intercept/blob/develop/src/Service/SlackService.php';
-        $avatarUrl = 'https://intercept.typo3.com/build/images/webhookavatars/default.png';
 
         $message = [
             'channel' => '#typo3-documentation',
             'username' => 'Intercept',
-            'icon_url' => $avatarUrl,
+            'icon_url' => self::AVATAR_URL,
             'attachments' => [
                 [
                     'title' => 'New extension documentation awaiting approval',
@@ -59,8 +62,8 @@ readonly class SlackService
                         . ":hammer_and_wrench: *Maintainers:* <{$deploymentsUrl}|Review pending deployments>\n"
                         . ":information_source: *Extension authors:* <{$webhookDocsUrl}|How does this work?>",
                     'fallback' => "Repository {$repoKey} is awaiting documentation approval at {$deploymentsUrl}",
-                    'footer' => "TYPO3 Intercept \u{00b7} <{$sourceUrl}|(?)>",
-                    'footer_icon' => $avatarUrl,
+                    'footer' => sprintf("TYPO3 Intercept \u{00b7} <{%s}|(?)>", self::SOURCE_URL),
+                    'footer_icon' => self::AVATAR_URL,
                     'mrkdwn_in' => ['text'],
                 ],
             ],
@@ -69,7 +72,7 @@ readonly class SlackService
         try {
             return $this->sendMessage($message);
         } catch (ClientException) {
-            // avoid UI exceptions if slack is not available
+            // avoid UI exceptions if Slack is not available
             return new Response();
         }
     }

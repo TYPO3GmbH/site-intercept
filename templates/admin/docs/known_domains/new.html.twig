@@ -1,0 +1,19 @@
+{% extends 'layout.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Register known domain{% endblock %}
+{% block headline %}Register known domain{% endblock %}
+{% block body %}
+
+    {% frame with { innerWidth: 'medium' } %}
+        <div class="card">
+            <div class="card-body">
+                Registering a new domain will influence <a href="{{ path('admin_docs_quarantine_index') }}" class="text-underline">quarantined items</a>.
+                Allowing a domain will release affected items and trigger rendering requests, requiring approval by the documentation team. Disallowing a domain will purge all related quarantined items.
+            </div>
+            <div class="card-body">
+                {{ form(form) }}
+            </div>
+        </div>
+    {% endframe %}
+
+{% endblock %}

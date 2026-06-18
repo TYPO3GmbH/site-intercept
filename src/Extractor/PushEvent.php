@@ -16,18 +16,17 @@ namespace App\Extractor;
  *
  * @codeCoverageIgnore
  */
-class PushEvent
+class PushEvent implements \JsonSerializable
 {
     /**
      * PushEvent constructor.
      */
-    public function __construct(protected string $repositoryUrl, protected string $versionString, protected string $urlToComposerFile)
-    {
-    }
-
-    public function getVersionString(): string
-    {
-        return $this->versionString;
+    public function __construct(
+        protected string $repositoryUrl,
+        protected string $versionString,
+        protected string $urlToComposerFile,
+        protected string $payload,
+    ) {
     }
 
     public function getRepositoryUrl(): string
@@ -35,8 +34,30 @@ class PushEvent
         return $this->repositoryUrl;
     }
 
+    public function getVersionString(): string
+    {
+        return $this->versionString;
+    }
+
     public function getUrlToComposerFile(): string
     {
         return $this->urlToComposerFile;
+    }
+
+    public function getPayload(): string
+    {
+        return $this->payload;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return get_object_vars($this);
+    }
+
+    public static function fromJson(string $data): self
+    {
+        $deserializedJson = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+
+        return new self($deserializedJson['repositoryUrl'], $deserializedJson['versionString'], $deserializedJson['urlToComposerFile'], $deserializedJson['payload']);
     }
 }

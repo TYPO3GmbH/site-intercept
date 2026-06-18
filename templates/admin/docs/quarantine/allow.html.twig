@@ -1,0 +1,45 @@
+{% extends 'layout.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Allow quarantined domain {{ quarantinedDocumentation.domain }}{% endblock %}
+{% block headline %}Allow quarantined domain {{ quarantinedDocumentation.domain }}{% endblock %}
+{% block body %}
+
+    {% frame %}
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        {{ form(form) }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card mb-0">
+                    <div class="datatable">
+                        <table class="datatable-table">
+                            <tbody>
+                            <tr>
+                                <th>Domain</th>
+                                <td>{{ quarantinedDocumentation.domain }}</td>
+                            </tr>
+                            <tr>
+                                <th>Repository URL</th>
+                                <td>{{ quarantinedDocumentation.pushEvent.repositoryUrl }}</td>
+                            </tr>
+                            <tr>
+                                <th>Branch</th>
+                                <td>{{ quarantinedDocumentation.pushEvent.versionString }}</td>
+                            </tr>
+                            <tr>
+                                <th>Request Payload</th>
+                                <td><pre><code class="language language-json">{{ quarantinedDocumentation.pushEvent.payload }}</code></pre></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endframe %}
+
+{% endblock %}

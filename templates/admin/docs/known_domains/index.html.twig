@@ -1,0 +1,81 @@
+{% extends 'layout.html.twig' %}
+{% import 'macros/macros.html.twig' as macros %}
+{% block title %}Known Repository Domains{% endblock %}
+{% block headline %}Known Repository Domains{% endblock %}
+{% block body %}
+
+    {% frame %}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-bar">
+                    <div class="card-header-title">
+                        <h3>Known Repository Domains</h3>
+                    </div>
+                    <div class="card-header-actions">
+                        <a href="{{ path('admin_docs_domains_new') }}" class="btn btn-sm btn-secondary">
+                            Add a domain
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="datatable">
+                <table class="datatable-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Domain</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Last hit on</th>
+                        <th scope="col" data-type="actions">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for knownDomain in pagination.getItems() %}
+                        <tr data-id="{{ knownDomain.id }}">
+                            <td>
+                                <span class="text-muted">{% if knownDomain.locked %}{{ icon('actions-lock') }}{% endif %}</span>
+                                {{ knownDomain.domain }}
+                            </td>
+                            <td>
+                                {% if knownDomain.allowed %}
+                                    <span class="badge badge-success">Allowed domain</span>
+                                {% elseif knownDomain.disallowed %}
+                                    <span class="badge badge-danger">Disallowed domain</span>
+                                    {% else %}
+                                        <span class="badge badge-info">Unknown domain status</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if knownDomain.lastHit is null %}
+                                    &dash;
+                                {% else %}
+                                    {{ localdatetime(knownDomain.lastHit) }}
+                                {% endif %}
+                            </td>
+                            <td data-type="actions" data-label="Actions">
+                                {% if not knownDomain.locked or is_granted('ROLE_ADMIN') %}
+                                    <a class="datatable-action" title="Delete" href="{{ path('admin_docs_domains_delete', {'domain': knownDomain.id}) }}">
+                                        <span class="datatable-action-icon">{{ icon('actions-delete') }}</span>
+                                        <span class="datatable-action-label datatable-visually-hidden">Delete</span>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="alert alert-warning">No domains registered.</div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pagination.getTotalItemCount() > 10 %}
+                <div class="card-footer">
+                    {{ knp_pagination_render(pagination) }}
+                </div>
+            {% endif %}
+        </div>
+    {% endframe %}
+
+{% endblock %}
