@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Dto\HistoryEntryDto;
 use App\Entity\DocumentationJar;
-use App\Entity\HistoryEntry;
 use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\DocumentationStatus;
 use App\Enum\HistoryEntryTrigger;
@@ -30,9 +30,9 @@ use App\Exception\UnsupportedWebHookRequestException;
 use App\Repository\RepositoryBlacklistEntryRepository;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\GithubService;
+use App\Service\HistoryService;
 use App\Service\MailService;
 use App\Service\WebHookService;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,17 +46,13 @@ use T3G\Bundle\Keycloak\Security\KeyCloakUser;
  */
 class DocsRenderingController extends AbstractController
 {
-    public function __construct(
-        private readonly EntityManagerInterface $entityManager
-    ) {
-    }
-
     #[Route(path: '/docs', name: 'docs_to_bamboo')]
     #[Route(path: '/', name: 'docs_hook_to_bamboo', host: 'docs-hook.typo3.org')]
     public function index(
         Request $request,
         GithubService $githubService,
         WebHookService $webhookService,
+        HistoryService $historyService,
         DocumentationBuildInformationService $documentationBuildInformationService,
         RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
         LoggerInterface $logger,
@@ -78,21 +74,17 @@ class DocsRenderingController extends AbstractController
 
                 try {
                     if ($repositoryBlacklistEntryRepository->isBlacklisted($pushEvent->getRepositoryUrl())) {
-                        $this->entityManager->persist(
-                            (new HistoryEntry())
-                                ->setType(HistoryEntryType::DOCS_RENDERING)
-                                ->setStatus(DocsRenderingHistoryStatus::BLACKLISTED)
-                                ->setData([
-                                    'type' => HistoryEntryType::DOCS_RENDERING,
-                                    'status' => DocsRenderingHistoryStatus::BLACKLISTED,
-                                    'triggeredBy' => HistoryEntryTrigger::API,
-                                    'repository' => $pushEvent->getRepositoryUrl(),
-                                    'composerFile' => $pushEvent->getUrlToComposerFile(),
-                                    'payload' => $request->getContent(),
-                                    'user' => $userIdentifier,
-                                ])
-                        );
-                        $this->entityManager->flush();
+                        $historyService->writeHistory(new HistoryEntryDto(
+                            type: HistoryEntryType::DOCS_RENDERING,
+                            status: DocsRenderingHistoryStatus::BLACKLISTED,
+                            triggeredBy: HistoryEntryTrigger::API,
+                            data: [
+                                'repository' => $pushEvent->getRepositoryUrl(),
+                                'composerFile' => $pushEvent->getUrlToComposerFile(),
+                                'payload' => $request->getContent(),
+                                'user' => $userIdentifier,
+                            ]
+                        ));
                         continue;
                     }
                     $buildInformation = $documentationBuildInformationService->generateBuildInformation($pushEvent, $composerAsObject);
@@ -104,22 +96,18 @@ class DocsRenderingController extends AbstractController
                     // an older build finishes after a younger triggered build which would overwrite the result af the later build.
                     if (DocumentationStatus::STATUS_RENDERING === $documentationJar->getStatus()) {
                         $documentationBuildInformationService->updateReRenderNeeded($documentationJar, true);
-                        $this->entityManager->persist(
-                            (new HistoryEntry())
-                                ->setType(HistoryEntryType::DOCS_RENDERING)
-                                ->setStatus(DocsRenderingHistoryStatus::RE_RENDER_NEEDED)
-                                ->setData([
-                                    'type' => HistoryEntryType::DOCS_RENDERING,
-                                    'status' => DocsRenderingHistoryStatus::RE_RENDER_NEEDED,
-                                    'triggeredBy' => HistoryEntryTrigger::API,
-                                    'repository' => $buildInformation->repositoryUrl,
-                                    'package' => $buildInformation->packageName,
-                                    'sourceBranch' => $buildInformation->sourceBranch,
-                                    'targetBranch' => $buildInformation->targetBranchDirectory,
-                                    'user' => $userIdentifier,
-                                ])
-                        );
-                        $this->entityManager->flush();
+                        $historyService->writeHistory(new HistoryEntryDto(
+                            type: HistoryEntryType::DOCS_RENDERING,
+                            status: DocsRenderingHistoryStatus::RE_RENDER_NEEDED,
+                            triggeredBy: HistoryEntryTrigger::API,
+                            data: [
+                                'repository' => $buildInformation->repositoryUrl,
+                                'package' => $buildInformation->packageName,
+                                'sourceBranch' => $buildInformation->sourceBranch,
+                                'targetBranch' => $buildInformation->targetBranchDirectory,
+                                'user' => $userIdentifier,
+                            ]
+                        ));
                     } elseif (!$documentationJar->isApproved()) {
                         $logger->info('Repository present, but not approved. Do nothing.', [$documentationJar]);
                     } else {
@@ -129,145 +117,117 @@ class DocsRenderingController extends AbstractController
                             $documentationJar->setReRenderNeeded(false);
                             $documentationJar->setBuildKey($buildTriggered->buildResultKey);
                         });
-                        $this->entityManager->persist(
-                            (new HistoryEntry())
-                                ->setType(HistoryEntryType::DOCS_RENDERING)
-                                ->setStatus(DocsRenderingHistoryStatus::TRIGGERED)
-                                ->setGroupEntry($buildTriggered->buildResultKey)
-                                ->setData([
-                                    'type' => HistoryEntryType::DOCS_RENDERING,
-                                    'status' => DocsRenderingHistoryStatus::TRIGGERED,
-                                    'triggeredBy' => HistoryEntryTrigger::API,
-                                    'repository' => $buildInformation->repositoryUrl,
-                                    'package' => $buildInformation->packageName,
-                                    'sourceBranch' => $buildInformation->sourceBranch,
-                                    'targetBranch' => $buildInformation->targetBranchDirectory,
-                                    'bambooKey' => $buildTriggered->buildResultKey,
-                                    'user' => $userIdentifier,
-                                ])
-                        );
-                        $this->entityManager->flush();
+                        $historyService->writeHistory(new HistoryEntryDto(
+                            type: HistoryEntryType::DOCS_RENDERING,
+                            status: DocsRenderingHistoryStatus::TRIGGERED,
+                            triggeredBy: HistoryEntryTrigger::API,
+                            groupEntry: $buildTriggered->buildResultKey,
+                            data: [
+                                'repository' => $buildInformation->repositoryUrl,
+                                'package' => $buildInformation->packageName,
+                                'sourceBranch' => $buildInformation->sourceBranch,
+                                'targetBranch' => $buildInformation->targetBranchDirectory,
+                                'bambooKey' => $buildTriggered->buildResultKey,
+                                'user' => $userIdentifier,
+                            ]
+                        ));
                     }
                 } catch (ComposerJsonNotFoundException $e) {
                     // Repository did not provide a composer.json, or fetch failed
-                    $this->entityManager->persist(
-                        (new HistoryEntry())
-                        ->setType(HistoryEntryType::DOCS_RENDERING)
-                        ->setStatus(DocsRenderingHistoryStatus::NO_COMPOSER_JSON)
-                        ->setData([
-                            'type' => HistoryEntryType::DOCS_RENDERING,
-                            'status' => DocsRenderingHistoryStatus::NO_COMPOSER_JSON,
-                            'triggeredBy' => HistoryEntryTrigger::API,
+                    $historyService->writeHistory(new HistoryEntryDto(
+                        type: HistoryEntryType::DOCS_RENDERING,
+                        status: DocsRenderingHistoryStatus::NO_COMPOSER_JSON,
+                        triggeredBy: HistoryEntryTrigger::API,
+                        data: [
                             'exceptionCode' => $e->getCode(),
                             'exceptionMessage' => $e->getMessage(),
                             'repository' => $pushEvent->getRepositoryUrl(),
                             'composerFile' => $pushEvent->getUrlToComposerFile(),
                             'payload' => $request->getContent(),
                             'user' => $userIdentifier,
-                        ])
-                    );
-                    $this->entityManager->flush();
+                        ]
+                    ));
                     ++$erroredPushes;
                     $errorMessage = 'No composer.json found, invalid or unable to fetch. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (ComposerJsonInvalidException $e) {
-                    $this->entityManager->persist(
-                        (new HistoryEntry())
-                            ->setType(HistoryEntryType::DOCS_RENDERING)
-                            ->setStatus(DocsRenderingHistoryStatus::INVALID_COMPOSER_JSON)
-                            ->setData([
-                                'type' => HistoryEntryType::DOCS_RENDERING,
-                                'status' => DocsRenderingHistoryStatus::INVALID_COMPOSER_JSON,
-                                'triggeredBy' => HistoryEntryTrigger::API,
-                                'exceptionCode' => $e->getCode(),
-                                'exceptionMessage' => $e->getMessage(),
-                                'repository' => $pushEvent->getRepositoryUrl(),
-                                'composerFile' => $pushEvent->getUrlToComposerFile(),
-                                'payload' => $request->getContent(),
-                                'user' => $userIdentifier,
-                            ])
-                    );
-                    $this->entityManager->flush();
+                    $historyService->writeHistory(new HistoryEntryDto(
+                        type: HistoryEntryType::DOCS_RENDERING,
+                        status: DocsRenderingHistoryStatus::INVALID_COMPOSER_JSON,
+                        triggeredBy: HistoryEntryTrigger::API,
+                        data: [
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'composerFile' => $pushEvent->getUrlToComposerFile(),
+                            'payload' => $request->getContent(),
+                            'user' => $userIdentifier,
+                        ]
+                    ));
                     ++$erroredPushes;
                     $errorMessage = 'Invalid composer.json. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (DocsPackageRegisteredWithDifferentRepositoryException $e) {
-                    $this->entityManager->persist(
-                        (new HistoryEntry())
-                        ->setType(HistoryEntryType::DOCS_RENDERING)
-                        ->setStatus(DocsRenderingHistoryStatus::PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY)
-                        ->setData([
-                            'type' => HistoryEntryType::DOCS_RENDERING,
-                            'status' => DocsRenderingHistoryStatus::PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY,
-                            'triggeredBy' => HistoryEntryTrigger::API,
+                    $historyService->writeHistory(new HistoryEntryDto(
+                        type: HistoryEntryType::DOCS_RENDERING,
+                        status: DocsRenderingHistoryStatus::PACKAGE_REGISTERED_WITH_DIFFERENT_REPOSITORY,
+                        triggeredBy: HistoryEntryTrigger::API,
+                        data: [
                             'exceptionCode' => $e->getCode(),
                             'exceptionMessage' => $e->getMessage(),
                             'repository' => $pushEvent->getRepositoryUrl(),
                             'package' => $e->getPackageName(),
                             'user' => $userIdentifier,
-                        ])
-                    );
-                    $this->entityManager->flush();
+                        ]
+                    ));
                     ++$erroredPushes;
                     $errorMessage = 'Package already registered for different repository. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (DocsPackageDoNotCareBranch $e) {
-                    $this->entityManager->persist(
-                        (new HistoryEntry())
-                            ->setType(HistoryEntryType::DOCS_RENDERING)
-                            ->setStatus(DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG)
-                            ->setData([
-                                'type' => HistoryEntryType::DOCS_RENDERING,
-                                'status' => DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG,
-                                'triggeredBy' => HistoryEntryTrigger::API,
-                                'exceptionCode' => $e->getCode(),
-                                'exceptionMessage' => $e->getMessage(),
-                                'repository' => $pushEvent->getRepositoryUrl(),
-                                'sourceBranch' => $pushEvent->getVersionString(),
-                                'user' => $userIdentifier,
-                            ])
-                    );
-                    $this->entityManager->flush();
+                    $historyService->writeHistory(new HistoryEntryDto(
+                        type: HistoryEntryType::DOCS_RENDERING,
+                        status: DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG,
+                        triggeredBy: HistoryEntryTrigger::API,
+                        data: [
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'sourceBranch' => $pushEvent->getVersionString(),
+                            'user' => $userIdentifier,
+                        ]
+                    ));
                     ++$erroredPushes;
                     $errorMessage = 'Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (DocsComposerMissingValueException $e) {
-                    $this->entityManager->persist(
-                        (new HistoryEntry())
-                            ->setType(HistoryEntryType::DOCS_RENDERING)
-                            ->setStatus(DocsRenderingHistoryStatus::MISSING_VALUE_IN_COMPOSER_JSON)
-                            ->setData([
-                                'type' => HistoryEntryType::DOCS_RENDERING,
-                                'status' => DocsRenderingHistoryStatus::MISSING_VALUE_IN_COMPOSER_JSON,
-                                'triggeredBy' => HistoryEntryTrigger::API,
-                                'exceptionCode' => $e->getCode(),
-                                'exceptionMessage' => $e->getMessage(),
-                                'repository' => $pushEvent->getRepositoryUrl(),
-                                'sourceBranch' => $pushEvent->getVersionString(),
-                                'user' => $userIdentifier,
-                            ])
-                    );
-                    $this->entityManager->flush();
+                    $historyService->writeHistory(new HistoryEntryDto(
+                        type: HistoryEntryType::DOCS_RENDERING,
+                        status: DocsRenderingHistoryStatus::MISSING_VALUE_IN_COMPOSER_JSON,
+                        triggeredBy: HistoryEntryTrigger::API,
+                        data: [
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'sourceBranch' => $pushEvent->getVersionString(),
+                            'user' => $userIdentifier,
+                        ]
+                    ));
                     ++$erroredPushes;
                     $errorMessage = 'A mandatory value is missing in the composer.json. See https://intercept.typo3.com for more information.';
                     continue;
                 } catch (DocsComposerDependencyException $e) {
-                    $this->entityManager->persist(
-                        (new HistoryEntry())
-                            ->setType(HistoryEntryType::DOCS_RENDERING)
-                            ->setStatus(DocsRenderingHistoryStatus::CORE_DEPENDENCY_NOT_SET)
-                            ->setData([
-                                'type' => HistoryEntryType::DOCS_RENDERING,
-                                'status' => DocsRenderingHistoryStatus::CORE_DEPENDENCY_NOT_SET,
-                                'triggeredBy' => HistoryEntryTrigger::API,
-                                'exceptionCode' => $e->getCode(),
-                                'exceptionMessage' => $e->getMessage(),
-                                'repository' => $pushEvent->getRepositoryUrl(),
-                                'sourceBranch' => $pushEvent->getVersionString(),
-                                'user' => $userIdentifier,
-                            ])
-                    );
-                    $this->entityManager->flush();
+                    $historyService->writeHistory(new HistoryEntryDto(
+                        type: HistoryEntryType::DOCS_RENDERING,
+                        status: DocsRenderingHistoryStatus::CORE_DEPENDENCY_NOT_SET,
+                        triggeredBy: HistoryEntryTrigger::API,
+                        data: [
+                            'exceptionCode' => $e->getCode(),
+                            'exceptionMessage' => $e->getMessage(),
+                            'repository' => $pushEvent->getRepositoryUrl(),
+                            'sourceBranch' => $pushEvent->getVersionString(),
+                            'user' => $userIdentifier,
+                        ]
+                    ));
                     try {
                         $author = $composerAsObject->getFirstAuthor();
                         if (filter_var($author['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
@@ -290,71 +250,55 @@ class DocsRenderingController extends AbstractController
             // Hook payload is a 'GitHub ping' - log that as 'info / success' with the
             // url that hook came from. This is triggered by GitHub when a new web hook is added,
             // we want to be nice and make this one succeed.
-            $this->entityManager->persist(
-                (new HistoryEntry())
-                    ->setType(HistoryEntryType::DOCS_RENDERING)
-                    ->setStatus(DocsRenderingHistoryStatus::GITHUB_PING)
-                    ->setData([
-                        'type' => HistoryEntryType::DOCS_RENDERING,
-                        'status' => DocsRenderingHistoryStatus::GITHUB_PING,
-                        'triggeredBy' => HistoryEntryTrigger::API,
-                        'repository' => $e->getRepositoryUrl(),
-                    ])
-            );
-            $this->entityManager->flush();
+            $historyService->writeHistory(new HistoryEntryDto(
+                type: HistoryEntryType::DOCS_RENDERING,
+                status: DocsRenderingHistoryStatus::GITHUB_PING,
+                triggeredBy: HistoryEntryTrigger::API,
+                data: [
+                    'repository' => $e->getRepositoryUrl(),
+                ]
+            ));
 
             return new Response('Received github ping. Please push content to the repository to render some documentation. See https://intercept.typo3.com for more information.');
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
-            $this->entityManager->persist(
-                (new HistoryEntry())
-                    ->setType(HistoryEntryType::DOCS_RENDERING)
-                    ->setStatus(DocsRenderingHistoryStatus::UNSUPPORTED_HOOK)
-                    ->setData([
-                        'type' => HistoryEntryType::DOCS_RENDERING,
-                        'status' => DocsRenderingHistoryStatus::UNSUPPORTED_HOOK,
-                        'headers' => $request->headers,
-                        'payload' => $request->getContent(),
-                        'triggeredBy' => HistoryEntryTrigger::API,
-                        'exceptionCode' => $e->getCode(),
-                        'user' => $userIdentifier,
-                    ])
-            );
-            $this->entityManager->flush();
+            $historyService->writeHistory(new HistoryEntryDto(
+                type: HistoryEntryType::DOCS_RENDERING,
+                status: DocsRenderingHistoryStatus::UNSUPPORTED_HOOK,
+                triggeredBy: HistoryEntryTrigger::API,
+                data: [
+                    'headers' => $request->headers,
+                    'payload' => $request->getContent(),
+                    'exceptionCode' => $e->getCode(),
+                    'user' => $userIdentifier,
+                ]
+            ));
 
             return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         } catch (GitBranchDeletedException $e) {
-            $this->entityManager->persist(
-                (new HistoryEntry())
-                    ->setType(HistoryEntryType::DOCS_RENDERING)
-                    ->setStatus(DocsRenderingHistoryStatus::BRANCH_DELETED)
-                    ->setData([
-                        'type' => HistoryEntryType::DOCS_RENDERING,
-                        'status' => DocsRenderingHistoryStatus::BRANCH_DELETED,
-                        'triggeredBy' => HistoryEntryTrigger::API,
-                        'exceptionCode' => $e->getCode(),
-                        'exceptionMessage' => $e->getMessage(),
-                        'user' => $userIdentifier,
-                    ])
-            );
-            $this->entityManager->flush();
+            $historyService->writeHistory(new HistoryEntryDto(
+                type: HistoryEntryType::DOCS_RENDERING,
+                status: DocsRenderingHistoryStatus::BRANCH_DELETED,
+                triggeredBy: HistoryEntryTrigger::API,
+                data: [
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'user' => $userIdentifier,
+                ]
+            ));
 
             return new Response('The branch in this push event has been deleted.', Response::HTTP_PRECONDITION_FAILED);
         } catch (DocsNoRstChangesException $e) {
-            $this->entityManager->persist(
-                (new HistoryEntry())
-                    ->setType(HistoryEntryType::DOCS_RENDERING)
-                    ->setStatus(DocsRenderingHistoryStatus::BRANCH_NO_RST_CHANGES)
-                    ->setData([
-                        'type' => HistoryEntryType::DOCS_RENDERING,
-                        'status' => DocsRenderingHistoryStatus::BRANCH_NO_RST_CHANGES,
-                        'triggeredBy' => HistoryEntryTrigger::API,
-                        'exceptionCode' => $e->getCode(),
-                        'exceptionMessage' => $e->getMessage(),
-                        'user' => $userIdentifier,
-                    ])
-            );
-            $this->entityManager->flush();
+            $historyService->writeHistory(new HistoryEntryDto(
+                type: HistoryEntryType::DOCS_RENDERING,
+                status: DocsRenderingHistoryStatus::BRANCH_NO_RST_CHANGES,
+                triggeredBy: HistoryEntryTrigger::API,
+                data: [
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'user' => $userIdentifier,
+                ]
+            ));
 
             return new Response(null, Response::HTTP_NO_CONTENT);
         }

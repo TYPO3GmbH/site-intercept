@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace App\Controller\AdminInterface\Docs;
 
+use App\Dto\HistoryEntryDto;
 use App\Entity\DocsServerRedirect;
-use App\Entity\HistoryEntry;
 use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\HistoryEntryTrigger;
 use App\Enum\HistoryEntryType;
@@ -23,6 +23,7 @@ use App\Repository\DocsServerRedirectRepository;
 use App\Repository\HistoryEntryRepository;
 use App\Service\DocsServerNginxService;
 use App\Service\GithubService;
+use App\Service\HistoryService;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,6 +43,7 @@ class RedirectController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly DocsServerNginxService $nginxService,
         private readonly GithubService $githubService,
+        private readonly HistoryService $historyService,
         private readonly Security $security,
     ) {
     }
@@ -210,21 +212,17 @@ class RedirectController extends AbstractController
         if ($user instanceof KeyCloakUser) {
             $userIdentifier = $user->getDisplayName();
         }
-        $this->entityManager->persist(
-            (new HistoryEntry())
-                ->setType(HistoryEntryType::DOCS_REDIRECT)
-                ->setStatus(DocsRenderingHistoryStatus::TRIGGERED)
-                ->setGroupEntry($bambooBuildTriggered->buildResultKey)
-                ->setData([
-                    'type' => HistoryEntryType::DOCS_REDIRECT,
-                    'status' => DocsRenderingHistoryStatus::TRIGGERED,
-                    'triggeredBy' => HistoryEntryTrigger::WEB,
-                    'subType' => $triggeredBySubType,
-                    'redirect' => $redirect->toArray(),
-                    'bambooKey' => $bambooBuildTriggered->buildResultKey,
-                    'user' => $userIdentifier,
-                ])
-        );
-        $this->entityManager->flush();
+        $this->historyService->writeHistory(new HistoryEntryDto(
+            type: HistoryEntryType::DOCS_REDIRECT,
+            status: DocsRenderingHistoryStatus::TRIGGERED,
+            triggeredBy: HistoryEntryTrigger::WEB,
+            groupEntry: $bambooBuildTriggered->buildResultKey,
+            data: [
+                'subType' => $triggeredBySubType,
+                'redirect' => $redirect->toArray(),
+                'bambooKey' => $bambooBuildTriggered->buildResultKey,
+                'user' => $userIdentifier,
+            ]
+        ));
     }
 }

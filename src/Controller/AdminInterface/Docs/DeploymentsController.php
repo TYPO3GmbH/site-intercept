@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace App\Controller\AdminInterface\Docs;
 
-use App\Entity\HistoryEntry;
+use App\Dto\HistoryEntryDto;
 use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\DocumentationStatus;
 use App\Enum\HistoryEntryTrigger;
@@ -27,6 +27,7 @@ use App\Repository\HistoryEntryRepository;
 use App\Service\DocsService;
 use App\Service\DocumentationBuildInformationService;
 use App\Service\GithubService;
+use App\Service\HistoryService;
 use App\Service\RenderDocumentationService;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
@@ -49,6 +50,7 @@ class DeploymentsController extends AbstractController
         private readonly HistoryEntryRepository $historyEntryRepository,
         private readonly DocumentationJarRepository $documentationJarRepository,
         private readonly DocsService $docsService,
+        private readonly HistoryService $historyService,
     ) {
     }
 
@@ -157,22 +159,18 @@ class DeploymentsController extends AbstractController
                 if ($user instanceof KeyCloakUser) {
                     $userIdentifier = $user->getDisplayName();
                 }
-                $entityManager->persist(
-                    (new HistoryEntry())
-                        ->setType('docsRendering')
-                        ->setStatus(DocsRenderingHistoryStatus::PACKAGE_DELETED)
-                        ->setGroupEntry($buildTriggered->buildResultKey)
-                        ->setData([
-                            'type' => HistoryEntryType::DOCS_RENDERING,
-                            'status' => DocsRenderingHistoryStatus::PACKAGE_DELETED,
-                            'triggeredBy' => HistoryEntryTrigger::WEB,
-                            'repository' => $jar->getRepositoryUrl(),
-                            'package' => $jar->getPackageName(),
-                            'bambooKey' => $buildTriggered->buildResultKey,
-                            'user' => $userIdentifier,
-                        ])
-                );
-                $entityManager->flush();
+                $this->historyService->writeHistory(new HistoryEntryDto(
+                    type: HistoryEntryType::DOCS_RENDERING,
+                    status: DocsRenderingHistoryStatus::PACKAGE_DELETED,
+                    triggeredBy: HistoryEntryTrigger::WEB,
+                    groupEntry: $buildTriggered->buildResultKey,
+                    data: [
+                        'repository' => $jar->getRepositoryUrl(),
+                        'package' => $jar->getPackageName(),
+                        'bambooKey' => $buildTriggered->buildResultKey,
+                        'user' => $userIdentifier,
+                    ]
+                ));
             }
         }
 
@@ -213,7 +211,6 @@ class DeploymentsController extends AbstractController
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function renderDocs(
         Request $request,
-        EntityManagerInterface $entityManager,
         DocumentationJarRepository $documentationJarRepository,
         RenderDocumentationService $renderDocumentationService
     ): Response {
@@ -233,40 +230,32 @@ class DeploymentsController extends AbstractController
             return $this->redirectToRoute('admin_docs_deployments');
         } catch (UnsupportedWebHookRequestException $e) {
             // Hook payload could not be identified as hook that should trigger rendering
-            $entityManager->persist(
-                (new HistoryEntry())
-                    ->setType('docsRendering')
-                    ->setStatus(DocsRenderingHistoryStatus::UNSUPPORTED_HOOK)
-                    ->setData([
-                        'type' => 'docsRendering',
-                        'status' => DocsRenderingHistoryStatus::UNSUPPORTED_HOOK,
-                        'headers' => $request->headers,
-                        'payload' => $request->getContent(),
-                        'triggeredBy' => HistoryEntryTrigger::API,
-                        'exceptionCode' => $e->getCode(),
-                        'user' => $userIdentifier,
-                    ])
-            );
-            $entityManager->flush();
+            $this->historyService->writeHistory(new HistoryEntryDto(
+                type: HistoryEntryType::DOCS_RENDERING,
+                status: DocsRenderingHistoryStatus::UNSUPPORTED_HOOK,
+                triggeredBy: HistoryEntryTrigger::API,
+                data: [
+                    'headers' => $request->headers,
+                    'payload' => $request->getContent(),
+                    'exceptionCode' => $e->getCode(),
+                    'user' => $userIdentifier,
+                ]
+            ));
 
             return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         } catch (DocsPackageDoNotCareBranch $e) {
-            $entityManager->persist(
-                (new HistoryEntry())
-                    ->setType(HistoryEntryType::DOCS_RENDERING)
-                    ->setStatus(DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG)
-                    ->setData([
-                        'type' => HistoryEntryType::DOCS_RENDERING,
-                        'status' => DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG,
-                        'triggeredBy' => HistoryEntryTrigger::API,
-                        'exceptionCode' => $e->getCode(),
-                        'exceptionMessage' => $e->getMessage(),
-                        'repository' => $documentationJar->getRepositoryUrl(),
-                        'sourceBranch' => $documentationJar->getBranch(),
-                        'user' => $userIdentifier,
-                    ])
-            );
-            $entityManager->flush();
+            $this->historyService->writeHistory(new HistoryEntryDto(
+                type: HistoryEntryType::DOCS_RENDERING,
+                status: DocsRenderingHistoryStatus::NO_RELEVANT_BRANCH_OR_TAG,
+                triggeredBy: HistoryEntryTrigger::API,
+                data: [
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'repository' => $documentationJar->getRepositoryUrl(),
+                    'sourceBranch' => $documentationJar->getBranch(),
+                    'user' => $userIdentifier,
+                ]
+            ));
 
             return new Response('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
         }
