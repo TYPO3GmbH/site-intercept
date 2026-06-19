@@ -11,15 +11,16 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Dto\HistoryEntryDto;
 use App\Entity\DocumentationJar;
-use App\Entity\HistoryEntry;
 use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\DocumentationStatus;
+use App\Enum\HistoryEntryType;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Extractor\DeploymentInformation;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
 class RenderDocumentationService
@@ -27,9 +28,9 @@ class RenderDocumentationService
     public function __construct(
         protected DocumentationBuildInformationService $documentationBuildInformationService,
         protected GithubService $githubService,
+        protected HistoryService $historyService,
         protected LoggerInterface $logger,
-        protected EntityManagerInterface $entityManager,
-        protected \Symfony\Bundle\SecurityBundle\Security $security
+        protected Security $security
     ) {
     }
 
@@ -52,24 +53,20 @@ class RenderDocumentationService
         if ($user instanceof KeyCloakUser) {
             $userIdentifier = $user->getDisplayName();
         }
-        $this->entityManager->persist(
-            (new HistoryEntry())
-                ->setType('docsRendering')
-                ->setStatus('triggered')
-                ->setGroupEntry($buildTriggered->buildResultKey)
-                ->setData([
-                    'type' => 'docsRendering',
-                    'status' => DocsRenderingHistoryStatus::TRIGGERED,
-                    'triggeredBy' => $scope,
-                    'repository' => $buildInformation->repositoryUrl,
-                    'package' => $buildInformation->packageName,
-                    'sourceBranch' => $buildInformation->sourceBranch,
-                    'targetBranch' => $buildInformation->targetBranchDirectory,
-                    'bambooKey' => $buildTriggered->buildResultKey,
-                    'user' => $userIdentifier,
-                ])
-        );
-        $this->entityManager->flush();
+        $this->historyService->writeHistory(new HistoryEntryDto(
+            type: HistoryEntryType::DOCS_RENDERING,
+            status: DocsRenderingHistoryStatus::TRIGGERED,
+            triggeredBy: $scope,
+            groupEntry: $buildTriggered->buildResultKey,
+            data: [
+                'repository' => $buildInformation->repositoryUrl,
+                'package' => $buildInformation->packageName,
+                'sourceBranch' => $buildInformation->sourceBranch,
+                'targetBranch' => $buildInformation->targetBranchDirectory,
+                'bambooKey' => $buildTriggered->buildResultKey,
+                'user' => $userIdentifier,
+            ]
+        ));
 
         return $buildInformation;
     }
