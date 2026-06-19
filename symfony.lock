@@ -775,9 +775,6 @@
     "symfony/yaml": {
         "version": "v4.1.7"
     },
-    "t3g/symfony-datahub-bundle": {
-        "version": "dev-master"
-    },
     "t3g/symfony-keycloak-bundle": {
         "version": "1.0.3"
     },

@@ -90,7 +90,7 @@ class MenuBuilder extends TemplateMenuBuider
                 'logout',
                 [
                     'label' => 'Sign out',
-                    'route' => 'logout',
+                    'route' => 't3g_keycloak_logout',
                     'extras' => [
                         'icon' => 'actions-logout',
                     ],
