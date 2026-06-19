@@ -46,18 +46,21 @@ use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 class DeploymentsController extends AbstractController
 {
     public function __construct(
+        private readonly EntityManagerInterface $entityManager,
         private readonly PaginatorInterface $paginator,
         private readonly HistoryEntryRepository $historyEntryRepository,
         private readonly DocumentationJarRepository $documentationJarRepository,
         private readonly DocsService $docsService,
         private readonly HistoryService $historyService,
+        private readonly RenderDocumentationService $renderDocumentationService,
+        private readonly DocumentationBuildInformationService $documentationBuildInformationService,
+        private readonly GithubService $githubService,
     ) {
     }
 
     #[Route(path: '/admin/docs/deployments', name: 'admin_docs_deployments')]
-    public function index(
-        Request $request,
-    ): Response {
+    public function index(Request $request): Response
+    {
         $recentLogsMessages = $this->historyEntryRepository->findByType('docsRendering', 30);
         $criteria = Criteria::create();
 
@@ -104,9 +107,8 @@ class DeploymentsController extends AbstractController
 
     #[Route(path: '/admin/docs/deployments/delete/{documentationJarId}/confirm', name: 'admin_docs_deployments_delete_view', requirements: ['documentationJarId' => '\d+'], methods: ['GET'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function deleteConfirm(
-        int $documentationJarId,
-    ): Response {
+    public function deleteConfirm(int $documentationJarId): Response
+    {
         $jar = $this->documentationJarRepository->find($documentationJarId);
         if (null === $jar || !$jar->isDeletable()) {
             return $this->redirectToRoute('admin_docs_deployments');
@@ -132,28 +134,22 @@ class DeploymentsController extends AbstractController
      */
     #[Route(path: '/admin/docs/deployments/delete/{documentationJarId}', name: 'admin_docs_deployments_delete_action', requirements: ['documentationJarId' => '\d+'], methods: ['DELETE'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function delete(
-        Request $request,
-        int $documentationJarId,
-        DocumentationJarRepository $documentationJarRepository,
-        EntityManagerInterface $entityManager,
-        DocumentationBuildInformationService $documentationBuildInformationService,
-        GithubService $githubService
-    ): Response {
+    public function delete(Request $request, int $documentationJarId): Response
+    {
         $form = $this->createForm(DeleteDeploymentType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $jar = $documentationJarRepository->find($documentationJarId);
+            $jar = $this->documentationJarRepository->find($documentationJarId);
 
             if (null !== $jar && $jar->isDeletable()) {
-                $informationFile = $documentationBuildInformationService->generateBuildInformationFromDocumentationJar($jar);
-                $documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
-                $buildTriggered = $githubService->triggerDocumentationDeletionPlan($informationFile);
+                $informationFile = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($jar);
+                $this->documentationBuildInformationService->dumpDeploymentInformationFile($informationFile);
+                $buildTriggered = $this->githubService->triggerDocumentationDeletionPlan($informationFile);
 
                 $jar
                     ->setBuildKey($buildTriggered->buildResultKey)
                     ->setStatus(DocumentationStatus::STATUS_DELETING);
-                $entityManager->persist($jar);
+                $this->entityManager->persist($jar);
                 $user = $this->getUser();
                 $userIdentifier = 'Anon.';
                 if ($user instanceof KeyCloakUser) {
@@ -183,20 +179,16 @@ class DeploymentsController extends AbstractController
      */
     #[Route(path: '/admin/docs/deployments/approve/{documentationJarId}', name: 'admin_docs_deployments_approve_action', requirements: ['documentationJarId' => '\d+'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function approve(
-        int $documentationJarId,
-        DocumentationJarRepository $documentationJarRepository,
-        EntityManagerInterface $entityManager,
-        RenderDocumentationService $renderDocumentationService
-    ): Response {
-        $originalJar = $documentationJarRepository->find($documentationJarId) ?? throw $this->createNotFoundException('Cannot find documentation with id ' . $documentationJarId);
-        $jars = $documentationJarRepository->findBy(['repositoryUrl' => $originalJar->getRepositoryUrl()]);
+    public function approve(int $documentationJarId): Response
+    {
+        $originalJar = $this->documentationJarRepository->find($documentationJarId) ?? throw $this->createNotFoundException('Cannot find documentation with id ' . $documentationJarId);
+        $jars = $this->documentationJarRepository->findBy(['repositoryUrl' => $originalJar->getRepositoryUrl()]);
 
         foreach ($jars as $jar) {
             $jar->setApproved(true);
-            $entityManager->persist($jar);
-            $entityManager->flush();
-            $renderDocumentationService->renderDocumentationByDocumentationJar($jar, 'interface');
+            $this->entityManager->persist($jar);
+            $this->entityManager->flush();
+            $this->renderDocumentationService->renderDocumentationByDocumentationJar($jar, 'interface');
         }
 
         $this->addFlash('success', 'Repository has been approved.');
@@ -209,11 +201,8 @@ class DeploymentsController extends AbstractController
      */
     #[Route(path: '/admin/docs/render', name: 'admin_docs_render')]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function renderDocs(
-        Request $request,
-        DocumentationJarRepository $documentationJarRepository,
-        RenderDocumentationService $renderDocumentationService
-    ): Response {
+    public function renderDocs(Request $request): Response
+    {
         $user = $this->getUser();
         $userIdentifier = 'Anon.';
         if ($user instanceof KeyCloakUser) {
@@ -221,10 +210,10 @@ class DeploymentsController extends AbstractController
         }
 
         $documentationJarId = (int) $request->get('documentation');
-        $documentationJar = $documentationJarRepository->find($documentationJarId) ?? throw $this->createNotFoundException('Cannot find documentation with id ' . $documentationJarId);
+        $documentationJar = $this->documentationJarRepository->find($documentationJarId) ?? throw $this->createNotFoundException('Cannot find documentation with id ' . $documentationJarId);
 
         try {
-            $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'interface');
+            $this->renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'interface');
             $this->addFlash('success', 'A re-rendering was triggered.');
 
             return $this->redirectToRoute('admin_docs_deployments');
@@ -263,17 +252,14 @@ class DeploymentsController extends AbstractController
 
     #[Route(path: '/admin/docs/deployments/reset/{documentationJarId}', name: 'admin_docs_deployments_reset_action', requirements: ['documentationJarId' => '\d+'], methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function resetStatus(
-        int $documentationJarId,
-        DocumentationJarRepository $documentationJarRepository,
-        EntityManagerInterface $entityManager
-    ): Response {
-        $jar = $documentationJarRepository->find($documentationJarId);
+    public function resetStatus(int $documentationJarId): Response
+    {
+        $jar = $this->documentationJarRepository->find($documentationJarId);
 
         if (null !== $jar) {
             $jar->setStatus(DocumentationStatus::STATUS_RENDERED);
-            $entityManager->persist($jar);
-            $entityManager->flush();
+            $this->entityManager->persist($jar);
+            $this->entityManager->flush();
         }
 
         return $this->redirectToRoute('admin_docs_deployments');

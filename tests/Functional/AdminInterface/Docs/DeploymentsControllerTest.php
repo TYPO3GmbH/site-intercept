@@ -51,6 +51,13 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
 
     public function testDeleteRenderTableEntries(): void
     {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything());
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $this->logInAsDocumentationMaintainer($this->client);
 
         $response = (new MockRequest($this->client))
@@ -58,12 +65,6 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
             ->setEndPoint('/admin/docs/deployments')
             ->execute();
         $this->assertStringContainsString('typo3/docs-homepage', $response->getContent());
-
-        $githubClient = $this->createMock(Client::class);
-        $githubClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything());
 
         $response = (new MockRequest($this->client))
             ->setMethod('DELETE')
@@ -73,7 +74,6 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
                     'delete' => '',
                 ],
             ])
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute();
         $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
@@ -88,6 +88,13 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
 
     public function testApproveEntry(): void
     {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything());
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $this->logInAsDocumentationMaintainer($this->client);
 
         $response = (new MockRequest($this->client))
@@ -96,16 +103,9 @@ class DeploymentsControllerTest extends AbstractFunctionalWebTestCase
             ->execute();
         $this->assertStringContainsString('Approve documentation', $response->getContent());
 
-        $githubClient = $this->createMock(Client::class);
-        $githubClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything());
-
         $response = (new MockRequest($this->client))
             ->setMethod('GET')
             ->setEndPoint('/admin/docs/deployments/approve/10')
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute();
         $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
