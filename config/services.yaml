@@ -63,8 +63,6 @@ services:
           User-Agent: 'TYPO3 Intercept'
           Authorization: 'token %env(GITHUB_API_PASSWORD_TOKEN)%'
         base_uri: 'https://api.github.com/'
-    tags:
-      - testDouble
 
   guzzle.client.slack:
     class: GuzzleHttp\Client

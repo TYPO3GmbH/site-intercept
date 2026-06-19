@@ -46,6 +46,10 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
 
     public function testGithubBuildIsNotTriggeredWithNewRepo(): void
     {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient->expects($this->never())->method('request');
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $generalClient = $this->createMock(Client::class);
         $generalClient
             ->expects($this->once())
@@ -56,19 +60,23 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK));
 
-        $githubClient = $this->createMock(Client::class);
-        $githubClient->expects($this->never())->method('request');
-
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
             ->withMock('guzzle.client.general', $generalClient)
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
         $this->assertSame(SymfonyResponse::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 
     public function testGithubBuildIsTriggered(): void
     {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything())
+            ->willReturn(new Response());
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $generalClient = $this->createMock(Client::class);
         $generalClient
             ->expects($this->once())
@@ -87,6 +95,8 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
 
         $this->rebootState();
 
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $jar = $this->documentationJarRepository->findOneBy(['packageName' => 'johndoe/make-good']);
         $this->assertInstanceOf(DocumentationJar::class, $jar);
         $jar->setApproved(true);
@@ -100,23 +110,18 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
 
-        $githubClient = $this->createMock(Client::class);
-        $githubClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything())
-            ->willReturn(new Response());
-
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
             ->withMock('guzzle.client.general', $generalClient)
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
         $this->assertSame(SymfonyResponse::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 
     public function testGithubBuildForMultipleBranchesIsTriggered(): void
     {
+        $githubClient = $this->createMock(Client::class);
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $requestPool = new RequestPool(
             new RequestExpectation(
                 'GET',
@@ -142,6 +147,8 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->assertSame(SymfonyResponse::HTTP_NO_CONTENT, $response->getStatusCode());
 
         $this->rebootState();
+
+        self::getContainer()->set('guzzle.client.github', $githubClient);
 
         $jars = $this->documentationJarRepository->findBy(['packageName' => 'bla/yay']);
         foreach ($jars as $jar) {
@@ -177,28 +184,25 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
                 new Response(SymfonyResponse::HTTP_OK)
             )
         );
-        $githubClient = $this->createMock(Client::class);
-        static::assertRequests($githubClient, $requestPool);
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
             ->withMock('guzzle.client.general', $generalClient)
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php');
         $this->assertSame(SymfonyResponse::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 
     public function testGithubBuildIsNotTriggered(): void
     {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient->expects($this->never())->method('request');
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->never())->method('request')->with('POST', self::anything());
 
-        $githubClient = $this->createMock(Client::class);
-        $githubClient->expects($this->never())->method('request');
-
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooBadRequest.php');
         $this->assertSame(SymfonyResponse::HTTP_PRECONDITION_FAILED, $response->getStatusCode());
     }
@@ -229,6 +233,14 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
      */
     public function testGithubBuildIsTriggeredForPackageThatCanNotRequireItself(): void
     {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything())
+            ->willReturn(new Response());
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK, [], ''));
 
@@ -248,6 +260,8 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
 
         $this->rebootState();
 
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $jar = $this->documentationJarRepository->findOneBy(['packageName' => 'typo3/cms-core']);
         $this->assertInstanceOf(DocumentationJar::class, $jar);
         $jar->setApproved(true);
@@ -261,17 +275,9 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
             ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
 
-        $githubClient = $this->createMock(Client::class);
-        $githubClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', self::anything())
-            ->willReturn(new Response());
-
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
             ->withMock('guzzle.client.general', $generalClient)
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
 
         $this->assertSame(SymfonyResponse::HTTP_NO_CONTENT, $response->getStatusCode());

@@ -73,6 +73,20 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
     public function testUpdateRenderTableWithRedirectEntries(): void
     {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient
+            ->expects($this->once())
+            ->method('request')
+            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
+                'json' => [
+                    'event_type' => 'redirect',
+                    'client_payload' => [
+                        'id' => 'fc9a9c60fe8aff9e85190aebe1c42361c373b8c6',
+                    ],
+                ],
+            ]);
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
         $this->logInAsDocumentationMaintainer($this->client);
 
         $response = (new MockRequest($this->client))
@@ -86,20 +100,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
         $this->rebootState();
 
-        $this->logInAsDocumentationMaintainer($this->client);
+        self::getContainer()->set('guzzle.client.github', $githubClient);
 
-        $githubClient = $this->createMock(Client::class);
-        $githubClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('POST', '/repos/TYPO3-Documentation/t3docs-ci-deploy/dispatches', [
-                'json' => [
-                    'event_type' => 'redirect',
-                    'client_payload' => [
-                        'id' => 'fc9a9c60fe8aff9e85190aebe1c42361c373b8c6',
-                    ],
-                ],
-            ]);
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $response = (new MockRequest($this->client))
             ->setMethod('POST')
@@ -111,7 +114,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
                     'statusCode' => 302,
                 ],
             ])
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute();
         $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
@@ -126,8 +128,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
     public function testNewRenderTableWithRedirectEntries(): void
     {
-        $this->logInAsDocumentationMaintainer($this->client);
-
         $githubClient = $this->createMock(Client::class);
         $githubClient
             ->expects($this->once())
@@ -140,6 +140,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
                     ],
                 ],
             ]);
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $response = (new MockRequest($this->client))
             ->setMethod('POST')
@@ -151,7 +154,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
                     'statusCode' => 303,
                 ],
             ])
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute();
         $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
@@ -165,17 +167,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
 
     public function testDeleteRenderTableWithRedirectEntries(): void
     {
-        $this->logInAsDocumentationMaintainer($this->client);
-
-        $this->client->request('GET', '/redirect/');
-        $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
-        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
-
-        $this->rebootState();
-
-        $this->logInAsDocumentationMaintainer($this->client);
-
         $githubClient = $this->createMock(Client::class);
         $githubClient
             ->expects($this->once())
@@ -188,6 +179,20 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
                     ],
                 ],
             ]);
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
+        $this->logInAsDocumentationMaintainer($this->client);
+
+        $this->client->request('GET', '/redirect/');
+        $content = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('/p/vendor/packageOld/1.0/Foo.html', $content);
+        $this->assertStringContainsString('/p/vendor/packageNew/1.0/Foo.html', $content);
+
+        $this->rebootState();
+
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $response = (new MockRequest($this->client))
             ->setMethod('DELETE')
@@ -197,7 +202,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
                     'delete' => '',
                 ],
             ])
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute();
         $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
 
@@ -261,8 +265,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
     #[DataProvider('validRedirectStringsDataProvider')]
     public function testValidTargetInputTriggersFormSubmit(string $input): void
     {
-        $this->logInAsDocumentationMaintainer($this->client);
-
         $githubClient = $this->createMock(Client::class);
         $githubClient
             ->expects($this->once())
@@ -275,6 +277,9 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
                     ],
                 ],
             ]);
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
+        $this->logInAsDocumentationMaintainer($this->client);
 
         $response = (new MockRequest($this->client))
             ->setMethod('POST')
@@ -286,7 +291,6 @@ class RedirectControllerTest extends AbstractFunctionalWebTestCase
                     'statusCode' => 303,
                 ],
             ])
-            ->withMock('guzzle.client.github', $githubClient)
             ->execute();
         $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         $this->assertStringContainsString('Redirecting to <a href="/redirect/">/redirect/</a>.', $response->getContent());

@@ -32,15 +32,14 @@ class GithubBuildStatusController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly DocumentationJarRepository $documentationJarRepository,
-        private readonly LoggerInterface $logger
+        private readonly RenderDocumentationService $renderDocumentationService,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
     #[Route(path: '/github/rendering-done', name: 'github_rendering_done')]
-    public function index(
-        Request $request,
-        RenderDocumentationService $renderDocumentationService
-    ): Response {
+    public function index(Request $request): Response
+    {
         $this->assertValidSignature($request);
 
         $result = new GithubBuildInfo($request);
@@ -88,7 +87,7 @@ class GithubBuildStatusController extends AbstractController
             }
             // If a re-rendering is registered, trigger docs rendering again and unset flag
             if ($documentationJar->isReRenderNeeded()) {
-                $renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'api');
+                $this->renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'api');
                 $documentationJar->setReRenderNeeded(false);
                 // persist immediately
                 $this->entityManager->flush();

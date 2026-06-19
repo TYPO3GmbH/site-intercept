@@ -45,20 +45,19 @@ class RedirectController extends AbstractController
         private readonly GithubService $githubService,
         private readonly HistoryService $historyService,
         private readonly Security $security,
+        private readonly DocsServerRedirectRepository $redirectRepository,
+        private readonly HistoryEntryRepository $historyEntryRepository,
+        private readonly PaginatorInterface $paginator,
     ) {
     }
 
     #[Route(path: '/', name: 'admin_redirect_index', methods: ['GET'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function index(
-        DocsServerRedirectRepository $redirectRepository,
-        HistoryEntryRepository $historyEntryRepository,
-        Request $request,
-        PaginatorInterface $paginator
-    ): Response {
+    public function index(Request $request): Response
+    {
         $currentConfigurationFile = $this->nginxService->getDynamicConfiguration();
         $staticConfigurationFile = $this->nginxService->getStaticConfiguration();
-        $recentLogsMessages = $historyEntryRepository->findByType(HistoryEntryType::DOCS_REDIRECT);
+        $recentLogsMessages = $this->historyEntryRepository->findByType(HistoryEntryType::DOCS_REDIRECT);
 
         $criteria = Criteria::create();
 
@@ -79,9 +78,9 @@ class RedirectController extends AbstractController
             }
         }
 
-        $redirects = $redirectRepository->matching($criteria);
+        $redirects = $this->redirectRepository->matching($criteria);
 
-        $pagination = $paginator->paginate(
+        $pagination = $this->paginator->paginate(
             $redirects,
             $request->query->getInt('page', 1)
         );
@@ -100,9 +99,8 @@ class RedirectController extends AbstractController
 
     #[Route(path: '/new', name: 'admin_redirect_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function new(
-        Request $request
-    ): Response {
+    public function new(Request $request): Response
+    {
         $redirect = new DocsServerRedirect();
         $form = $this->createForm(DocsServerRedirectType::class, $redirect);
         $form->handleRequest($request);
@@ -127,9 +125,8 @@ class RedirectController extends AbstractController
 
     #[Route(path: '/{id<\d+>}', name: 'admin_redirect_show', methods: ['GET'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function show(
-        DocsServerRedirect $redirect
-    ): Response {
+    public function show(DocsServerRedirect $redirect): Response
+    {
         $deleteRedirectForm = $this->createForm(DeleteRedirectType::class, [], [
             'action' => $this->generateUrl('admin_redirect_delete', ['id' => $redirect->getId()]),
         ]);
@@ -145,10 +142,8 @@ class RedirectController extends AbstractController
 
     #[Route(path: '/{id<\d+>}/edit', name: 'admin_redirect_edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function edit(
-        Request $request,
-        DocsServerRedirect $redirect
-    ): Response {
+    public function edit(Request $request, DocsServerRedirect $redirect): Response
+    {
         $deleteRedirectForm = $this->createForm(DeleteRedirectType::class, [], [
             'action' => $this->generateUrl('admin_redirect_delete', ['id' => $redirect->getId()]),
         ]);
@@ -175,10 +170,8 @@ class RedirectController extends AbstractController
 
     #[Route(path: '/{id<\d+>}', name: 'admin_redirect_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function delete(
-        Request $request,
-        DocsServerRedirect $redirect,
-    ): Response {
+    public function delete(Request $request, DocsServerRedirect $redirect): Response
+    {
         $form = $this->createForm(DeleteRedirectType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

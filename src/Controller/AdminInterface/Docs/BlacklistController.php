@@ -24,24 +24,29 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class BlacklistController extends AbstractController
 {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly DocumentationJarRepository $documentationJarRepository,
+        private readonly RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
+        private readonly PaginatorInterface $paginator,
+    ) {
+    }
+
     #[Route(path: '/admin/docs/deployments/blacklist/{documentationJarId}', name: 'admin_docs_deployments_blacklist_action', requirements: ['documentationJarId' => '\d+'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function blacklist(
-        int $documentationJarId,
-        DocumentationJarRepository $documentationJarRepository,
-        EntityManagerInterface $entityManager
-    ): Response {
-        $originalJar = $documentationJarRepository->find($documentationJarId);
-        $jars = $documentationJarRepository->findBy(['repositoryUrl' => $originalJar->getRepositoryUrl()]);
+    public function blacklist(int $documentationJarId): Response
+    {
+        $originalJar = $this->documentationJarRepository->find($documentationJarId);
+        $jars = $this->documentationJarRepository->findBy(['repositoryUrl' => $originalJar->getRepositoryUrl()]);
 
         $blacklistEntry = new RepositoryBlacklistEntry();
         $blacklistEntry->setRepositoryUrl($originalJar->getRepositoryUrl());
-        $entityManager->persist($blacklistEntry);
+        $this->entityManager->persist($blacklistEntry);
 
         foreach ($jars as $jar) {
-            $entityManager->remove($jar);
+            $this->entityManager->remove($jar);
         }
-        $entityManager->flush();
+        $this->entityManager->flush();
         $this->addFlash('success', 'Repository has been blacklisted.');
 
         return $this->redirectToRoute('admin_docs_deployments');
@@ -49,14 +54,11 @@ class BlacklistController extends AbstractController
 
     #[Route(path: '/admin/docs/deployments/blacklist', name: 'admin_docs_deployments_blacklist_index')]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function blacklistIndex(
-        Request $request,
-        PaginatorInterface $paginator,
-        RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository
-    ): Response {
-        $entries = $repositoryBlacklistEntryRepository->findAll();
+    public function blacklistIndex(Request $request): Response
+    {
+        $entries = $this->repositoryBlacklistEntryRepository->findAll();
 
-        $pagination = $paginator->paginate(
+        $pagination = $this->paginator->paginate(
             $entries,
             $request->query->getInt('page', 1)
         );
@@ -71,16 +73,13 @@ class BlacklistController extends AbstractController
 
     #[Route(path: '/admin/docs/deployments/blacklist/delete/{entryId}', name: 'admin_docs_deployments_blacklist_delete_action', requirements: ['entryId' => '\d+'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function blacklistDelete(
-        int $entryId,
-        RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
-        EntityManagerInterface $entityManager
-    ): Response {
-        $entry = $repositoryBlacklistEntryRepository->find($entryId);
+    public function blacklistDelete(int $entryId): Response
+    {
+        $entry = $this->repositoryBlacklistEntryRepository->find($entryId);
 
         if (null !== $entry) {
-            $entityManager->remove($entry);
-            $entityManager->flush();
+            $this->entityManager->remove($entry);
+            $this->entityManager->flush();
             $this->addFlash('success', 'Blacklist entry deleted.');
         }
 

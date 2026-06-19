@@ -25,11 +25,16 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class GithubRstIssueController extends AbstractController
 {
+    public function __construct(
+        private readonly GithubService $githubService,
+    ) {
+    }
+
     /**
      * Called by GitHub post merge, this checks the incoming merge for rst file changes and posts them on a GitHub repository as issues.
      */
     #[Route(path: '/create-rst-issue', name: 'docs_github_rst_issue_create', methods: ['POST'])]
-    public function index(Request $request, GithubService $githubService, string $githubChangelogToLogRepository): Response
+    public function index(Request $request, string $githubChangelogToLogRepository): Response
     {
         try {
             $pushEventInformation = new GithubPushEventForCore(json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR));
@@ -37,7 +42,7 @@ class GithubRstIssueController extends AbstractController
                 // We do not care about backport changes
                 throw new DoNotCareException();
             }
-            $githubService->handleGithubIssuesForRstFiles($pushEventInformation, $githubChangelogToLogRepository);
+            $this->githubService->handleGithubIssuesForRstFiles($pushEventInformation, $githubChangelogToLogRepository);
         } catch (DoNotCareException) {
             // Hook payload could not be identified as hook that should trigger git split
         } catch (\JsonException) {
