@@ -61,7 +61,7 @@ class DeploymentsController extends AbstractController
     #[Route(path: '/admin/docs/deployments', name: 'admin_docs_deployments')]
     public function index(Request $request): Response
     {
-        $recentLogsMessages = $this->historyEntryRepository->findByType('docsRendering', 30);
+        $recentLogsMessages = $this->historyEntryRepository->findByType(HistoryEntryType::DOCS_RENDERING, 30);
         $criteria = Criteria::create();
 
         $requestSortDirection = $request->query->get('direction');
@@ -188,7 +188,7 @@ class DeploymentsController extends AbstractController
             $jar->setApproved(true);
             $this->entityManager->persist($jar);
             $this->entityManager->flush();
-            $this->renderDocumentationService->renderDocumentationByDocumentationJar($jar, 'interface');
+            $this->renderDocumentationService->renderDocumentationByDocumentationJar($jar, HistoryEntryTrigger::WEB);
         }
 
         $this->addFlash('success', 'Repository has been approved.');
@@ -213,7 +213,7 @@ class DeploymentsController extends AbstractController
         $documentationJar = $this->documentationJarRepository->find($documentationJarId) ?? throw $this->createNotFoundException('Cannot find documentation with id ' . $documentationJarId);
 
         try {
-            $this->renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'interface');
+            $this->renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, HistoryEntryTrigger::WEB);
             $this->addFlash('success', 'A re-rendering was triggered.');
 
             return $this->redirectToRoute('admin_docs_deployments');

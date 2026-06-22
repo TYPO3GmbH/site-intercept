@@ -15,6 +15,7 @@ use App\Dto\HistoryEntryDto;
 use App\Entity\DocumentationJar;
 use App\Enum\DocsRenderingHistoryStatus;
 use App\Enum\DocumentationStatus;
+use App\Enum\HistoryEntryTrigger;
 use App\Enum\HistoryEntryType;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DuplicateDocumentationRepositoryException;
@@ -38,7 +39,7 @@ class RenderDocumentationService
      * @throws DocsPackageDoNotCareBranch
      * @throws DuplicateDocumentationRepositoryException
      */
-    public function renderDocumentationByDocumentationJar(DocumentationJar $documentationJar, string $scope): DeploymentInformation
+    public function renderDocumentationByDocumentationJar(DocumentationJar $documentationJar, HistoryEntryTrigger $scope): DeploymentInformation
     {
         $buildInformation = $this->documentationBuildInformationService->generateBuildInformationFromDocumentationJar($documentationJar);
         $documentationJar = $this->documentationBuildInformationService->registerDocumentationRendering($buildInformation);

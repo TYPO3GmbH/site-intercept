@@ -11,12 +11,15 @@ declare(strict_types=1);
 
 namespace App\Dto;
 
+use App\Enum\HistoryEntryTrigger;
+use App\Enum\HistoryEntryType;
+
 final readonly class HistoryEntryDto
 {
     public function __construct(
-        public string $type,
+        public HistoryEntryType $type,
         public string $status,
-        public string $triggeredBy,
+        public HistoryEntryTrigger $triggeredBy,
         public ?string $groupEntry = null,
         public array $data = [],
     ) {
