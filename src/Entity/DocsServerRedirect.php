@@ -14,6 +14,7 @@ namespace App\Entity;
 use App\Exception\InvalidStatusException;
 use App\Repository\DocsServerRedirectRepository;
 use App\Validator\Constraints as AppAssert;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -38,29 +39,29 @@ class DocsServerRedirect
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: Types::INTEGER)]
     private int $id;
 
-    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(type: 'string', length: 2000)]
+    #[ORM\Column(type: Types::STRING, length: 2000)]
     #[AppAssert\InvalidCharacter]
     #[Assert\Regex(pattern: '@^/(([pcmh]{1}|other)/([^/]*)/([^/]*)/([^/]*)/(.*)|typo3cms/extensions/([^/]*)/([^/]*)/)$@m', message: "The path doesn't match the required format")]
     private string $source = '';
 
-    #[ORM\Column(type: 'string', length: 2000)]
+    #[ORM\Column(type: Types::STRING, length: 2000)]
     #[AppAssert\InvalidCharacter]
     #[Assert\Regex(pattern: '@^/([pcmh]{1}|other)/([^/]*)/([^/]*)/([^/]*)/(.*)$@m', message: "The path doesn't match the required format")]
     private string $target = '';
 
-    #[ORM\Column(name: 'is_legacy', type: 'boolean')]
+    #[ORM\Column(name: 'is_legacy', type: Types::BOOLEAN)]
     private bool $isLegacy = false;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: Types::INTEGER)]
     private int $statusCode = self::STATUS_CODE_303;
 
     /**
