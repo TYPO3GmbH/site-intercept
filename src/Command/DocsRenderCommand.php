@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\DocumentationJar;
+use App\Enum\HistoryEntryTrigger;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Repository\DocumentationJarRepository;
@@ -110,6 +111,6 @@ class DocsRenderCommand extends Command
      */
     protected function renderDocumentation(DocumentationJar $documentationJar): void
     {
-        $this->renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'CLI');
+        $this->renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, HistoryEntryTrigger::CLI);
     }
 }

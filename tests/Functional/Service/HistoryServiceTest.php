@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Service;
 
 use App\Dto\HistoryEntryDto;
+use App\Enum\HistoryEntryTrigger;
+use App\Enum\HistoryEntryType;
 use App\Service\HistoryService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -36,9 +38,9 @@ final class HistoryServiceTest extends KernelTestCase
     public static function writeHistoryDataProvider(): \Generator
     {
         yield [
-            'type' => 'history_type',
+            'type' => HistoryEntryType::DOCS_RENDERING,
             'status' => 'history_status',
-            'triggeredBy' => 'API',
+            'triggeredBy' => HistoryEntryTrigger::API,
             'groupEntry' => null,
             'data' => [
                 'foo' => 'bar',
@@ -46,9 +48,9 @@ final class HistoryServiceTest extends KernelTestCase
                 'answer' => 42,
             ],
             'expectedData' => [
-                'type' => 'history_type',
+                'type' => HistoryEntryType::DOCS_RENDERING,
                 'status' => 'history_status',
-                'triggeredBy' => 'API',
+                'triggeredBy' => HistoryEntryTrigger::API,
                 'foo' => 'bar',
                 'baz' => 'bencer',
                 'answer' => 42,
@@ -56,12 +58,12 @@ final class HistoryServiceTest extends KernelTestCase
         ];
 
         yield [
-            'type' => 'history_type',
+            'type' => HistoryEntryType::DOCS_RENDERING,
             'status' => 'history_status',
-            'triggeredBy' => 'API',
+            'triggeredBy' => HistoryEntryTrigger::API,
             'groupEntry' => 'Grouped entry',
             'data' => [
-                'type' => 'ignored_type',
+                'type' => HistoryEntryType::DOCS_REDIRECT,
                 'status' => 'ignored_status',
                 'triggeredBy' => 'ignored_trigger',
                 'foo' => 'bar',
@@ -69,9 +71,9 @@ final class HistoryServiceTest extends KernelTestCase
                 'answer' => 42,
             ],
             'expectedData' => [
-                'type' => 'history_type',
+                'type' => HistoryEntryType::DOCS_RENDERING,
                 'status' => 'history_status',
-                'triggeredBy' => 'API',
+                'triggeredBy' => HistoryEntryTrigger::API,
                 'foo' => 'bar',
                 'baz' => 'bencer',
                 'answer' => 42,
@@ -81,7 +83,7 @@ final class HistoryServiceTest extends KernelTestCase
 
     #[DataProvider('writeHistoryDataProvider')]
     #[Test]
-    public function writeHistory(string $type, string $status, string $triggeredBy, ?string $groupEntry, array $data, array $expectedData): void
+    public function writeHistory(HistoryEntryType $type, string $status, HistoryEntryTrigger $triggeredBy, ?string $groupEntry, array $data, array $expectedData): void
     {
         $historyEntry = $this->historyService->writeHistory(new HistoryEntryDto(
             type: $type,

@@ -13,6 +13,7 @@ namespace App\Controller;
 
 use App\Entity\DocumentationJar;
 use App\Enum\DocumentationStatus;
+use App\Enum\HistoryEntryTrigger;
 use App\Extractor\GithubBuildInfo;
 use App\Repository\DocumentationJarRepository;
 use App\Service\RenderDocumentationService;
@@ -87,7 +88,7 @@ class GithubBuildStatusController extends AbstractController
             }
             // If a re-rendering is registered, trigger docs rendering again and unset flag
             if ($documentationJar->isReRenderNeeded()) {
-                $this->renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, 'api');
+                $this->renderDocumentationService->renderDocumentationByDocumentationJar($documentationJar, HistoryEntryTrigger::API);
                 $documentationJar->setReRenderNeeded(false);
                 // persist immediately
                 $this->entityManager->flush();

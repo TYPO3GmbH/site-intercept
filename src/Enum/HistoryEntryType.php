@@ -11,10 +11,10 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-class HistoryEntryType
+enum HistoryEntryType: string
 {
-    final public const DOCS_RENDERING = 'docsRendering';
-    final public const DOCS_REDIRECT = 'docsRedirect';
-    final public const PATCH = 'patch';
-    final public const TAG = 'tag';
+    case DOCS_RENDERING = 'docsRendering';
+    case DOCS_REDIRECT = 'docsRedirect';
+    case PATCH = 'patch';
+    case TAG = 'tag';
 }

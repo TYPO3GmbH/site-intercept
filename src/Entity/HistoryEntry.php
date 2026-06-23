@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\HistoryEntryType;
 use App\Repository\HistoryEntryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,8 +25,8 @@ class HistoryEntry
     #[ORM\Column(type: Types::INTEGER)]
     private int $id;
 
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $type;
+    #[ORM\Column(type: Types::ENUM)]
+    private HistoryEntryType $type;
 
     #[ORM\Column(type: Types::STRING, length: 255)]
     private string $status;
@@ -47,12 +48,12 @@ class HistoryEntry
         return $this->id;
     }
 
-    public function getType(): ?string
+    public function getType(): ?HistoryEntryType
     {
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(HistoryEntryType $type): self
     {
         $this->type = $type;
 

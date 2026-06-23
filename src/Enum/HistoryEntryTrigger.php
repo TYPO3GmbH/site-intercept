@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-class HistoryEntryTrigger
+enum HistoryEntryTrigger: string
 {
-    final public const API = 'api';
-    final public const CLI = 'cli';
-    final public const WEB = 'interface';
+    case API = 'api';
+    case CLI = 'cli';
+    case WEB = 'interface';
 }
