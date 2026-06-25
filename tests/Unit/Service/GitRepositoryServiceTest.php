@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Service\GitRepositoryService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class GitRepositoryServiceTest extends TestCase
@@ -23,7 +24,7 @@ class GitRepositoryServiceTest extends TestCase
         $this->subject = new GitRepositoryService();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('payloadDataProvider')]
+    #[DataProvider('payloadDataProvider')]
     public function testComposerJsonUrlIsResolvedByPayload(string $expectedUrl, \stdClass $payload, string $repoService): void
     {
         $composerJsonUrl = $this->subject->resolvePublicComposerJsonUrlByPayload($payload, $repoService);
@@ -160,7 +161,7 @@ class GitRepositoryServiceTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('filterAllowedBranchesDataProvider')]
+    #[DataProvider('filterAllowedBranchesDataProvider')]
     public function testFilterAllowedBranchesReturnsOnlyValidBranchNames(array $values, array $expected): void
     {
         $data = $this->subject->filterAllowedBranches($values);

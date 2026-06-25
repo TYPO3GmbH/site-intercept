@@ -13,6 +13,7 @@ namespace App\Tests\Unit\Extractor;
 
 use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Extractor\ComposerJson;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ComposerJsonTest extends TestCase
@@ -40,7 +41,7 @@ class ComposerJsonTest extends TestCase
         yield [null];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('emptyNameDataProvider')]
+    #[DataProvider('emptyNameDataProvider')]
     public function testEmptyNameThrowsException(mixed $value): void
     {
         $this->expectException(DocsComposerMissingValueException::class);
@@ -56,7 +57,7 @@ class ComposerJsonTest extends TestCase
         $this->assertSame('typo3-cms-extension', $composerJson->getType());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('otherTypeDataProvider')]
+    #[DataProvider('otherTypeDataProvider')]
     public function testTypeIsReturnedAsExpectedIfShouldBeOther($value): void
     {
         $composerJson = new ComposerJson(['name' => $value, 'type' => 'package']);
@@ -142,7 +143,7 @@ class ComposerJsonTest extends TestCase
         yield ['^10.0', '10.4', '10.4'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('cmsCoreConstraintProvider')]
+    #[DataProvider('cmsCoreConstraintProvider')]
     public function testCoreConstraints(string $versionString, string $expectedMin, string $expectedMax): void
     {
         $composerJson = new ComposerJson($this->dummyComposerJsonArray($versionString));

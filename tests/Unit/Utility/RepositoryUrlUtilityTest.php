@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Utility;
 
 use App\Utility\RepositoryUrlUtility;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class RepositoryUrlUtilityTest extends TestCase
@@ -23,7 +24,7 @@ class RepositoryUrlUtilityTest extends TestCase
         yield ['git@github.com:TYPO3GmbH/elts-8.7-release.git', 'TYPO3GmbH/elts-8.7-release'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('extractRepositoryNameFromCloneUrlDataProvider')]
+    #[DataProvider('extractRepositoryNameFromCloneUrlDataProvider')]
     public function testExtractRepositoryNameFromCloneUrlReturnsName(string $url, string $expectedName): void
     {
         $this->assertSame($expectedName, RepositoryUrlUtility::extractRepositoryNameFromCloneUrl($url));

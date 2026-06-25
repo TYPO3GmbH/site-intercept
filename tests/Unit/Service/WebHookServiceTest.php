@@ -14,6 +14,7 @@ namespace App\Tests\Unit\Service;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
 use App\Service\WebHookService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -58,7 +59,7 @@ class WebHookServiceTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('createPushEventDataProvider')]
+    #[DataProvider('createPushEventDataProvider')]
     public function dataCreatePushEventReturnsValidPushEventObject(Request $request, PushEvent $pushEvent): void
     {
         $createdPushEvent = $this->subject->createPushEvent($request);
@@ -92,7 +93,7 @@ class WebHookServiceTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('createPushEventsDataProvider')]
+    #[DataProvider('createPushEventsDataProvider')]
     public function testCreatePushEventsReturnsValidPushEventObject(Request $request, array $pushEvents): void
     {
         $createdPushEvent = $this->subject->createPushEvent($request);
@@ -118,7 +119,7 @@ class WebHookServiceTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('createPushEventsWithDocFiles')]
+    #[DataProvider('createPushEventsWithDocFiles')]
     public function testDoesNotTriggersExceptionWhenDocFileWasTouched(Request $request): void
     {
         $this->subject->createPushEvent($request);
