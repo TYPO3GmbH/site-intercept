@@ -14,6 +14,7 @@ namespace App\Tests\Unit\Extractor;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Extractor\DeploymentInformation;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
@@ -105,7 +106,7 @@ class DeploymentInformationTest extends TestCase
         yield ['foobar/baz_42', 'foobar', 'baz_42'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('validPackageNameDataProvider')]
+    #[DataProvider('validPackageNameDataProvider')]
     public function testPackageNamePartsAreCorrectlyResolved(string $packageName, string $expectedVendor, string $expectedName): void
     {
         $composerJsonAsArray = [
@@ -142,7 +143,7 @@ class DeploymentInformationTest extends TestCase
         yield ['lolli/../enetcache', 1553082490];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidPackageNameDataProvider')]
+    #[DataProvider('invalidPackageNameDataProvider')]
     public function testInvalidPackageNameThrowException(?string $packageName, int $expectedExceptionCode): void
     {
         $this->expectException(ComposerJsonInvalidException::class);
@@ -178,7 +179,7 @@ class DeploymentInformationTest extends TestCase
         yield 'typo3 fluid' => ['', 'typo3fluid/fluid', 'other', 'other'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('packageTypeDataProvider')]
+    #[DataProvider('packageTypeDataProvider')]
     public function testPackageTypePartsAreCorrectlyResolved(string $type, string $packageName, string $expectedLong, string $expectedShort): void
     {
         $composerJsonAsArray = [
@@ -385,7 +386,7 @@ class DeploymentInformationTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('validBranchNameDataProvider')]
+    #[DataProvider('validBranchNameDataProvider')]
     public function testBranchNamesAreNormalized(string $type, string $branch, string $expectedBranch): void
     {
         $composerJsonAsArray = [
@@ -448,7 +449,7 @@ class DeploymentInformationTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidBranchNameDataProvider')]
+    #[DataProvider('invalidBranchNameDataProvider')]
     public function testInvalidBranchNamesThrowException(string $type, string $branch, int $exceptionCode): void
     {
         $this->expectException(DocsPackageDoNotCareBranch::class);
