@@ -25,7 +25,7 @@ class HistoryEntry
     #[ORM\Column(type: Types::INTEGER)]
     private int $id;
 
-    #[ORM\Column(type: Types::ENUM)]
+    #[ORM\Column(type: Types::STRING, enumType: HistoryEntryType::class)]
     private HistoryEntryType $type;
 
     #[ORM\Column(type: Types::STRING, length: 255)]
