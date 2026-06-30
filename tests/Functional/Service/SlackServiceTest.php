@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Service;
 
 use App\Entity\DocumentationJar;
-use App\Service\DocsService;
 use App\Service\SlackService;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
@@ -30,7 +29,7 @@ class SlackServiceTest extends KernelTestCase
             ->method('request')
             ->with(
                 'POST',
-                'https://hooks.slack.com/test',
+                'http://localhost/slack',
                 self::callback(static function (array $options) use (&$capturedPayload): bool {
                     $capturedPayload = $options['json'] ?? null;
 
@@ -39,6 +38,8 @@ class SlackServiceTest extends KernelTestCase
             )
             ->willReturn(new Response());
 
+        self::getContainer()->set('guzzle.client.slack', $mockClient);
+
         $jar = new DocumentationJar();
         $jar->setVendor('acme');
         $jar->setName('my-extension');
@@ -46,11 +47,7 @@ class SlackServiceTest extends KernelTestCase
         $jar->setTypeShort('p');
         $jar->setTargetBranchDirectory('main');
 
-        $service = new SlackService(
-            $mockClient,
-            self::getContainer()->get(DocsService::class),
-            'https://hooks.slack.com/test'
-        );
+        $service = self::getContainer()->get(SlackService::class);
         $service->sendRepositoryDiscoveryMessage($jar);
 
         self::assertNotNull($capturedPayload, 'Slack message payload was not captured');
@@ -65,11 +62,11 @@ class SlackServiceTest extends KernelTestCase
         self::assertStringContainsString('awaiting approval', strtolower($attachment['title']));
 
         // Title link must point to deployments admin
-        self::assertSame('https://intercept.typo3.com/admin/docs/deployments', $attachment['title_link']);
+        self::assertSame('https://localhost/admin/docs/deployments', $attachment['title_link']);
 
         // Fallback must mention package and deployments URL
         self::assertStringContainsString('acme/my-extension', $attachment['fallback']);
-        self::assertStringContainsString('intercept.typo3.com/admin/docs/deployments', $attachment['fallback']);
+        self::assertStringContainsString('localhost/admin/docs/deployments', $attachment['fallback']);
 
         // Text must mention the package
         self::assertStringContainsString('acme/my-extension', $attachment['text']);
@@ -82,7 +79,7 @@ class SlackServiceTest extends KernelTestCase
         self::assertStringContainsString('localhost/docs/p/acme/my-extension/main/en-us', $attachment['text']);
 
         // Must link to deployments admin for maintainers
-        self::assertStringContainsString('intercept.typo3.com/admin/docs/deployments', $attachment['text']);
+        self::assertStringContainsString('localhost/admin/docs/deployments', $attachment['text']);
 
         // Must link to webhook docs for extension authors
         self::assertStringContainsString('localhost/docs/permalink/h2document:webhook', $attachment['text']);

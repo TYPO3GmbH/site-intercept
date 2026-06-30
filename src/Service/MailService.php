@@ -11,16 +11,19 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Entity\DocumentationQuarantine;
 use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Extractor\ComposerJson;
 use App\Extractor\PushEvent;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 readonly class MailService
 {
     public function __construct(
+        private RouterInterface $router,
         private MailerInterface $mailer,
         private Environment $twig,
     ) {
@@ -50,6 +53,22 @@ readonly class MailService
             // Thrown if author is not set, we can't send a mail, then.
             return;
         }
+
+        $this->mailer->send($email);
+    }
+
+    public function sendDomainQuarantinedEmailToAdmins(DocumentationQuarantine $documentationQuarantine): void
+    {
+        $urlToInterface = $this->router->generate('admin_docs_quarantine_index', [], RouterInterface::ABSOLUTE_URL);
+
+        $email = $this->createMessageWithTemplate(
+            'email/docs/documentationQuarantined.html.twig',
+            [
+                'documentationQuarantine' => $documentationQuarantine,
+                'urlToInterface' => $urlToInterface,
+            ]
+        )->from('intercept@typo3.com')
+        ->to('admin@typo3.com');
 
         $this->mailer->send($email);
     }

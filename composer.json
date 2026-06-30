@@ -59,9 +59,7 @@
         "symfony/validator": "^6.4.22",
         "symfony/webpack-encore-bundle": "^2.2",
         "symfony/yaml": "^6.4.21",
-        "t3g/datahub-api-library": "^3.5.3",
-        "t3g/symfony-datahub-bundle": "^3.0.1",
-        "t3g/symfony-keycloak-bundle": "^3.0.4",
+        "t3g/symfony-keycloak-bundle": "^3.1",
         "t3g/symfony-template-bundle": "^6.1",
         "t3g/symfony-usercentrics-bundle": "^2.0.0",
         "twig/twig": "^3.21.1"

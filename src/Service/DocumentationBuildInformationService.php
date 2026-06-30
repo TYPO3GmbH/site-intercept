@@ -12,21 +12,28 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\DocumentationJar;
+use App\Entity\DocumentationQuarantine;
 use App\Enum\DocumentationStatus;
 use App\Exception\Composer\DocsComposerDependencyException;
 use App\Exception\Composer\DocsComposerMissingValueException;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\ComposerJsonNotFoundException;
+use App\Exception\DisallowedComposerJsonUrlException;
 use App\Exception\DocsPackageDoNotCareBranch as DocsPackageDoNotCareBranchAlias;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\DuplicateDocumentationRepositoryException;
+use App\Exception\InvalidComposerJsonUrlException;
+use App\Exception\UnknownComposerJsonUrlException;
 use App\Extractor\ComposerJson;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
 use App\Repository\DocumentationJarRepository;
+use App\Repository\KnownRepositoryDomainRepository;
+use App\Utility\RepositoryUrlUtility;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Uri;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -39,11 +46,23 @@ readonly class DocumentationBuildInformationService
         private string $privateDir,
         private string $subDir,
         private DocumentationJarRepository $documentationJarRepository,
+        private KnownRepositoryDomainRepository $knownRepositoryDomainsRepository,
         private EntityManagerInterface $entityManager,
         private Filesystem $fileSystem,
         private ClientInterface $generalClient,
-        private SlackService $slackService
+        private SlackService $slackService,
+        private MailService $mailService,
     ) {
+    }
+
+    public function updateLastHit(string $domain): void
+    {
+        $knownRepositoryDomain = $this->knownRepositoryDomainsRepository->findOneBy(['domain' => $domain]);
+        if (null !== $knownRepositoryDomain) {
+            $knownRepositoryDomain->setLastHit(new \DateTime());
+            $this->entityManager->persist($knownRepositoryDomain);
+            $this->entityManager->flush();
+        }
     }
 
     /**
@@ -54,6 +73,8 @@ readonly class DocumentationBuildInformationService
      */
     public function fetchRemoteComposerJson(string $path): array
     {
+        $this->assertUrlToComposerFileIsSafe($path);
+
         try {
             $response = $this->generalClient->request('GET', $path);
         } catch (GuzzleException $e) {
@@ -276,6 +297,33 @@ readonly class DocumentationBuildInformationService
     {
         if (null === $composerJson->getCoreRequirement() && (str_contains($composerJson->getType(), 'typo3-cms') && 'typo3/cms-core' !== $composerJson->getName())) {
             throw new DocsComposerDependencyException('Dependency typo3/cms-core is missing', 1557310527);
+        }
+    }
+
+    public function notifyAboutUnknownRepositoryDomain(DocumentationQuarantine $documentationQuarantine): void
+    {
+        $this->mailService->sendDomainQuarantinedEmailToAdmins($documentationQuarantine);
+    }
+
+    private function assertUrlToComposerFileIsSafe(string $url): void
+    {
+        $uri = new Uri($url);
+
+        if (!in_array($uri->getScheme(), ['http', 'https'], true)) {
+            throw new InvalidComposerJsonUrlException('URL to composer.json contains disallowed scheme', 1781613532, null, $url);
+        }
+
+        $normalizedHost = RepositoryUrlUtility::getNormalizedDomain($uri);
+        $allowedRepositoryDomain = $this->knownRepositoryDomainsRepository->findOneBy([
+            'domain' => $normalizedHost,
+        ]);
+
+        if (null === $allowedRepositoryDomain) {
+            throw new UnknownComposerJsonUrlException(sprintf('Fetching the composer.json file from domain "%s" is not allowed.', $normalizedHost), 1782290340, null, $url, $normalizedHost);
+        }
+
+        if (!$allowedRepositoryDomain->isAllowed()) {
+            throw new DisallowedComposerJsonUrlException(sprintf('Fetching the composer.json file from domain "%s" is not allowed.', $normalizedHost), 1782290351, null, $url, $normalizedHost);
         }
     }
 }

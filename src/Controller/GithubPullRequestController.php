@@ -30,28 +30,31 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class GithubPullRequestController extends AbstractController
 {
+    public function __construct(
+        private readonly GithubService $githubService,
+        private readonly ForgeService $forgeService,
+        private readonly LocalCoreGitService $gitService,
+    ) {
+    }
+
     /**
      * Called by GitHub for new pull requests on.
      */
     #[Route(path: '/githubpr', name: 'core_git_pr')]
-    public function index(
-        Request $request,
-        GithubService $githubService,
-        ForgeService $forgeService,
-        LocalCoreGitService $gitService
-    ): Response {
+    public function index(Request $request): Response
+    {
         try {
             $pullRequest = new GithubCorePullRequest($request->getContent());
-            $issueDetails = $githubService->getIssueDetails($pullRequest);
-            $userDetails = $githubService->getUserDetails($pullRequest);
-            $forgeIssue = $forgeService->createIssue($issueDetails);
+            $issueDetails = $this->githubService->getIssueDetails($pullRequest);
+            $userDetails = $this->githubService->getUserDetails($pullRequest);
+            $forgeIssue = $this->forgeService->createIssue($issueDetails);
             $gerritCommitMessage = new GerritCommitMessage($issueDetails, $forgeIssue);
-            $localDiffFile = $githubService->getLocalDiff($pullRequest);
-            $gitService->commitPatchAsUser($localDiffFile, $pullRequest, $userDetails, $gerritCommitMessage);
-            $gitPushOutput = $gitService->pushToGerrit($pullRequest);
+            $localDiffFile = $this->githubService->getLocalDiff($pullRequest);
+            $this->gitService->commitPatchAsUser($localDiffFile, $pullRequest, $userDetails, $gerritCommitMessage);
+            $gitPushOutput = $this->gitService->pushToGerrit($pullRequest);
             $closeComment = new GithubPullRequestCloseComment($gitPushOutput);
-            $githubService->closePullRequest($pullRequest, $closeComment);
-            $githubService->removeLocalDiff($pullRequest);
+            $this->githubService->closePullRequest($pullRequest, $closeComment);
+            $this->githubService->removeLocalDiff($pullRequest);
         } catch (DoNotCareException) {
             // Hook payload could not be identified as hook that
             // should trigger a transfer of this PR

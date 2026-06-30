@@ -31,9 +31,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ConfigurationController extends AbstractController
 {
+    public function __construct(
+        private readonly RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
+        private readonly DocumentationBuildInformationService $docBuildInfoService,
+        private readonly DocumentationService $docService,
+    ) {
+    }
+
     #[Route(path: '/admin/docs/deployments/add', name: 'admin_docs_deployments_add')]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function addConfiguration(Request $request, RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository): Response
+    public function addConfiguration(Request $request): Response
     {
         $documentationJar = new DocumentationJar();
         $repositoryUrl = $request->get('documentation_deployment')['repositoryUrl'] ?? '';
@@ -46,7 +53,7 @@ class ConfigurationController extends AbstractController
             if (1 !== preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, (string) $repositoryUrl)) {
                 $error = new FormError('A repository url must be a valid https git url. Staring with \'https://\' and ending with \'.git\'.');
                 $form->addError($error);
-            } elseif ($repositoryBlacklistEntryRepository->isBlacklisted($repositoryUrl)) {
+            } elseif ($this->repositoryBlacklistEntryRepository->isBlacklisted($repositoryUrl)) {
                 $error = new FormError('This repository has been blacklisted and cannot be added.');
                 $form->addError($error);
             } else {
@@ -98,11 +105,8 @@ class ConfigurationController extends AbstractController
      */
     #[Route(path: '/admin/docs/deployments/add/step3', name: 'admin_docs_deployments_add_step3')]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
-    public function addConfigurationStep3(
-        Request $request,
-        DocumentationBuildInformationService $docBuildInfoService,
-        DocumentationService $docService
-    ): Response {
+    public function addConfigurationStep3(Request $request): Response
+    {
         $deploymentParams = $request->get('documentation_deployment');
         $repositoryUrl = $deploymentParams['repositoryUrl'];
         $branch = $deploymentParams['branch'] ?? '';
@@ -115,12 +119,12 @@ class ConfigurationController extends AbstractController
 
         $deploymentInformation = null;
         try {
-            $docService->enrichWithComposerInformation($doc, $branch);
+            $this->docService->enrichWithComposerInformation($doc, $branch);
             // pre-fill form composer json url
             $deploymentParams['publicComposerJsonUrl'] = $doc->getPublicComposerJsonUrl();
             $request->request->set('documentation_deployment', $deploymentParams);
-            $docService->assertUrlIsUnique($repositoryUrl, $doc->getPackageName());
-            $deploymentInformation = $docBuildInfoService->generateBuildInformationFromDocumentationJar($doc);
+            $this->docService->assertUrlIsUnique($repositoryUrl, $doc->getPackageName());
+            $deploymentInformation = $this->docBuildInfoService->generateBuildInformationFromDocumentationJar($doc);
         } catch (ComposerJsonNotFoundException|ComposerJsonInvalidException|DocsComposerDependencyException|DocsPackageDoNotCareBranch|DocsPackageRegisteredWithDifferentRepositoryException $e) {
             $this->addFlash('danger', $e->getMessage());
         }
@@ -128,7 +132,7 @@ class ConfigurationController extends AbstractController
         $form = $this->createForm(DocumentationDeployment::class, $doc, ['step3' => true]);
         $form->handleRequest($request);
         if (null !== $deploymentInformation && $form->isValid()) {
-            $docService->addNewDocumentationBuild($doc, $deploymentInformation);
+            $this->docService->addNewDocumentationBuild($doc, $deploymentInformation);
             $this->addFlash('success', 'Configuration added');
 
             return $this->redirectToRoute('admin_docs_deployments');

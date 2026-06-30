@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Utility;
 
 use App\Service\GitRepositoryService;
+use GuzzleHttp\Psr7\Uri;
 
 class RepositoryUrlUtility
 {
@@ -34,6 +35,15 @@ class RepositoryUrlUtility
         }
 
         throw new \InvalidArgumentException(sprintf('Cannot extract repository from clone URL %s', $url), 1632320303);
+    }
+
+    public static function getNormalizedDomain(string|Uri $url): string
+    {
+        $uri = is_string($url) ? new Uri($url) : $url;
+        $normalizedHost = $uri->getHost();
+        $normalizedHost = preg_replace('/^www\./', '', $normalizedHost);
+
+        return $normalizedHost;
     }
 
     private static function extractComposerJsonUrlFromRepositoryUrl(string $repositoryUrl, string $branch): string

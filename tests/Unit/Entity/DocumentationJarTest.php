@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\DocumentationJar;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DocumentationJarTest extends TestCase
@@ -25,7 +26,7 @@ class DocumentationJarTest extends TestCase
         yield ['https://gitlab.com/vendor/package.git', 1];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('repositoryUrlDataProvider')]
+    #[DataProvider('repositoryUrlDataProvider')]
     public function testRepositoryUrlRegex(string $url, int $expected): void
     {
         $result = preg_match(DocumentationJar::VALID_REPOSITORY_URL_REGEX, $url);

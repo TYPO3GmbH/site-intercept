@@ -19,9 +19,9 @@
                 <div class="card-body">
                     <p>
                         {% if app.user %}
-                            Welcome {{ app.user.username }}, you are logged in to Intercept.
+                            Welcome {{ app.user.fullName }}, you are logged in to Intercept.
                         {% else %}
-                            You can login to Intercept with your <a href="https://typo3.org" target="_blank" rel="noopener">typo3.org</a> account.
+                            You can log in to Intercept with your <a href="https://typo3.org" target="_blank" rel="noopener">typo3.org</a> account.
                         {% endif %}
                         This enables various interfaces to trigger intercept jobs. Members
                         of the documentation team have additional access right to manage the documentation
@@ -32,7 +32,7 @@
                     {% if app.user %}
                         {{
                             macros.linkbutton(
-                                path('logout'),
+                                path('t3g_keycloak_logout'),
                                 'Sign out',
                                 'primary',
                                 'actions-logout'

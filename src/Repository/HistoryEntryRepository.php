@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\HistoryEntry;
+use App\Enum\HistoryEntryType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -30,7 +31,7 @@ class HistoryEntryRepository extends ServiceEntityRepository
         parent::__construct($registry, HistoryEntry::class);
     }
 
-    public function findByType(string $type, int $limit = 10): array
+    public function findByType(HistoryEntryType $type, int $limit = 10): array
     {
         return $this->createQueryBuilder('h')
             ->andWhere('h.type = :val')

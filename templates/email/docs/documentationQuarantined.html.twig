@@ -1,0 +1,30 @@
+{% extends '@Template/email.html.twig' %}
+
+{% block email_subject %}Documentation rendering from unknown domain requested{% endblock %}
+
+{% block email_html_preview %}
+    A new documentation rendering request from {{ documentationQuarantine.domain }} awaits approval.
+{% endblock %}
+
+{% block email_html_body %}
+    <p>Hi!</p>
+    <p>A new documentation rendering request from {{ documentationQuarantine.domain }} <a href="{{ urlToInterface }}" target="_blank" rel="noreferrer">awaits approval</a>.</p>
+    <ul>
+        <li>Once approved, all pending rendering requests from {{ documentationQuarantine.domain }} will be triggered and need additional approval by the Documentation Team</li>
+        <li>Any subsequent rendering request from {{ documentationQuarantine.domain }} will be allowed</li>
+    </ul>
+
+    <p><small>This is an automated email. Please do not reply to this message.</small></p>
+{% endblock %}
+
+{% block email_plaintext %}
+    Hi!
+
+    A new documentation rendering request from {{ documentationQuarantine.domain }} awaits approval.
+    <{{ urlToInterface }}>
+
+    * Once approved, all pending rendering requests from {{ documentationQuarantine.domain }} will be triggered and need additional approval by the Documentation Team
+    * Any subsequent rendering request from {{ documentationQuarantine.domain }} will be allowed
+
+    This is an automated email. Please do not reply to this message.
+{% endblock %}

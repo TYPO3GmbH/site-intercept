@@ -13,6 +13,7 @@ namespace App\Entity;
 
 use App\Enum\DocumentationStatus;
 use App\Repository\DocumentationJarRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -27,75 +28,75 @@ class DocumentationJar
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: Types::INTEGER)]
     private int $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
     #[Assert\Url]
     private string $repositoryUrl;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => ''])]
     #[Assert\NotBlank]
     #[Assert\Url]
     private ?string $publicComposerJsonUrl = null;
 
-    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 255, options: ['default' => ''])]
     private string $vendor;
 
-    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 255, options: ['default' => ''])]
     private string $name;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $packageName;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
     private string $packageType;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => ''])]
     private ?string $extensionKey = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $branch;
 
-    #[ORM\Column(type: 'datetime', nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $lastRenderedAt = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $targetBranchDirectory;
 
-    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 255, options: ['default' => ''])]
     private string $typeLong;
 
-    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 255, options: ['default' => ''])]
     private string $typeShort;
 
-    #[ORM\Column(type: 'string', length: 20, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 20, options: ['default' => ''])]
     private string $minimumTypoVersion;
 
-    #[ORM\Column(type: 'string', length: 20, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 20, options: ['default' => ''])]
     private string $maximumTypoVersion;
 
-    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $status;
 
-    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 255, options: ['default' => ''])]
     private string $buildKey;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => 0])]
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $reRenderNeeded;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => 0])]
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $new;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => 1])]
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => 1])]
     private bool $approved;
 
-    #[ORM\Column(type: 'string', length: 255, options: ['default' => ''])]
+    #[ORM\Column(type: Types::STRING, length: 255, options: ['default' => ''])]
     private string $lastRenderedLink = '';
 
     public function isReRenderNeeded(): bool

@@ -11,7 +11,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\HistoryEntryType;
 use App\Repository\HistoryEntryRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HistoryEntryRepository::class)]
@@ -20,25 +22,25 @@ class HistoryEntry
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: Types::INTEGER)]
     private int $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $type;
+    #[ORM\Column(type: Types::STRING, enumType: HistoryEntryType::class)]
+    private HistoryEntryType $type;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $status;
 
     /**
      * Allow grouping of history entries.
      */
-    #[ORM\Column(type: 'string', length: 255, options: ['default' => 'default'])]
+    #[ORM\Column(type: Types::STRING, length: 255, options: ['default' => 'default'])]
     private string $groupEntry = 'default';
 
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column(type: Types::JSON)]
     private array $data = [];
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
@@ -46,12 +48,12 @@ class HistoryEntry
         return $this->id;
     }
 
-    public function getType(): ?string
+    public function getType(): ?HistoryEntryType
     {
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(HistoryEntryType $type): self
     {
         $this->type = $type;
 
