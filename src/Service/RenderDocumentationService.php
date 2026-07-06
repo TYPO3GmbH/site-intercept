@@ -46,7 +46,7 @@ final readonly class RenderDocumentationService
         private DocumentationQuarantineService $documentationQuarantineService,
         private RepositoryBlacklistEntryRepository $repositoryBlacklistEntryRepository,
         private MailService $mailService,
-        private Security $security
+        private Security $security,
     ) {
     }
 

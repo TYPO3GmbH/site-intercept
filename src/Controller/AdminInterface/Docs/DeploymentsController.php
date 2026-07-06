@@ -231,7 +231,7 @@ class DeploymentsController extends AbstractController
                 ]
             ));
 
-            return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
+            return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (DocsPackageDoNotCareBranch $e) {
             $this->historyService->writeHistory(new HistoryEntryDto(
                 type: HistoryEntryType::DOCS_RENDERING,
@@ -246,7 +246,7 @@ class DeploymentsController extends AbstractController
                 ]
             ));
 
-            return new Response('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
+            return new Response('Branch or tag name ignored for documentation rendering. See https://intercept.typo3.com for more information.', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 

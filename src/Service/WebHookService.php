@@ -14,6 +14,7 @@ namespace App\Service;
 use App\Exception\DocsNoRstChangesException;
 use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
+use App\Exception\InvalidWebHookPayloadException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
 use Symfony\Component\HttpFoundation\Request;
@@ -64,29 +65,40 @@ class WebHookService
         $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
         $events = [];
         $versions = [];
-        if (isset($payload->push->changes[0]->new->target->links->html->href)) {
+
+        if (isset($payload->push?->changes[0]?->new?->target?->links?->html->href)) {
             // Cloud (Push)
             // Bitbucket sends one hook, even when multiple branches are pushed
-            // Here we extract those brances and create a pushevent per branch
-            foreach ($payload->push->changes as $change) {
-                if (in_array((string) $change->new->name, $versions, true)) {
+            // Here we extract those branches and create a pushevent per branch
+            foreach ($payload->push->changes ?? [] as $index => $change) {
+                $changeName = (string) ($change->new->name ?? null);
+                if ('' === $changeName) {
+                    throw new InvalidWebHookPayloadException('.push.changes.' . $index . 'new.name', 1783338255);
+                }
+
+                if (in_array($changeName, $versions, true)) {
                     continue;
                 }
 
-                $events[] = $this->pushEventFromBitbucketCloudChange($payload, $change);
-                $versions[] = (string) $change->new->name;
+                $events[] = $this->pushEventFromBitbucketCloudChange($payload, $change, $index);
+                $versions[] = $changeName;
             }
         } else {
             // Server (refs_changed)
             // Bitbucket sends one hook, even when multiple branches are pushed
             // Here we extract those brances and create a pushevent per branch
-            foreach ($payload->changes as $change) {
-                if (in_array((string) $change->ref->displayId, $versions, true)) {
+            foreach ($payload->changes ?? [] as $index => $change) {
+                $displayId = (string) ($change->ref->displayId ?? null);
+                if ('' === $displayId) {
+                    throw new InvalidWebHookPayloadException('.push.changes.' . $index . 'ref.displayId', 1783338287);
+                }
+
+                if (in_array($displayId, $versions, true)) {
                     continue;
                 }
 
-                $events[] = $this->pushEventFromBitbucketServerChange($payload, $change);
-                $versions[] = (string) $change->ref->displayId;
+                $events[] = $this->pushEventFromBitbucketServerChange($payload, $change, $index);
+                $versions[] = $displayId;
             }
         }
 
@@ -100,7 +112,14 @@ class WebHookService
     {
         $content = $request->getContent();
         $payload = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
-        $repositoryUrl = (string) $payload->repository->git_http_url;
+        $repositoryUrl = (string) $payload->repository?->git_http_url;
+        if ('' === $repositoryUrl) {
+            throw new InvalidWebHookPayloadException('.repository.git_http_url', 1783338330);
+        }
+        if (!isset($payload->ref)) {
+            throw new InvalidWebHookPayloadException('.ref', 1783338442);
+        }
+
         $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string) $payload->ref);
         $urlToComposerFile = (new GitRepositoryService())
             ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITLAB);
@@ -131,10 +150,7 @@ class WebHookService
             }
         }
         if (!empty($payload->deleted) && true === $payload->deleted) {
-            $cloneUrl = '';
-            if (isset($payload->repository)) {
-                $cloneUrl = $payload->repository->clone_url;
-            }
+            $cloneUrl = $payload->repository->clone_url ?? '';
             throw new GitBranchDeletedException(sprintf('Webhook was triggered on deleted branch %s for repository %s.', $payload->ref ?? '[unknown]', $cloneUrl), 1564408696);
         }
 
@@ -159,6 +175,10 @@ class WebHookService
             }
         }
 
+        $repositoryUrl = (string) ($payload->repository->clone_url ?? null);
+        if ('' === $repositoryUrl) {
+            throw new InvalidWebHookPayloadException('.repository.clone_url', 1783336462);
+        }
         $repositoryUrl = (string) $payload->repository->clone_url;
         $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string) $payload->ref);
         $urlToComposerFile = (new GitRepositoryService())
@@ -167,12 +187,19 @@ class WebHookService
         return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile, $content)];
     }
 
-    private function pushEventFromBitbucketCloudChange(\stdClass $payload, \stdClass $change): PushEvent
+    private function pushEventFromBitbucketCloudChange(\stdClass $payload, \stdClass $change, int|string $index): PushEvent
     {
         unset($payload->push->changes);
         $payload->push->changes = [0 => $change];
-        $versionString = (string) $change->new->name;
-        $repositoryUrl = (string) $change->new->target->links->html->href;
+        $versionString = (string) ($change->new->name ?? null);
+        if ('' === $versionString) {
+            throw new InvalidWebHookPayloadException('.push.changes.' . $index . '.new.name', 1783337619);
+        }
+
+        $repositoryUrl = (string) ($change->new?->target?->links?->html->href ?? null);
+        if ('' === $repositoryUrl) {
+            throw new InvalidWebHookPayloadException('.push.changes.' . $index . '.new.target.links.html.href', 1783337633);
+        }
         // Add .git at end if it misses. This must be aligned, otherwise manual adding of configuration will go wrong.
         if (!str_ends_with($repositoryUrl, '.git')) {
             $repositoryUrl .= '.git';
@@ -186,18 +213,24 @@ class WebHookService
         return new PushEvent($repositoryUrl, $versionString, $urlToComposerFile, json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
-    private function pushEventFromBitbucketServerChange(\stdClass $payload, \stdClass $change): PushEvent
+    private function pushEventFromBitbucketServerChange(\stdClass $payload, \stdClass $change, int|string $index): PushEvent
     {
         unset($payload->changes);
         $payload->changes = [0 => $change];
-        $versionString = (string) $change->ref->displayId;
+        $versionString = (string) ($change->ref->displayId ?? null);
+        if ('' === $versionString) {
+            throw new InvalidWebHookPayloadException('.push.changes.' . $index . 'ref.displayId', 1783339961);
+        }
         $repositoryUrl = null;
         // Server (refs_changed)
         // In case of self-hosted, Bitbucket provides a git clone url
         // We have to use this url, as html url will not work with git clone
-        foreach ($payload->repository->links->clone as $cloneInformation) {
-            if ('http' === $cloneInformation->name) {
-                $repositoryUrl = (string) $cloneInformation->href;
+        foreach ($payload->repository?->links->clone ?? [] as $cloneIndex => $cloneInformation) {
+            if ('http' === ($cloneInformation->name ?? null)) {
+                $repositoryUrl = (string) ($cloneInformation->href ?? null);
+                if ('' === $repositoryUrl) {
+                    throw new InvalidWebHookPayloadException('.repository.links.clone.' . $cloneIndex . 'href', 1783339966);
+                }
                 break;
             }
         }

@@ -121,6 +121,11 @@ services:
     tags:
       - testDouble
 
+  App\Service\IpAddressService:
+    class: App\Service\IpAddressService
+    arguments:
+      $generalClient: '@guzzle.client.general'
+
   App\Strategy\GithubRst\StrategyResolver:
     arguments:
       $strategies: !tagged 'github_rst_strategy'
