@@ -5,3 +5,9 @@ parameters:
 			identifier: notIdentical.alwaysTrue
 			count: 1
 			path: ../src/Command/DocsRenderCommand.php
+
+		-
+			message: '#^Attribute class App\\Doctrine\\Middleware\\SensitiveParameter does not exist\.$#'
+			identifier: attribute.notFound
+			count: 1
+			path: ../src/Doctrine/Middleware/SqlitePerformance.php
