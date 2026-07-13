@@ -69,6 +69,16 @@ services:
     tags:
       - testDouble
 
+  Doctrine\DBAL\Driver\AbstractSQLiteDriver\Middleware\EnableForeignKeys:
+    class: Doctrine\DBAL\Driver\AbstractSQLiteDriver\Middleware\EnableForeignKeys
+    tags:
+      - { name: doctrine.middleware }
+
+  App\Doctrine\Middleware\SqlitePerformance:
+    class: App\Doctrine\Middleware\SqlitePerformance
+    tags:
+      - { name: doctrine.middleware }
+
   App\Service\LocalCoreGitService:
     class: App\Service\LocalCoreGitService
     public: true
