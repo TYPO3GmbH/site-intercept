@@ -14,7 +14,6 @@ namespace App\Command;
 use App\Entity\DocumentationJar;
 use App\Enum\HistoryEntryTrigger;
 use App\Exception\DocsPackageDoNotCareBranch;
-use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Repository\DocumentationJarRepository;
 use App\Service\RenderDocumentationService;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -77,7 +76,6 @@ class DocsRenderCommand extends Command
 
     /**
      * @throws DocsPackageDoNotCareBranch
-     * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderConfiguration(int $id): void
     {
@@ -90,7 +88,6 @@ class DocsRenderCommand extends Command
 
     /**
      * @throws DocsPackageDoNotCareBranch
-     * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderPackage(string $package): void
     {
@@ -107,7 +104,6 @@ class DocsRenderCommand extends Command
 
     /**
      * @throws DocsPackageDoNotCareBranch
-     * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderDocumentation(DocumentationJar $documentationJar): void
     {

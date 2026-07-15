@@ -18,7 +18,6 @@ use App\Enum\HistoryEntryTrigger;
 use App\Enum\HistoryEntryType;
 use App\Exception\ComposerJsonInvalidException;
 use App\Exception\DocsPackageDoNotCareBranch;
-use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Form\DeleteDeploymentType;
 use App\Form\DocsDeploymentFilterType;
@@ -175,7 +174,6 @@ class DeploymentsController extends AbstractController
 
     /**
      * @throws DocsPackageDoNotCareBranch
-     * @throws DuplicateDocumentationRepositoryException
      */
     #[Route(path: '/admin/docs/deployments/approve/{documentationJarId}', name: 'admin_docs_deployments_approve_action', requirements: ['documentationJarId' => '\d+'])]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
@@ -196,9 +194,6 @@ class DeploymentsController extends AbstractController
         return $this->redirectToRoute('admin_docs_deployments');
     }
 
-    /**
-     * @throws DuplicateDocumentationRepositoryException
-     */
     #[Route(path: '/admin/docs/render', name: 'admin_docs_render')]
     #[IsGranted('ROLE_DOCUMENTATION_MAINTAINER')]
     public function renderDocs(Request $request): Response

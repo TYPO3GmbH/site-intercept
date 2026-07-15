@@ -26,7 +26,6 @@ use App\Exception\DisallowedComposerJsonUrlException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\DocumentationRenderingRequestDeclinedException;
-use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Exception\UnknownComposerJsonUrlException;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
@@ -261,7 +260,6 @@ final readonly class RenderDocumentationService
 
     /**
      * @throws DocsPackageDoNotCareBranch
-     * @throws DuplicateDocumentationRepositoryException
      */
     public function renderDocumentationByDocumentationJar(DocumentationJar $documentationJar, HistoryEntryTrigger $scope): DeploymentInformation
     {
