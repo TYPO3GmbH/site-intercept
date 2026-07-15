@@ -13,7 +13,6 @@ namespace App\Command;
 
 use App\Entity\DocumentationJar;
 use App\Exception\DocsPackageDoNotCareBranch;
-use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Repository\DocumentationJarRepository;
 use App\Service\RenderDocumentationService;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -67,7 +66,7 @@ class DocsDumpRenderInformationCommand extends Command
                             $this->renderDocumentation($documentationJar);
                             $io->success('Dumped info for package "' . $documentationJar->getPackageName() . '" with target branch "' . $documentationJar->getTargetBranchDirectory() . '"');
                             // avoid stopping the whole queue because of a broken / irrelevant package
-                        } catch (DuplicateDocumentationRepositoryException|DocsPackageDoNotCareBranch $exception) {
+                        } catch (DocsPackageDoNotCareBranch $exception) {
                             $io->error($exception->getMessage());
                         }
                     }
@@ -93,7 +92,6 @@ class DocsDumpRenderInformationCommand extends Command
 
     /**
      * @throws DocsPackageDoNotCareBranch
-     * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderConfiguration(int $id): void
     {
@@ -106,7 +104,6 @@ class DocsDumpRenderInformationCommand extends Command
 
     /**
      * @throws DocsPackageDoNotCareBranch
-     * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderPackage(string $package): void
     {
@@ -123,7 +120,6 @@ class DocsDumpRenderInformationCommand extends Command
 
     /**
      * @throws DocsPackageDoNotCareBranch
-     * @throws DuplicateDocumentationRepositoryException
      */
     protected function renderDocumentation(DocumentationJar $documentationJar): void
     {

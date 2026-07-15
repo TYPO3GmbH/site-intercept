@@ -15,12 +15,15 @@ use App\Enum\DocumentationStatus;
 use App\Repository\DocumentationJarRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @codeCoverageIgnore
  */
 #[ORM\Entity(repositoryClass: DocumentationJarRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_documentation_jar', fields: ['repositoryUrl', 'packageName', 'targetBranchDirectory'])]
+#[UniqueEntity(fields: ['repositoryUrl', 'packageName', 'targetBranchDirectory'], message: 'Only one repository per target branch must exist')]
 #[ORM\HasLifecycleCallbacks]
 class DocumentationJar
 {

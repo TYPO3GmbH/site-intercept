@@ -21,7 +21,6 @@ use App\Exception\ComposerJsonNotFoundException;
 use App\Exception\DisallowedComposerJsonUrlException;
 use App\Exception\DocsPackageDoNotCareBranch as DocsPackageDoNotCareBranchAlias;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
-use App\Exception\DuplicateDocumentationRepositoryException;
 use App\Exception\InvalidComposerJsonUrlException;
 use App\Exception\UnknownComposerJsonUrlException;
 use App\Extractor\ComposerJson;
@@ -182,20 +181,14 @@ readonly class DocumentationBuildInformationService
 
     /**
      * Add / update a db entry for this docs deployment.
-     *
-     * @throws DuplicateDocumentationRepositoryException
      */
     public function registerDocumentationRendering(DeploymentInformation $deploymentInformation): DocumentationJar
     {
-        $records = $this->documentationJarRepository->findBy([
+        $record = $this->documentationJarRepository->findOneBy([
             'repositoryUrl' => $deploymentInformation->repositoryUrl,
             'packageName' => $deploymentInformation->packageName,
             'targetBranchDirectory' => $deploymentInformation->targetBranchDirectory,
         ]);
-        if (count($records) > 1) {
-            throw new DuplicateDocumentationRepositoryException('Inconsistent database, there should be only one entry for repository ' . $deploymentInformation->repositoryUrl . ' package ' . $deploymentInformation->packageName . ' with target directory ' . $deploymentInformation->targetBranchDirectory . ' , but ' . count($records) . ' found.', 1557755476);
-        }
-        $record = array_pop($records);
         if ($record instanceof DocumentationJar) {
             // Update source branch if needed. This way, that db entry always hold the latest tag the
             // documentation was rendered from, e.g. if first target dir '5.7' was rendered from tag '5.7.1'
@@ -231,46 +224,64 @@ readonly class DocumentationBuildInformationService
             // status is not updated at this point, this is done later by controllers
             $this->entityManager->flush();
         } else {
-            // No entry, yet - create one
-            $documentationJar = (new DocumentationJar())
-                ->setRepositoryUrl($deploymentInformation->repositoryUrl)
-                ->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl)
-                ->setVendor($deploymentInformation->vendor)
-                ->setName($deploymentInformation->name)
-                ->setPackageName($deploymentInformation->packageName)
-                ->setPackageType($deploymentInformation->packageType)
-                ->setExtensionKey($deploymentInformation->extensionKey)
-                ->setBranch($deploymentInformation->sourceBranch)
-                ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
-                ->setTypeLong($deploymentInformation->typeLong)
-                ->setTypeShort($deploymentInformation->typeShort)
-                ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
-                ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion)
-                ->setReRenderNeeded(false)
-                // Set a new record to 'rendered' for now, this will be updated by controllers later on
-                ->setStatus(DocumentationStatus::STATUS_RENDERED)
-                ->setBuildKey('');
-            // Check if this repository is entirely new (aka, no branches at all known)
-            // And mark it as new if needed
-            $branchExists = $this->documentationJarRepository->findOneBy([
-                'repositoryUrl' => $deploymentInformation->repositoryUrl,
-                'packageName' => $deploymentInformation->packageName,
-            ]);
-            if (null === $branchExists) {
-                $documentationJar->setNew(true);
-                $documentationJar->setApproved(false);
-                $this->slackService->sendRepositoryDiscoveryMessage($documentationJar);
-            } else {
-                $documentationJar->setNew(false);
-                $documentationJar->setApproved($branchExists->isApproved());
-            }
+            $this->entityManager->beginTransaction();
+            try {
+                // No entry, yet - create one
+                $documentationJar = (new DocumentationJar())
+                    ->setRepositoryUrl($deploymentInformation->repositoryUrl)
+                    ->setPublicComposerJsonUrl($deploymentInformation->publicComposerJsonUrl)
+                    ->setVendor($deploymentInformation->vendor)
+                    ->setName($deploymentInformation->name)
+                    ->setPackageName($deploymentInformation->packageName)
+                    ->setPackageType($deploymentInformation->packageType)
+                    ->setExtensionKey($deploymentInformation->extensionKey)
+                    ->setBranch($deploymentInformation->sourceBranch)
+                    ->setTargetBranchDirectory($deploymentInformation->targetBranchDirectory)
+                    ->setTypeLong($deploymentInformation->typeLong)
+                    ->setTypeShort($deploymentInformation->typeShort)
+                    ->setMinimumTypoVersion($deploymentInformation->minimumTypoVersion)
+                    ->setMaximumTypoVersion($deploymentInformation->maximumTypoVersion)
+                    ->setReRenderNeeded(false)
+                    // Set a new record to 'rendered' for now, this will be updated by controllers later on
+                    ->setStatus(DocumentationStatus::STATUS_RENDERED)
+                    ->setBuildKey('');
+                // Check if this repository is entirely new (aka, no branches at all known)
+                // And mark it as new if needed
+                $branchExists = $this->documentationJarRepository->findOneBy([
+                    'repositoryUrl' => $deploymentInformation->repositoryUrl,
+                    'packageName' => $deploymentInformation->packageName,
+                ]);
+                if (null === $branchExists) {
+                    $documentationJar->setNew(true);
+                    $documentationJar->setApproved(false);
+                    $this->slackService->sendRepositoryDiscoveryMessage($documentationJar);
+                } else {
+                    $documentationJar->setNew(false);
+                    $documentationJar->setApproved($branchExists->isApproved());
+                }
 
-            if (!$documentationJar->isApproved()) {
-                $documentationJar->setStatus(DocumentationStatus::STATUS_AWAITING_APPROVAL);
-            }
+                if (!$documentationJar->isApproved()) {
+                    $documentationJar->setStatus(DocumentationStatus::STATUS_AWAITING_APPROVAL);
+                }
 
-            $this->entityManager->persist($documentationJar);
-            $this->entityManager->flush();
+                $this->entityManager->persist($documentationJar);
+                $this->entityManager->flush();
+                $this->entityManager->commit();
+            } catch (\Exception $e) {
+                $this->entityManager->rollback();
+
+                // We ran into an exception, re-attempt to fetch an existing documentation jar
+                $documentationJar = $this->documentationJarRepository->findOneBy([
+                    'repositoryUrl' => $deploymentInformation->repositoryUrl,
+                    'packageName' => $deploymentInformation->packageName,
+                    'targetBranchDirectory' => $deploymentInformation->targetBranchDirectory,
+                ]);
+
+                // Still no result, something else went wrong
+                if (null === $documentationJar) {
+                    throw $e;
+                }
+            }
 
             $record = $documentationJar;
         }
