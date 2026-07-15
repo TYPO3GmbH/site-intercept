@@ -20,13 +20,17 @@ use App\Exception\DocsNoRstChangesException;
 use App\Exception\DocumentationRenderingRequestDeclinedException;
 use App\Exception\GitBranchDeletedException;
 use App\Exception\GithubHookPingException;
+use App\Exception\InvalidWebHookPayloadException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Service\HistoryService;
+use App\Service\IpAddressService;
 use App\Service\RenderDocumentationService;
 use App\Service\WebHookService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimit;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use T3G\Bundle\Keycloak\Security\KeyCloakUser;
 
@@ -40,6 +44,8 @@ class DocsRenderingController extends AbstractController
         private readonly WebHookService $webhookService,
         private readonly HistoryService $historyService,
         private readonly RenderDocumentationService $renderDocumentationService,
+        private readonly RateLimiterFactory $documentationTriggerLimiter,
+        private readonly IpAddressService $ipAddressService,
     ) {
     }
 
@@ -47,6 +53,18 @@ class DocsRenderingController extends AbstractController
     #[Route(path: '/', name: 'docs_hook_to_bamboo', host: 'docs-hook.typo3.org')]
     public function index(Request $request): Response
     {
+        $clientIp = $request->getClientIp();
+        if (null === $clientIp) {
+            throw $this->createAccessDeniedException('Could not determine IP address from incoming request.');
+        }
+        if (!$this->ipAddressService->isIpAddressToBeIgnored($clientIp)) {
+            $rateLimiter = $this->documentationTriggerLimiter->create($clientIp);
+            $rateLimit = $rateLimiter->consume();
+            if (!$rateLimit->isAccepted()) {
+                return $this->renderTooManyRequestsResponse($rateLimit);
+            }
+        }
+
         $user = $this->getUser();
         $userIdentifier = 'Anon.';
         if ($user instanceof KeyCloakUser) {
@@ -64,7 +82,7 @@ class DocsRenderingController extends AbstractController
                 }
             }
             if ([] !== $errorMessages) {
-                return new Response(implode("\n", $errorMessages), Response::HTTP_PRECONDITION_FAILED);
+                return new Response(implode("\n", $errorMessages), Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             return new Response(null, Response::HTTP_NO_CONTENT);
@@ -96,7 +114,7 @@ class DocsRenderingController extends AbstractController
                 ]
             ));
 
-            return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_PRECONDITION_FAILED);
+            return new Response('Invalid hook payload. See https://intercept.typo3.com for more information.', Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (GitBranchDeletedException $e) {
             $this->historyService->writeHistory(new HistoryEntryDto(
                 type: HistoryEntryType::DOCS_RENDERING,
@@ -109,7 +127,7 @@ class DocsRenderingController extends AbstractController
                 ]
             ));
 
-            return new Response('The branch in this push event has been deleted.', Response::HTTP_PRECONDITION_FAILED);
+            return new Response('The branch in this push event has been deleted.', Response::HTTP_NOT_FOUND);
         } catch (DocsNoRstChangesException $e) {
             $this->historyService->writeHistory(new HistoryEntryDto(
                 type: HistoryEntryType::DOCS_RENDERING,
@@ -123,6 +141,28 @@ class DocsRenderingController extends AbstractController
             ));
 
             return new Response(null, Response::HTTP_NO_CONTENT);
+        } catch (InvalidWebHookPayloadException $e) {
+            $this->historyService->writeHistory(new HistoryEntryDto(
+                type: HistoryEntryType::DOCS_RENDERING,
+                status: DocsRenderingHistoryStatus::HOOK_INVALID_PAYLOAD,
+                triggeredBy: HistoryEntryTrigger::API,
+                data: [
+                    'exceptionCode' => $e->getCode(),
+                    'exceptionMessage' => $e->getMessage(),
+                    'user' => $userIdentifier,
+                ]
+            ));
+
+            return new Response($e->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+    }
+
+    private function renderTooManyRequestsResponse(RateLimit $rateLimit): Response
+    {
+        $retryAfter = $rateLimit->getRetryAfter();
+
+        return new Response(null, Response::HTTP_TOO_MANY_REQUESTS, [
+            'Retry-After' => $retryAfter->format(\DateTimeInterface::RFC822),
+        ]);
     }
 }

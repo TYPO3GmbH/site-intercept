@@ -28,6 +28,7 @@ final class DocsRenderingHistoryStatus
     public const PACKAGE_DELETED = 'packageDeleted';
     public const TRIGGERED = 'triggered';
     public const GITHUB_PING = 'githubPing';
+    public const HOOK_INVALID_PAYLOAD = 'invalidPayload';
     public static array $warnings = [
         self::BLACKLISTED,
         self::RE_RENDER_NEEDED,
@@ -42,6 +43,7 @@ final class DocsRenderingHistoryStatus
         self::BRANCH_DELETED,
         self::BRANCH_NO_RST_CHANGES,
         self::PACKAGE_DELETED,
+        self::HOOK_INVALID_PAYLOAD,
     ];
     public static array $success = [
         self::TRIGGERED,
@@ -63,5 +65,6 @@ final class DocsRenderingHistoryStatus
         self::PACKAGE_DELETED => 'Package has been deleted.',
         self::TRIGGERED => 'Rendering triggered.',
         self::GITHUB_PING => 'Github ping received.',
+        self::HOOK_INVALID_PAYLOAD => 'Invalid payload in hook.',
     ];
 }

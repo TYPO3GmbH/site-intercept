@@ -52,8 +52,20 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $githubClient->expects($this->never())->method('request');
         self::getContainer()->set('guzzle.client.github', $githubClient);
 
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/meta',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://ip-ranges.atlassian.com/',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
+            ),
+        );
         $generalClient = $this->createMock(Client::class);
-        $generalClient->expects($this->never())->method('request');
+        $this->assertRequests($generalClient, $requestPool);
 
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->never())->method('request');
@@ -62,7 +74,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             ->withMock('guzzle.client.slack', $slackClient)
             ->withMock('guzzle.client.general', $generalClient)
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
-        $this->assertSame(SymfonyResponse::HTTP_PRECONDITION_FAILED, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
     }
 
     public function testGithubBuildIsNotTriggeredWithNewRepo(): void
@@ -71,12 +83,25 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $githubClient->expects($this->never())->method('request');
         self::getContainer()->set('guzzle.client.github', $githubClient);
 
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/meta',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://ip-ranges.atlassian.com/',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json'))
+            ),
+        );
         $generalClient = $this->createMock(Client::class);
-        $generalClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
+        $this->assertRequests($generalClient, $requestPool);
 
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK));
@@ -104,12 +129,25 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             ->willReturn(new Response());
         self::getContainer()->set('guzzle.client.github', $githubClient);
 
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/meta',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://ip-ranges.atlassian.com/',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json'))
+            ),
+        );
         $generalClient = $this->createMock(Client::class);
-        $generalClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
+        $this->assertRequests($generalClient, $requestPool);
 
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK));
@@ -136,12 +174,25 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->getEntityManager()->persist($jar);
         $this->getEntityManager()->flush();
 
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/meta',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://ip-ranges.atlassian.com/',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json'))
+            ),
+        );
         $generalClient = $this->createMock(Client::class);
-        $generalClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json')));
+        $this->assertRequests($generalClient, $requestPool);
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
@@ -158,6 +209,16 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $requestPool = new RequestPool(
             new RequestExpectation(
                 'GET',
+                'https://api.github.com/meta',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://ip-ranges.atlassian.com/',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
+            ),
+            new RequestExpectation(
+                'GET',
                 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json',
                 new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json'))
             ),
@@ -168,7 +229,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             )
         );
         $generalClient = $this->createMock(Client::class);
-        static::assertRequests($generalClient, $requestPool);
+        $this->assertRequests($generalClient, $requestPool);
 
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK));
@@ -199,6 +260,16 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $requestPool = new RequestPool(
             new RequestExpectation(
                 'GET',
+                'https://api.github.com/meta',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://ip-ranges.atlassian.com/',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
+            ),
+            new RequestExpectation(
+                'GET',
                 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json',
                 new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodMultiBranchRequestComposer.json'))
             ),
@@ -209,7 +280,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             )
         );
         $generalClient = $this->createMock(Client::class);
-        static::assertRequests($generalClient, $requestPool);
+        $this->assertRequests($generalClient, $requestPool);
 
         $requestPool = new RequestPool(
             new RequestExpectation(
@@ -243,7 +314,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooBadRequest.php');
-        $this->assertSame(SymfonyResponse::HTTP_PRECONDITION_FAILED, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
     }
 
     public function testGithubBuildIsNotTriggeredDueToMissingDependency(): void
@@ -251,12 +322,25 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->never())->method('request')->with('POST', self::anything());
 
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/meta',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://ip-ranges.atlassian.com/',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooBadRequestComposerWithoutDependency.json'))
+            ),
+        );
         $generalClient = $this->createMock(Client::class);
-        $generalClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooBadRequestComposerWithoutDependency.json')));
+        $this->assertRequests($generalClient, $requestPool);
 
         $knownRepositoryDomain = (new KnownRepositoryDomain())
             ->setDomain('raw.githubusercontent.com')
@@ -270,7 +354,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
 
         $this->assertSame('Dependencies are not fulfilled. See https://intercept.typo3.com for more information.', $response->getContent());
-        $this->assertSame(SymfonyResponse::HTTP_PRECONDITION_FAILED, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
     }
 
     /**
@@ -289,12 +373,25 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK, [], ''));
 
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/meta',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://ip-ranges.atlassian.com/',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json'))
+            ),
+        );
         $generalClient = $this->createMock(Client::class);
-        $generalClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
+        $this->assertRequests($generalClient, $requestPool);
 
         $knownRepositoryDomain = (new KnownRepositoryDomain())
             ->setDomain('raw.githubusercontent.com')
@@ -319,12 +416,25 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->getEntityManager()->persist($jar);
         $this->getEntityManager()->flush();
 
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://api.github.com/meta',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://ip-ranges.atlassian.com/',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
+            ),
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json'))
+            ),
+        );
         $generalClient = $this->createMock(Client::class);
-        $generalClient
-            ->expects($this->once())
-            ->method('request')
-            ->with('GET', 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json')
-            ->willReturn(new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json')));
+        $this->assertRequests($generalClient, $requestPool);
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.slack', $slackClient)
@@ -344,7 +454,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooGithubDeletedBranchRequest.php');
 
         $this->assertSame('The branch in this push event has been deleted.', $response->getContent());
-        $this->assertSame(SymfonyResponse::HTTP_PRECONDITION_FAILED, $response->getStatusCode());
+        $this->assertSame(SymfonyResponse::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
     public function testGithubPingIsHandled(): void

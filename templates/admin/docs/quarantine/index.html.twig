@@ -32,9 +32,13 @@
                                     <span class="datatable-action-icon">{{ icon('actions-check') }}</span>
                                     <span class="datatable-action-label datatable-visually-hidden">Allow</span>
                                 </a>
-                                <a class="datatable-action" title="Disllow" href="{{ path('admin_docs_quarantine_disallow', {'quarantinedDocumentation': quarantinedRequest.id}) }}">
+                                <a class="datatable-action" title="Disallow" href="{{ path('admin_docs_quarantine_disallow', {'quarantinedDocumentation': quarantinedRequest.id}) }}">
                                     <span class="datatable-action-icon">{{ icon('actions-ban') }}</span>
                                     <span class="datatable-action-label datatable-visually-hidden">Disallow</span>
+                                </a>
+                                <a class="datatable-action" title="Delete" href="{{ path('admin_docs_quarantine_delete', {'quarantinedDocumentation': quarantinedRequest.id}) }}">
+                                    <span class="datatable-action-icon">{{ icon('actions-delete') }}</span>
+                                    <span class="datatable-action-label datatable-visually-hidden">Delete</span>
                                 </a>
                             </td>
                         </tr>
