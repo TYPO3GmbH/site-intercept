@@ -16,6 +16,7 @@ use App\Entity\KnownRepositoryDomain;
 use App\Enum\DocumentationRenderingTrigger;
 use App\Enum\RepositoryDomainStatus;
 use App\Form\QuarantinedDocumentationAllowType;
+use App\Form\QuarantinedDocumentationDeleteType;
 use App\Form\QuarantinedDocumentationDisallowType;
 use App\Repository\DocumentationQuarantineRepository;
 use App\Service\DocumentationQuarantineService;
@@ -118,6 +119,30 @@ final class QuarantinedDocumentationsController extends AbstractController
 
         return $this->render(
             'admin/docs/quarantine/disallow.html.twig',
+            [
+                'form' => $form,
+                'quarantinedDocumentation' => $quarantinedDocumentation,
+            ]
+        );
+    }
+
+    #[Route(path: '/{quarantinedDocumentation}/delete', name: 'delete', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function delete(Request $request, DocumentationQuarantine $quarantinedDocumentation): Response
+    {
+        $form = $this->createForm(QuarantinedDocumentationDeleteType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->remove($quarantinedDocumentation);
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'The quarantined render request has been removed.');
+
+            return $this->redirectToRoute('admin_docs_quarantine_index');
+        }
+
+        return $this->render(
+            'admin/docs/quarantine/delete.html.twig',
             [
                 'form' => $form,
                 'quarantinedDocumentation' => $quarantinedDocumentation,
