@@ -52,20 +52,7 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $githubClient->expects($this->never())->method('request');
         self::getContainer()->set('guzzle.client.github', $githubClient);
 
-        $requestPool = new RequestPool(
-            new RequestExpectation(
-                'GET',
-                'https://api.github.com/meta',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
-            ),
-            new RequestExpectation(
-                'GET',
-                'https://ip-ranges.atlassian.com/',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
-            ),
-        );
         $generalClient = $this->createMock(Client::class);
-        $this->assertRequests($generalClient, $requestPool);
 
         $slackClient = $this->createMock(Client::class);
         $slackClient->expects($this->never())->method('request');
@@ -84,16 +71,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         self::getContainer()->set('guzzle.client.github', $githubClient);
 
         $requestPool = new RequestPool(
-            new RequestExpectation(
-                'GET',
-                'https://api.github.com/meta',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
-            ),
-            new RequestExpectation(
-                'GET',
-                'https://ip-ranges.atlassian.com/',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
-            ),
             new RequestExpectation(
                 'GET',
                 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
@@ -132,16 +109,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $requestPool = new RequestPool(
             new RequestExpectation(
                 'GET',
-                'https://api.github.com/meta',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
-            ),
-            new RequestExpectation(
-                'GET',
-                'https://ip-ranges.atlassian.com/',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
-            ),
-            new RequestExpectation(
-                'GET',
                 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
                 new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json'))
             ),
@@ -177,16 +144,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $requestPool = new RequestPool(
             new RequestExpectation(
                 'GET',
-                'https://api.github.com/meta',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
-            ),
-            new RequestExpectation(
-                'GET',
-                'https://ip-ranges.atlassian.com/',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
-            ),
-            new RequestExpectation(
-                'GET',
                 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
                 new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json'))
             ),
@@ -207,16 +164,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         self::getContainer()->set('guzzle.client.github', $githubClient);
 
         $requestPool = new RequestPool(
-            new RequestExpectation(
-                'GET',
-                'https://api.github.com/meta',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
-            ),
-            new RequestExpectation(
-                'GET',
-                'https://ip-ranges.atlassian.com/',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
-            ),
             new RequestExpectation(
                 'GET',
                 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json',
@@ -258,16 +205,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->entityManager->flush();
 
         $requestPool = new RequestPool(
-            new RequestExpectation(
-                'GET',
-                'https://api.github.com/meta',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
-            ),
-            new RequestExpectation(
-                'GET',
-                'https://ip-ranges.atlassian.com/',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
-            ),
             new RequestExpectation(
                 'GET',
                 'https://bitbucket.org/pathfindermediagroup/eso-export-addon/raw/main/composer.json',
@@ -325,16 +262,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $requestPool = new RequestPool(
             new RequestExpectation(
                 'GET',
-                'https://api.github.com/meta',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
-            ),
-            new RequestExpectation(
-                'GET',
-                'https://ip-ranges.atlassian.com/',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
-            ),
-            new RequestExpectation(
-                'GET',
                 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
                 new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooBadRequestComposerWithoutDependency.json'))
             ),
@@ -376,16 +303,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $requestPool = new RequestPool(
             new RequestExpectation(
                 'GET',
-                'https://api.github.com/meta',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
-            ),
-            new RequestExpectation(
-                'GET',
-                'https://ip-ranges.atlassian.com/',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
-            ),
-            new RequestExpectation(
-                'GET',
                 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
                 new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposerWithoutDependencyForSamePackage.json'))
             ),
@@ -417,16 +334,6 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->getEntityManager()->flush();
 
         $requestPool = new RequestPool(
-            new RequestExpectation(
-                'GET',
-                'https://api.github.com/meta',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolGithub.json'))
-            ),
-            new RequestExpectation(
-                'GET',
-                'https://ip-ranges.atlassian.com/',
-                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/IpAddressPoolAtlassian.json'))
-            ),
             new RequestExpectation(
                 'GET',
                 'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
