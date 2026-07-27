@@ -15,10 +15,12 @@ use App\Creator\GerritCommitMessage;
 use App\Creator\GithubPullRequestCloseComment;
 use App\Exception\DoNotCareException;
 use App\Extractor\GithubCorePullRequest;
+use App\Security\WebhookSignatureTrait;
 use App\Service\ForgeService;
 use App\Service\GithubService;
 use App\Service\LocalCoreGitService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,10 +32,14 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class GithubPullRequestController extends AbstractController
 {
+    use WebhookSignatureTrait;
+
     public function __construct(
         private readonly GithubService $githubService,
         private readonly ForgeService $forgeService,
         private readonly LocalCoreGitService $gitService,
+        #[Autowire(env: 'GITHUB_HOOK_PING_SECRET')]
+        private readonly string $pingWebhookSecret,
     ) {
     }
 
@@ -43,6 +49,8 @@ class GithubPullRequestController extends AbstractController
     #[Route(path: '/githubpr', name: 'core_git_pr')]
     public function index(Request $request): Response
     {
+        $this->assertValidSignature($request, $this->pingWebhookSecret);
+
         try {
             $pullRequest = new GithubCorePullRequest($request->getContent());
             $issueDetails = $this->githubService->getIssueDetails($pullRequest);

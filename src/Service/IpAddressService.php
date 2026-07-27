@@ -11,15 +11,14 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Matcher\CidrMatcher;
 use GuzzleHttp\ClientInterface;
+use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class IpAddressService
 {
     public function __construct(
-        private CidrMatcher $cidrMatcher,
         private ClientInterface $generalClient,
         private CacheInterface $ipAddressPoolCache,
     ) {
@@ -27,13 +26,17 @@ final readonly class IpAddressService
 
     public function isIpAddressToBeIgnored(string $ipAddress): bool
     {
+        if (IpUtils::isPrivateIp($ipAddress)) {
+            return false;
+        }
+
         foreach ([
             [$this, 'getGithubAddressPool'],
             [$this, 'getGitlabAddressPool'],
             [$this, 'gitBitbucketCloudAddressPool'],
         ] as $fetcher) {
             $ipAddressPool = $fetcher();
-            if ($this->cidrMatcher->matches($ipAddress, $ipAddressPool)) {
+            if (IpUtils::checkIp($ipAddress, $ipAddressPool)) {
                 return true;
             }
         }
@@ -81,11 +84,9 @@ final readonly class IpAddressService
 
             $cidrs = [];
             foreach ($body['items'] ?? [] as $networkItem) {
-                if (!in_array('bitbucket', $networkItem['product'], true)) {
-                    continue;
+                if (in_array('bitbucket', $networkItem['product'], true)) {
+                    $cidrs[] = $networkItem['cidr'];
                 }
-
-                $cidrs[] = $networkItem['cidr'];
             }
 
             return $cidrs;

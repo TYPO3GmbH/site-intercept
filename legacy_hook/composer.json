@@ -27,9 +27,9 @@
         "t3docs/typo3-version-handling": "^0.36"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-latest",
-        "phpunit/phpunit": "^12.5",
-        "mikey179/vfsstream": "^1.6.11"
+        "mikey179/vfsstream": "^1.6.11",
+        "phpunit/phpunit": "^11.5.0",
+        "roave/security-advisories": "dev-latest"
     },
     "scripts": {
         "t3g:test:php:unit": [
@@ -38,6 +38,9 @@
         "t3g:test": [
             "@t3g:test:php:unit"
         ]
+    },
+    "replace": {
+        "symfony/polyfill-php80": "*"
     },
     "config": {
         "sort-packages": true
