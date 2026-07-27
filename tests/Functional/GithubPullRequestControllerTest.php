@@ -86,7 +86,7 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
             ]),
         );
         $generalClient = $this->createMock(Client::class);
-        static::assertRequests($generalClient, $generalClientRequestPool);
+        $this->assertRequests($generalClient, $generalClientRequestPool);
 
         $forgeClient = $this->createMock(\Redmine\Client\Client::class);
         $forgeIssueApi = $this->createMock(Issue::class);
@@ -113,6 +113,9 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
             ->withMock('guzzle.client.general', $generalClient)
             ->withMock('redmine.client.forge', $forgeClient)
             ->withMock(LocalCoreGitService::class, $gitService)
+            ->setHeaders([
+                'x-hub-signature-256' => 'sha256=3ac11a43862e90936d0a83f4e6730a8826420db8f6e3cd9f776f225aefe2fd40',
+            ])
             ->execute(require __DIR__ . '/Fixtures/GithubPullRequestGoodRequest.php');
         $this->assertSame(SymfonyResponse::HTTP_OK, $response->getStatusCode());
     }
@@ -124,6 +127,9 @@ class GithubPullRequestControllerTest extends AbstractFunctionalWebTestCase
 
         $response = (new MockRequest($this->client))
             ->withMock('guzzle.client.general', $generalClient)
+            ->setHeaders([
+                'x-hub-signature-256' => 'sha256=7ec7a50231f4a1361e7704183ebcc544ea7b9b1f952ee2b6179833f71e937870',
+            ])
             ->execute(require __DIR__ . '/Fixtures/GithubPullRequestBadRequest.php');
         $this->assertSame(SymfonyResponse::HTTP_OK, $response->getStatusCode());
     }

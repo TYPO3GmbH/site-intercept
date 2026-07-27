@@ -16,13 +16,14 @@ use App\Enum\DocumentationStatus;
 use App\Enum\HistoryEntryTrigger;
 use App\Extractor\GithubBuildInfo;
 use App\Repository\DocumentationJarRepository;
+use App\Security\WebhookSignatureTrait;
 use App\Service\RenderDocumentationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -30,18 +31,22 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class GithubBuildStatusController extends AbstractController
 {
+    use WebhookSignatureTrait;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly DocumentationJarRepository $documentationJarRepository,
         private readonly RenderDocumentationService $renderDocumentationService,
         private readonly LoggerInterface $logger,
+        #[Autowire(env: 'GITHUB_HOOK_SECRET')]
+        private readonly string $docsWebhookSecret,
     ) {
     }
 
     #[Route(path: '/github/rendering-done', name: 'github_rendering_done')]
     public function index(Request $request): Response
     {
-        $this->assertValidSignature($request);
+        $this->assertValidSignature($request, $this->docsWebhookSecret);
 
         $result = new GithubBuildInfo($request);
         // This is a back-channel triggered by GitHub after a "documentation rendering" build is done
@@ -101,7 +106,7 @@ class GithubBuildStatusController extends AbstractController
     #[Route(path: '/github/rendering-started', name: 'github_rendering_started')]
     public function renderingStart(Request $request): Response
     {
-        $this->assertValidSignature($request);
+        $this->assertValidSignature($request, $this->docsWebhookSecret);
 
         $result = new GithubBuildInfo($request);
         // This is a back-channel triggered by GitHub after a "documentation rendering" build is done
@@ -129,7 +134,7 @@ class GithubBuildStatusController extends AbstractController
     #[Route(path: '/github/deletion-done', name: 'github_deletion_done')]
     public function deletionDone(Request $request): Response
     {
-        $this->assertValidSignature($request);
+        $this->assertValidSignature($request, $this->docsWebhookSecret);
 
         $result = new GithubBuildInfo($request);
         // This is a back-channel triggered by GitHub after a "documentation rendering" build is done
@@ -153,18 +158,5 @@ class GithubBuildStatusController extends AbstractController
         }
 
         return new Response();
-    }
-
-    private function assertValidSignature(Request $request): void
-    {
-        $expectedSignature = $request->headers->get('x-hub-signature-256') ?? '';
-        if ('' === $expectedSignature) {
-            throw new AccessDeniedHttpException('Missing payload signature header');
-        }
-
-        $signature = 'sha256=' . hash_hmac('sha256', (string) $request->getContent(), $_ENV['GITHUB_HOOK_SECRET'] ?? '');
-        if (!hash_equals($expectedSignature, $signature)) {
-            throw new AccessDeniedHttpException('Content doesn\'t match expected signature "' . $expectedSignature . '"');
-        }
     }
 }
