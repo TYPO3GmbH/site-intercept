@@ -14,7 +14,6 @@ namespace App\Service;
 use App\Entity\DocumentationQuarantine;
 use App\Extractor\PushEvent;
 use App\Repository\DocumentationQuarantineRepository;
-use App\Utility\RepositoryUrlUtility;
 use Doctrine\ORM\EntityManagerInterface;
 
 class DocumentationQuarantineService
@@ -32,10 +31,15 @@ class DocumentationQuarantineService
         ]);
     }
 
-    public function quarantine(PushEvent $pushEvent): DocumentationQuarantine
+    /**
+     * The domain has to be the one the request was actually blocked on, which is
+     * the host of the composer.json url. It differs from the host of the clone url
+     * for Github always, and can differ for the other services as well.
+     */
+    public function quarantine(PushEvent $pushEvent, string $blockedDomain): DocumentationQuarantine
     {
         $documentationQuarantine = (new DocumentationQuarantine())
-            ->setDomain(RepositoryUrlUtility::getNormalizedDomain($pushEvent->getRepositoryUrl()))
+            ->setDomain($blockedDomain)
             ->setSerializedPushEvent(json_encode($pushEvent, JSON_THROW_ON_ERROR))
             ->setChecksum($this->hash($pushEvent));
 

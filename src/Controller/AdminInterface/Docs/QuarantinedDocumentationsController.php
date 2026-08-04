@@ -15,6 +15,7 @@ use App\Entity\DocumentationQuarantine;
 use App\Entity\KnownRepositoryDomain;
 use App\Enum\DocumentationRenderingTrigger;
 use App\Enum\RepositoryDomainStatus;
+use App\Exception\DocumentationRenderingRequestDeclinedException;
 use App\Form\QuarantinedDocumentationAllowType;
 use App\Form\QuarantinedDocumentationDeleteType;
 use App\Form\QuarantinedDocumentationDisallowType;
@@ -70,15 +71,26 @@ final class QuarantinedDocumentationsController extends AbstractController
             $this->entityManager->persist($knownRepositoryDomain);
             $this->entityManager->flush();
 
+            $declined = 0;
             foreach ($this->documentationQuarantineService->findAllByDomain($domain) as $documentationQuarantine) {
                 $pushEvent = $documentationQuarantine->getPushEvent();
-                $this->renderDocumentationService->requestDocumentationRendering($pushEvent, DocumentationRenderingTrigger::WEB);
+                try {
+                    $this->renderDocumentationService->requestDocumentationRendering($pushEvent, DocumentationRenderingTrigger::WEB);
+                } catch (DocumentationRenderingRequestDeclinedException) {
+                    // An entry can be undeployable for reasons that have nothing to do
+                    // with the domain, an irrelevant branch name for instance. Keep
+                    // going, one such entry must not stop the others.
+                    ++$declined;
+                }
 
                 $this->entityManager->remove($documentationQuarantine);
             }
             $this->entityManager->flush();
 
             $this->addFlash('success', sprintf('The domain %s has been allowed and all quarantined renderings have been activated.', $domain));
+            if ($declined > 0) {
+                $this->addFlash('warning', sprintf('%d of them could not be rendered and were discarded, see the rendering history for the reason.', $declined));
+            }
 
             return $this->redirectToRoute('admin_docs_quarantine_index');
         }
