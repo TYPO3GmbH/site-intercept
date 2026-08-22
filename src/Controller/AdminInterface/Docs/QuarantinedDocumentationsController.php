@@ -15,6 +15,7 @@ use App\Entity\DocumentationQuarantine;
 use App\Entity\KnownRepositoryDomain;
 use App\Enum\DocumentationRenderingTrigger;
 use App\Enum\RepositoryDomainStatus;
+use App\Exception\DocumentationRenderingRequestDeclinedException;
 use App\Form\QuarantinedDocumentationAllowType;
 use App\Form\QuarantinedDocumentationDeleteType;
 use App\Form\QuarantinedDocumentationDisallowType;
@@ -72,7 +73,12 @@ final class QuarantinedDocumentationsController extends AbstractController
 
             foreach ($this->documentationQuarantineService->findAllByDomain($domain) as $documentationQuarantine) {
                 $pushEvent = $documentationQuarantine->getPushEvent();
-                $this->renderDocumentationService->requestDocumentationRendering($pushEvent, DocumentationRenderingTrigger::WEB);
+                try {
+                    $this->renderDocumentationService->requestDocumentationRendering($pushEvent, DocumentationRenderingTrigger::WEB);
+                } catch (DocumentationRenderingRequestDeclinedException) {
+                    // Exception is thrown if the request documentation rendering does not comply with requirements
+                    // Intended fall-thru
+                }
 
                 $this->entityManager->remove($documentationQuarantine);
             }
