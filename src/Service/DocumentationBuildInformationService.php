@@ -324,6 +324,14 @@ readonly class DocumentationBuildInformationService
             throw new InvalidComposerJsonUrlException('URL to composer.json contains disallowed scheme', 1781613532, null, $url);
         }
 
+        // The url is assembled from payload fields, so a '#' or a '?' inside one of
+        // them can push the intended '…/composer.json' suffix out of the path and
+        // leave an arbitrary endpoint on the same host. Every format this
+        // application builds ends in that suffix, so require it.
+        if (!str_ends_with($uri->getPath(), '/composer.json')) {
+            throw new InvalidComposerJsonUrlException('URL to composer.json does not point to a composer.json', 1785816000, null, $url);
+        }
+
         $normalizedHost = RepositoryUrlUtility::getNormalizedDomain($uri);
         $allowedRepositoryDomain = $this->knownRepositoryDomainsRepository->findOneBy([
             'domain' => $normalizedHost,
