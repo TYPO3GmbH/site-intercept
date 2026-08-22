@@ -71,13 +71,16 @@ final class QuarantinedDocumentationsController extends AbstractController
             $this->entityManager->persist($knownRepositoryDomain);
             $this->entityManager->flush();
 
+            $declined = 0;
             foreach ($this->documentationQuarantineService->findAllByDomain($domain) as $documentationQuarantine) {
                 $pushEvent = $documentationQuarantine->getPushEvent();
                 try {
                     $this->renderDocumentationService->requestDocumentationRendering($pushEvent, DocumentationRenderingTrigger::WEB);
                 } catch (DocumentationRenderingRequestDeclinedException) {
-                    // Exception is thrown if the request documentation rendering does not comply with requirements
-                    // Intended fall-thru
+                    // An entry can be undeployable for reasons that have nothing to do
+                    // with the domain, an irrelevant branch name for instance. Keep
+                    // going, one such entry must not stop the others.
+                    ++$declined;
                 }
 
                 $this->entityManager->remove($documentationQuarantine);
@@ -85,6 +88,9 @@ final class QuarantinedDocumentationsController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', sprintf('The domain %s has been allowed and all quarantined renderings have been activated.', $domain));
+            if ($declined > 0) {
+                $this->addFlash('warning', sprintf('%d of them could not be rendered and were discarded, see the rendering history for the reason.', $declined));
+            }
 
             return $this->redirectToRoute('admin_docs_quarantine_index');
         }

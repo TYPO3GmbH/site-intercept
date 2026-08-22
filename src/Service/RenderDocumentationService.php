@@ -55,12 +55,12 @@ final readonly class RenderDocumentationService
         $userIdentifier = $this->security->getUser() instanceof KeyCloakUser ? $this->security->getUser()->getDisplayName() : 'Anon.';
 
         try {
-            $this->documentationBuildInformationService->updateLastHit(RepositoryUrlUtility::getNormalizedDomain($pushEvent->getRepositoryUrl()));
+            $this->documentationBuildInformationService->updateLastHit(RepositoryUrlUtility::getNormalizedDomain($pushEvent->getUrlToComposerFile()));
 
             $composerJson = $this->documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
         } catch (UnknownComposerJsonUrlException $e) {
             if (!$this->documentationQuarantineService->isQuarantined($pushEvent)) {
-                $documentationQuarantine = $this->documentationQuarantineService->quarantine($pushEvent);
+                $documentationQuarantine = $this->documentationQuarantineService->quarantine($pushEvent, $e->normalizedHost);
                 $this->documentationBuildInformationService->notifyAboutUnknownRepositoryDomain($documentationQuarantine);
 
                 $this->historyService->writeHistory(new HistoryEntryDto(

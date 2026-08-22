@@ -13,6 +13,7 @@ namespace App\Controller\AdminInterface\Docs;
 
 use App\Entity\KnownRepositoryDomain;
 use App\Enum\DocumentationRenderingTrigger;
+use App\Exception\DocumentationRenderingRequestDeclinedException;
 use App\Form\KnownDomainCreateType;
 use App\Form\KnownDomainDeleteType;
 use App\Repository\KnownRepositoryDomainRepository;
@@ -69,7 +70,13 @@ final class KnownRepositoryDomainsController extends AbstractController
             if ($data->isAllowed()) {
                 foreach ($this->documentationQuarantineService->findAllByDomain($data->getDomain()) as $documentationQuarantine) {
                     $pushEvent = $documentationQuarantine->getPushEvent();
-                    $this->renderDocumentationService->requestDocumentationRendering($pushEvent, DocumentationRenderingTrigger::WEB);
+                    try {
+                        $this->renderDocumentationService->requestDocumentationRendering($pushEvent, DocumentationRenderingTrigger::WEB);
+                    } catch (DocumentationRenderingRequestDeclinedException) {
+                        // An entry can be undeployable for reasons that have nothing to
+                        // do with the domain, an irrelevant branch name for instance.
+                        // Keep going, one such entry must not stop the others.
+                    }
 
                     $this->entityManager->remove($documentationQuarantine);
                 }
