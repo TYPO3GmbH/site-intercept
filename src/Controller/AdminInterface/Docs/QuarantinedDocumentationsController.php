@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route(path: '/admin/docs/quatantine', name: 'admin_docs_quarantine_')]
+#[Route(path: '/admin/docs/quarantine', name: 'admin_docs_quarantine_')]
 final class QuarantinedDocumentationsController extends AbstractController
 {
     public function __construct(
