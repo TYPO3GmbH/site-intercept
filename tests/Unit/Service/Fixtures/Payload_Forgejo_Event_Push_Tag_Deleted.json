@@ -1,0 +1,31 @@
+{
+  "ref": "refs/tags/v1.0.0",
+  "before": "4b2b0873e595e805267eb0b41cba0b2e2b0c8a70",
+  "after": "0000000000000000000000000000000000000000",
+  "compare_url": "https://forgejo.example.com/",
+  "commits": [],
+  "total_commits": 0,
+  "head_commit": null,
+  "repository": {
+    "id": 42,
+    "name": "coolextension",
+    "full_name": "acme/coolextension",
+    "html_url": "https://forgejo.example.com/acme/coolextension",
+    "ssh_url": "git@forgejo.example.com:acme/coolextension.git",
+    "clone_url": "https://forgejo.example.com/acme/coolextension.git",
+    "default_branch": "main",
+    "private": false
+  },
+  "pusher": {
+    "id": 1,
+    "login": "jane",
+    "full_name": "Jane Doe",
+    "email": "jane@example.com"
+  },
+  "sender": {
+    "id": 1,
+    "login": "jane",
+    "full_name": "Jane Doe",
+    "email": "jane@example.com"
+  }
+}

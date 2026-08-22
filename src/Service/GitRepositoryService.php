@@ -20,6 +20,7 @@ class GitRepositoryService
     final public const SERVICE_BITBUCKET_SERVER = 'bitbucket-server';
     final public const SERVICE_GITHUB = 'github';
     final public const SERVICE_GITLAB = 'gitlab';
+    final public const SERVICE_FORGEJO = 'forgejo';
 
     final public const SERVICE_NAMES = [
         self::SERVICE_GITHUB => 'GitHub',
@@ -32,6 +33,7 @@ class GitRepositoryService
         self::SERVICE_BITBUCKET_SERVER => '{baseUrl}/projects/{project}/repos/{package}/raw/composer.json?at=refs%2F{type}%2F{version}',
         self::SERVICE_GITLAB => '{baseUrl}/raw/{version}/composer.json',
         self::SERVICE_GITHUB => 'https://raw.githubusercontent.com/{repoName}/{version}/composer.json',
+        self::SERVICE_FORGEJO => '{baseUrl}/raw/{type}/{version}/composer.json',
     ];
     protected array $allowedBranches = ['master', 'main', 'documentation-draft'];
 
@@ -41,6 +43,7 @@ class GitRepositoryService
             self::SERVICE_BITBUCKET_SERVER, self::SERVICE_BITBUCKET_CLOUD => $this->getPublicComposerUrlForBitbucket($payload),
             self::SERVICE_GITHUB => $this->getPublicComposerUrlForGithub($payload),
             self::SERVICE_GITLAB => $this->getPublicComposerUrlForGitlab($payload),
+            self::SERVICE_FORGEJO => $this->getPublicComposerUrlForForgejo($payload),
             default => '',
         };
     }
@@ -136,6 +139,18 @@ class GitRepositoryService
         return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_GITLAB], [
             '{baseUrl}' => (string) $payload->project->web_url,
             '{version}' => str_replace(['refs/tags/', 'refs/heads/'], '', (string) $payload->ref),
+        ]);
+    }
+
+    protected function getPublicComposerUrlForForgejo(\stdClass $payload): string
+    {
+        $ref = (string) $payload->ref;
+        $version = str_replace(['refs/tags/', 'refs/heads/'], '', $ref);
+
+        return $this->getParsedUrl($this->composerJsonUrlFormat[self::SERVICE_FORGEJO], [
+            '{baseUrl}' => (string) $payload->repository->html_url,
+            '{type}' => str_starts_with($ref, 'refs/tags/') ? 'tag' : 'branch',
+            '{version}' => $version,
         ]);
     }
 

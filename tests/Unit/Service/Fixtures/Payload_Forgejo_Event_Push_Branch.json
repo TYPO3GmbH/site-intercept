@@ -1,0 +1,73 @@
+{
+  "ref": "refs/heads/main",
+  "before": "0000000000000000000000000000000000000000",
+  "after": "4b2b0873e595e805267eb0b41cba0b2e2b0c8a70",
+  "compare_url": "https://forgejo.example.com/acme/coolextension/compare/main",
+  "commits": [
+    {
+      "id": "4b2b0873e595e805267eb0b41cba0b2e2b0c8a70",
+      "message": "Update documentation",
+      "url": "https://forgejo.example.com/acme/coolextension/commit/4b2b0873e595e805267eb0b41cba0b2e2b0c8a70",
+      "author": {
+        "name": "Jane Doe",
+        "email": "jane@example.com",
+        "username": "jane"
+      },
+      "committer": {
+        "name": "Jane Doe",
+        "email": "jane@example.com",
+        "username": "jane"
+      },
+      "added": [
+        "Documentation/Index.rst"
+      ],
+      "modified": [],
+      "removed": [],
+      "timestamp": "2026-08-03T12:00:00Z"
+    }
+  ],
+  "total_commits": 1,
+  "head_commit": {
+    "id": "4b2b0873e595e805267eb0b41cba0b2e2b0c8a70",
+    "message": "Update documentation",
+    "url": "https://forgejo.example.com/acme/coolextension/commit/4b2b0873e595e805267eb0b41cba0b2e2b0c8a70",
+    "author": {
+      "name": "Jane Doe",
+      "email": "jane@example.com",
+      "username": "jane"
+    },
+    "committer": {
+      "name": "Jane Doe",
+      "email": "jane@example.com",
+      "username": "jane"
+    },
+    "added": [
+      "Documentation/Index.rst"
+    ],
+    "modified": [],
+    "removed": [],
+    "timestamp": "2026-08-03T12:00:00Z"
+  },
+  "repository": {
+    "id": 42,
+    "name": "coolextension",
+    "full_name": "acme/coolextension",
+    "html_url": "https://forgejo.example.com/acme/coolextension",
+    "ssh_url": "git@forgejo.example.com:acme/coolextension.git",
+    "clone_url": "https://forgejo.example.com/acme/coolextension.git",
+    "default_branch": "main",
+    "private": false
+  },
+  "pusher": {
+    "id": 1,
+    "login": "jane",
+    "full_name": "Jane Doe",
+    "email": "jane@example.com"
+  },
+  "sender": {
+    "id": 1,
+    "login": "jane",
+    "full_name": "Jane Doe",
+    "email": "jane@example.com"
+  }
+}

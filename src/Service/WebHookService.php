@@ -24,7 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
  * - Bitbucket: Push Events
  * - Github: Push Events for branches and tags
  * - Github: Release Events
- * - Gitlab: Push Events for branches and tags.
+ * - Gitlab: Push Events for branches and tags
+ * - Forgejo / Gitea: Push Events for branches and tags.
  */
 class WebHookService
 {
@@ -46,6 +47,13 @@ class WebHookService
         }
         if (in_array($request->headers->get('X-Gitlab-Event', ''), ['Push Hook', 'Tag Push Hook'], true)) {
             return $this->getPushEventFromGitlab($request);
+        }
+        // Forgejo and Gitea send X-Gitea-Event and X-GitHub-Event compatibility
+        // headers along with their own, so this check must come before the Github one
+        if ('push' === $request->headers->get('X-Forgejo-Event', '')
+            || 'push' === $request->headers->get('X-Gitea-Event', '')
+        ) {
+            return $this->getPushEventFromForgejo($request);
         }
         if ('push' === $request->headers->get('X-GitHub-Event', '')) {
             return $this->getPushEventFromGithub($request);
@@ -136,11 +144,46 @@ class WebHookService
     private function getPushEventFromGithub(Request $request): array
     {
         $content = $request->getContent();
+
+        return $this->getPushEventFromGithubStylePayload($this->decodePayload($content), $content, GitRepositoryService::SERVICE_GITHUB);
+    }
+
+    /**
+     * Forgejo and Gitea push payloads follow the Github push payload structure and
+     * are handled by the same code, apart from resolving the composer.json url and
+     * from telling a deleted ref apart, both of which differ.
+     *
+     * @return PushEvent[]
+     *
+     * @throws DocsNoRstChangesException
+     * @throws GitBranchDeletedException
+     */
+    private function getPushEventFromForgejo(Request $request): array
+    {
+        $content = $request->getContent();
+        $payload = $this->decodePayload($content);
+        // Forgejo and Gitea have no 'deleted' property. Deleting a tag sends a
+        // regular push event whose 'after' is the all zero object id, 40 or 64
+        // characters wide depending on the object format of the repository.
+        // Deleting a branch sends no push event at all, only a 'delete' event
+        if (is_string($payload->after ?? null) && 1 === preg_match('/^(?:0{40}|0{64})$/D', $payload->after)) {
+            throw $this->branchDeletedException($payload);
+        }
+
+        return $this->getPushEventFromGithubStylePayload($payload, $content, GitRepositoryService::SERVICE_FORGEJO);
+    }
+
+    /**
+     * Github, Forgejo and Gitea can all be configured to send the hook with content
+     * type 'application/x-www-form-urlencoded', the body then is 'payload=<json>'.
+     */
+    private function decodePayload(string $content): \stdClass
+    {
         try {
             $payload = json_decode($content, false, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
-            // If it can't be decoded to json, this might be an x-www-form-encoded body
-            // probably by using the old legacy hook, that used this
+            // Not json, so the hook is configured to post a form body. Github,
+            // Forgejo and Gitea all offer that, and the old legacy hook used it too
             $payload = urldecode($content);
             $payload = substr($payload, 8); // cut off 'payload=', rest should be json, then
             try {
@@ -149,15 +192,32 @@ class WebHookService
                 throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1559152710);
             }
         }
+        // Valid json, but not an object, so it can not be a hook payload
+        if (!$payload instanceof \stdClass) {
+            throw new UnsupportedWebHookRequestException('The request could not be decoded or is not supported.', 1785754800);
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @return PushEvent[]
+     *
+     * @throws DocsNoRstChangesException
+     * @throws GitBranchDeletedException
+     */
+    private function getPushEventFromGithubStylePayload(\stdClass $payload, string $content, string $repoService): array
+    {
         if (!empty($payload->deleted) && true === $payload->deleted) {
-            $cloneUrl = $payload->repository->clone_url ?? '';
-            throw new GitBranchDeletedException(sprintf('Webhook was triggered on deleted branch %s for repository %s.', $payload->ref ?? '[unknown]', $cloneUrl), 1564408696);
+            throw $this->branchDeletedException($payload);
         }
 
         // Only for actual push events, not releases
         if (!empty($payload->commits)) {
             $triggeringChange = false;
+            $deliveredCommits = 0;
             foreach ($payload->commits as $commit) {
+                ++$deliveredCommits;
                 $files = array_merge($commit->added ?? [], $commit->modified ?? [], $commit->removed ?? []);
                 foreach ($files as $file) {
                     if ('README.md' === $file
@@ -170,7 +230,13 @@ class WebHookService
                 }
             }
 
-            if (!$triggeringChange) {
+            // Senders cap the commit list, Forgejo at 15 and Gitea at 5 by default,
+            // while 'total_commits' keeps the real number. A documentation change in
+            // one of the dropped commits would be lost for good, so rather render
+            // once too often than never. Count what was iterated rather than the
+            // payload value, which is not required to be an array
+            $isTruncated = (int) ($payload->total_commits ?? 0) > $deliveredCommits;
+            if (!$triggeringChange && !$isTruncated) {
                 throw new DocsNoRstChangesException(sprintf('The commit %s pushed to %s:%s doesn\'t contain any changed .rst files', $payload->head_commit->id ?? '[unknown]', $payload->repository->full_name ?? '[unknown]', $payload->ref ?? '[unknown]'), 1570011098);
             }
         }
@@ -179,12 +245,39 @@ class WebHookService
         if ('' === $repositoryUrl) {
             throw new InvalidWebHookPayloadException('.repository.clone_url', 1783336462);
         }
-        $repositoryUrl = (string) $payload->repository->clone_url;
+        if (GitRepositoryService::SERVICE_FORGEJO === $repoService) {
+            $this->assertForgejoPayloadIsComplete($payload);
+        }
         $versionString = str_replace(['refs/tags/', 'refs/heads/'], '', (string) $payload->ref);
         $urlToComposerFile = (new GitRepositoryService())
-            ->resolvePublicComposerJsonUrlByPayload($payload, GitRepositoryService::SERVICE_GITHUB);
+            ->resolvePublicComposerJsonUrlByPayload($payload, $repoService);
 
         return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile, $content)];
+    }
+
+    /**
+     * The Forgejo url format needs a full ref to tell a branch from a tag, and the
+     * repository html url as its base, so both are required to be usable here.
+     */
+    private function assertForgejoPayloadIsComplete(\stdClass $payload): void
+    {
+        $ref = (string) ($payload->ref ?? null);
+        if (!str_starts_with($ref, 'refs/heads/') && !str_starts_with($ref, 'refs/tags/')) {
+            throw new InvalidWebHookPayloadException('.ref', 1785749100);
+        }
+        if ('' === str_replace(['refs/tags/', 'refs/heads/'], '', $ref)) {
+            throw new InvalidWebHookPayloadException('.ref', 1785749100);
+        }
+        if ('' === (string) ($payload->repository->html_url ?? null)) {
+            throw new InvalidWebHookPayloadException('.repository.html_url', 1785751200);
+        }
+    }
+
+    private function branchDeletedException(\stdClass $payload): GitBranchDeletedException
+    {
+        $cloneUrl = $payload->repository->clone_url ?? '';
+
+        return new GitBranchDeletedException(sprintf('Webhook was triggered on deleted branch %s for repository %s.', $payload->ref ?? '[unknown]', $cloneUrl), 1564408696);
     }
 
     private function pushEventFromBitbucketCloudChange(\stdClass $payload, \stdClass $change, int|string $index): PushEvent

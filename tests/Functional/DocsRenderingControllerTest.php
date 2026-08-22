@@ -364,6 +364,19 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
         $this->assertSame(SymfonyResponse::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
+    public function testForgejoBuildIsNotTriggeredDueToDeletedTag(): void
+    {
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects($this->never())->method('request')->with('POST', self::anything());
+
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooForgejoDeletedTagRequest.php');
+
+        $this->assertSame('The branch in this push event has been deleted.', $response->getContent());
+        $this->assertSame(SymfonyResponse::HTTP_NOT_FOUND, $response->getStatusCode());
+    }
+
     public function testGithubPingIsHandled(): void
     {
         $slackClient = $this->createMock(Client::class);
