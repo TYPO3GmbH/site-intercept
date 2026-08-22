@@ -33,6 +33,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Uri;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -75,7 +78,20 @@ readonly class DocumentationBuildInformationService
         $this->assertUrlToComposerFileIsSafe($path);
 
         try {
-            $response = $this->generalClient->request('GET', $path);
+            // The url is only known to be safe until the first redirect, so every
+            // hop has to pass the same check. Without this an open redirect on an
+            // allowed domain would be enough to reach an arbitrary target.
+            $response = $this->generalClient->request('GET', $path, [
+                'allow_redirects' => [
+                    'max' => 5,
+                    'protocols' => ['http', 'https'],
+                    'strict' => false,
+                    'referer' => false,
+                    'on_redirect' => function (RequestInterface $request, ResponseInterface $response, UriInterface $uri): void {
+                        $this->assertUrlToComposerFileIsSafe((string) $uri);
+                    },
+                ],
+            ]);
         } catch (GuzzleException $e) {
             throw new ComposerJsonNotFoundException($e->getMessage(), $e->getCode());
         }
