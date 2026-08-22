@@ -26,6 +26,7 @@ use App\Exception\DisallowedComposerJsonUrlException;
 use App\Exception\DocsPackageDoNotCareBranch;
 use App\Exception\DocsPackageRegisteredWithDifferentRepositoryException;
 use App\Exception\DocumentationRenderingRequestDeclinedException;
+use App\Exception\InvalidComposerJsonUrlException;
 use App\Exception\UnknownComposerJsonUrlException;
 use App\Extractor\DeploymentInformation;
 use App\Extractor\PushEvent;
@@ -54,12 +55,12 @@ final readonly class RenderDocumentationService
         $userIdentifier = $this->security->getUser() instanceof KeyCloakUser ? $this->security->getUser()->getDisplayName() : 'Anon.';
 
         try {
-            $this->documentationBuildInformationService->updateLastHit(RepositoryUrlUtility::getNormalizedDomain($pushEvent->getRepositoryUrl()));
+            $this->documentationBuildInformationService->updateLastHit(RepositoryUrlUtility::getNormalizedDomain($pushEvent->getUrlToComposerFile()));
 
             $composerJson = $this->documentationBuildInformationService->fetchRemoteComposerJson($pushEvent->getUrlToComposerFile());
         } catch (UnknownComposerJsonUrlException $e) {
             if (!$this->documentationQuarantineService->isQuarantined($pushEvent)) {
-                $documentationQuarantine = $this->documentationQuarantineService->quarantine($pushEvent);
+                $documentationQuarantine = $this->documentationQuarantineService->quarantine($pushEvent, $e->normalizedHost);
                 $this->documentationBuildInformationService->notifyAboutUnknownRepositoryDomain($documentationQuarantine);
 
                 $this->historyService->writeHistory(new HistoryEntryDto(
@@ -90,6 +91,20 @@ final readonly class RenderDocumentationService
             ));
 
             throw new DocumentationRenderingRequestDeclinedException(sprintf('composer.json\'s host domain %s is disallowed for rendering request', $e->normalizedHost), 1782294348, $e);
+        } catch (InvalidComposerJsonUrlException $e) {
+            $this->historyService->writeHistory(new HistoryEntryDto(
+                type: HistoryEntryType::DOCS_RENDERING,
+                status: DocsRenderingHistoryStatus::INVALID_COMPOSER_JSON_URL,
+                triggeredBy: $trigger->toHistoryEntryTrigger(),
+                data: [
+                    'repository' => $pushEvent->getRepositoryUrl(),
+                    'composerFile' => $pushEvent->getUrlToComposerFile(),
+                    'payload' => $pushEvent->getPayload(),
+                    'user' => $userIdentifier,
+                ]
+            ));
+
+            throw new DocumentationRenderingRequestDeclinedException(sprintf('composer.json url %s can not be used for a rendering request', $e->composerJsonUrl), 1785810600, $e);
         }
 
         $composerAsObject = $this->documentationBuildInformationService->getComposerJsonObject($composerJson);

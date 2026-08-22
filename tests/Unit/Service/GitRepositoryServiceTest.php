@@ -71,6 +71,16 @@ class GitRepositoryServiceTest extends TestCase
             self::getPayloadFromFixture('Payload_Gitlab_Event_Push_Tag.json'),
             GitRepositoryService::SERVICE_GITLAB,
         ];
+        yield 'Forgejo push branch' => [
+            'https://forgejo.example.com/acme/coolextension/raw/branch/main/composer.json',
+            self::getPayloadFromFixture('Payload_Forgejo_Event_Push_Branch.json'),
+            GitRepositoryService::SERVICE_FORGEJO,
+        ];
+        yield 'Forgejo push tag' => [
+            'https://forgejo.example.com/acme/coolextension/raw/tag/v1.0.0/composer.json',
+            self::getPayloadFromFixture('Payload_Forgejo_Event_Push_Tag.json'),
+            GitRepositoryService::SERVICE_FORGEJO,
+        ];
     }
 
     public static function filterAllowedBranchesDataProvider(): \Iterator
