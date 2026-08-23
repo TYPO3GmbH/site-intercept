@@ -44,6 +44,7 @@ readonly class SlackService
         $docsLink = $this->docsService->generateLinkToDocs($jar);
         $deploymentsUrl = $this->router->generate('admin_docs_deployments', [], RouterInterface::ABSOLUTE_URL);
         $webhookDocsUrl = $this->docsService->getDocsServer() . '/permalink/h2document:webhook';
+        $gitUrl = $jar->getRepositoryUrl();
 
         $message = [
             'channel' => '#typo3-documentation',
@@ -59,7 +60,7 @@ readonly class SlackService
                         . "\u{2022} A documentation maintainer will review and approve the repository\n"
                         . "\u{2022} Once approved, docs will be rendered and deployed to <{$docsLink}|docs.typo3.org>\n"
                         . "\u{2022} This is handled by volunteers \u{2014} please be patient\n\n"
-                        . ":hammer_and_wrench: *Maintainers:* <{$deploymentsUrl}|Review pending deployments>\n"
+                        . ":hammer_and_wrench: *Maintainers:* <{$deploymentsUrl}|Review pending deployments> | <{$gitUrl}|:git:>\n"
                         . ":information_source: *Extension authors:* <{$webhookDocsUrl}|How does this work?>",
                     'fallback' => "Repository {$repoKey} is awaiting documentation approval at {$deploymentsUrl}",
                     'footer' => sprintf("TYPO3 Intercept \u{00b7} <{%s}|(?)>", self::SOURCE_URL),
