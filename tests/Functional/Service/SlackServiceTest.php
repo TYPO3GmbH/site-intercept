@@ -89,6 +89,15 @@ class SlackServiceTest extends KernelTestCase
         self::assertStringContainsString('github.com/TYPO3GmbH/site-intercept', $attachment['footer']);
         self::assertStringContainsString('SlackService.php', $attachment['footer']);
 
+        // Every link target must be a bare URL, `<{https://…}|label>` is rendered verbatim by Slack
+        foreach (['text', 'footer'] as $field) {
+            preg_match_all('/<([^|>]*)\|[^>]*>/', $attachment[$field], $links);
+            self::assertNotEmpty($links[1], sprintf('No Slack link found in attachment field "%s"', $field));
+            foreach ($links[1] as $target) {
+                self::assertMatchesRegularExpression('#^https?://\S+$#', $target);
+            }
+        }
+
         // Must opt into mrkdwn rendering for the text field
         self::assertContains('text', $attachment['mrkdwn_in']);
 

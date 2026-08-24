@@ -63,7 +63,7 @@ readonly class SlackService
                         . ":hammer_and_wrench: *Maintainers:* <{$deploymentsUrl}|Review pending deployments> | <{$gitUrl}|:git:>\n"
                         . ":information_source: *Extension authors:* <{$webhookDocsUrl}|How does this work?>",
                     'fallback' => "Repository {$repoKey} is awaiting documentation approval at {$deploymentsUrl}",
-                    'footer' => sprintf("TYPO3 Intercept \u{00b7} <{%s}|(?)>", self::SOURCE_URL),
+                    'footer' => sprintf("TYPO3 Intercept \u{00b7} <%s|(?)>", self::SOURCE_URL),
                     'footer_icon' => self::AVATAR_URL,
                     'mrkdwn_in' => ['text'],
                 ],
