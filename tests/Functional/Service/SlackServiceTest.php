@@ -44,6 +44,7 @@ class SlackServiceTest extends KernelTestCase
         $jar->setVendor('acme');
         $jar->setName('my-extension');
         $jar->setPackageName('acme/my-extension');
+        $jar->setRepositoryUrl('https://github.com/acme/my-extension.git');
         $jar->setTypeShort('p');
         $jar->setTargetBranchDirectory('main');
 
@@ -90,5 +91,7 @@ class SlackServiceTest extends KernelTestCase
 
         // Must opt into mrkdwn rendering for the text field
         self::assertContains('text', $attachment['mrkdwn_in']);
+
+        self::assertStringContainsString('<https://github.com/acme/my-extension.git|:git:', $attachment['text']);
     }
 }
