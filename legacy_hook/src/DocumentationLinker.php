@@ -268,7 +268,16 @@ final readonly class DocumentationLinker
         } else {
             // CASE: Third party documentation, based on composer-keys like https://docs.typo3.org/p/georgringer/news
             //       A permalink like https://docs.typo3.org/permalink/someVendor-some-extension/ is resolved to https://docs.typo3.org/p/somevendor/some-extension/
-            $entrypoint = 'https://docs.typo3.org/p/' . preg_replace('/-/', '/', strtolower($repository), 1) . '/{typo3_version}/en-us/';
+            //
+            //       Where the shortcode already carries a slash, that slash is the vendor separator and is used
+            //       as given. Guessing it from the first hyphen is only needed when there is none, and the guess
+            //       is wrong whenever a hyphen appears earlier than the separator: "friendsoftypo3/content-blocks"
+            //       would be looked up as "/p/friendsoftypo3/content/blocks/", and a vendor with a hyphen such as
+            //       "web-vision/wv_deepltranslate" has no spelling that resolves at all.
+            $vendorAndPackage = str_contains($repository, '/')
+                ? strtolower($repository)
+                : preg_replace('/-/', '/', strtolower($repository), 1);
+            $entrypoint = 'https://docs.typo3.org/p/' . $vendorAndPackage . '/{typo3_version}/en-us/';
             $useCoreVersionResolving = false;
         }
 
