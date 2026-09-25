@@ -23,7 +23,7 @@
         "doctrine/migrations": "^3.9",
         "doctrine/orm": "^3.4",
         "gitonomy/gitlib": "dev-bugfix/205",
-        "guzzlehttp/guzzle": "^7.9.3",
+        "guzzlehttp/guzzle": "^7.15.5",
         "kbsali/redmine-api": "^2.8",
         "knplabs/knp-menu": "^3.8",
         "knplabs/knp-paginator-bundle": "^5.9",
@@ -64,7 +64,7 @@
         "t3g/symfony-keycloak-bundle": "^3.1",
         "t3g/symfony-template-bundle": "^6.1",
         "t3g/symfony-usercentrics-bundle": "^2.0.0",
-        "twig/twig": "^3.21.1"
+        "twig/twig": "^3.27.0"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.7.1",
@@ -73,7 +73,7 @@
         "phpstan/phpstan": "^2.1.17",
         "phpstan/phpstan-doctrine": "^2.0.3",
         "phpstan/phpstan-symfony": "^2.0.6",
-        "phpunit/phpunit": "^11.5.23",
+        "phpunit/phpunit": "^11.5.50",
         "rector/rector": "^2.0.18",
         "symfony/browser-kit": "^6.4.19",
         "symfony/css-selector": "^6.4.13",
