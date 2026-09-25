@@ -79,6 +79,22 @@ class PermalinksTest extends TestCase
 
     public static function redirectWorksDataProvider(): \Iterator
     {
+        yield 'third party, hyphen in package name, vendor separator as hyphen' => [
+            'friendsoftypo3-tt-address:changelog',
+            'https://docs.typo3.org/p/friendsoftypo3/tt-address/main/en-us/Administration/Changelog/Index.html#changelog',
+        ];
+        yield 'third party, hyphen in package name, vendor separator as slash' => [
+            'friendsoftypo3/tt-address:changelog',
+            'https://docs.typo3.org/p/friendsoftypo3/tt-address/main/en-us/Administration/Changelog/Index.html#changelog',
+        ];
+        yield 'third party, hyphen in vendor name' => [
+            'web-vision/wv_deepltranslate:administration-access',
+            'https://docs.typo3.org/p/web-vision/wv_deepltranslate/main/en-us/Administration/Access/Index.html#administration-access',
+        ];
+        yield 'third party, slash and no hyphen at all' => [
+            'georgringer/news:start',
+            'https://docs.typo3.org/p/georgringer/news/main/en-us/Index.html#start',
+        ];
         yield 'dupe sorting' => [
             'dummyvendor-dummy:dupe-entry',
             'https://docs.typo3.org/p/dummyvendor/dummy/main/en-us/Index.html#dupe-entry',

@@ -26,3 +26,8 @@ wget -x --cut-dirs=0 -nH https://docs.typo3.org/other/t3docs/render-guides/main/
 wget -x --cut-dirs=0 -nH https://docs.typo3.org/p/georgringer/news/main/en-us/objects.inv.json
 wget -x --cut-dirs=0 -nH https://docs.typo3.org/p/georgringer/news/12.1/en-us/objects.inv.json
 wget -x --cut-dirs=0 -nH https://docs.typo3.org/p/georgringer/news/10.0/en-us/objects.inv.json
+
+# A package name with a hyphen, and a vendor with a hyphen: both cases where
+# deriving the vendor separator from the first hyphen picks the wrong place.
+wget -x --cut-dirs=0 -nH https://docs.typo3.org/p/friendsoftypo3/tt-address/main/en-us/objects.inv.json
+wget -x --cut-dirs=0 -nH https://docs.typo3.org/p/web-vision/wv_deepltranslate/main/en-us/objects.inv.json
