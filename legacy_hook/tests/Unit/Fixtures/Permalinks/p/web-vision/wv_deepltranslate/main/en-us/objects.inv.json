@@ -1,0 +1,544 @@
+{
+    "std:doc": {
+        "Administration\/Access\/Index": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Access\/Index.html",
+            "Access Configuration"
+        ],
+        "Administration\/AutoTranslatePrefix\/Index": [
+            "DeepL Translate",
+            "main",
+            "Administration\/AutoTranslatePrefix\/Index.html",
+            "Auto-translate-prefix"
+        ],
+        "Administration\/Configuration\/Index": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html",
+            "Configuration"
+        ],
+        "Administration\/Index": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Index.html",
+            "Administration"
+        ],
+        "Administration\/Installation\/Index": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Installation\/Index.html",
+            "Installation"
+        ],
+        "Administration\/Updates\/Index": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Updates\/Index.html",
+            "Updates"
+        ],
+        "Editor\/AutoTranslatePrefix\/Index": [
+            "DeepL Translate",
+            "main",
+            "Editor\/AutoTranslatePrefix\/Index.html",
+            "Auto-translate-prefix"
+        ],
+        "Editor\/Glossary\/Index": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Glossary\/Index.html",
+            "Glossaries"
+        ],
+        "Editor\/Index": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Index.html",
+            "Editors manuel"
+        ],
+        "Editor\/Usage\/Index": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Usage\/Index.html",
+            "Basic Usage"
+        ],
+        "Faq\/Index": [
+            "DeepL Translate",
+            "main",
+            "Faq\/Index.html",
+            "FAQ"
+        ],
+        "Housekeeping\/Index": [
+            "DeepL Translate",
+            "main",
+            "Housekeeping\/Index.html",
+            "Housekeeping"
+        ],
+        "Index": [
+            "DeepL Translate",
+            "main",
+            "Index.html",
+            "DeepL Translate"
+        ],
+        "Introduction\/About\/Index": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/About\/Index.html",
+            "What does it do?"
+        ],
+        "Introduction\/Contribution\/Index": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Contribution\/Index.html",
+            "Contribution"
+        ],
+        "Introduction\/Index": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Index.html",
+            "Introduction"
+        ],
+        "Introduction\/Sponsoring\/Index": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Sponsoring\/Index.html",
+            "Sponsors"
+        ],
+        "KnownIssues\/Index": [
+            "DeepL Translate",
+            "main",
+            "KnownIssues\/Index.html",
+            "Known issues"
+        ],
+        "Reference\/ExtensionConfiguration\/Index": [
+            "DeepL Translate",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html",
+            "Extension Configuration"
+        ],
+        "Reference\/Index": [
+            "DeepL Translate",
+            "main",
+            "Reference\/Index.html",
+            "Reference"
+        ],
+        "Reference\/TableConfiguration\/Index": [
+            "DeepL Translate",
+            "main",
+            "Reference\/TableConfiguration\/Index.html",
+            "Table Configuration"
+        ]
+    },
+    "std:label": {
+        "administration-access": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Access\/Index.html#administration-access",
+            "Access Configuration"
+        ],
+        "administration-autotranslateprefix": [
+            "DeepL Translate",
+            "main",
+            "Administration\/AutoTranslatePrefix\/Index.html#administration-autotranslateprefix",
+            "Auto-translate-prefix"
+        ],
+        "configuration": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html#configuration",
+            "Configuration"
+        ],
+        "sitesetup": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html#sitesetup",
+            "Set up translation language"
+        ],
+        "administration": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Index.html#administration",
+            "Administration"
+        ],
+        "installation": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Installation\/Index.html#installation",
+            "Installation"
+        ],
+        "updates": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Updates\/Index.html#updates",
+            "Updates"
+        ],
+        "editor-autotranslateprefix": [
+            "DeepL Translate",
+            "main",
+            "Editor\/AutoTranslatePrefix\/Index.html#editor-autotranslateprefix",
+            "Auto-translate-prefix"
+        ],
+        "glossaries": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Glossary\/Index.html#glossaries",
+            "Glossaries"
+        ],
+        "editor": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Index.html#editor",
+            "Editors manuel"
+        ],
+        "basic-usage": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Usage\/Index.html#basic-usage",
+            "Basic Usage"
+        ],
+        "faq": [
+            "DeepL Translate",
+            "main",
+            "Faq\/Index.html#faq",
+            "FAQ"
+        ],
+        "housekeeping": [
+            "DeepL Translate",
+            "main",
+            "Housekeeping\/Index.html#housekeeping`",
+            "Housekeeping"
+        ],
+        "sync-cli": [
+            "DeepL Translate",
+            "main",
+            "Housekeeping\/Index.html#sync-cli",
+            "Synchronisation"
+        ],
+        "whatdoesitdo": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/About\/Index.html#whatDoesItDo",
+            "What does it do?"
+        ],
+        "contribution": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Contribution\/Index.html#contribution",
+            "Contribution"
+        ],
+        "introduction": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Index.html#introduction",
+            "Introduction"
+        ],
+        "sponsoring": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Sponsoring\/Index.html#sponsoring",
+            "Sponsors"
+        ],
+        "extensionconfiguration": [
+            "DeepL Translate",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#extensionConfiguration",
+            "Extension Configuration"
+        ],
+        "deeplapikey": [
+            "DeepL Translate",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#deeplApiKey",
+            "DeepL API Key"
+        ],
+        "reference": [
+            "DeepL Translate",
+            "main",
+            "Reference\/Index.html#reference",
+            "Reference"
+        ],
+        "tableconfiguration": [
+            "DeepL Translate",
+            "main",
+            "Reference\/TableConfiguration\/Index.html#tableConfiguration",
+            "Table Configuration"
+        ]
+    },
+    "std:title": {
+        "access-configuration": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Access\/Index.html#access-configuration",
+            "Access Configuration"
+        ],
+        "auto-translate-prefix": [
+            "DeepL Translate",
+            "main",
+            "Editor\/AutoTranslatePrefix\/Index.html#auto-translate-prefix",
+            "Auto-translate-prefix"
+        ],
+        "configuration-1": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html#configuration-1",
+            "Configuration"
+        ],
+        "set-up-api": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html#set-up-api",
+            "Set up API"
+        ],
+        "set-up-translation-language": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html#set-up-translation-language",
+            "Set up translation language"
+        ],
+        "choice-a-formality": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html#choice-a-formality",
+            "Choice a Formality"
+        ],
+        "configure-tables": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html#configure-tables",
+            "Configure tables"
+        ],
+        "detecting-target-language": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html#detecting-target-language",
+            "Detecting target language"
+        ],
+        "administration-1": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Index.html#administration-1",
+            "Administration"
+        ],
+        "installation-1": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Installation\/Index.html#installation-1",
+            "Installation"
+        ],
+        "compatibility": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Installation\/Index.html#compatibility",
+            "Compatibility"
+        ],
+        "updates-1": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Updates\/Index.html#updates-1",
+            "Updates"
+        ],
+        "version-3-x-4-x": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Updates\/Index.html#version-3-x-4-x",
+            "Version 3.x > 4.x"
+        ],
+        "upgrade-with-core-upgrade": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Updates\/Index.html#upgrade-with-core-upgrade",
+            "Upgrade with Core Upgrade"
+        ],
+        "version-2-x-3-x": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Updates\/Index.html#version-2-x-3-x",
+            "Version 2.x > 3.x"
+        ],
+        "glossaries-1": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Glossary\/Index.html#glossaries-1",
+            "Glossaries"
+        ],
+        "editors-manuel": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Index.html#editors-manuel",
+            "Editors manuel"
+        ],
+        "basic-usage-1": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Usage\/Index.html#basic-usage-1",
+            "Basic Usage"
+        ],
+        "translating-content-elements": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Usage\/Index.html#translating-content-elements",
+            "Translating content elements"
+        ],
+        "translating-a-page": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Usage\/Index.html#translating-a-page",
+            "Translating a page"
+        ],
+        "translating-a-single-element": [
+            "DeepL Translate",
+            "main",
+            "Editor\/Usage\/Index.html#translating-a-single-element",
+            "Translating a single element"
+        ],
+        "faq-1": [
+            "DeepL Translate",
+            "main",
+            "Faq\/Index.html#faq-1",
+            "FAQ"
+        ],
+        "my-dropdown-in-the-site-configuration-is-empty": [
+            "DeepL Translate",
+            "main",
+            "Faq\/Index.html#my-dropdown-in-the-site-configuration-is-empty",
+            "My dropdown in the site configuration is empty"
+        ],
+        "what-will-be-the-cost-for-deepl-api-subscription": [
+            "DeepL Translate",
+            "main",
+            "Faq\/Index.html#what-will-be-the-cost-for-deepl-api-subscription",
+            "What will be the cost for DeepL API subscription?"
+        ],
+        "housekeeping": [
+            "DeepL Translate",
+            "main",
+            "Housekeeping\/Index.html#housekeeping",
+            "Housekeeping"
+        ],
+        "overview": [
+            "DeepL Translate",
+            "main",
+            "Housekeeping\/Index.html#overview",
+            "Overview"
+        ],
+        "cleanup": [
+            "DeepL Translate",
+            "main",
+            "Housekeeping\/Index.html#cleanup",
+            "Cleanup"
+        ],
+        "synchronisation": [
+            "DeepL Translate",
+            "main",
+            "Housekeeping\/Index.html#synchronisation",
+            "Synchronisation"
+        ],
+        "deepl-translate": [
+            "DeepL Translate",
+            "main",
+            "Index.html#deepl-translate",
+            "DeepL Translate"
+        ],
+        "what-does-it-do": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/About\/Index.html#what-does-it-do",
+            "What does it do?"
+        ],
+        "contribution-1": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Contribution\/Index.html#contribution-1",
+            "Contribution"
+        ],
+        "contribution-workflow": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Contribution\/Index.html#contribution-workflow",
+            "Contribution workflow"
+        ],
+        "introduction-1": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Index.html#introduction-1",
+            "Introduction"
+        ],
+        "sponsors": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Sponsoring\/Index.html#sponsors",
+            "Sponsors"
+        ],
+        "deepl-glossary-feature-sponsored-by": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Sponsoring\/Index.html#deepl-glossary-feature-sponsored-by",
+            "DeepL Glossary feature sponsored by"
+        ],
+        "deepl-add-automatic-translation-flag-and-hint-sponsored-by": [
+            "DeepL Translate",
+            "main",
+            "Introduction\/Sponsoring\/Index.html#deepl-add-automatic-translation-flag-and-hint-sponsored-by",
+            "DeepL \"Add automatic translation flag and hint\" sponsored by"
+        ],
+        "known-issues": [
+            "DeepL Translate",
+            "main",
+            "KnownIssues\/Index.html#known-issues",
+            "Known issues"
+        ],
+        "translation-options-not-shown": [
+            "DeepL Translate",
+            "main",
+            "KnownIssues\/Index.html#translation-options-not-shown",
+            "Translation options not shown"
+        ],
+        "extension-configuration": [
+            "DeepL Translate",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#extension-configuration",
+            "Extension Configuration"
+        ],
+        "deepl-api-key": [
+            "DeepL Translate",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#deepl-api-key",
+            "DeepL API Key"
+        ],
+        "reference-1": [
+            "DeepL Translate",
+            "main",
+            "Reference\/Index.html#reference-1",
+            "Reference"
+        ],
+        "table-configuration": [
+            "DeepL Translate",
+            "main",
+            "Reference\/TableConfiguration\/Index.html#table-configuration",
+            "Table Configuration"
+        ]
+    },
+    "std:confval": {
+        "allowed-translate": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Access\/Index.html#allowed-translate",
+            "Allowed Translate"
+        ],
+        "allowed-glossary-sync": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Access\/Index.html#allowed-glossary-sync",
+            "Allowed Glossary Sync"
+        ],
+        "deeplformality": [
+            "DeepL Translate",
+            "main",
+            "Administration\/Configuration\/Index.html#deeplformality",
+            "deeplFormality"
+        ],
+        "apikey": [
+            "DeepL Translate",
+            "main",
+            "Reference\/ExtensionConfiguration\/Index.html#apikey",
+            "apiKey"
+        ]
+    }
+}
