@@ -13,6 +13,7 @@ namespace App\Tests\Functional;
 
 use App\Entity\DocumentationJar;
 use App\Entity\KnownRepositoryDomain;
+use App\Enum\DocumentationStatus;
 use App\Enum\RepositoryDomainStatus;
 use App\Extractor\DeploymentInformation;
 use App\Repository\DocumentationJarRepository;
@@ -236,6 +237,102 @@ class DocsRenderingControllerTest extends AbstractFunctionalWebTestCase
             ->withMock('guzzle.client.slack', $slackClient)
             ->withMock('guzzle.client.general', $generalClient)
             ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequestMultiBranch.php');
+        $this->assertSame(SymfonyResponse::HTTP_NO_CONTENT, $response->getStatusCode());
+    }
+
+    /**
+     * A repository whose documentation is complete when the hook is added pushes
+     * no documentation changes, it must still be registered and await approval.
+     */
+    public function testGithubPushWithoutDocChangesRegistersNewRepo(): void
+    {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient->expects($this->never())->method('request');
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json'))
+            ),
+        );
+        $generalClient = $this->createMock(Client::class);
+        $this->assertRequests($generalClient, $requestPool);
+
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK));
+
+        $knownRepositoryDomain = (new KnownRepositoryDomain())
+            ->setDomain('raw.githubusercontent.com')
+            ->setStatus(RepositoryDomainStatus::ALLOWED);
+        $this->getEntityManager()->persist($knownRepositoryDomain);
+        $this->getEntityManager()->flush();
+
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequestNoDocsChanges.php');
+        $this->assertSame(SymfonyResponse::HTTP_NO_CONTENT, $response->getStatusCode());
+
+        $this->rebootState();
+
+        $jar = $this->documentationJarRepository->findOneBy(['packageName' => 'johndoe/make-good']);
+        $this->assertInstanceOf(DocumentationJar::class, $jar);
+        $this->assertSame('https://github.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi.git', $jar->getRepositoryUrl());
+        $this->assertFalse($jar->isApproved());
+        $this->assertSame(DocumentationStatus::STATUS_AWAITING_APPROVAL, $jar->getStatus());
+    }
+
+    public function testGithubPushWithoutDocChangesIsDroppedForKnownRepo(): void
+    {
+        $githubClient = $this->createMock(Client::class);
+        $githubClient->expects($this->never())->method('request');
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
+        $requestPool = new RequestPool(
+            new RequestExpectation(
+                'GET',
+                'https://raw.githubusercontent.com/TYPO3-Documentation/TYPO3CMS-Reference-CoreApi/latest/composer.json',
+                new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__ . '/Fixtures/DocsToBambooGoodRequestComposer.json'))
+            ),
+        );
+        $generalClient = $this->createMock(Client::class);
+        $this->assertRequests($generalClient, $requestPool);
+
+        $slackClient = $this->createMock(Client::class);
+        $slackClient->expects($this->once())->method('request')->with('POST', self::anything())->willReturn(new Response(SymfonyResponse::HTTP_OK));
+
+        $knownRepositoryDomain = (new KnownRepositoryDomain())
+            ->setDomain('raw.githubusercontent.com')
+            ->setStatus(RepositoryDomainStatus::ALLOWED);
+        $this->getEntityManager()->persist($knownRepositoryDomain);
+        $this->getEntityManager()->flush();
+
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequest.php');
+        $this->assertSame(SymfonyResponse::HTTP_NO_CONTENT, $response->getStatusCode());
+
+        $this->rebootState();
+
+        self::getContainer()->set('guzzle.client.github', $githubClient);
+
+        $jar = $this->documentationJarRepository->findOneBy(['packageName' => 'johndoe/make-good']);
+        $this->assertInstanceOf(DocumentationJar::class, $jar);
+        $jar->setApproved(true);
+        $this->getEntityManager()->persist($jar);
+        $this->getEntityManager()->flush();
+
+        // The push is dropped before composer.json is fetched
+        $generalClient = $this->createMock(Client::class);
+        $generalClient->expects($this->never())->method('request');
+
+        $response = (new MockRequest($this->client))
+            ->withMock('guzzle.client.slack', $slackClient)
+            ->withMock('guzzle.client.general', $generalClient)
+            ->execute(require __DIR__ . '/Fixtures/DocsToBambooGoodRequestNoDocsChanges.php');
         $this->assertSame(SymfonyResponse::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 

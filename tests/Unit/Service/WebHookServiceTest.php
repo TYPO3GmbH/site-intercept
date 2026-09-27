@@ -11,11 +11,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Service;
 
+use App\Entity\DocumentationJar;
 use App\Exception\DocsNoRstChangesException;
 use App\Exception\GitBranchDeletedException;
 use App\Exception\InvalidWebHookPayloadException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
+use App\Repository\DocumentationJarRepository;
 use App\Service\WebHookService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +29,11 @@ class WebHookServiceTest extends TestCase
 
     public function setUp(): void
     {
-        $this->subject = new WebHookService();
+        // Unless a test says otherwise the repository is known to Intercept, so a
+        // push without documentation changes is dropped
+        $documentationJarRepository = $this->createStub(DocumentationJarRepository::class);
+        $documentationJarRepository->method('findOneBy')->willReturn(new DocumentationJar());
+        $this->subject = new WebHookService($documentationJarRepository);
     }
 
     public static function createPushEventDataProvider(): \Iterator
@@ -129,6 +135,61 @@ class WebHookServiceTest extends TestCase
         $this->subject->createPushEvent($request);
         // Plain assertion, we ensure that no exception is thrown
         $this->assertTrue(true);
+    }
+
+    public static function pushWithoutDocFilesDataProvider(): \Iterator
+    {
+        yield 'Github' => [
+            new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Branch_No_Docs_Changes.json')),
+            'https://github.com/Codertocat/Hello-World.git',
+        ];
+        yield 'Forgejo' => [
+            new Request([], [], [], [], [], ['HTTP_X-Forgejo-Event' => 'push', 'HTTP_X-Gitea-Event' => 'push', 'HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_Forgejo_Event_Push_Branch_No_Docs_Changes.json')),
+            'https://forgejo.example.com/acme/coolextension.git',
+        ];
+    }
+
+    /**
+     * Only a push that reaches the registration creates the approval request for a
+     * repository Intercept does not know yet. Its documentation may be complete
+     * already, so the push must not be dropped for touching no documentation file.
+     */
+    #[DataProvider('pushWithoutDocFilesDataProvider')]
+    public function testDoesNotTriggerExceptionWithoutDocFilesForUnknownRepository(Request $request, string $repositoryUrl): void
+    {
+        $documentationJarRepository = $this->createMock(DocumentationJarRepository::class);
+        $documentationJarRepository->expects($this->once())->method('findOneBy')->with(['repositoryUrl' => $repositoryUrl])->willReturn(null);
+        $subject = new WebHookService($documentationJarRepository);
+
+        $pushEvents = $subject->createPushEvent($request);
+
+        $this->assertCount(1, $pushEvents);
+        $this->assertSame($repositoryUrl, $pushEvents[0]->getRepositoryUrl());
+        $this->assertSame('main', $pushEvents[0]->getVersionString());
+    }
+
+    #[DataProvider('pushWithoutDocFilesDataProvider')]
+    public function testTriggersExceptionWithoutDocFilesForKnownRepository(Request $request, string $repositoryUrl): void
+    {
+        $documentationJarRepository = $this->createMock(DocumentationJarRepository::class);
+        $documentationJarRepository->expects($this->once())->method('findOneBy')->with(['repositoryUrl' => $repositoryUrl])->willReturn(new DocumentationJar());
+        $subject = new WebHookService($documentationJarRepository);
+        $this->expectException(DocsNoRstChangesException::class);
+        $this->expectExceptionCode(1570011098);
+
+        $subject->createPushEvent($request);
+    }
+
+    public function testDoesNotLookUpRepositoryWhenDocFileWasTouched(): void
+    {
+        $documentationJarRepository = $this->createMock(DocumentationJarRepository::class);
+        $documentationJarRepository->expects($this->never())->method('findOneBy');
+        $subject = new WebHookService($documentationJarRepository);
+        $request = new Request([], [], [], [], [], ['HTTP_X-GitHub-Event' => 'push'], file_get_contents(__DIR__ . '/Fixtures/Payload_GitHub_Event_Push_Branch.json'));
+
+        $pushEvents = $subject->createPushEvent($request);
+
+        $this->assertCount(1, $pushEvents);
     }
 
     public static function createPushEventFromForgejoDataProvider(): \Iterator
