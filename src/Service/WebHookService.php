@@ -17,6 +17,7 @@ use App\Exception\GithubHookPingException;
 use App\Exception\InvalidWebHookPayloadException;
 use App\Exception\UnsupportedWebHookRequestException;
 use App\Extractor\PushEvent;
+use App\Repository\DocumentationJarRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -29,6 +30,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class WebHookService
 {
+    public function __construct(
+        private readonly DocumentationJarRepository $documentationJarRepository,
+    ) {
+    }
+
     /**
      * Entry method that creates a push event object from an incoming
      * github / gitlab / bitbucket repository hook. Used to trigger documentation
@@ -236,7 +242,7 @@ class WebHookService
             // once too often than never. Count what was iterated rather than the
             // payload value, which is not required to be an array
             $isTruncated = (int) ($payload->total_commits ?? 0) > $deliveredCommits;
-            if (!$triggeringChange && !$isTruncated) {
+            if (!$triggeringChange && !$isTruncated && !$this->isUnknownRepository($payload)) {
                 throw new DocsNoRstChangesException(sprintf('The commit %s pushed to %s:%s doesn\'t contain any changed .rst files', $payload->head_commit->id ?? '[unknown]', $payload->repository->full_name ?? '[unknown]', $payload->ref ?? '[unknown]'), 1570011098);
             }
         }
@@ -253,6 +259,20 @@ class WebHookService
             ->resolvePublicComposerJsonUrlByPayload($payload, $repoService);
 
         return [new PushEvent($repositoryUrl, $versionString, $urlToComposerFile, $content)];
+    }
+
+    /**
+     * Only a push that reaches the registration creates the approval request for a
+     * repository Intercept has no documentation entry for yet. Its documentation may
+     * be complete already when the hook is added, so such a push must not be dropped
+     * for touching no documentation file.
+     */
+    private function isUnknownRepository(\stdClass $payload): bool
+    {
+        $repositoryUrl = (string) ($payload->repository->clone_url ?? null);
+
+        return '' !== $repositoryUrl
+            && null === $this->documentationJarRepository->findOneBy(['repositoryUrl' => $repositoryUrl]);
     }
 
     /**
