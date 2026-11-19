@@ -62,21 +62,28 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
     outputs:
       redirects: ${{ steps.filter.outputs.redirects }}
     steps:
       - uses: actions/checkout@v7
-
-      - uses: dorny/paths-filter@v3
-        id: filter
         with:
-          # On push: compare with the commit before the push. On pull requests: compare with the PR base.
-          base: ${{ github.ref }}
-          filters: |
-            redirects:
-              - 'config/nginx/redirects.conf'
-              - 'tests/Redirects/**'
+          fetch-depth: 0
+
+      - name: Check for changed redirect files
+        id: filter
+        env:
+          # On pull requests: compare with the PR base. On push: compare with the commit before the push.
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          # Empty or all-zero base (new branch) or unknown commit (force push): run the check to be safe
+          if [[ -z "$BASE" || "$BASE" =~ ^0+$ ]] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "redirects=true" >> "$GITHUB_OUTPUT"
+          elif git diff --quiet "$BASE...HEAD" -- config/nginx/redirects.conf tests/Redirects; then
+            echo "redirects=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "redirects=true" >> "$GITHUB_OUTPUT"
+          fi
+          cat "$GITHUB_OUTPUT"
 
   redirects:
     name: 'Redirects'
