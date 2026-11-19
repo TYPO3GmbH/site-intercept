@@ -21,6 +21,14 @@ updates:
       prefix: "[DEP]"
       prefix-development: "[DEP-DEV]"
 
+  - package-ecosystem: "composer"
+    versioning-strategy: lockfile-only
+    directory: "/build/tools/deployer"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "[DEP-DEV]"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

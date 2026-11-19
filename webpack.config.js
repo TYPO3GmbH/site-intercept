@@ -29,9 +29,6 @@ Encore
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
 
-    // Displays build status system notifications to the user
-    // .enableBuildNotifications()
-
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning()
     .configureBabelPresetEnv((config) => {

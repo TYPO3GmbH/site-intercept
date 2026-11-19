@@ -32,3 +32,7 @@ npm-debug.log
 ###< symfony/webpack-encore-bundle ###
 /.ddev/keycloak-gatekeeper.conf
 /auth.json
+
+###> deployer ###
+/build/tools/**/vendor/
+###< deployer ###
