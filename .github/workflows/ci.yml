@@ -57,11 +57,66 @@ jobs:
         env:
           COMPOSER_PROCESS_TIMEOUT: 2400
 
+  redirect_changes:
+    name: 'Detect redirect changes'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      redirects: ${{ steps.filter.outputs.redirects }}
+      base: ${{ steps.filter.outputs.base }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check for changed redirect files
+        id: filter
+        env:
+          # On pull requests: compare with the PR base. On push: compare with the commit before the push.
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          # Empty or all-zero base (new branch) or unknown commit (force push): run the check to be safe
+          if [[ -z "$BASE" || "$BASE" =~ ^0+$ ]] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "redirects=true" >> "$GITHUB_OUTPUT"
+          elif git diff --quiet "$BASE...HEAD" -- config/nginx/redirects.conf tests/Redirects; then
+            echo "redirects=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "redirects=true" >> "$GITHUB_OUTPUT"
+            # The redirects job compares the redirects with this version
+            echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          fi
+          cat "$GITHUB_OUTPUT"
+
+  redirects:
+    name: 'Redirects'
+    needs: redirect_changes
+    if: needs.redirect_changes.outputs.redirects == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The base version of redirects.conf is read from the git history
+          fetch-depth: 0
+
+      # Lint, nginx -t, every rule reachable and answered as written, diff against the base version
+      # (job summary) and a live check of changed destinations on docs.typo3.org (warnings)
+      - name: Verify nginx redirects
+        env:
+          BASE: ${{ needs.redirect_changes.outputs.base }}
+        run: tests/Redirects/check.py --live-check ${BASE:+--base-ref "$BASE"}
 
   deployment:
     name: 'Deployment'
-    needs: build
-    if: (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && github.event_name != 'pull_request'
+    needs: [build, redirect_changes, redirects]
+    # The redirects job is skipped when redirects.conf did not change, a skipped job must not block the deployment
+    if: >-
+      !cancelled()
+      && needs.build.result == 'success'
+      && needs.redirect_changes.result == 'success'
+      && contains(fromJSON('["success", "skipped"]'), needs.redirects.result)
+      && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')
+      && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Setup SSH Key
