@@ -57,11 +57,50 @@ jobs:
         env:
           COMPOSER_PROCESS_TIMEOUT: 2400
 
+  redirect_changes:
+    name: 'Detect redirect changes'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      redirects: ${{ steps.filter.outputs.redirects }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          # On push: compare with the commit before the push. On pull requests: compare with the PR base.
+          base: ${{ github.ref }}
+          filters: |
+            redirects:
+              - 'config/nginx/redirects.conf'
+              - 'tests/Redirects/**'
+
+  redirects:
+    name: 'Redirects'
+    needs: redirect_changes
+    if: needs.redirect_changes.outputs.redirects == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # nginx -t plus the expected status and Location for every URL in tests/Redirects/expectations.tsv
+      - name: Verify nginx redirects
+        run: tests/Redirects/run.sh
 
   deployment:
     name: 'Deployment'
-    needs: build
-    if: (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && github.event_name != 'pull_request'
+    needs: [build, redirect_changes, redirects]
+    # The redirects job is skipped when redirects.conf did not change, a skipped job must not block the deployment
+    if: >-
+      !cancelled()
+      && needs.build.result == 'success'
+      && needs.redirect_changes.result == 'success'
+      && contains(fromJSON('["success", "skipped"]'), needs.redirects.result)
+      && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')
+      && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Setup SSH Key
