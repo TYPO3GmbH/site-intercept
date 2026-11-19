@@ -11,3 +11,24 @@
 **/bin/** text eol=lf
 bin/splitsh-lite-darwin binary
 bin/splitsh-lite-linux binary
+
+# Not part of the deployed build (deploy.php builds from `git archive`)
+/.ddev export-ignore
+/.editorconfig export-ignore
+/.env.dev export-ignore
+/.env.test export-ignore
+/.gitattributes export-ignore
+/.github export-ignore
+/.gitignore export-ignore
+/.nvmrc export-ignore
+/.phpstorm.meta.php export-ignore
+/README.md export-ignore
+/assets export-ignore
+/build export-ignore
+/deploy.php export-ignore
+/legacy_hook export-ignore
+/package-lock.json export-ignore
+/package.json export-ignore
+/symfony.lock export-ignore
+/tests export-ignore
+/webpack.config.js export-ignore

@@ -1,0 +1,14 @@
+name: Setup workflow run
+inputs:
+  php-version:
+    description: PHP version of the runner
+    required: false
+    default: '8.2'
+runs:
+  using: composite
+  steps:
+    - uses: TYPO3GmbH/infra-github-actions/setup-php@main
+      with:
+        php-version: ${{ inputs.php-version }}
+    - uses: TYPO3GmbH/infra-github-actions/setup-node-version-file@main
+    - uses: TYPO3GmbH/infra-github-actions/cache-composer@main
