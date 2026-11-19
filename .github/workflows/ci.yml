@@ -64,6 +64,7 @@ jobs:
       contents: read
     outputs:
       redirects: ${{ steps.filter.outputs.redirects }}
+      base: ${{ steps.filter.outputs.base }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -82,6 +83,8 @@ jobs:
             echo "redirects=false" >> "$GITHUB_OUTPUT"
           else
             echo "redirects=true" >> "$GITHUB_OUTPUT"
+            # The redirects job compares the redirects with this version
+            echo "base=$BASE" >> "$GITHUB_OUTPUT"
           fi
           cat "$GITHUB_OUTPUT"
 
@@ -92,10 +95,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The base version of redirects.conf is read from the git history
+          fetch-depth: 0
 
-      # nginx -t plus the expected status and Location for every URL in tests/Redirects/expectations.tsv
+      # Lint, nginx -t, every rule reachable and answered as written, diff against the base version
+      # (job summary) and a live check of changed destinations on docs.typo3.org (warnings)
       - name: Verify nginx redirects
-        run: tests/Redirects/run.sh
+        env:
+          BASE: ${{ needs.redirect_changes.outputs.base }}
+        run: tests/Redirects/check.py --live-check ${BASE:+--base-ref "$BASE"}
 
   deployment:
     name: 'Deployment'
