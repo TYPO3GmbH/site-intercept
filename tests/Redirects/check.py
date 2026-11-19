@@ -7,7 +7,7 @@ Verifies config/nginx/redirects.conf without hand-written expectations.
               reached by one of its samples (otherwise an earlier rule shadows it) and nginx must answer the
               sample exactly as the rule says.
 3. Diff:      with --base-ref, the redirects of the base version and the current version are compared for
-              all URLs in urls.txt plus the generated samples of both versions. Changes are listed for review.
+              the generated sample URLs of both versions. Changes are listed for review.
 4. Live:      with --live-check, the destinations of changed redirects are requested on docs.typo3.org,
               a 404 is reported as warning.
 
@@ -278,13 +278,27 @@ def samples(rule: Rule) -> list[str]:
     if rule.regex is None:
         return []
     urls = []
-    for branch in range(3):
+    # One sample per alternative, so (main|13\.4|12\.4) is tested with main, 13.4 and 12.4
+    for branch in range(max(1, _max_alternatives(sre_parse.parse(rule.pattern)))):
         for filler in FILLERS:
             # nginx merges duplicate slashes before matching locations (merge_slashes), samples are sent merged
             url = re.sub(r'/{2,}', '/', '/' + generate(rule.pattern, branch, filler))
             if rule.regex.search(url) and url not in urls:
                 urls.append(url)
     return urls
+
+
+def _max_alternatives(items) -> int:
+    """The largest number of alternatives of any group in a parsed regex."""
+    result = 0
+    for op, value in items:
+        if op is sre_constants.BRANCH:
+            result = max(result, len(value[1]), *(_max_alternatives(alt) for alt in value[1]))
+        elif op is sre_constants.SUBPATTERN:
+            result = max(result, _max_alternatives(value[-1]))
+        elif op in (sre_constants.MAX_REPEAT, sre_constants.MIN_REPEAT, sre_constants.POSSESSIVE_REPEAT):
+            result = max(result, _max_alternatives(value[2]))
+    return result
 
 
 def select(rules: list[Rule], uri: str) -> Rule | None:
@@ -402,9 +416,7 @@ class Nginx:
 # 3. Diff and 4. live check
 # --------------------------------------------------------------------------------------------------------------------
 
-def diff(
-    base: Nginx, current: Nginx, urls: list[str], generated: set[str], rules: list[Rule], report: Report, live: bool
-) -> None:
+def diff(base: Nginx, current: Nginx, urls: list[str], rules: list[Rule], report: Report, live: bool) -> None:
     changes = []
     for url in urls:
         before, after = base.probe(url), current.probe(url)
@@ -417,7 +429,7 @@ def diff(
         report.summary.append(f'No URL redirects differently ({len(urls)} URLs compared).')
         return
 
-    live_results = check_live(current, changes, generated, rules, report) if live else {}
+    live_results = check_live(current, changes, rules, report) if live else {}
     report.summary += [
         f'{len(changes)} of {len(urls)} URLs redirect differently. Please check that every change is intended.', '',
         '| URL | Before | After |' + (' Live destination |' if live else ''),
@@ -431,7 +443,7 @@ def diff(
         print(f'  {url}\n      before: {format_response(before)}\n      after:  {format_response(after)}')
 
 
-def check_live(current: Nginx, changes, generated: set[str], rules: list[Rule], report: Report) -> dict[str, str]:
+def check_live(current: Nginx, changes, rules: list[Rule], report: Report) -> dict[str, str]:
     results: dict[str, str] = {}
     checked: dict[str, int | str] = {}
     for url, _, after in changes:
@@ -450,9 +462,10 @@ def check_live(current: Nginx, changes, generated: set[str], rules: list[Rule], 
         results[url] = f'{status} `{destination}`'
         if status == 404:
             rule = select(rules, url)
-            sample = ' (generated sample URL, captures may be filled with placeholders)' if url in generated else ''
             report.warning(
-                f'{url} ends at {LIVE_HOST}{destination}, which returns 404{sample}', rule.line if rule else None
+                f'{url} ends at {LIVE_HOST}{destination}, which returns 404 '
+                '(sample URL generated from the rule, captures may be filled with placeholders)',
+                rule.line if rule else None,
             )
         elif not isinstance(status, int):
             report.warning(f'Could not check {LIVE_HOST}{destination}: {status}')
@@ -518,12 +531,9 @@ def main() -> int:
                     report.warning(f'Skipping the diff, nginx -t fails for {CONF_PATH} in {args.base_ref}')
                 else:
                     base_rules = parse(shown.stdout)
-                    urls = [u for u in (DIR / 'urls.txt').read_text(encoding='utf-8').splitlines()
-                            if u.strip() and not u.startswith('#')]
-                    generated = {url for rule in base_rules + rules for url in samples(rule)} - set(urls)
+                    urls = list(dict.fromkeys(url for rule in base_rules + rules for url in samples(rule)))
                     with base:
-                        diff(base, current, list(dict.fromkeys(urls + sorted(generated))), generated, rules, report,
-                             args.live_check)
+                        diff(base, current, urls, rules, report, args.live_check)
 
     print(f'== {report.errors} error(s), {report.warnings} warning(s)')
     report.write_summary()

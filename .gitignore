@@ -36,3 +36,7 @@ npm-debug.log
 ###> deployer ###
 /build/tools/**/vendor/
 ###< deployer ###
+
+###> python ###
+__pycache__/
+###< python ###
