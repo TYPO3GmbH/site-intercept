@@ -71,7 +71,8 @@ jobs:
       - name: Install Deployer
         run: |
           composer install --working-dir=build/tools/deployer --no-progress --no-interaction --ansi
-          build/tools/deployer/vendor/bin/dep --version
+          # Without --file, dep loads the root deploy.php, which needs the recipe checkout of the Intercept deployment
+          build/tools/deployer/vendor/bin/dep --version --file=legacy_hook/deploy.php
 
       - name: Deployment
         env:
